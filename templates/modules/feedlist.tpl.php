@@ -25,9 +25,11 @@ if(!is_array($list) || empty($list)){
 		$wb['uid'] 	  = USER::uid();
 		$wb['author'] = isset($author) ? $author : TRUE;
 
-		echo '<li rel="w:'.$wb['id'].'">';
-			TPL::module('feed', $wb);
-		echo '</li>';
+		if (array_key_exists('id',$wb)) {
+			echo '<li rel="w:'.$wb['id'].'">';
+				TPL::module('feed', $wb);
+			echo '</li>';
+		}
 	}
 }
 ?>

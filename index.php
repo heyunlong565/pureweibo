@@ -14,7 +14,7 @@ ob_start();
 /// 入口名称
 define('ENTRY_SCRIPT_NAME','index');
 /// 当前入口的默认模块路由
-define('R_DEF_MOD', "pub");
+define('R_DEF_MOD', "index");
 /// 强制的路由模式　如果你尝试使用　rewrite　功能　失败，可以通过此选项快速恢复网站正常
 //define('R_FORCE_MODE', 0);
 

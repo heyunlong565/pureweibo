@@ -1,4 +1,5 @@
 <?php
+include_once P_CLASS.'/purify.inc.php';
 /**
  * @file			weibo.class.php
  * @CopyRight		(C)1996-2099 SINA Inc.
@@ -297,7 +298,7 @@ include_once P_CLASS.'/oauth.class.php';
 			$response = $this->oAuthRequest($url, 'get', $params);
 		}
 
-		return $response;
+		return purify($response);
 	 }
 
 
@@ -330,7 +331,7 @@ include_once P_CLASS.'/oauth.class.php';
 
 		$response = $this->oAuthRequest($url, 'get', $params);
 
-		return $response;
+		return purify($response);
 	 }
 
 
@@ -369,7 +370,7 @@ include_once P_CLASS.'/oauth.class.php';
 
 		$response = $this->oAuthRequest($url, 'get', $params);
 
-		return $response;
+		return purify($response);
 	 }
 
 
@@ -423,7 +424,7 @@ include_once P_CLASS.'/oauth.class.php';
 		} else {
 			$response = $this->oAuthRequest($url, 'get', $params);
 		}
-		return $response;
+		return purify($response);
 	 }
 
 
@@ -456,7 +457,7 @@ include_once P_CLASS.'/oauth.class.php';
 
 		$response = $this->oAuthRequest($url, 'get', $params);
 
-		return $response;
+		return purify($response);
 	 }
 
 
@@ -1733,7 +1734,7 @@ include_once P_CLASS.'/oauth.class.php';
 		}
 		$response = $this->oAuthRequest($url, 'get', $params);
 
-		return $response;
+		return purify($response);
 	 }
 
 
@@ -2057,7 +2058,7 @@ var_dump($result);
 		} else {
 			$response = $this->oAuthRequest($url, 'get', $params);
 		}
-		return $response;
+		return purify($response);
 	}
 
 
@@ -2087,7 +2088,7 @@ var_dump($result);
 		} else {
 			$response = $this->oAuthRequest($url, 'get', $params);
 		}
-		return $response;
+		return purify($response);
 	}
 
 	/**
@@ -2214,7 +2215,7 @@ var_dump($result);
 
 		$response = $this->oAuthRequest($url, 'get', $params);
 
-		return $response;
+		return purify($response);
 	}
 
 	/**
@@ -2321,7 +2322,7 @@ var_dump($result);
 	   $params['base_app'] = $base_app;
 	   $response = $this->oAuthRequest($url, 'get', $params);
 
-	   return $response;
+	   return purify($response);
 	}
 
    /**
@@ -2340,7 +2341,7 @@ var_dump($result);
 	   }
 	   $response = $this->oAuthRequest($url, 'get', $params);
 
-	   return $response;
+	   return purify($response);
 	}
 
    /**
@@ -2360,7 +2361,7 @@ var_dump($result);
 	   $params['base_app'] = $base_app;
 	   $response = $this->oAuthRequest($url, 'get', $params);
 
-	   return $response;
+	   return purify($response);
 	}
 
    /**
@@ -2379,7 +2380,7 @@ var_dump($result);
 	   }
 	   $response = $this->oAuthRequest($url, 'get', $params);
 
-	   return $response;
+	   return purify($response);
 	}
 
 	//标签
@@ -2567,7 +2568,7 @@ var_dump($result);
 
 		$response = $this->oAuthRequest($url, 'get', $params);
 
-		return $response;
+		return purify($response);
 	}
 
 	/**
@@ -2625,7 +2626,7 @@ var_dump($result);
 		}
 		$response = $this->oAuthRequest($url, 'get', $params);
 
-		return $response;
+		return purify($response);
 	}
 
 	/**

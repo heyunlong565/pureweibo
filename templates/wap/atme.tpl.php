@@ -11,7 +11,7 @@
 <?php TPL::plugin('wap/include/my_preview', '', false); ?>
 <?php TPL::plugin('wap/include/msg_common', '', false); ?>
 <?php if (!empty($list)): ?>
-<?php TPL::plugin('wap/include/feedlist', array('list' => $list), false); ?>
+<?php TPL::plugin('wap/include/feedlist', array('list' => array_filter($list, 'ispure')), false); ?>
 <?php else: ?>
 	<div class="f-list">
 	<?php if (V('g:page', 1) > 1):?>
