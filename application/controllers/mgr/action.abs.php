@@ -5,245 +5,20 @@
 *  后台Action基类
 *
 *  @Xweibo (C)1996-2099 SINA Inc.
-*  @Author zhenquan <zhenquan@staff.sina.com.cn>
+*  @Author liwen <liwen2@staff.sina.com.cn>
 *
 ***************************************************/
 class action {
 		var $userInfo = array();
-		var $memu = array(); // 管理后台菜单
-		var $menu_click_record = array(); // 用记点击记录
-
-		/**
-		 * 初始化菜单
-		 */
-		function _initMenu() {
-			$this->menu = array(
-				'home' => array('title' => '首页'),
-				'system' => array('title' => '系统设置'),
-				'ui' => array('title' => '界面管理'),
-				'content' => array('title' => '内容管理'),
-				'user' => array('title' => '用户管理'),
-				'tools' => array('title' => '扩展工具')
-			);
-
-			$this->menu['home']['sub'] = array(
-					array(
-						'title' => '常用功能',
-						'sub' => array(
-							array('title' => '首页', 'url' => URL('mgr/admin.default_page')),
-							array('title' => '聚焦图',			'url' =>URL('mgr/plugins.config','id=2')),
-							array('title' => '个人资料推广位',	'url' =>URL('mgr/plugins.config','id=3')),
-							array('title' => '通知',			'url' =>URL('mgr/notice')),
-							array('title' => '首次登录关注',	'url' =>URL('mgr/plugins.config','id=4'))
-							)
-						),
-					array(
-						'title' => '最近使用',
-						'sub' => array(
-							)
-						)
-					);
-			$this->menu['system']['sub'] = array(
-					array(
-						'title' => '基础设置',
-						'sub' => array(
-									array('title'=>'站点设置', 		'url' => URL('mgr/setting.editIndex')),
-									array('title'=>'优化设置',		'url' => URL('mgr/setting.editRewrite')),
-									array('title'=>'帐号登录设置',	'url' => URL('mgr/setting.editUser')),
-									array('title'=>'个性化域名',	'url' => URL('mgr/setting.setPersonalDomain'))
-									//array('title'=>'短链接',		'url' => URL('mgr/setting.setShortLink'))
-									//array('title'=>'数据备份',		'url' => URL('mgr/setting.dataBackup'))
-									)
-						),
-					array(
-						'title' => '外部设置',
-						'sub' => array(
-							//array('title' => 'WAP设置',				'url' => URL('mgr/setting.wap')),
-							array('title' => '与论坛插件通信',		'url' => URL('mgr/connection'))
-							)
-
-						),
-					array(
-						'title' => '管理员',
-						'sub' => array(
-//							array('title' => '管理员设置',			'url' => URL('mgr/admin.userlist')),
-//							array('title' => '添加管理员',			'url' => URL('mgr/admin.search')),
-							array('title' => '修改密码',				'url' => URL('mgr/admin.repassword'))
-							)
-						)
-					);
-					
-			if (XWB_SERVER_ENV_TYPE!=='sae'){
-				$this->menu['system']['sub'][0]['sub'][] = array('title'=>'短链接',		'url' => URL('mgr/setting.setShortLink'));
-			}
-			// 只有超级管理员才能添加管理员
-			$admRst = DR('mgr/adminCom.getAdminById', FALSE, $this->_getUid());	//获取当前操作者的数据
-			if( $admRst['rst']['is_root'] ) 
-			{
-				array_unshift($this->menu['system']['sub'][2]['sub'], array('title'=>'管理员设置', 'url'=>URL('mgr/admin.userlist')));
-				array_unshift($this->menu['system']['sub'][2]['sub'], array('title'=>'添加管理员', 'url'=>URL('mgr/admin.search')));
-			}
-/*
-			$this->menu['system']['sub'] = array(
-					array(
-						'title' => '基础设置',
-						'sub' => array(
-									array('title' => '站点设置',			'url' =>URL('mgr/setting.editIndex')),
-									array('title' => '优化设置',	'url' =>URL('mgr/setting.editRewrite')),
-									array('title' => '账号登陆设置',	'url' =>URL('mgr/setting.editUser')),
-									array('title' => '首次登录关注',	'url' =>URL('mgr/plugins.config','id=4'))
-									)
-					)
-				);
-*/
-			$this->menu['ui']['sub'] = array(
-							array(
-								'title' => '界面',
-								'sub' => array(
-									array('title' => '布局',		'url' => URL('mgr/page_nav')),
-									array('title' => '导航',		'url' => URL('mgr/page_nav.nav')),
-									array('title' => '皮肤',		'url' => URL('mgr/skin.getAllSkin')),
-									array('title' => '页头设置',	'url' => URL('mgr/setting.header'))
-									)
-								),
-							array(
-								'title' => '页面模块',
-								'sub' => array(
-									array('title' => '页面设置',	'url' => URL('mgr/page_manager'))
-									)
-								)
-							);
-
-			$this->menu['content']['sub'] = array(
-							array(
-								'title' => '内容',
-								'sub' => array(
-									array('title' => '微博',		'url' => URL('mgr/weibo/weiboCopy.weiboList')),
-									array('title' => '已屏蔽的评论',		'url' => URL('mgr/weibo/disableComment.commentList')),
-									//array('title' => '话题',		'url' => URL('mgr/weibo/todayTopic.category')),
-									array('title' => '意见反馈',	'url' => URL('mgr/feedback.getList')),
-									)
-								),
-							array(
-								'title' => '屏蔽过滤',
-								'sub' => array(
-									array('title' => '关键字过滤',	'url' => URL('mgr/weibo/keyword.add'))
-									)
-								),
-							array(
-								'title' => '活动',
-								'sub' => array(
-									array('title' => '活动管理', 	'url' => URL('mgr/events.getList'))
-									)
-								),
-							array(
-									'title' => '通知',
-									'sub' => array(
-										array('title' => '通知',	'url' => URL('mgr/notice'))
-										)
-								 ),
-							array(
-									'title' => '扩展设置',
-									'sub' => array(
-										array('title' => '页头页脚链接',	'url' => URL('mgr/setting.getlink')),
-										array('title' => '个人资料推广',	'url' => URL('mgr/plugins.config', 'id=3')),
-										array('title' => '我的首页聚焦位',	'url' => URL('mgr/plugins.config', 'id=2'))
-										)
-								 )
-					 );
-
-			$this->menu['user']['sub'] = array(
-							array('title' => '用户',
-								'sub' => array(
-									array('title' => '用户管理',		'url' => URL('mgr/users.search')),
-									array('title' => '用户组管理',		'url' => URL('mgr/user_recommend.getReSort')),
-									array('title' => '禁止用户',		'url' => URL('mgr/users.userAction')),
-									)
-								),
-							array(
-								'title' => '名人 - 认证',
-								'sub' => array(
-									array('title' => '认证管理',		'url' => URL('mgr/user_verify.search')),
-									array('title' => '名人管理',		'url' => URL('mgr/celeb_mgr.starCatList')),
-									)
-								)
-							);
-
-			$this->menu['tools']['sub'] = array(
-				array('title' => '整合工具',
-					'sub' => array(
-						array('title' => '转发按钮', 'url' => URL('mgr/share')),
-						array('title' => '站外调用', 'url' => URL('mgr/content_unit'))
-					)
-				),
-				array('title' => '扩展应用',
-					'sub' => array(
-						array('title' => '在线直播', 'url' => URL('mgr/wb_live')),
-						array('title' => '在线访谈', 'url' => URL('mgr/micro_interview'))
-					)
-				)
-			);
-
-			arsort($this->menu_click_record);
-			// 添加常用功能子菜单
-			$max = 5;
-			$n = 0;
-			if (isset($this->menu_click_record) && is_array($this->menu_click_record)) {
-				foreach ($this->menu_click_record as $path => $count) {
-				//for ($i=0,$count=count($this->menu_click_record); $i<$count; $i++) {
-					$index = explode('/', $path);
-					if (!isset($this->menu[$index[0]]['sub'][$index[1]]['sub'][$index[2]])) {
-						continue;
-					}
-					if(!in_array($this->menu[$index[0]]['sub'][$index[1]]['sub'][$index[2]],$this->menu['home']['sub'][1]['sub'])){
-						$this->menu['home']['sub'][1]['sub'][] = $this->menu[$index[0]]['sub'][$index[1]]['sub'][$index[2]];	
-					}
-					$n++;
-					if ($n >= $max) {
-						break;
-					}
-					//var_dump($this->menu['home']['sub'][0]['sub']);
-				}
-			}
-		}
-
-		function _recordClick() {
-			$cache_name = 'menu_click_record';
-
-			$record = CACHE::get($cache_name);
-			if (!$record || !is_array($record)) {
-				$record = array();
-			}
-
-			$menu_path = V('g:router', false);
-			// 如果要记录菜单点击
-			if ($menu_path) {
-				$record[$menu_path] =	isset($record[$menu_path])? $record[$menu_path] +1:1;
-			}
-			CACHE::set($cache_name, $record);
-			$this->menu_click_record = $record;
-		}
-
 		function action() {
-			Xpipe::usePipe(false);
-			$this->_recordClick();
-			$this->_initMenu();
-			$ajax = V('g:ajax', false);
 			//判断用户是否登录			
 			if (!USER::isUserLogin()) {
-				if ($ajax) {
-					//APP::ajaxRst(false, '-1', '用户未登录');
-					exit('{"state":"403", "msg":"您未登录！"}');
-				}
 				exit('<script>window.top.location.href = "' . URL('account.sinaLogin','cb=login&loginCallBack=' . urlencode(URL('mgr/admin.login', '', 'admin.php')), 'index.php'). '"</script>');
 				//APP :: redirect(URL('account.gloCheckLogin', '', 'index.php'), 3);
 			}
 
 			//判断管理员是否登录
 			if (!$this->_isLogin() && !($this->_getModule() == 'admin' && in_array($this->_getAction() , array('login', 'authcode')) )) {
-				if ($ajax) {
-					APP::ajaxRst(false, '-2', '管理员未登录');
-				}
 				exit('<script>window.top.location.href = "' . URL('mgr/admin.login', '', 'admin.php'). '"</script>');
 				//APP :: redirect(URL('mgr/admin.login', 'admin.php'), 3);
 			}
@@ -328,12 +103,8 @@ class action {
 		 * 操作成功后跳转
 		 * @param $msg String 要显示的消息
 		 * @param $url String|Array 显示消息3秒后跳转的地址,如果该参数为数据则为路由方式,其中下标为0表示action,1表示module,2表示controller,
-		 * @param $data mixed json数据，如果设置该值，则以json方式输出
 		 */
-		function _succ($msg, $url = null, $data=null) {
-			if ($data !== null) {
-				APP::ajaxRst($data);
-			}
+		function _succ($msg, $url = null) {
 			if (is_array($url)) {
 				if (empty($url[0])) {
 					APP :: tips(array('msg'=> $msg, 'tpl' => 'error', 'baseskin'=>false));
@@ -354,12 +125,8 @@ class action {
 		 * 操作成功后跳转
 		 * @param $msg String 要显示的消息
 		 * @param $url String|Array 显示消息3秒后跳转的地址,如果该参数为数据则为路由方式,其中下标为0表示action,1表示module,2表示controller,
-		 * @param $errno int 如果设置该参数，则返回json结果
 		 */
-		function _error($msg, $url = null, $errno=null) {
-			if ($errno !== null) {
-				APP::ajaxRst(false, $errno, $msg);
-			}
+		function _error($msg, $url = null) {
 			if (is_array($url)) {
 				if (empty($url[0])) {
 					APP :: tips(array('msg'=> $msg, 'tpl' => 'error', 'baseskin'=>false));
@@ -406,105 +173,6 @@ class action {
 		}
 
 		function _display($tpl) {
-			$adminNotShowNav = V('-:adminNotShowNav');
-			TPL::assign('adminNotShowNav', $adminNotShowNav[PAGE_TYPE_CURRENT]);
 			TPL :: display('mgr/' . $tpl, '', 0, false);
-		}
-
-		/**
-		 * 上传图片
-		 *
-		 * @param array $config array('field_name' => string, 'upload_path' => string, 'allowed_types' => string, 'thumb' => bool)
-		 * 输出json
-		 */
-		function _upload_pic($config){
-			extract($config);
-			$field_name = empty($field_name) ? 'pic' : $field_name;
-			$allowed_types = empty($allowed_types) ? 'jpg,jpeg,gif,png' : $allowed_types;
-
-			$callback = V('g:callback','');
-			$redirect = 'window.location="'.W_BASE_URL.'js/blank.html?rand='.rand(1,PHP_INT_MAX) . '"';
-			if(isset($_FILES[$field_name])){
-				$f_upload = APP::ADP('upload');
-				$fileName = $f_upload->getName();
-				if($f_upload->upload($field_name,	$fileName ,P_URL_UPLOAD.'/'.$upload_path.'/', $allowed_types,1)){
-					$fileInfo = $f_upload->getUploadFileInfo();
-					if ($fileInfo['errcode']) {
-						die("<script language=\"javascript\">$callback(".APP::ajaxRst(false, '30'.$fileInfo['errcode'], $fileInfo['errmsg'], true).");$redirect</script>");
-					}
-					//缩小图片
-					if ($thumb) {
-						$image = APP::ADP('image');
-						if (strtolower(IMAGE_ADAPTER)==='sae'){
-							$image->loadFile($fileInfo['webpath']);
-							$imageInfo = $image->getImgInfo();
-							if($imageInfo['width']>120 || $imageInfo['height']>120){
-								$image->resize(120,120);
-								$image->save($fileName);
-							}
-						}else{
-							$image->loadFile($fileInfo['savepath']);
-							$imageInfo = $image->getImgInfo();
-							if($imageInfo['width']>120 || $imageInfo['height']>120){
-								$image->resize(120,120);
-								$image->save($fileInfo['savepath']);
-							}
-						}
-					}
-
-				}else{
-					$errno = '3040050';
-					if ($f_upload->getErrorCode()){
-						$errno = '30'.$f_upload->getErrorCode();
-					}
-					die("<script language=\"javascript\">$callback(".APP::ajaxRst(false,$errno, $f_upload->getErrorMsg(), true).");$redirect</script>");
-				}
-
-			} else {
-				die("<script language=\"javascript\">$callback(".APP::ajaxRst(false, '1010000', 'Parameter can not be empty', true).");$redirect</script>");
-			}
-
-			$json = array();
-			$result['pic'] = $fileInfo['webpath'];
-			$result['filepath'] = $fileInfo['webpath'];
-
-			die("<script language=\"javascript\">$callback(".APP::ajaxRst($result, 0, '', true).");$redirect</script>");
-		}
-
-		/**
-		 * 批量获取用户信息
-		 */
-		function _getUserBatchShow()
-		{
-			$names 		= V('p:names');
-			$nameList 	= explode(',', $names);
-			$countId 		= count($nameList);
-			$result		= array();
-			
-			if ($countId > 0) 
-			{
-				//批量获取, 目前最多支持20个人,超过20个人, 分组调用批量接口
-				if ($countId > 20) 
-				{
-					$pageCnt = ceil($count/20);
-			
-					for ($p=1; $p <=$pageCnt; $p++) 
-					{
-						$offset = ($p-1) * 20;
-						$nameList = array_slice($nameList, $offset, 20);
-						$rspTmp = DR('xweibo/xwb.getUsersBatchShow', FALSE, array(), $nameList);
-						if (!empty($rspTmp['errno'])) {
-							continue;
-						}
-						$result = array_merge($result, $rspTmp['rst']);
-					}
-				} 
-				else {
-					$rspTmp = DS('xweibo/xwb.getUserShow', FALSE, '', '', $nameList);
-					$result = $rspTmp;
-				}
-			} 
-
-			APP::ajaxRst($result);
 		}
 }

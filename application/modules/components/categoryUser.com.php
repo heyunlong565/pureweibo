@@ -22,11 +22,7 @@ class categoryUser extends PageModule{
 		parent :: PageModule();
 	}
 
-	function getGroups($groupid = null) {
-		if(!is_numeric($groupid) || $groupid < 1){
-			$groupid = $this->group_id;
-		}
-		
+	function getGroups() {
 		$rs = $this->config('groups');
 
 		$itemgroup = APP::N('itemGroups');
@@ -35,7 +31,7 @@ class categoryUser extends PageModule{
 			$cfg = $this->cfg2Array($rs['rst']);
 			$rs['rst'] = $cfg;
 
-			$list = $itemgroup->getItems($groupid);
+			$list = $itemgroup->getItems($this->group_id);
 
 			if (!empty($list)) {
 				$groups = array();

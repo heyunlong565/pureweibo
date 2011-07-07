@@ -29,20 +29,6 @@ class userCom {
 		return RST($rs);
 	}
 
-	/**
-	 * 返回统计所有微博数
-	 * @return int
-	 */
-	function counts($type = '') {
-		$db = APP :: ADP('db');
-		$sql = 'SELECT COUNT(*)AS count FROM ' . $db->getTable(T_USERS);
-		if ($type === 'today')  {
-			$sql .= ' WHERE  FROM_UNIXTIME(`first_login`,"%Y%m%d")="'. date('Ymd') . '"';
-		}
-		$count = $db->getOne($sql);
-		return RST($count);
-	}
-
 	/*
 	* 根据用户名称获取用户数据
     * @param string $nickname
@@ -56,10 +42,10 @@ class userCom {
 		}
 
 		$db = APP :: ADP('db');
-		$keyword = (string)$db->escape($nickname);
+		$keyword = $db->escape($nickname);
 
 		$where = $limit = "";
-		if($keyword !== '') {
+		if($keyword) {
 			$where = ' WHERE `nickname` LIKE "%' . $keyword . '%" ';
 		}
 
@@ -70,26 +56,6 @@ class userCom {
 		$sql = 'SELECT * FROM ' . $db->getPrefix() . T_USERS. $where . ' ORDER BY `first_login` DESC ' . $limit;
 		return RST($db->query($sql));
 	}
-	
-	
-   /**
-	* 根据用户名称获取用户SinaID
-    * @param string $nickname
-    * @return bigint
-	*/
-	function getSinaUidByName($nickname) 
-	{
-		if( $nickname=$db->escape($nickname) ) 
-		{
-			$db 	= APP::ADP('db');
-			$table 	= $db->getTable(T_USERS);
-			$sql	= "Select sina_uid From $table Where nickname='$nickname'";
-			return $db->getOne($sql);
-		}
-
-		return FALSE;
-	}
-	
 
 	/**
 	* 根据sina_uid称获取用户数据
@@ -147,7 +113,7 @@ class userCom {
 			$limit =  ' LIMIT ' . $offset . ',' . $each;
 		}
 		
-		$sql = 'SELECT * FROM ' . $db->getPrefix() . T_USER_VERIFY. ' ORDER BY `add_time` DESC ' . $limit;
+		$sql = 'SELECT * FROM ' . $db->getPrefix() . T_USER_VERIFY. ' ORDER BY `id` ' . $limit;
 		return RST($db->query($sql));
 	}
 	
@@ -164,7 +130,7 @@ class userCom {
 		}
 		$data = array();
 		for ($i=0,$count=count($rst); $i<$count; $i++) {
-			$data[(string)$rst[$i]['sina_uid']] = array('nick' => $rst[$i]['nick'], 'reason' => $rst[$i]['reason']);
+			$data[(string)$rst[$i]['sina_uid']] = $rst[$i]['nick'];
 		}
 		return RST($data);
 	}
@@ -240,10 +206,11 @@ class userCom {
      * @param array $data
      * @return boolean
      */
-	function saveVerify($data, $id = '', $id_name = 'id') {
+	function saveVerify($data, $id = '') {
 		$db = APP :: ADP('db');
+		$db->setTable(T_USER_VERIFY);
 		$this->_cleanCache();
-		$db->save($data, $id, T_USER_VERIFY, $id_name);
+		$db->save($data, $id = '');
 		return RST(true);
 	}
 
@@ -324,129 +291,4 @@ class userCom {
 		DD('mgr/userCom.getVerifyById');
 		DD('mgr/userCom.getBanByUid');
 	}
-	
-	
-  /**
-    * 设置用户的短domain
-    * 
-    * @param mixed $uid
-    * @param mixed $domain
-    */
-    function setUserDomain($uid, $domain) 
-    {
-    	if ($uid && $domain)
-    	{
-	        $db  	= APP::ADP('db');
-	        $table 	= $db->getTable(T_USERS);
-	        $domain = $db->escape($domain);
-	        $sql 	= "Update $table Set domain_name='$domain' Where sina_uid='$uid'";
-	        
-	        if ($db->execute($sql) !== false)
-	        {
-	        	USER::set('domain_name', $domain);
-	        	return TRUE;
-	        }
-    	}
-    	return FALSE;
-    }
-    
-    
-    /**
-    * 根据用户短域名，从数据查询用户　
-    * 
-    * @param mixed $domain
-    */
-    function getUidByDomain($domain) 
-    {
-    	if ($domain)
-    	{
-	        $db  	= APP::ADP('db');
-	        $table 	= $db->getTable(T_USERS);
-	        $domain = $db->escape($domain);
-	        return $db->getOne("Select sina_uid From $table Where domain_name='$domain'");
-    	}
-    	return FALSE;
-    }
-    
-    
-    /**
-    * 根据用户短域名，从数据查询用户　
-    * 
-    * @param mixed $domain
-    */
-    function isDomainExist($domain) 
-    {
-    	$result = FALSE;
-    	
-    	if ($domain)
-    	{
-	        $db  	= APP::ADP('db');
-	        $table 	= $db->getTable(T_USERS);
-	        $domain = $db->escape($domain);
-	        
-	        // 检查是否已有用户设置相同域名
-	        $result = $db->getRow("Select * From $table Where domain_name='$domain'");
-	        
-	        // 检查是否域名保留字
-	        if ( empty($result) )
-	        {
-	        	$kdTable = $db->getTable(KEEP_USERDOMAIN);
-	        	$result  = $db->getRow("Select * From $kdTable Where keep_domain='$domain'");
-	        }
-    	}
-    	return empty($result) ? FALSE : TRUE;
-    }
-	/**
-	  *  对某个用户进行操作 
-	  */
-	function setUserAction($sina_uid,$action_type){
-		if(isset($sina_uid)&&in_array($action_type,array(1,2,3,4))){
-			$db  	= APP::ADP('db');
-			$table 	= $db->getTable(T_USER_ACTION);
-			$rst=$db->query(sprintf("select id from %s where sina_uid='%s'",$table,$sina_uid));
-			if(empty($rst)){
-				$id='';
-			}
-			else{
-				$id=$rst[0]['id'];
-			}
-			$rst=$db->save(array('sina_uid'=>$sina_uid,'action_type'=>$action_type),$id,T_USER_ACTION);
-			if($rst){
-				return TRUE;
-			}
-		}
-		else{
-			return NULL;
-		}
-	}
-	
-	/**
-	  *  获取是所有禁止用户列表 
-	  */
-	function getUserActionList(){
-			$db  	= APP::ADP('db');
-			$table 	= $db->getTable(T_USER_ACTION);
-			$rst=$db->query(sprintf("select sina_uid,action_type from %s",$table));
-			return RST($rst);
-	}
-	
-	/**
-	  *  获取某用户的看控制列表
-	  *  
-	  */
-	function getUserAction($sina_uid){
-			$db  	= APP::ADP('db');
-			$table 	= $db->getTable(T_USER_ACTION);
-			$rst=$db->query(sprintf("select action_type from %s where sina_uid=%s",$table,$sina_uid));
-			if(empty($rst)){
-				$rst=array();
-				$rst[0]=array();
-				$rst[0]['action_type']=4;
-			}
-			return RST($rst);
-	}
-	
-	
-	
-	
 }

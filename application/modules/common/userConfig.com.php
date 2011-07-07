@@ -17,20 +17,12 @@ class userConfig {
 	/// user_page_wb		微博显示的条数 
 	/// user_page_comment	评论显示的条数
 	/// user_skin			用户皮肤设置
-	/// new_followers		是否有新粉丝
-	/// index_listId		我的首页的List ID
 	var $options = array(
 						'user_newfeed' 		=>	'',
 						'user_newmsg' 		=>	'',
-						'user_newnotice'	=>	'1',
 						'user_page_wb' 		=>	50,
 						'user_page_comment' =>	20,
-						'user_skin'			=>	'',
-						'wap_font_size'		=>	'1',
-						'wap_show_pic'		=>	'1',
-						'wap_page_wb'		=>	'10',
-						'new_followers'		=>	0,
-						'index_listId'		=>  ''
+						'user_skin'			=>	''
 						);	
 
 
@@ -43,33 +35,22 @@ class userConfig {
 	 */
 	function set()
 	{
-		$sina_uid 	= USER::uid(); 
-		$args 		= func_get_args();
-		$args_num 	= count($args);
-		
-		if ($args_num > 1) 
-		{
+		$args = func_get_args();
+		$args_num = count($args);
+		if ($args_num > 1) {
 			$key = $args[0];	
 			if (!isset($this->options[$key])) {
 				return RST('', '2010001', 'Set the option does not exist'); 
 			}
-			
-			$value 			= $args[1];
-			$user_configs 	= V('-:userConfig');
-			
-			// 指定用户的配置
-			if ( isset($args[2]))
-			{
-				$sina_uid 		= $args[2];
-				$user_configs 	= $this->get(null, $sina_uid);
-				$user_configs	= $user_configs['rst'];
-			}
-			
+			$value = $args[1];
+			$user_configs = V('-:userConfig');
 			$user_configs[$key] = $value;
-			$values 			= json_encode($user_configs);
+			$values = json_encode($user_configs);
 		} else {
 			$values = json_encode($args[0]);	
 		}
+
+		$sina_uid = USER::uid(); 
 		
 		if (empty($sina_uid) || empty($values)) {
 			return RST('', '2010000', 'User_id or Options can not be empty'); 
@@ -112,7 +93,7 @@ class userConfig {
 		if (!empty($row)) {
 			$values = $row[0]['values']; 
 			$values = json_decode($values, true);
-			if ($values === false || !is_array($values) ) {
+			if ($values === false) {
 				$values = array();
 			}
 		} else {

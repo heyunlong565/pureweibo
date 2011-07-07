@@ -21,19 +21,14 @@ class account_mod {
 	}
 		
 	/// 绑定引导页
-	function bind(){
-		TPL::display('bind_account', array(), 0, 'modules');
+	function bind(){		
+		TPL::display('bind_account');
 	}
 	
 	/// 退出登录
 	function logout($eUrl=false){
-		if(APP::F('is_robot')){
-			APP::deny();
-		}
-		
 		/// 上报
 		F('report', 'logout', 'http');
-		setcookie('site_login_report', 0);
 
 		$site_uid = USER::get('site_uid');
 
@@ -42,12 +37,7 @@ class account_mod {
 		USER::resetInfo();
 		
 		/// 退出地址
-		if($eUrl){
-			$exitUrl = $eUrl;
-		}else{
-			$loginCallBack = strval(V('g:loginCallBack', ''));
-			$exitUrl = $loginCallBack ? $loginCallBack : URL('pub');
-		}
+		$exitUrl = $eUrl ? $eUrl : URL('pub');
 		$login_way = V('-:sysConfig/login_way', 1)*1; 
 		if ($login_way==1){
 			APP::redirect($exitUrl,4);
@@ -64,10 +54,6 @@ class account_mod {
 	
 	/// 显示登录 页面
 	function login(){
-		if(APP::F('is_robot')){
-			APP::deny();
-		}
-		
 		if (USER::isUserLogin()){
 			APP::redirect(URL('pub'), 3);exit;
 		}
@@ -84,14 +70,8 @@ class account_mod {
 		
 		TPL::assign('use_sina_login', $use_sina_login);   
 		TPL::assign('use_site_login', $use_site_login);  
-
-		$loginCallBack = V('g:loginCallBack', '');
-		$sina_callback_url = $loginCallBack ? URL('account.sinaLogin','cb=login&type=sina&loginCallBack='. urlencode($loginCallBack)) : URL('account.sinaLogin','cb=login&type=sina'); 
-		$site_callback_url = $loginCallBack ? URL('account.siteLogin','cb=login&type=site&loginCallBack='. urlencode($loginCallBack)) : URL('account.siteLogin','cb=login&type=site'); 
-		TPL::assign('site_callback_url', $site_callback_url);
-		TPL::assign('sina_callback_url', $sina_callback_url);
 		
-		TPL::display('login', array(), 0, 'modules');
+		TPL::display('login');
 	}
 	
 	/// 初始化附属站信息,并根据附属站同步登录信息
@@ -126,19 +106,13 @@ class account_mod {
 			
 			//　从  附属站　同步到  Xweibo  
 			if (!empty($site_uid) && !USER::isUserLogin()){
-			
 				 $user = $this->getBindInfo($site_uid, 'uid');
 				 if (!empty($user) && is_array($user) && !empty($user['access_token']) && !empty($user['token_secret']) ){
 				 	 $this->_setSinaLoginSession(array(
 				 	   		'oauth_token'=> $user['access_token'],
-				 	   		'oauth_token_secret'=> $user['token_secret']
-				 	   ), $user);
-					 if (!isset($_COOKIE['site_login_report']) || ($_COOKIE['site_login_report'] != 1)) {
-						 F('report', 'site_login', 'http');
-						 setcookie('site_login_report', 1);
-					 }
+				 	   		'oauth_token_secret'=> $user['token_secret'],
+				 	   ));
 				 }
-
 			}
 			
 			//　从 Xweibo　同步到附属站
@@ -174,106 +148,54 @@ class account_mod {
 		}
 	}
 	
-	///
-	function allowedLogin(){
-		if(F('user_action_check',array(2,3))){
-			//APP::tips(array('tpl' => 'e403', 'msg' => '对不起，您已经被禁止登录了'));
-			//$this->logout();
-			TPL::module('error_inhibit');
-			exit();
-		}
-	}
-	
 	/// 默认动作
 	function default_action(){
 		$this->_goLogin();
 	}
 	/// 自动跳转 
 	function _goLogin(){
-		if(APP::F('is_robot')){
-			APP::deny();
-		}
-		
-		$loginCallBack = APP::getRequestRoute();
-		//$querystring = isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : '';
-		$q = V('g',array());
-		$querystring = $q ? http_build_query($q) : '';
 		// 1 使用新浪帐号登录，2 使用附属站帐号登录 3 可同时使用两种帐号登录
 		$login_way = V('-:sysConfig/login_way', 1)*1;
 		switch ($login_way) {
 			case 2 :
-				$call_back_url = $loginCallBack ? $loginCallBack : 'pub';
-				$goUrl = $this->accAdapter->goLogin(W_BASE_HTTP.URL($call_back_url, $querystring));
+				$goUrl = $this->accAdapter->goLogin(W_BASE_HTTP.URL('pub'));
 				break;
 			case 1 :
 			case 3 :
 			default:
-				$goUrl = URL('account.login','loginCallBack='.urlencode(URL($loginCallBack, $querystring)));
+				$goUrl = URL('account.login');
 				break;
 		}
 		APP::redirect($goUrl, 4);
 	}
-
-	// 得到URL
-	function getTokenAuthorizeURL($cb, $isPop, $active=null, $loginCallBack = '') {
+	
+	/// 用SINA帐号进行登录,根据 V('g:cb'); 决定授权后 的动作
+	function sinaLogin(){
+		$cb = V('g:cb', 'login');
 		$callbackOpt = $cb ? 'cb='.$cb : 'cb=login';
 		
-		if($cb == 'bind'){
-			if(!USER::get('site_uid')){
-				die('site user id not found!');
-			}
-		} else {
-			//2 使用附属站帐号登录时，禁止新浪帐号登录
-			$login_way = intval(V('-:sysConfig/login_way', 1));
-			if(2 == $login_way){
-				die('SINA LOGIN FAILURE!');
-			}
-		}
-
+		$isPop = V('g:popup');
 		if ($isPop) {
 			$callbackOpt .= '&popup=1';
 		}
-		if ($active ) {
-			$callbackOpt .= '&active=1';
-		}
+		
 		///　登录后的跳转URL
-		$loginCallBack = strval($loginCallBack);
-		if (!empty($loginCallBack)) {
-			$callbackOpt .= '&loginCallBack='.urlencode($loginCallBack);
+		$loginCallBack = V('g:loginCallBack', '');
+		if ($loginCallBack) {
+			$loginCallBack = '&loginCallBack='.urlencode($loginCallBack);
 		}
 		
-		$oauthCbUrl = W_BASE_HTTP.URL('account.oauthCallback', $callbackOpt);
+		$oauthCbUrl = W_BASE_HTTP.URL('account.oauthCallback', $callbackOpt).$loginCallBack;
 		
 		$oauthUrl	 = DS('xweibo/xwb.getTokenAuthorizeURL', '', $oauthCbUrl);
-		//&from=xweibo 取消特制的XWEIBO授权页面
-		$oauthUrl	.= '&xwb_'.$callbackOpt;
-		return $oauthUrl;
-	}
-
-	/// 用SINA帐号进行登录,根据 V('g:cb'); 决定授权后 的动作
-	function sinaLogin(){
-		if(APP::F('is_robot')){
-			APP::deny();
-		}
-		////如果仅是站点登录，让其转向到主登录页面
-		//if(V('-:sysConfig/login_way',1) == 2){
-		//	APP::redirect('account.login', 2);
-		//	exit(-1);
-		//}
-
-		$cb = V('g:cb', 'login');
-		$active = V('g:active');
-		$isPop = V('g:popup');
-		$loginCallBack = V('g:loginCallBack', '');
-
-		$oauthUrl = $this->getTokenAuthorizeURL($cb, $isPop, $active, $loginCallBack);
+		$oauthUrl	.= '&from=xweibo&xwb_'.$callbackOpt;
 		APP::redirect($oauthUrl, 3);
 	}
 	
 	/// 使用 附属网站登录
 	function siteLogin(){
 		  $goUrl = $this->accAdapter->goLogin(W_BASE_HTTP.URL('pub'));
-		  $this->logout($goUrl);
+		  $this->logout($goUrl);      
 	}
 	
 	/// 检查是否第一次登录
@@ -283,53 +205,17 @@ class account_mod {
 		 if (!is_array($user)){
 		 	die('DB ERROR...');
 		 }
-		 
-		 
 		 //第一次登录，用户信息入库 将引导用户关注
-		 if (empty($user) || !isset($user['sina_uid']))
-		 {
-		 	$maxTime = APP_LOCAL_TIMESTAMP;
-			USER::set('user_max_notice_time', $maxTime);
-			
+		 if (empty($user) || !isset($user['sina_uid'])){
             $inData = array();
             $inData['first_login']	= APP_LOCAL_TIMESTAMP;
 			$inData['sina_uid']	= $uInfo['id'];
 			$inData['nickname']	= $uInfo['screen_name'];
-			$inData['max_notice_time'] = $maxTime;
-			
-			// 本地关系的时候保留token信息
-			if ( XWB_PARENT_RELATIONSHIP ) 
-			{
-				$token 					= USER::getOAuthKey(TRUE);
-				$inData['access_token']	= $token['oauth_token'];
-				$inData['token_secret']	= $token['oauth_token_secret'];
-				
-				// 初始化用户首页List
-				DS('xweibo/xwb.initUserIndexList', FALSE, $inData['sina_uid']);
-			}
-			
 			$r = DR('mgr/userCom.insertUser', '', $inData);  
 			return true;
-		 }
-		 else
-		 {
+		 }else{
 		 	 //var_dump($user);exit;
 		 	 USER::set('site_uid', $user['uid']);
-		 	 
-		 	// 本地关系的时候保留token信息
-			if ( XWB_PARENT_RELATIONSHIP ) 
-			{
-				$noToken 	= !isset($user['access_token']) || empty($user['access_token']);
-				$noSecret	= !isset($user['token_secret']) || empty($user['token_secret']);
-				if ( $sina_uid && ($noToken || $noSecret) )
-				{
-					$token 					= USER::getOAuthKey(TRUE);
-					$inData 				= array();
-					$inData['access_token']	= $token['oauth_token'];
-					$inData['token_secret']	= $token['oauth_token_secret'];
-					DR('mgr/userCom.insertUser', FALSE, $inData, $sina_uid);
-				}
-			}
 		 }
 		 
 		 return false;
@@ -351,6 +237,8 @@ class account_mod {
 	   	$uInfo = $this->_setSinaLoginSession($last_key);
 		
 
+		/// 上报
+		F('report', 'login', 'http');
 
 		//--------------------------------------------------------
 		switch ($callbackOpt) {
@@ -373,10 +261,6 @@ class account_mod {
 				if (!empty($user) && is_array($user)  ){
 					if (empty($user['access_token']) || empty($user['token_secret']) || empty($user['uid']) ){
 					   $r = DR('mgr/userCom.insertUser', '', $inData, $uInfo['id']);
-
-					   ///同步插件的绑定数据
-					   $this->_xwbBBSplugin($inData);
-
 					}else{
 						//重复绑定
 						$this->isBinded($uInfo['screen_name']);
@@ -384,15 +268,11 @@ class account_mod {
 				}else{
 					$inData['first_login'] 	= APP_LOCAL_TIMESTAMP; 
 					$r = DR('mgr/userCom.insertUser', '', $inData);
-
-					///如果开启插件通信
-					$this->_xwbBBSplugin($inData);
 				}
-				F('report', 'bind', 'http');
-				F('report', 'site_login', 'http');
+				
 				//登录回调
 				$loadUrl = V('g:loginCallBack', false);
-				//if (!$loadUrl) {
+				if (!$loadUrl) {
 
 					//检查是否第一次登录并引导用户
 					$isFirst = $this->_initFirstLoginUser($uInfo);
@@ -402,35 +282,27 @@ class account_mod {
 						if ($firstPlugin['in_use'])
 							$loadUrl = URL('welcome');
 					}
-				//}
+				}				
 				$this->_onlogin($loadUrl);
 				break;
 			
 			// 登录时的用户身份获取
 			case 'login'	: 
-				/// 上报
-				F('report', 'sina_login', 'http');
 			default 		:
 				//设置同步　登录退出状态，在 footer　中输出JS通知 
 				USER::set('syncLoginScript', 1);
 				//登录回调
 				$loadUrl = V('g:loginCallBack', false);
-				/// 是否是激活
-				$active = V('g:active', false);
 				//检查是否第一次登录并引导用户
 				$isFirst = $this->_initFirstLoginUser($uInfo);
-
-				if (empty($active)) {
+				if (!$loadUrl) {
 					if ($isFirst) {
-						/// 上报
-						F('report', 'logon', 'http');
 						$firstPlugin = DS('Plugins.get', 'g1/86400', 4);
 
 						if ($firstPlugin['in_use'])
 							$loadUrl = URL('welcome');
 					}
-				}
-
+				}				
 				$this->_onlogin($loadUrl);
 				break;
 		}
@@ -450,41 +322,15 @@ class account_mod {
 	}
 	
 	/// 设置会话信息
-	function _setSinaLoginSession($token, $user = null){
+	function _setSinaLoginSession($token){
 		USER::setOAuthKey($token, true);
 		DS('xweibo/xwb.setToken');
-		$uInfo = DR('xweibo/xwb.verifyCredentials');
-		/// 用户取消之前的授权
-		/*
-		if ($uInfo['errno'] == '1040008') {
-			/// 解除之前的绑定，重新bind
-			$inData = array('access_token'=>'', 'token_secret'=>'', 'uid'=>0);
-			DR('mgr/userCom.insertUser', '', $inData, $user['sina_uid']);
-
-			///如果开启的插件通信
-			$this->_xwbBBSplugin(null, $user['sina_uid'], 'delete');
-
-			return;
-		}
-		 */
-		$uInfo = $uInfo['rst'];
+		$uInfo = DS('xweibo/xwb.verifyCredentials');
 	   //print_r($uInfo);exit;
 		USER::uid($uInfo['id']);
 		USER::set('sina_uid',		$uInfo['id']);
 		USER::set('screen_name',	$uInfo['screen_name']);
 		USER::set('description',	$uInfo['description']);
-		
-		//设置已读的最新消息时间戳
-		$user_info = DR('mgr/userCom.getByUid', 'p', $uInfo['id']);
-		$maxNoticeTime = isset($user_info['rst']['max_notice_time']) ? (int)$user_info['rst']['max_notice_time'] : APP_LOCAL_TIMESTAMP;
-		USER::set('user_max_notice_time', $maxNoticeTime);
-		
-		// 设置个性域名
-		if ( USED_PERSON_DOMAIN ) {
-			$domainRst  = DR('mgr/userCom.getByUid', 'p', $uInfo['id']);
-			$domain		= isset($domainRst['rst']['domain_name']) ? $domainRst['rst']['domain_name'] : FALSE;
-			USER::set('domain_name',    $domain);
-		}
 		
 		//检查当前帐号是否是　管理员 
 		if ($this->_chkIsAdminAcc($uInfo['id'])){
@@ -526,23 +372,21 @@ class account_mod {
 		USER::set('sina_uid',		'');
 		USER::set('screen_name',	'');
 		USER::set('description',	'');
-		USER::set('user_max_notice_time',	'');
 	}
 	
 	///　封禁页面
 	function inhibit(){
-		TPL::display('inhibit', array(), 0, 'modules');
+		
+		TPL::display('inhibit');
 		exit;
 	}
 	
 	///　重复绑定页面
-	function isBinded($user_name){ $this->_resetClientSess();
-		Xpipe::usePipe(false);
+	function isBinded($user_name){
+		$this->_resetClientSess();
 		TPL::assign('user_name',		$user_name);
-		$url = $this->getTokenAuthorizeURL('bind', 1);
-		$url = 'http://login.sina.com.cn/sso/logout.php?r='. urlencode($url);
-		TPL::assign('sina_login_url',	$url);
-		TPL::display('isbind', array(), 0, 'modules');
+		TPL::assign('sina_login_url',	URL('account.sinaLogin','cb=bind&popup=1'));
+		TPL::display('isbind');
 		exit;
 	}
 	
@@ -560,13 +404,8 @@ class account_mod {
 	function unBind(){
 		$sina_uid = USER::uid();
 		if ($sina_uid){
-
-			///如果开启的插件通信
-			$this->_xwbBBSplugin(null, $sina_uid, 'delete');
-
 			$inData = array('access_token'=>'', 'token_secret'=>'', 'uid'=>0);	
 			$r = DR('mgr/userCom.insertUser', '', $inData, $sina_uid);
-			F('report', 'untie', 'http');
 			$this->logout();
 		}else{
 			APP::deny('未登录用户不能解除绑定.');			
@@ -577,112 +416,7 @@ class account_mod {
 	/// 获取绑定信息
 	function getBindInfo($v, $vField='sina_uid'){
 		$com =  $vField == 'sina_uid' ? 'mgr/userCom.getByUid' : 'mgr/userCom.getBySiteUid';
-		$result = DR($com, 'p', $v);
-		$result = $result['rst'];
-
-		/// xwb与插件开启通信
-		$xwb_discuz_enable = V('-:sysConfig/xwb_discuz_enable'); 
-		if ($xwb_discuz_enable == 1) {
-			if (empty($result)) {
-				/// 读取插件的绑定数据
-				$type = $vField == 'sina_uid' ? 'sina_uid' : 'uid';
-				$ret = DR('xwbBBSpluginCf.getBindUser', '', $v, $type);
-				if (empty($ret['errno'])) {
-					$ret = isset($ret['rst']) ? $ret['rst'] : false; 
-					$inData = array();
-					if ($ret) {
-						///查询sina帐号是否已经绑定其他论坛帐号
-						$sina_result = DR('mgr/userCom.getByUid', 'p', $ret['sina_uid']);
-						$sina_result = $sina_result['rst'];
-						if (is_array($sina_result) && !empty($sina_result['uid']) && !empty($sina_result['access_token']) && !empty($sina_result['token_secret'])) {
-							/// 更新xwb的绑定数据
-							$inData['uid']			= $ret['uid'];
-							DR('mgr/userCom.insertUser', '', $inData, $ret['sina_uid']);
-						} else {
-							$token_array = array('oauth_token'=> $ret['token'],
-													'oauth_token_secret'=> $ret['tsecret']);
-							USER::setOAuthKey($token_array, true);
-							DS('xweibo/xwb.setToken');
-							$uInfo = DR('xweibo/xwb.verifyCredentials');
-							if (!empty($uInfo['errno'])) {
-								return;
-							}
-							$uInfo = $uInfo['rst'];
-							$inData['sina_uid']		= $ret['sina_uid'];
-							$inData['nickname']		= $uInfo['screen_name'];
-							$inData['uid']			= $ret['uid'];
-							$inData['access_token']	= $ret['token'];
-							$inData['token_secret']	= $ret['tsecret'];
-							
-							/// 同步xwb的绑定数据
-							$sina_uid = isset($sina_result['sina_uid']) && !empty($sina_result['sina_uid']) ? $sina_result['sina_uid'] : '';
-							DR('mgr/userCom.insertUser', '', $inData, $sina_uid);
-						}
-
-					}
-					return $inData;
-				} else {
-					///记录日志
-					$msg = "api: getBindUser\r\n id: $v\r\n type: $type\r\n errno: {$ret['errno']}\r\n err: {$ret['err']}";
-					APP::LOG($msg, 'xplug');
-				}
-			}
-		   	else {
-				if (!empty($result['uid']) && !empty($result['access_token']) && !empty($result['token_secret'])) {
-					///同步插件的绑定数据
-					$bindUser = DR('xwbBBSpluginCf.updateBindUser', '', $result['uid'], $result['sina_uid'], $result['access_token'], $result['token_secret']);
-					$bindUser = $bindUser['rst'];
-					if (!empty($bindUser['errno'])) {
-						///记录日志
-						$msg = "api: updateBindUser\r\n uid: {$result['uid']}\r\n sina_uid: {$result['sina_uid']}\r\n access_token: {$result['access_token']}\r\n token_secret: {$result['token_secret']}\r\n errno: {$bindUser['errno']}\r\n err: {$bindUser['err']}";
-						APP::LOG($msg, 'xplug');
-					}
-				}
-			}
-		}
-	    return $result; 
-	}
-	
-	/**
-	 * 到新浪页面进行注册
-	 */
-	function goSinaReg(){
-		if(APP::F('is_robot')){
-			APP::deny();
-		}
-		
-		if(USER::isUserLogin()){
-			$url = W_BASE_HTTP.URL('pub');
-		}else{
-			$url = F('get_reg_url');
-		}
-		APP::redirect($url, 3);
-		exit();
-	}
-
-	/**
-	 * 同步插件绑定数据
-	 */
-	function _xwbBBSplugin($inData = null, $sina_uid = null, $type = 'update') {
-		$xwb_discuz_enable = V('-:sysConfig/xwb_discuz_enable'); 
-		if (1 == $xwb_discuz_enable) {
-			if ($type == 'delete') {
-				$userinfo = $this->getBindInfo($sina_uid);
-				if ($userinfo) {
-					///同步插件的绑定数据
-					DR('xwbBBSpluginCf.deleteBindUser', '', $userinfo['uid'], $userinfo['sina_uid']);
-				}
-			} else {
-				///同步插件的绑定数据
-				$bindUser = DR('xwbBBSpluginCf.updateBindUser', '', $inData['uid'], $inData['sina_uid'], $inData['access_token'], $inData['token_secret']);
-				$bindUser = $bindUser['rst'];
-				if (!empty($bindUser['errno'])) {
-					///记录日志
-					$msg = "api: addBindUser\r\n uid: {$result['uid']}\r\n sina_uid: {$result['sina_uid']}\r\n access_token: {$result['access_token']}\r\n token_secret: {$result['token_secret']}\r\n errno: {$bindUser['errno']}\r\n err: {$bindUser['err']}";
-					APP::LOG($msg, 'xplug');
-				}
-			}
-		}
+	    return DS($com,'p',$v);
 	}
 	
 }

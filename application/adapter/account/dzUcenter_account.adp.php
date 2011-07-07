@@ -33,8 +33,6 @@ define('DZUC_USER_CK_PATH', 	'/');
 define('DZUC_USER_AGENT',		XWB_HTTP_USER_AGENT);
 // 已绑定DZ用户的SINA帐号，登录，退出时，是不是要同步到 DZ　
 define('DZUC_SYNC_USER_STATUS',	true);
-// WAP 的远程登录验证地址     
-define('WAP_LOGIN_URL', 		'http://domain/waplogin.php');
 // ------------------------------------------------------------------------------
 
 /**
@@ -122,26 +120,6 @@ class dzUcenter_account {
 	function localLogout(){
 		$this->_uc_setAuthData('');
 	}
-
-	function xweiboLogout() {
-		/// 清空SESSION 
-		USER::uid(0);
-		USER::resetInfo();
-	}
-
-	function wapLogin($account, $password)
-	{
-		$http = APP::ADP('http');
-		$http->setUrl(WAP_LOGIN_URL);
-		$http->setData(array('account' => $account, 'password' => $password));
-		$result = $http->request('post');
-		$code = $http->getState();
-		if ($code != 200) {
-			return RST(false, $code, '登录失败，请检查远程登录验证接口');
-		}
-		return RST($result);
-	}
-	
 	// ------------------------------------------------------------------------------
 	
 	    
@@ -149,7 +127,6 @@ class dzUcenter_account {
 	//UC 的登出通知
 	function  _uc_action_synlogout($vStr, $vArr){
 		$this->_uc_setAuthData('');
-		$this->xweiboLogout();
 		echo 1;exit;
 	}
 	

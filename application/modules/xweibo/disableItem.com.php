@@ -31,12 +31,12 @@ class disableItem {
 		$where = ' WHERE type=' . (int)$type;
 		if ($ids !== null) {
 			switch(true) {
-				case is_numeric($ids): $ids = (array) $ids; break;
+				case is_int($ids): $ids = (array) $ids; break;
 				case is_string($ids) : $ids = explode(',', $ids); break;
 				default: $ids = (array)$ids;
 			}
 			foreach ($ids as $id) {
-				if (!is_numeric($id)) {
+				if (!is_int($id)) {
 					$this->_err(2145201, '获取屏蔽项ID时参数出错');
 				}
 			}
@@ -48,12 +48,7 @@ class disableItem {
 		$rs = $this->db->query($sql);
 		$return = array();
 		foreach ($rs as $row) {
-			//var_dump($row['item']);
-			$key=trim((string)$row['item'],chr(13));
-			if($key!=NULL){
-				$return[$key] = 1;
-			}
-			
+			$return[$row['item']] = 1;
 		}
 		return RST($return);
 	}
@@ -89,11 +84,11 @@ class disableItem {
 	function resume($ids) {
 		switch (true) {
 			case is_string($ids): $ids = explode(',', $ids); break;
-			case is_numeric($ids): $ids = (array)$ids; break;
+			case is_int($ids): $ids = (array)$ids; break;
 			default: $ids = (array)$ids;
 		}
 		foreach ($ids as $id) {
-			!is_numeric($id) &&	$this->_err(2145105, '删除话题时参数必须为整数,字串或数组');
+			!is_int($id) &&	$this->_err(2145105, '删除话题时参数必须为整数,字串或数组');
 		}
 		$rst = $this->db->delete($ids, T_DISABLE_ITEMS, 'kw_id');
 		return RST($rst);
@@ -128,10 +123,9 @@ class disableItem {
 		return RST($rst);
 	}
 
-	function saveKeywords($keywords, $admin_id, $admin_name, $delimiter='\||\n') {
-		///无法删除
+	function saveKeywords($keywords, $admin_id, $admin_name, $delimiter=',') {
 		switch (true) {
-			case is_string($keywords): $keywords = preg_split("/".$delimiter."/", trim($keywords, '|\n ')); break;
+			case is_string($keywords): $keywords = explode($delimiter, trim($keywords, $delimiter.' ')); break;
 			case is_array($keywords): break;
 			default: return $this->_err('2151003', '添加关键字时参数不正确');
 		}
@@ -145,10 +139,8 @@ class disableItem {
 				$data[] = '(4,"' . $this->db->escape($keyword) . '",' . $admin_id . ',"' . $this->db->escape($admin_name) . '",' . $add_time . ')';
 			}
 		}
-		$delsql='delete from ' . $this->table . ' where type=4';
-		$this->db->execute($delsql);
-		if (empty($data)) {
-			return RST(true);
+		if (empty($keywords)) {
+			return $this->_err(2152004, '没有可添加的关键字');
 		}
 		$sql = 'INSERT IGNORE INTO ' . $this->table . '(type,item,admin_id,admin_name,add_time)';
 		$sql .= 'VALUES ' . implode(',', $data);

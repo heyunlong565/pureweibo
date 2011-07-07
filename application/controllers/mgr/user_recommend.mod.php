@@ -1,9 +1,6 @@
 <?php
 include('action.abs.php');
-class user_recommend_mod extends action 
-{
-	const OFFICAL_WB_TYPE = 4;
-	
+class user_recommend_mod extends action {
 	function user_recommend_mod() {
 		parent :: action();
 	}
@@ -78,90 +75,102 @@ class user_recommend_mod extends action
 	*/
 	function addReSort() {
 		$group_name = V('p:name',0);	//分组id
-		$json = V('g:json', false);		// 是否返回json
+
 		if(!$group_name) {
-			$this->_error('类别名称不存在！', URL('mgr/user_recommend.getReSort'), $json?1:null);
+			$this->_error('类别名称不存在！', URL('mgr/user_recommend.getReSort'));
 		}
 
 		$rs = DR('mgr/userRecommendCom.addSort', '', $group_name);
 
 		if(!$rs['rst']) {
-			$this->_error('操作失败！', URL('mgr/user_recommend.getReSort'), $josn?2:null);
+			$this->_error('操作失败！', URL('mgr/user_recommend.getReSort'));
 		}
 					
-		$this->_succ('操作已成功', array('getReSort'), $json?array('group_id' =>$rs['rst']):null);
+		$this->_succ('操作已成功', array('getReSort'));
 	}
 
-	
-	
 	/*
 	* 添加新用户
 	*/
-	function addReUser() 
-	{
-		$group_id 	= (int)V('r:group_id',0);	//分组id
-		$nickname 	= V('p:nickname','');		//成员昵称
-		$remark 	= V('p:remark','');			//备注   备注不为必填项
-		$json = V('g:json', false);		// 是否返回json
+	function addReUser() {
+		$group_id = (int)V('p:group_id',0);	//分组id
+		$nickname = V('p:nickname','');	//成员昵称
+		$remark = V('p:remark','');	//备注
 
 		if(!$group_id || !$nickname) {
 			$this->_error('类别或昵称不存在！', URL('mgr/user_recommend.getReSort'));
 		}
 
-		// Check User In Api
 		$user_info = DR('xweibo/xwb.getUserShow', '', null, null, $nickname);
+
         if(empty($user_info['rst'])) {
-			$this->_error('该用户不存在！', URL('mgr/user_recommend.getUserById', 'group_id='.$group_id), $json?1:null);
+			$this->_error('该用户不存在！', URL('mgr/user_recommend.getUserById', 'group_id='.$group_id));
         }
 
-        // 删除缓存
-		DD('mgr/userRecommendCom.getUserById');		
-		
-		//if($remark === '') {
-		//	$this->_error('备注不存在！', URL('mgr/user_recommend.getUserById' ,'group_id='.$group_id), $json?2:null);
-		//}
+		DD('mgr/userRecommendCom.getUserById');
+		if($group_id == 4) {
+			$rs = DR('components/officialWB.addUser', '', $user_info['rst']['id']);
 
-		$data = array(
-					'group_id' 	=> $group_id,
-					'uid' 		=> $user_info['rst']['id'],
-					'nickname' 	=> $nickname,
-					'remark' 	=> $remark
-				);
+			if(!$rs['rst']) {
+				$this->_error('操作失败！', URL('mgr/user_recommend.getUserById', 'group_id='.$group_id));
+			}
+		}else{
+			if(!$remark) {
+				$this->_error('备注不存在！', URL('mgr/user_recommend.getUserById' ,'group_id='.$group_id));
+			}
 
-		// Check Data
-		$rs = DR('mgr/userRecommendCom.getUserById', '', $group_id);
-		if(count($rs['rst']) >= 3 && $group_id == 3) {  //自动关注限制为3个
-			$this->_error('用户数已达上限，不能继续添加！', URL('mgr/user_recommend.getUserById','group_id='.$group_id), $json?3:null);
-		}elseif(count($rs['rst']) >= 20) {		//其他限制为20个
-			$this->_error('用户数已达上限，不能继续添加！', URL('mgr/user_recommend.getUserById','group_id='.$group_id), $json?4:null);
+			$data = array(
+						'group_id' => $group_id,
+						'uid' => $user_info['rst']['id'],
+						'nickname' => $nickname,
+						'remark' => $remark
+					);
+
+			$rs = DR('mgr/userRecommendCom.getUserById', '', $group_id);
+
+			if(count($rs['rst']) >= 3 && $group_id == 3) {  //自动关注限制为3个
+				$this->_error('用户数已达上限，不能继续添加！', URL('mgr/user_recommend.getUserById','group_id='.$group_id));
+			}elseif(count($rs['rst']) >= 20) {		//其他限制为20个
+				$this->_error('用户数已达上限，不能继续添加！', URL('mgr/user_recommend.getUserById','group_id='.$group_id));
+			}
+
+			$rs = DR('mgr/userRecommendCom.addUser', '', $data);
+			if(!$rs['rst']) {
+				$this->_error('操作失败！', URL('mgr/user_recommend.getUserById','group_id='.$group_id));
+			}
 		}
-
-		
-		$rs = DR('mgr/userRecommendCom.addUser', '', $data);
-		if(!$rs['rst']) {
-			$this->_error('操作失败！', URL('mgr/user_recommend.getUserById','group_id='.$group_id), $json?5:null);
-		}
-		$this->_succ('操作已成功', array('getUserById&group_id='.$group_id), $json?array('uid' =>$user_info['rst']['id'], 'profile_img'=> F('profile_image_url',$user_info['rst']['id'], 'comment')):null);
+		$this->_succ('操作已成功', array('getUserById&group_id='.$group_id));
 	}
 
-	
 	/*
 	* 根据分组gruop_id获取用户数据
 	*/
-	function getUserById()
-	{
+	function getUserById(){
 		$group_id = (int)V('g:group_id',0);	//分组id
+
 		if(!$group_id) {
 			$this->_error('类别id不存在！', URL('mgr/user_recommend.getReSort'));
 		}
 		TPL :: assign('group_id', $group_id);
 		
 
-		// Build Data
 		$rs = $rst = $rss = array();
-		if($group_id)	//获取其他数据
-		{			
-			$rs  = DR('mgr/userRecommendCom.getById', '', $group_id);
+		if($group_id == 4) {		//获取官方微薄数据
+			$rss = DR('components/officialWB.getUsers');
+			//$http_url = 'http://' . V('S:HTTP_HOST') . ':' . V('S:SERVER_PORT') . '/index.php?m=ta&id=';
+            if(isset($rss['rst']['users'])) {
+				foreach($rss['rst']['users'] as $value) {
+					if(isset($value['id'])) {
+						$value['http_url'] = W_BASE_HTTP . URL('ta', 'id='.$value['id'], 'index.php');
+						$rst[] = $value;
+					}
+                }
+            }
+
+			TPL :: assign('userlist', $rst);
+			TPL :: display('mgr/auth_recommended_user', '', 0, false);
+		}elseif($group_id){				//获取其他数据
+			$rs = DR('mgr/userRecommendCom.getById', '', $group_id);
 			$rss = DR('mgr/userRecommendCom.getUserById', '', $group_id);
 			//$http_url = W_BASE_HTTP . URL('ta', 'id='.$value['sina_uid'], 'index.php');
             if($rss['rst']) {
@@ -174,53 +183,54 @@ class user_recommend_mod extends action
 			TPL :: assign('group_name', $rs['rst'][0]['group_name']);
 			TPL :: assign('userlist', $rst);
 			TPL :: display('mgr/recommended_user_list', '', 0, false);
-		} else {
+		}else{
 			$rs = DR('mgr/userRecommendCom.getById');
 			$rss = $this->_relatedSort($rs['rst']);
 			
 			TPL :: assign('list', $rss);
 			TPL :: display('mgr/recommended_user', '', 0, false);
+
 		}
 	}
 
-	
-	
 	/*
 	* 根据group_id和uid删除用户数据
 	*/
-	function delUserById() 
-	{
-		$uid 		= (int)V('r:uid',0);		//用户uid
-		$group_id 	= (int)V('r:group_id','');	//类别id
-		$json = V('g:json', false);		// 是否返回json
+	function delUserById() {
+		$uid = (int)V('g:uid',0);	//用户uid
+		$group_id = (int)V('g:group_id','');	//类别id
 
 		if(!$group_id) {
-			$this->_error('参数错误！', URL('mgr/user_recommend.getReSort'), $json?1:null);
+			$this->_error('参数错误！', URL('mgr/user_recommend.getReSort'));
 		}
 					
 		if(!$uid) {
-			$this->_error('参数错误！', URL('mgr/user_recommend.getUserById','group_id=' . $group_id), $json?2:null);
+			$this->_error('参数错误！', URL('mgr/user_recommend.getUserById','group_id=' . $group_id));
 		}
 
-		
-		// Delete From DB
-		$rs = DR('mgr/userRecommendCom.delByUid', '', $uid, $group_id);
-		if(!$rs['rst']) {
-			$this->_error('操作失败！', URL('mgr/user_recommend.getUserById','group_id=' . $group_id), $json?3:null);
+		if($group_id == 4) {	//删除官方微薄
+			$rs = DR('components/officialWB.delUser', '', $uid);
+
+			if(!$rs['rst']) {
+				$this->_error('操作失败！', URL('mgr/user_recommend.getUserById','group_id=' . $group_id));
+			}
+		}else{		//删除其他
+			$rs = DR('mgr/userRecommendCom.delByUid', '', $uid, $group_id);
+
+			if(!$rs['rst']) {
+				$this->_error('操作失败！', URL('mgr/user_recommend.getUserById','group_id=' . $group_id));
+			}
 		}
 
-		$this->_succ('操作已成功', array('getUserById&group_id='.$group_id), $json?true:null);
+		$this->_succ('操作已成功', array('getUserById&group_id='.$group_id));
 	}
 
-	
-	
 	/*
 	* 根据group_id和uid串修改推荐用户排序
 	*/
-	function userSortById() 
-	{
-		$uids 		= V('p:uids', '');			//用户uid串
-		$group_id 	= (int)V('p:group_id',0);	//类别id
+	function userSortById() {
+		$uids = V('p:uids', '');	//用户uid串
+		$group_id = (int)V('p:group_id',0);	//类别id
 
 		if(!$group_id || $group_id == 4) {
 			exit('{"rst":false,"errno":0,"err":"参数错误！"}');
@@ -246,15 +256,12 @@ class user_recommend_mod extends action
 		//$this->_succ('操作已成功', array('getUserById&group_id='.$group_id));
 	}
 
-	
-	
 	/*
 	* 根据group_id和uid删除所选用户数据
 	*/
-	function delAllUserById() 
-	{
-		$uids 		= V('g:uids', '');			//用户uid串
-		$group_id 	= (int)V('g:group_id',0);	//类别id
+	function delAllUserById() {
+		$uids = V('g:uids', '');	//用户uid串
+		$group_id = (int)V('g:group_id',0);	//类别id
 		
 		$uid_arrs = explode(',', $uids);
 		if(!$group_id) {
@@ -265,46 +272,52 @@ class user_recommend_mod extends action
 			$this->_error('参数错误！', URL('mgr/user_recommend.getUserById','group_id=' . $group_id));
 		}
 
-		
-		// Delete From DB
-		foreach ($uid_arrs as $value) {
-			$uid_arr[] = '"' .mysql_escape_string($value) . '"';
-		}
+		if($group_id == 4) {		//删除官方微薄组
+			foreach ($uid_arrs as $uid) {
+				$rs = DR('components/officialWB.delUser', '', $uid);
 
-		$uids 	= implode(',', $uid_arr);
-		$rs 	= DR('mgr/userRecommendCom.delAllByUid', '', $uids, $group_id);
-		if(!$rs['rst']) {
-			$this->_error('操作失败！', URL('mgr/user_recommend.getUserById','group_id=' . $group_id));
+				if(!$rs['rst']) {
+					$this->_error('操作失败！', URL('mgr/user_recommend.getUserById','group_id=' . $group_id));
+				}
+			}
+		}else{				//删除其他组
+			foreach ($uid_arrs as $value) {
+				$uid_arr[] = '"' .mysql_escape_string($value) . '"';
+			}
+
+			$uids = implode(',', $uid_arr);
+			$rs = DR('mgr/userRecommendCom.delAllByUid', '', $uids, $group_id);
+			if(!$rs['rst']) {
+				$this->_error('操作失败！', URL('mgr/user_recommend.getUserById','group_id=' . $group_id));
+			}
 		}
 
 		$group = DS('mgr/userRecommendCom.getById', '', $group_id);
+
 		!empty($group) && !empty($group[0]['related_id']) && DR('PageModule.clearCache', '', explode(',', $group[0]['related_id']), $group_id);
 		
 		$this->_succ('操作已成功', array('getUserById&group_id='.$group_id));
 	}
 
-	
-	
 	/*
 	 * 修改用户备注
 	 */
 	function setUserRemark() {
-		$group_id = (int)V('r:group_id',0);	//类别id
-		$uid = (int)V('r:uid',0);	//用户id
+		$group_id = (int)V('p:group_id',0);	//类别id
+		$uid = (int)V('p:uid',0);	//用户id
 		$remark = trim(V('p:remark',''));	//备注
-		$json = V('g:json', false);		// 是否返回json
 
 		if(!$group_id || !$uid) {
-			$this->_error('参数错误！', URL('mgr/user_recommend.getReSort'), $json?1:null);
+			$this->_error('参数错误！', URL('mgr/user_recommend.getReSort'));
 		}
 
 		$data = array('remark'=>$remark);
 		$rs = DR('mgr/userRecommendCom.updateUser', '', $data, $uid, $group_id);
-		if(!$rs['rst'] && 0!==$rs['rst']) {
-			$this->_error('操作失败！', URL('mgr/user_recommend.getUserById','group_id=' . $group_id), $json?2:null);
+		if(!$rs['rst']) {
+			$this->_error('操作失败！', URL('mgr/user_recommend.getUserById','group_id=' . $group_id));
 		}
 
-		$this->_succ('操作已成功', array('getUserById&group_id='.$group_id), $json?true:null);
+		$this->_succ('操作已成功', array('getUserById&group_id='.$group_id));
 	}
 
 	/*

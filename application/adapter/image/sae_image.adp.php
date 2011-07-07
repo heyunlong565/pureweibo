@@ -75,7 +75,7 @@
          }
          function save($key){
          	$io = APP::ADP('io');
-         	return $io->write($key,$this->saeimg->exec());
+         	$io->write(md5($key),$this->saeimg->exec());
          }
  } 
  ?>

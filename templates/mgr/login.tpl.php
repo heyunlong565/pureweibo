@@ -3,13 +3,12 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>管理员登录</title>
-<link href="<?php echo W_BASE_URL;?>css/admin/admin.css" rel="stylesheet" type="text/css" />
+<link href="<?php echo W_BASE_URL;?>css/admin.css" rel="stylesheet" type="text/css" />
 <style type="text/css">
 html{ background:#F2F5F8;}
-body{ background:#F2F5F8;}
 </style>
 <script type='text/javascript' src='<?php echo W_BASE_URL;?>js/jquery.min.js'></script>
-<script type='text/javascript' src='<?php echo W_BASE_URL;?>js/admin/admin.js'></script>
+<script type='text/javascript' src='<?php echo W_BASE_URL;?>js/admin.js'></script>
 <link rel="shortcut icon" href="<?php echo W_BASE_URL;?>favicon.ico">
 <script language="javascript" type="text/javascript">
 function refreshCc() {
@@ -29,24 +28,21 @@ function ajax_submit() {
 		return false;
 	}
 
-	var url = '<?php echo URL('mgr/admin.login',array('ajax'=>1));?>';
+	var url = '<?php echo URL('mgr/admin.login');?>';
 	var data = {
 			'sina_uid': $('#sina_uid').val(),
 			'password': $('#password').val(),
 			'verify_code': $('#verify_code').val()
 		};
 	$.post(url, data, function(json){
-		if ('string' == typeof json) {
-			json = eval('(' + json + ')');
-		}
+		json = eval('(' + json + ')');
+		
 		if (json.state == '200') {
 			window.location.href = '<?php echo URL('mgr/admin.index');?>';
 		} else {
 			if (json.state == '402') {
 				$('#verify_code_msg').html(json.msg).addClass("a-error").show();
 				$('#username_msg').hide();
-			} else if (json.state == '403') {
-				window.top.location.href = "<?php echo URL('account.sinaLogin','cb=login&loginCallBack=' . urlencode(URL('mgr/admin.login', '', 'admin.php')), 'index.php');?>";
 			} else {
 				$('#username_msg').html(json.msg).addClass("a-error").show();
 				$('#verify_code_msg').hide();
@@ -74,13 +70,13 @@ function ajax_submit() {
                 </div>
                 <div class="account1">
                 	<label for="">密码：</label>
-                    <input class="input-txt admin-txt" id="password" name="password" type="password" />
+                    <input class="input-box admin-txt" id="password" name="password" type="password" />
                     <span id="username_msg"></span>
                 </div>
 				<?php if(IS_USE_CAPTCHA):?>
                 <div class="account2">
                 	<label for="">验证码：</label>
-                    <input class="input-txt admin-txt" id="verify_code" name="verify_code" type="text" autocomplete="off" />
+                    <input class="input-box admin-txt" id="verify_code" name="verify_code" type="text" autocomplete="off" />
                     <span id="verify_code_msg"></span>
                 </div>
                 <div class="account3">

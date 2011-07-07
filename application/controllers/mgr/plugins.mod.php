@@ -8,18 +8,10 @@ class plugins_mod extends action {
 		parent :: action();
 	}
 
-	
-	/**
-	 * 插件列表
-	 */
-	function default_action() 
-	{
-		$plugins = DS('Plugins.getList');
-		TPL::assign('plugins', $plugins);
-		$this->_display('plugin_list');
+	function default_action() {
+
 	}
 
-	
 	function config() {
 		$id = V('g:id');
 
@@ -47,27 +39,6 @@ class plugins_mod extends action {
 				break;
 
 			case 4:
-
-				$autoFollow = DS('common/sysConfig.get', '', 'guide_auto_follow');
-
-
-				TPL::assign('autoFollow', $autoFollow);
-
-				//if ($autoFollow) { //自动关注
-					$followId = DS('common/sysConfig.get','', 'guide_auto_follow_id');
-					$result = DR('mgr/userRecommendCom.getUserById', '', $followId);
-					$rst = '';
-
-					if ($result['errno'] == 0) {
-						$rst = &$result['rst'];
-
-						if (count($rst) > 3) {
-							$rst = array_slice($rst, 0, 3);
-						}
-						TPL::assign('autoFollowUsers', $rst);
-					}
-
-				//}
 				$list =  DS('mgr/userRecommendCom.getById');
 				TPL::assign('list', $list);
 
@@ -92,32 +63,15 @@ class plugins_mod extends action {
 		}
 	}
 
-	function pluginGuideView() {
-		if ($item_id = V('g:item_id', false)) {
-			$itemgroup = APP::N('itemGroups');
-			$info = $itemgroup->getItem($item_id);
-			TPL::assign('info', $info);
-		}
-		$this->_display('pluginGuideView');
-	}
-	
-	
 	/**
 	 * 用户分组推荐异步处理接口
 	 *
 	 */
 	function itemgroup() {
-		$op = V('r:op'); //操作:add, del, edit
+		$op = V('p:op'); //操作:add, del, edit
 
 		$item_id = V('p:item_id');
 		$item_name = V('p:item_name');
-
-/*
-		$data = V('p:data');
-		$item_id = $data['title'];
-		$param = V('p:param');
-		$item_name =$param['group_id'];
-*/
 		$id = V('p:id');
 
 		$itemgroup = APP::N('itemGroups');
@@ -145,9 +99,6 @@ class plugins_mod extends action {
 				$obj->item_name = $item_name;
 
 				$result = $itemgroup->saveItem($obj, $id);
-				if ($result !== false) {
-					$result = true;
-				}
 			break;
 		}
 
@@ -184,21 +135,18 @@ class plugins_mod extends action {
 			));
 
 
-			$this->_succ('操作已成功', array('default_action','plugins'));
+			$this->_succ('操作已成功', array('default_action','components'));
 
-		} else if ($id == 3) 
-		{
-			$title 		= V('r:title');
-			$link_id 	= V('r:link_id');
-			$link 		= V('r:link');
-			$link		= F('fix_url', $link, 'http://', 'http://');
-			$op 		= V('r:op');
-			
+		} else if ($id == 3) {
+			$title = V('r:title');
+			$link = V('r:link');
+			$link_id = V('r:link_id');
+
+			$op = V('r:op');
+
 			if ($op == 'add' || $op == 'mod') {
 
 				$rs = DR('plugins/adProfile.save', '', array('title' => $title, 'link' => $link), $link_id);
-				APP::ajaxRst(array('id'=>$rs['rst'], 'link'=>$link));
-				exit;
 
 			} elseif ($op == 'del') {
 
@@ -210,10 +158,9 @@ class plugins_mod extends action {
 		} else if ($id == 2) {
 			//图片处理
 			$img = V('f:bg');
+
 			$bgPath = '';
-			if ($img && $img['name'] && $img['error']) {
-				$this->_error('上传的图片不符合规格',$_SERVER['HTTP_REFERER']);
-			}
+
 
 			if ($img && $img['tmp_name']) {
                 $uploader = APP::ADP('upload');
@@ -227,7 +174,8 @@ class plugins_mod extends action {
                 $error = $uploader->getErrorCode();
                 
                 if ($error != 0) {
-                    $this->_error($uploader->getErrorMsg(), $_SERVER['HTTP_REFERER']);
+                    $this->_error($uploader->getErrorMsg());
+                    exit;
                 }
                 
                 $fileInfo = $uploader->getUploadFileInfo();
@@ -240,9 +188,6 @@ class plugins_mod extends action {
 			foreach ($keys as $key) {
 				$data[$key] = V('p:'.$key);
 			}
-			
-			//判断链接地址是否以http开头
-			$data['link'] = F('fix_url', $data['link'], 'http://', 'http://');
 
 			//背景图
 			$data['bg_pic'] = $bgPath;
@@ -267,22 +212,22 @@ class plugins_mod extends action {
 			DS('common/sysConfig.set', '', 'guide_auto_follow', $autoFollow);
 			DS('common/sysConfig.set', '', 'guide_auto_follow_id', $autoFollowId);
 
-			$this->_succ('操作已成功', array('default_action','plugins'), true);
+			$this->_succ('操作已成功', array('default_action','components'));
 		}
 	}
 
-	
-	
 	/**
 	 * 保存设置
+	 *
+	 *
 	 */
-	function setStatus() 
-	{
-		$id 	= V('g:id');
+	function setStatus() {
+		$id = V('g:id');
 		$status = V('g:inuse');
-		$rs 	= DS('Plugins.setStatus', '', $id, $status);
+		
+		$rs = DS('Plugins.setStatus', '', $id, $status);
 
-		APP::redirect(URL('mgr/plugins'), 3);
+		APP::redirect(URL('mgr/components'), 3);
 	}
 
 }

@@ -31,12 +31,11 @@ class cityWB extends PageModule{
 	 * @return array
 	 *
 	 */
-	function get($province = '', $city = '', $num = null, $page = null, $source=FALSE) {
+	function get($province = '', $city = '', $num = null, $page = null) {
 //		$area = DR('xweibo/xwb.getProvinces');
 
-		$page 	= $page ? $page: 1;
-		$source = $source ? $source : (isset($cfg['source']) ? $cfg['source'] : '0');
-		
+		$page = $page ? $page: 1;
+
 		if (!$num) {
 			$cfg = $this->configList();
 			$num = $cfg['show_num'] ? $cfg['show_num']: 3;
@@ -54,11 +53,7 @@ class cityWB extends PageModule{
 			}
 		}
 
-		if (USER::isUserLogin() /* && $source*/) {
-			$rs = DR('xweibo/xwb.searchStatuse', null, array('base_app' => $source, 'q' => '的', 'city' => $city, 'province' => $province, 'count' => $num * 2, 'page' => $page));
-		} else {
-			$rs = DR('xweibo/xwb.searchStatuse', null, array('base_app' => $source, 'q' => '的', 'city' => $city, 'province' => $province, 'count' => $num * 2, 'page' => $page), false);
-		}
+		$rs = DR('xweibo/xwb.searchStatuse', null, array('q' => '的', 'city' => $city, 'province' => $province, 'rpp' => $num, 'page' => $page), false);
 
 		if ($rs['errno'] == 0 && count($rs['rst']) > $num) {
 			$rs['rst'] = array_slice($rs['rst'], 0, $num);

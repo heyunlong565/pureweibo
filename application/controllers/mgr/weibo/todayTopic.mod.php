@@ -240,17 +240,14 @@ class todayTopic_mod extends action {
 		}
 		$topic_id = $rst['rst']['topic_id'];
 		$rst = DR('xweibo/topics.hasTopics', '', $topic_id);
-		
+
 		if ($topic_id != 2 || $rst['rst'] && $rst['rst'] > count($ids)) {
 			$rst = DR('xweibo/topics.deleteTopic', '', $ids);
+			//清除缓存
+			DS('PageModule.clearTopicCache', '', $topic_id);
 		} else {
 			$this->_error('最少保留一个话题', URL('mgr/weibo/todayTopic.topicList', 'category=' . $topic_id, 'admin.php'));
 		}
-		
-
-		//强制清除缓存
-		DS('PageModule.clearTopicCache', '', $topic_id);
-		
 		$this->_succ('已经成功删除', URL('mgr/weibo/todayTopic.topicList', 'category=' . $topic_id, 'admin.php'));
 		//$this->_redirect('topicList');
 	}

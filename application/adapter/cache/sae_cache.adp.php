@@ -8,7 +8,6 @@ class sae_cache
 		if($this->memcache){
 			$this -> is_cache = true;
 		}else{
-			LOGSTR('cache', 'SAE memcache init error.');
 			$this -> is_cache = false;
 		}
 	}
@@ -27,11 +26,7 @@ class sae_cache
 
 	function set($key, $value, $ttl = 0) {
 		if($this -> is_cache){
-			$rst = memcache_set($this->memcache,$key, $value, MEMCACHE_COMPRESSED, $ttl);
-			if (!$rst) {
-				LOGSTR('cache', 'SAE set data error.data size is:'. sizeof($value));
-			}
-			return $rst;
+			return memcache_set($this->memcache,$key, $value, MEMCACHE_COMPRESSED, $ttl);
 		}else{
 			return false;
 		}

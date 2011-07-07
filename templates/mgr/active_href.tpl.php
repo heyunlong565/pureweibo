@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>管理员登录</title>
-<link href="<?php echo W_BASE_URL;?>css/admin/admin.css" rel="stylesheet" type="text/css" />
+<link href="<?php echo W_BASE_URL;?>css/admin.css" rel="stylesheet" type="text/css" />
 <style type="text/css">
 html{ background:#F2F5F8;}
 </style>

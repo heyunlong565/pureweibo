@@ -32,11 +32,9 @@ class memcache_cache
 				}
 
 				$param = explode(':', $server);
-				// @todo 是否使用多台服务器
+
 				$connect = $connect || @$this->obj->addServer($param[0], $param[1], $config['pconnect']);
-				if (!$connect) {
-					LOGSTR('cache', 'memcache add server error');
-				}
+
 			}
 
 			$this->enable = $connect ? true : false;
@@ -51,20 +49,16 @@ class memcache_cache
 
 	function set($key, $value, $ttl = 0) {
 		$key = $this->_feaKey($key);
-		$rst = $this->obj->set($key, $value, MEMCACHE_COMPRESSED, $ttl);
-		if (!$rst) {
-			LOGSTR('cache', 'memcache add server error');
-		}
-		return $rst;
+		return $this->obj->set($key, $value, MEMCACHE_COMPRESSED, $ttl);
 	}
 
 	function delete($key) {
 		$key = $this->_feaKey($key);
-		return $this->obj->delete($key, 0);
+		return $this->obj->delete($key);
 	}
 	
 	function _feaKey($key) {
-		return md5($this->keyPre . $key);
+		return $this->keyPre . $key;
 	}	
 }
 

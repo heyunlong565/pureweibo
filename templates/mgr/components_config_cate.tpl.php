@@ -3,9 +3,9 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>组件列表 - 组件设置 - 组件管理</title>
-<link href="<?php echo W_BASE_URL;?>css/admin/admin.css" rel="stylesheet" type="text/css" />
+<link href="<?php echo W_BASE_URL;?>css/admin.css" rel="stylesheet" type="text/css" />
 <script src="<?php echo W_BASE_URL;?>js/jquery.min.js" type="text/javascript"></script>
-<script src="<?php echo W_BASE_URL;?>js/admin/admin_lib.js" type="text/javascript"></script>
+<script src="<?php echo W_BASE_URL;?>js/admin_lib.js" type="text/javascript"></script>
 <script>
 var itemgroup_id = '<?php echo USER_CATEGORY_RECOMMEND_ID;?>';
 $(function() {
@@ -88,24 +88,22 @@ foreach($list as $key => $g) {
 					box.edit(vals[2], vals[1]);
 					box.show();
 				} else {
-					Xwb.ui.MsgBox.confirm('提示','确定要删除这个类别吗？',function(id){
-						if(id=='ok'){
-							$.ajax({
-								url: '<?php echo URL("mgr/components.itemgroup");?>',
-								data: {id: id, op:'del'},
-								type: 'post',
-								dataType: 'json',
-								cache: false,
-								success: function(ret) {
-									if (ret.errno == 0)
-									{
-										$row.remove();
-									}
+					if (confirm('确定要删除这个类别吗？'))
+					{
+						$.ajax({
+							url: '<?php echo URL("mgr/components.itemgroup");?>',
+							data: {id: id, op:'del'},
+							type: 'post',
+							dataType: 'json',
+							cache: false,
+							success: function(ret) {
+								if (ret.errno == 0)
+								{
+									$row.remove();
 								}
-							});
-						}
-					});
-
+							}
+						});
+					}
 				}
 
 			break;
@@ -126,9 +124,9 @@ foreach($list as $key => $g) {
     <div class="set-wrap">
         
         <div class="login-guide" id="panel">
-            <h4 class="main-title"><a href="#" class="btn-add" rel="e:add"><span rel="add">添加新类别</span></a>设置</h4>
+            <h4 class="main-title"><a href="#" class="add-category" rel="add"></a>设置</h4>
 			<div class="set-area-int">
-        		<table width="100%" border="0" cellpadding="0" cellspacing="0"  class="table">
+        		<table width="100%" border="0" cellpadding="0" cellspacing="0"  class="table-border">
 					<colgroup>
 						<col class="guide-list" />
     					<col />
@@ -136,9 +134,9 @@ foreach($list as $key => $g) {
     				</colgroup>
                     <thead class="td-title-bg">
 					<tr>
-   					  	<th><div class="td-inside">类别名称</div></th>
-   					  	<th><div class="td-inside">类别使用的用户列表</div></th>
-   					  	<th><div class="td-inside">操作</div></th>
+   					  	<td>类别名称</td>
+   					  	<td>类别使用的用户列表</td>
+   					  	<td>操作</td>
 				  	</tr>
               		</thead>
                 	<tbody>
@@ -162,16 +160,14 @@ foreach($list as $key => $g) {
    					  	<td><?php echo F('escape', $r['item_name']);?></td>
    					  	<td><?php echo F('escape', getUserListName($list, $r['item_id']));?></td>
 						<td>
-							
-                        		<a class="change-icon" title="编辑" href="#" rel="e:edit">编辑</a>
-                        		<a class="del-icon" title="删除" href="#" rel="e:del">删除</a>
-							
+                        	<a class="change-icon" title="编辑" href="#" rel="edit">编辑</a>
+                        	<a class="del-icon" title="删除" href="#" rel="del">删除</a>
                         </td>
 					</tr>
 	<?php endforeach;?>
 <?php else:?>
 	<tr>
-		<td colspan="3"><p class="no-data">还没有记录哦，<a href="#" rel="add">请点击添加</a></p></td>
+		<td colspan="3" class="no-data">还没有记录哦，<a href="#" rel="add">请点击添加</a></td>
 	</tr>
 <?php endif;?>
 					</tbody>

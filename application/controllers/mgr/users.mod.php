@@ -107,8 +107,6 @@ class users_mod extends action {
 
         $this->_succ('操作已成功', array('search'));
 	}
-	
-	
 
 	/*
     * 搜索用户
@@ -122,8 +120,6 @@ class users_mod extends action {
 
 		$rss = $rs = "";
 		$rss = DR('mgr/userCom.getByName', '', $nickname, $offset, $each);
-		
-		
 
         foreach($rss['rst'] as $value) {
             //调用微博个人资料接口
@@ -131,31 +127,23 @@ class users_mod extends action {
             //$value['userinfo'] = $userinfo['rst'];
                                     
             //搜索是否为加V用户
-            /*
 			$rst = DR('mgr/userCom.getVerifyById', '', $value['sina_uid']);
             if($rst['rst']) {
 				$value['is_verify'] = 1;
             }else{
 				$value['is_verify'] = 0;
 			}
-			*/
-			
-            //搜索是否为封禁用户
-			//$rst = DR('mgr/userCom.getBanByUid', '', $value['sina_uid']);
 
-//            if($rst['rst']) {
-//				$value['is_ban'] = 1;
-//            }else{
-//				$value['is_ban'] = 0;
-//			}
-			$value['action_type']=F('user_action_check',array(1,2,3),$value['sina_uid'],TRUE);
-			if($value['action_type']==FALSE){
-				$value['action_type']=4;
+            //搜索是否为封禁用户
+			$rst = DR('mgr/userCom.getBanByUid', '', $value['sina_uid']);
+
+            if($rst['rst']) {
+				$value['is_ban'] = 1;
+            }else{
+				$value['is_ban'] = 0;
 			}
 
             $rs[$value['sina_uid']] = $value;
-			
-			
 
         }
 
@@ -165,7 +153,6 @@ class users_mod extends action {
 		$pager = APP :: N('pager');
 		$page_param = array('currentPage'=> $page, 'pageSize' => $each, 'recordCount' => $count, 'linkNumber' => 10);
 		$pager->setParam($page_param);
-		
 
 		TPL :: assign('num', $num);
 		TPL :: assign('pager', $pager->makePageForKeyWord('',array('keyword'=>urlencode($nickname))));
@@ -228,72 +215,4 @@ class users_mod extends action {
 		TPL :: assign('num', $num);
         TPL :: display('mgr/user/users_ban', '', 0, false);
 	}
-	
-	
-	/**
-	  *  对用户进行1禁言、2禁止登录和3清除用户（禁止发言、禁止登录、禁止他人查看、禁止他的微博展示） 4恢复正常
-	  */
-	
-	function userAction(){
-		$type=(int)V('r:type',NULL);
-		$screen_name=V('r:name',NULL);
-		$sina_uid=V('r:id',NULL);
-		//判断sina_uid是否存在于新浪账户
-		if((($screen_name!=NULL&&trim($screen_name)!='')||$sina_uid!=NULL)&&in_array($type,array(1,2,3,4))){
-			if(!isset($sina_uid)){
-				$rst=DR('xweibo/xwb.getUserShow','',NULL,NULL,trim($screen_name));
-				if($rst['errno']==0&&isset($rst['rst']['id'])){
-					$sina_uid=$rst['rst']['id'];
-				}
-			}
-			else{
-				$rst=DR('xweibo/xwb.getUserShow','',NULL,$sina_uid);
-				if($rst['errno']==0&&isset($rst['rst']['screen_name'])){
-					$screen_name=$rst['rst']['screen_name'];
-					TPL::assign('screen_name',$screen_name);
-				}
-				$ret=DR('mgr/userCom.getUserAction','',$sina_uid);
-				if($ret['errno']==0){
-					$type=$ret['rst'][0]['action_type'];
-					TPL::assign('type',$type);
-					$onlyDisplay=TRUE;
-				}
-			}
-			if(isset($sina_uid)&&(!isset($onlyDisplay)||$onlyDisplay==FALSE)){
-				DD('mgr/userCom.getUserActionList');
-				if($type!=NULL){
-					DR('mgr/userCom.setUserAction','',$sina_uid,$type);
-					if($type==3){
-						DD('UserFollow.getLocalFollowTop');		
-					}
-					if(in_array($type,array(3))){
-						///删除用户需要批处理一批信息
-						//屏蔽其发布的活动
-						DR('events.batchUpdateEvents', '', $sina_uid, 3);
-						//批量删除用户组里面的数据
-						DR('mgr/userRecommendCom.delUserByUid', '', $sina_uid);
-						
-						
-					}
-					$this->_succ('操作已成功', array('userAction'));
-						
-				}
-			}
-			elseif(!isset($sina_uid)){
-				$this->_error('不存在该昵称的用户',URL('mgr/users.userAction'));
-				//用户不存在
-			}	
-		}
-		elseif(in_array($type,array(1,2,3,4))&&($screen_name==NULL||trim($screen_name)=='')){
-			//screen name is NULL
-			$this->_error('操作的用户名不能为空',URL('mgr/users.userAction'));
-			//有原始页面
-			
-		}
-		
-		TPL::display('mgr/user/user_action','',0,FALSE);
-		
-	}
-	
-	
 }

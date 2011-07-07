@@ -3,103 +3,26 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>认证用户列表 - 认证管理 - 运营管理</title>
-<link href="<?php echo W_BASE_URL;?>css/admin/admin.css" rel="stylesheet" type="text/css" />
+<link href="<?php echo W_BASE_URL;?>css/admin.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="<?php echo W_BASE_URL;?>js/jquery.min.js"></script>
-<script type="text/javascript" src="<?php echo W_BASE_URL;?>js/admin/admin_lib.js"></script>
-<script type="text/javascript" src="<?php echo W_BASE_URL;?>js/admin/admin.js"></script>
-<script src="<?php echo W_BASE_URL;?>js/admin-all.js"></script>
+<script type="text/javascript" src="<?php echo W_BASE_URL;?>js/admin_lib.js"></script>
+<script src="<?php echo W_BASE_URL;?>js/mgr.js"></script>
 <script type="text/javascript">
-var HtmlMode=['<form action="<?php echo URL('mgr/user_verify.authentication');?>" method="post"  name="add-newlink" id="form1">',
-            	'	<div class="pop-form">',
-				'		<div class="form-row">',
-            	'			<label for="nick">成员昵称</label>',
-            	'			<div class="form-cont">',
-            	'				<input name="nick" id="nick" class="input-txt" type="text" value="" vrel="_f|sz=max:20,m:多于10个汉字,ww:true|ne=m:不能为空" warntip="#errTip"/><span id="errTip" class="tips-error hidden"></span>',
-            	'			</div>',
-            	'		</div>',
-				'		<div class="form-row">',
-            	'			<label for="reason">认证理由</label>',
-            	'			<div class="form-cont">',
-            	'				<input name="reason" id="reason" class="input-txt" type="text" value="" vrel="_f|sz=max:40,m:多于20个汉字,ww:true|ne=m:不能为空" warntip="#reasonTip"/><span id="reasonTip" class="tips-error hidden"></span>',
-            	'			</div>',
-            	'		</div>',
-                '   	<div class="btn-area">',
-                '			<a href="#" class="general-btn btn-s2" id="pop_submit"><span>确定</span></a>',
-                '			<a href="#" class="general-btn" id="pop_cancel"><span>取消</span></a>',
-                '    	</div>',
-				'	</div>',
-                '</form>'].join('');
-                
 	function add_user(){
-	    Xwb.use('MgrDlg',{
-			modeHtml:HtmlMode,
-			formMode:true,
-			valcfg:{
-				form:'#form1',
-				trigger: '#pop_submit'
-			},
-			dlgcfg:{
-				cs:'add-certification win-fixed',
-				onViewReady:function(View){
-					var self=this;
-					$(View).find('#pop_cancel').click(function(){
-						self.close();
-					});
-				},
-				destroyOnClose:true,
-				actionMgr:false,
-				title:'添加新用户'
-			}
-		})
+		$('#add_user').show();
+		$("input[warntip='#errTip']").val('');
+		$('#edit_class').addClass('mask');
 	}
-	
-	function edit_user(nickname, reason, sina_uid) {
-		var EditHtml = ['<form action="<?php echo URL('mgr/user_verify.updateVerifyReason');?>" method="post" name="edit_reason" id="edit_frm">',
-            	'	<div class="pop-form">',
-            	'		<input type="hidden" name="sina_uid" value="', sina_uid,
-            	'" />',
-            	'		<div class="form-row">',
-            	'			<label>成员昵称</label>',
-				'			<div class="form-cont">',
-				'     			<span class="text">',
-								 nickname,
-				'				</span>',
-				'			</div>',
-            	'		</div>',
-            	'		<div class="form-row">',
-            	'			<label for="reason">认证理由</label>',
-            	'			<div class="form-cont">',
-            	'				<input name="reason" id="reason" class="input-txt" type="text" value="', reason,
-            	'" vrel="_f|sz=max:40,m:多于20个汉字,ww:true|ne=m:不能为空" warntip="#reasonTip"/><span id="reasonTip" class="tips-error hidden"></span>',
-            	'			</div>',
-            	'		</div>',
-                '   	<div class="btn-area">',
-                '			<a href="#" class="general-btn btn-s2" id="pop_submit"><span>确定</span></a>',
-                '			<a href="#" class="general-btn" id="pop_cancel"><span>取消</span></a>',
-                '    	</div>',
-                '    </div>',
-                '</form>'].join('');
-        Xwb.use('MgrDlg',{
-			modeHtml:EditHtml,
-			formMode:true,
-			valcfg:{
-				form:'#edit_frm',
-				trigger: '#pop_submit'
-			},
-			dlgcfg:{
-				cs:'add-certification win-fixed',
-				onViewReady:function(View){
-					var self=this;
-					$(View).find('#pop_cancel').click(function(){
-						self.close();
-					});
-				},
-				destroyOnClose:true,
-				actionMgr:false,
-				title:'编辑认证理由'
-			}
-		})
+
+	function closeBox() {
+		$("#errTip").cssDisplay(false);
+		$('#add_user').hide();
+		$('#edit_class').removeClass('mask');
 	}
+
+	$(function() {
+		bindSelectAll('#selectAll','#recordList > tr > td > input[type=checkbox]');
+	});
 
 	function delSelectId(url) {
 		var $checkbox = $('#recordList > tr > td > input[type=checkbox]:checked');
@@ -112,76 +35,104 @@ var HtmlMode=['<form action="<?php echo URL('mgr/user_verify.authentication');?>
 		}
 		//alert(url+'&uids='+ids);
 		if(ids)
-			delConfirm(url+'&ids='+ids, '您确定要处理这些数据吗？');
+			confirmDel(url+'&ids='+ids, '您确定要处理这些数据吗？');
 		else
 			window.href="#";
 	}
-	$(function(){
-		$('#selectAll').click(function(){
-			var $checkbox = $('#recordList > tr > td > input[type=checkbox]'),flag=this.checked;
-			$checkbox.each(function(){
-				this.checked=flag;
-			})
-		})
-	})
 </script>
 </head>
-<body  class="main-body">
-	<div class="path"><p>当前位置：用户管理<span>&gt;</span>认证管理</p></div>
-    <div class="main-cont">
-        <h3 class="title"><a class="general-btn" href="javascript:add_user();"><span>添加认证用户</span></a><a class="general-btn" href="<?php echo URL('mgr/user_verify.webAuthenWay'); ?>"><span>认证设置</span></a>认证用户列表</h3>
-		<div class="set-area">
-            <table class="table" cellpadding="0" cellspacing="0" width="100%" border="0">
-                <colgroup>
-                    <col class="h-w50" />
-                    <col class="h-w50" />
-                    <col class="h-w140" />
-                    <col />
-                    <col class="h-w150" />
-                    <col class="h-w150" />
-                </colgroup>
-                <thead class="tb-tit-bg">
-                    <tr>
-                        <th><div class="th-gap"></div></th>
-                        <th><div class="th-gap">编号</div></th>
-                        <th><div class="th-gap">昵称</div></th>
-                        <th><div class="th-gap">认证理由</div></th>
-                        <th><div class="th-gap">认证时间</div></th>
-                        <th><div class="th-gap">操作</div></th>
-                    </tr>
-                </thead>
-                <tfoot class="tb-tit-bg">
-                    <tr>
-                        <td colspan="6">
-                            <div class="pre-next">
-                                <?php echo $pager;?>
-                            </div>
-                            <input name="slectALL" id="selectAll" class="ipt-checkbox" type="checkbox" value="" />全选
-                            <a class="del-all" href="javascript:delSelectId('<?php echo URL('mgr/user_verify.delAuthen');?>');">取消所选用户的认证</a>
-                        </td>
-                    </tr>
-                </tfoot>
-                <tbody id="recordList">
-					<?php if (isset($list) && !empty($list) ) {?>
-                    <?php foreach($list as $value):?>
-					<?php if(!F('user_action_check',array(3),$value['sina_uid'])) :?>
-                        <tr>
-                            <td><input name="1" type="checkbox" value="<?php echo $value['sina_uid'];?>" /></td>
-                            <td><?php echo ++$num;?></td>
-                            <td><a href="<?php echo URL('ta', 'id='.$value['sina_uid'], 'index.php');?>" target="_blank"><?php echo F('escape', $value['nick']); ?></a></td>
-                            <td><?php echo F('escape', $value['reason']); ?></td>
-                            <td><?php echo date('Y-m-d H:i:s', $value['add_time']);?></td>
-                            <td><a class="icon-edit" href="javascript:void(0);" onclick="javascript:edit_user('<?php echo F('escape', $value['nick'], ENT_QUOTES); ?>', '<?php echo F('escape', $value['reason'], ENT_QUOTES); ?>', '<?php echo $value['sina_uid']; ?>')">编辑</a> <a class="icon-identify-n" href="javascript:delConfirm('<?php echo URL('mgr/user_verify.authentication', 'id=' . $value['sina_uid'] . '&v=0');?>','确认取消该用户的认证？')">取消认证</a></td>
-                        </tr>
-					<?php endif;?>
-                    <?php endforeach;?>
-					<?php } else {?>
-						<tr><td colspan="6"><p class="no-data">没有通过认证的用户</p></td></tr>
-					<?php }?>
-                </tbody>
-            </table>
+<body>
+<div class="main-wrap">
+	<div class="path"><span class="path-icon"></span>当前位置：运营管理<span> &gt; </span>认证管理<span> &gt; </span>认证用户列表</div>
+    <div class="set-wrap">
+        <h4 class="main-title"><a class="add-new-authenticateuser" href="javascript:add_user();"></a>认证用户列表</h4>
+		<div class="set-area-int">
+			<div class="user-list">
+            	<table width="100%" border="0" cellpadding="0" cellspacing="0" class="table-border">
+            		<colgroup>
+						<col class="checkbox-tab" />
+                        <col class="serial-number" />
+                        <col class="nikename" />
+    					<col />
+    					<col class="s-time" />
+    					<col class="user-name" />
+                        <col class="operate-w6" />
+    				</colgroup>
+                    <thead class="td-title-bg">
+  						<tr>
+    						<td></td>
+                            <td>编号</td>
+    						<td>昵称</td>
+    						<td>微博地址</td>
+                            <td>认证时间</td>
+                    		<td>操作者</td>
+    						<td>操作</td>
+  						</tr>
+                	</thead>
+                	<tfoot class="tfoot-bg">
+                    	<tr>
+                    		<td colspan="7">
+                            	<div class="pre-next">
+									<?php echo $pager;?>
+                        		</div>
+                            	<input name="slectALL" id="selectAll" class="select-all" type="checkbox" value="" />全选
+                                <a class="del-all" href="javascript:delSelectId('<?php echo URL('mgr/user_verify.delAuthen');?>');">取消所选用户的认证</a>
+                            </td>
+                   		</tr>
+                    </tfoot>
+                    <tbody id="recordList">
+						<?php foreach($list as $value):?>
+							<tr>
+								<td><input name="1" type="checkbox" value="<?php echo $value['sina_uid'];?>" /></td>
+								<td><?php echo ++$num;?></td>
+								<td><?php echo $value['nick'];?></td>
+								<td><a href="<?php echo URL('ta', 'id='.$value['sina_uid'], 'index.php');?>" target="_blank"><?php echo $value['http_url'];?></a></td>
+								<td><?php echo date('Y-m-d H:i:s', $value['add_time']);?></td>
+								<td><?php if(isset($value['admin_info']['nickname'])) echo $value['admin_info']['nickname'];?></td>
+								<td><a class="renzheng-n" href="<?php echo URL('mgr/user_verify.authentication', 'id=' . $value['sina_uid'] . '&v=0');?>">取消认证</a></td>
+							</tr>
+						<?php endforeach;?>
+                    </tbody>
+                </table>
+            </div>
         </div> 
     </div>
- 
+
+<div class="pop-float fixed-pop" id="add_user" style="display:none">
+	<div class="pop-t">
+		<div></div>
+	</div>
+	<div class="pop-m">
+		<div class="pop-inner">
+        	<h4><a class="clos" href="javascript:closeBox();"></a>添加新的认证用户</h4>
+            <div class="add-float-content">
+				<form action="<?php echo URL('mgr/user_verify.authentication');?>" method="post"  name="add-newlink" id="form1">
+            		<div class="float-info">
+            			<label>
+            				<p>请输入新成员的昵称：</p>
+            				<input name="nick" class="input-box pop-w7" type="text" value="" vrel="sz=max:10,m:不能多于10个汉字|ne=m:不能为空" warntip="#errTip"/><span id="errTip" class="a-error hidden"></span>
+            			</label>
+            		</div>
+                    <div class="float-button">
+                    	<span class="float-button-y"><input type="submit" name="确定" value="确定" /></span>
+                    	<span class="float-button-n"><input type="button" name="取消" value="取消" onclick="closeBox();"/></span>
+                    </div>
+                </form>
+            </div>
+    	</div>
+		<div class="pop-inner-bg"></div>
+	</div>
+	<div class="pop-b">
+		<div></div>
+	</div>
+</div>
+
+</div>
+<div id="edit_class"></div>
+<script type="text/javascript">
+var valid = new Validator({
+	form: '#form1'
+});
+</script>
 </body>
 </html>

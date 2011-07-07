@@ -2,29 +2,29 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>关键字过滤 - 微博 - 运营管理</title>
-<link href="<?php echo W_BASE_URL;?>css/admin/admin.css" rel="stylesheet" type="text/css" />
+<title>关键字过滤 - 微博管理 - 运营管理</title>
+<link href="<?php echo W_BASE_URL;?>css/admin.css" rel="stylesheet" type="text/css" />
 <script src="<?php echo W_BASE_URL;?>js/jquery.min.js"></script>
-<script src="<?php echo W_BASE_URL;?>js/admin-all.js"></script>
+<script src="<?php echo W_BASE_URL;?>js/mgr.js"></script>
 <script>
 $(function() {
-			bindSelectAll('#selectAll','#recordList > tr > td input[type=checkbox]');
+			bindSelectAll('#selectAll','#recordList > tr > td > input[type=checkbox]');
 			});
 
 function delSelectedConfirm() {
-	var v = getSelectedValues('#recordList > tr > td input[type=checkbox]');
+	var v = getSelectedValues('#recordList > tr > td > input[type=checkbox]');
 	if (!v) {
 		alert('最少选中其中一项');
 		return;
 	}
 	var url = '<?php echo URL('mgr/weibo/keyword.del', 'id=' , 'admin.php');?>' + v;
-	delConfirm(url, '确认要恢复所有选中的微博吗?');
+	confirmDel(url, '确认要恢复所有选中的微博吗?');
 }
 </script>
 </head>
 <body>
 <div class="main-wrap">
-	<div class="path"><span class="path-icon"></span>当前位置：运营管理<span> &gt; </span>微博<span> &gt; </span>关键字过滤</div>
+	<div class="path"><span class="path-icon"></span>当前位置：运营管理<span> &gt; </span>微博管理<span> &gt; </span>关键字过滤</div>
     <div class="set-wrap">
         <h4 class="main-title">关键字列表</h4>
 		<div class="set-area-int">
@@ -39,7 +39,7 @@ function delSelectedConfirm() {
 				</form>
 			</div>
 			<div class="user-list">
-            	<table width="100%" border="0" cellpadding="0" cellspacing="0" class="table">
+            	<table width="100%" border="0" cellpadding="0" cellspacing="0" class="table-border">
             		<colgroup>
 						<col class="checkbox-tab"/>
                         <col class="serial-number" />
@@ -50,18 +50,17 @@ function delSelectedConfirm() {
     				</colgroup>
                     <thead class="td-title-bg">
   						<tr>
-    						<th><div class="td-inside"></div></th>
-                            <th><div class="td-inside">编号</div></th>
-    						<th><div class="td-inside">关键字</div></th>
-                    		<th><div class="td-inside">添加时间</div></th>
-                    		<th><div class="td-inside">操作者</div></th>
-    						<th><div class="td-inside">操作</div></th>
+    						<td></td>
+                            <td>编号</td>
+    						<td>关键字</td>
+                    		<td>添加时间</td>
+                    		<td>操作者</td>
+    						<td>操作</td>
   						</tr>
                 	</thead>
                 	<tfoot class="tfoot-bg">
                     	<tr>
                     		<td colspan="6">
-							
                                 <div class="pre-next">
 								<?php if (isset($list) && is_array($list) && !empty($list)) {?>
 								<?php echo $pager;?>
@@ -69,7 +68,6 @@ function delSelectedConfirm() {
                         		</div>
                                 <input class="select-all" name="slectALL" id="selectAll" type="checkbox" value="" />全选
                                 <a href="javascript:delSelectedConfirm()">删除所选关键字</a>
-								
                             </td>
                    		</tr>
                     </tfoot>
@@ -81,10 +79,10 @@ function delSelectedConfirm() {
                             <td><?php echo htmlspecialchars($row['item']);?></td>
     						<td><?php echo date('Y-m-d H:i:s', $row['add_time']);?></td>
                             <td><?php echo $row['admin_name'];?></td>
-    						<td><a class="del-icon" title="删除" href="javascript:delConfirm('<?php echo URL('mgr/weibo/keyword.del','id=' . $row['kw_id'], 'admin.php');?>','确认要删除该关键字吗?')">删除</a></td>
+    						<td><a class="del-icon" title="删除" href="javascript:confirmDel('<?php echo URL('mgr/weibo/keyword.del','id=' . $row['kw_id'], 'admin.php');?>','确认要删除该关键字吗?')">删除</a></td>
                         </tr>
 					<?php }} else {?>
-						<tr><td colspan=6><p class="no-data">尚没有添加任何关键字</p></td></tr>
+						<tr><td colspan=6 class="no-data">尚没有添加任何关键字</td></tr>
 					<?php }?>
                     </tbody>
                 </table>

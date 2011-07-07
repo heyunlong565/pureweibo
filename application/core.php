@@ -23,71 +23,30 @@ class APP {
 		static $is_init;
 		if ($is_init) {return true;}
 
-		APP::_initCheckMobile();
 		APP::_initConfig();
 		APP::_globalVar();
 		APP::_initRouteVar();
 		
 		APP::_aclCheck();
-		APP::_initOther();
 		APP::_initSkin();
-		
 		//debug
 		//V('-:sysConfig/login_way', 3, true); 
 		APP::_doPreActions();
 		$is_init = true;
 	}
-	
-	function _initOther()
-	{
-		// 产品版本，两栏或三栏或更多
-		if ( !defined('PAGE_TYPE_CURRENT') ) 
-		{
-			$pageType = V('-:sysConfig/'.PAGE_TYPE_SYSCONFIG, PAGE_TYPE_DEFAULT);
-			define('PAGE_TYPE_CURRENT', $pageType);
-		}
-		
-		// 是否开启用户关系本地化
-		if ( !defined('XWB_PARENT_RELATIONSHIP') )
-		{
-			define('XWB_PARENT_RELATIONSHIP', V('-:sysConfig/open_user_local_relationship', 0) );
-		}
-		
-		// 个性域名开关
-		$isDomain = V('-:sysConfig/use_person_domain', FALSE);
-		define('USED_PERSON_DOMAIN', $isDomain);
-		
-		//写权限排查 对数据中
-		$nowRouter=APP::getRequestRoute();
-		if(in_array($nowRouter,V('-:writeableCheckRouter',array()))){
-				if(F('user_action_check',array(1,2,3))){
-					//错误码需要统一定义
-					if(defined('ENTRY_SCRIPT_NAME')&&ENTRY_SCRIPT_NAME=='wap'){
-						$this->_showErr('对不起，您已经被禁止发言。', $this->_getBackURL());
-					}
-					else{
-						if(substr($nowRouter,0,3)=='api'){
-							APP::ajaxRst('',1040005,'对不起，您已经被禁止发言。');	
-						}
-						else{
-							TPL::module('error_delete', array('msg'=>'对不起，您已经被禁止发言。') );	
-						}	
-					}
-					exit();
-				}
-			}
-		}
 	//------------------------------------------------------------------
 	/// 初始化皮肤 目录常量
 	function _initSkin(){
-		$user_skin_config=F('weibo_skin.getSkinPath');
-		if(isset($user_skin_config['path'])){
-			define('SKIN_CONSTUM_PATH',$user_skin_config['path']);
-		}
-		elseif(isset($user_skin_config['dir'])){
-			define('SKIN_CONSTUM_DIR',$user_skin_config['dir']);
-			define('SKIN_CONSTUM_STYLEID',$user_skin_config['style_id']);
-		}
+		// 预览皮肤
+		$skinCssDirName = V(SITE_SKIN_PREV_V, false);
+		$rs = DR('mgr/skinCom.getSkinById', 86400);
+		$skin_list = $rs['rst'];
+		$skin_id = 0;
+		$route = APP::getRequestRoute(true);
+		
+		$user_skin_config = F('weibo_skin.selectSkin', $skinCssDirName, $skin_id, $skin_list, $route);
+		define('SKIN_ID',	$user_skin_config['skin_id']);
+		define('SKIN_CSS_PATH',	$user_skin_config['skinCssDirName']);
 	}
 	//------------------------------------------------------------------
 	/// 初始化全局量 userConfig sysConfig session
@@ -137,7 +96,6 @@ class APP {
 		if (empty($ss)) {return true;}
 		if (preg_match_all("#/([a-z0-9_]+)-([^/]+)#sim",$ss,$pv)){
 			foreach ($pv[1] as $i=>$ni){
-				if (isset($_GET[$ni])){continue;}
 				// echo " $ni => ".($pv[2][$i])."\n"; //urldecode
 				$_GET[$ni] = urldecode($pv[2][$i]);
 				$_REQUEST[$ni] = urldecode($pv[2][$i]);
@@ -186,31 +144,11 @@ class APP {
 		// 协议类型 http https
 		define('W_BASE_PROTO',		(empty($protoV) || $protoV == 'off') ? 'http' : 'https'); 
 		define('W_BASE_HTTP',		W_BASE_PROTO.'://' . $host);
-		define('W_BASE_HOST',		$host);
+		
 		// 产品安装路径 如: /xweibo/  W_BASE_URL_PATH 将在安装的时候生成计算 
 		define('W_BASE_URL',		defined('W_BASE_URL_PATH') ? rtrim(W_BASE_URL_PATH, '/\\').'/' : '/' );
 		$fName	= basename(V('S:SCRIPT_FILENAME'));
 		define('W_BASE_FILENAME',	 $fName ? $fName : 'index.php');
-		
-	}
-	//------------------------------------------------------------------
-	//------------------------------------------------------------------
-	/**
-	 * 初始化判断是否WAP访问
-	 * @return bool true
-	 */
-	function _initCheckMobile(){
-		if (!defined('ENTRY_SCRIPT_NAME') || ENTRY_SCRIPT_NAME != 'wap') {
-			if (isset($_COOKIE['IS_MOBILE_AGENT']) && $_COOKIE['IS_MOBILE_AGENT'] == 0) {
-				return true;
-			} elseif (APP::F('is_mobile') === false) {
-				setcookie('IS_MOBILE_AGENT', 0, time() + 24*3600);
-			} else {
-				header("Location: wap.php");
-				exit;
-			}
-		}
-		return true;
 	}
 	//------------------------------------------------------------------
 	/**
@@ -394,64 +332,33 @@ class APP {
 		$baseUrl	= $entry ?  W_BASE_URL.$entry : W_BASE_URL.W_BASE_FILENAME;
 		$basePath	= W_BASE_URL;
 		//--------------------------------------------------------------
-		//锚点
-		$aName = "";
-		//把参数统一转换为数组
-		if (!is_array($qData)){
-			if (!empty($qData)){
-				if (strpos($qData,'#')!==false ){
-					$aName = substr($qData,strpos($qData,'#'));
-					$qData = substr($qData, 0, strpos($qData,'#'));
+		if($qData){
+			if(is_array($qData)){
+				$kv = array();
+				foreach($qData as $k=>$v){
+					$kv[] = $k . "=" . urlencode($v);
 				}
-				parse_str($qData,$qData);
+				$qData = implode("&", $kv);
 			}else{
-				$qData = array();
+				$qData = trim($qData, "&");
 			}
+		}else{
+			$qData = '';
 		}
 		//--------------------------------------------------------------
-		//wap URL特殊处理，增加SESSIONID
-		if(ENTRY_SCRIPT_NAME == 'wap' && (!isset($_COOKIE) || empty($_COOKIE))){
-			$qData[WAP_SESSION_NAME]=session_id();
-		}
-		//--------------------------------------------------------------
-		//处理 APACHE 中 类 /index.php/sdfdsf 地址，在 ？ 之前出现 %2f 时无法使用的BUG
-		//可用于 rewrite 优化的数据
-		$qStr1 = "";
-		//不可用于 rewrite 优化的数据 值 或者 名 中，包含 / 字符
-		$qStr2 = "";
-		if(!empty($qData)) {
-			$kv1 = array();
-			$kv2 = array();
-			foreach($qData as $k=>$v){
-				if (strpos($k.$v, '/') === false) {
-					$kv1[] = $k . "=" . urlencode($v);
-				}else{
-					$kv2[] = $k . "=" . urlencode($v);
-				}
-			}
-
-			$qStr1 = empty($kv1) ? "" :  implode("&", $kv1);
-			$qStr2 = empty($kv2) ? "" :  implode("&", $kv2);
-		}
-		//--------------------------------------------------------------		
 		if (R_MODE == 0 ){
 			$rStr	= R_GET_VAR_NAME . '=' . $mRoute;
-			if ($qStr1) $rStr.="&".$qStr1;
-			if ($qStr2) $rStr.="&".$qStr2;
-			return $baseUrl . '?' . $rStr . $aName;
+			$qData	= empty($qData) ?  $rStr  : $rStr . "&" . $qData;
+			return $baseUrl ."?" . $qData;
 		}
 		//--------------------------------------------------------------
 		if (R_MODE == 1 ){
-			return empty($qData) ? $baseUrl."/" . trim($mRoute,'/ ') 
-								 : $baseUrl."/" . trim($mRoute,'/ ')  ."?" . trim($qStr1.'&'.$qStr2, '& ') ;
+			return empty($qData) ? $baseUrl."/" . trim($mRoute,'/ ') : $baseUrl."/" . trim($mRoute,'/ ')  ."?" . $qData ;
 		}
 		//--------------------------------------------------------------
 		if (R_MODE == 2 || R_MODE == 3 ){
-			
-			$rStr = $qStr1 ? preg_replace("#(?:^|&)([a-z0-9_]+)=#sim","/\\1-",$qStr1) : '/';
-			$rStr .= $qStr2 ? "?".$qStr2 : '';
 			return empty($qData)? $basePath. trim($mRoute,'/ ')
-								: $basePath. trim($mRoute,'/ ') . $rStr ;
+								: $basePath. trim($mRoute,'/ ') . preg_replace("#(?:^|&)([a-z0-9_]+)=#sim","/\\1-",$qData) ;
 		}
 		//--------------------------------------------------------------
 		trigger_error("Unknow route type: [ ".R_MODE." ]", E_USER_ERROR);
@@ -468,7 +375,6 @@ class APP {
 	 * 						V('p'); 		表示获取 $_POST
 	 * 						V('c:var_name');表示获取 $_COOKIE['var_name']
 	 * @param $def_v
-	 * @param $setVar	是否设置一个变量
 	 * @return unknown_type
 	 */
 	function V($vRoute,$def_v=NULL,$setVar=false){
@@ -532,28 +438,6 @@ class APP {
 			return $mixed;
 		}
 	}
-	//-----------------------------------------------------------------
-	/**
-	 *
-	 *用于wap的url传递session_id的session_start 包裹函数
-	 *
-	 *@return 无
-	 */	
-	
-	function session_wap_init() {
-		
-		if($sid=V('r:'.WAP_SESSION_NAME,false)){
-			//XSS
-			if(!preg_match("/^[a-zA-Z0-9]{26}$/",$sid)){
-				exit(-1);
-			}
-			session_id($sid);
-		}
-		session_start();
-		
-	}
-		
-
 	//------------------------------------------------------------------
 	/**
 	 * APP::redirect($mRoute,$type=1);
@@ -563,7 +447,6 @@ class APP {
 	 * @return 无返回值
 	 */
 	function redirect($mRoute,$type=1){
-		//if(ENTRY_SCRIPT_NAME=='wap') {}
 		switch ($type){
 			case 1:
 				APP::M($mRoute);
@@ -593,25 +476,19 @@ class APP {
 	 * @return 函数执行结果
 	 */
 	function F($fRoute){
-		static $_fTree = array();		
 		$p = func_get_args();
 		array_shift($p);
-		
-		if(isset($_fTree[$fRoute])){
-			return call_user_func_array($_fTree[$fRoute],$p);
-		}
-		
+
 		$cFile = APP::_getIncFile($fRoute,'func');
 		require_once($cFile);
-		
+
 		$pp = preg_match("#^([a-z_][a-z0-9_\./]*/|)([a-z0-9_]+)(?:\.([a-z_][a-z0-9_]*))?\$#sim",$fRoute,$m);
 		if (!$pp) { trigger_error("fRoute : [ $fRoute  ] is  invalid ", E_USER_ERROR);  return false;}
-		$_fTree[$fRoute] = empty($m[3])?$m[2]:$m[3];
-		if ( !function_exists($_fTree[$fRoute]) ) {
-			trigger_error("Can't find function [ {$_fTree[$fRoute]} ] in file [ $cFile ]", E_USER_ERROR);
+		$func = empty($m[3])?$m[2]:$m[3];
+		if ( !function_exists($func) ) {
+			trigger_error("Can't find function [ $func ] in file [ $cFile ]", E_USER_ERROR);
 		}
-		
-		return call_user_func_array($_fTree[$fRoute],$p);
+		return call_user_func_array($func,$p);
 	}
 	//------------------------------------------------------------------
 	/**
@@ -702,8 +579,7 @@ class APP {
 		$tCfg = array(
 			'cls'=>	'',
 			'mod'=>	'_mod',
-			'com'=>	'',
-			'pls'=> '_pls'
+			'com'=>	''
 		);
 		return isset($tCfg[$type]) ? $className.$tCfg[$type] : $className;
 	}
@@ -714,9 +590,8 @@ class APP {
 		$iRoute = trim($iRoute);
 		$type 	= trim($type);
 		
-		$clsKey = $type.":".$iRoute;
-		if ( $is_single && isset($clsArr[$clsKey]) &&  is_object($clsArr[$clsKey]) ){
-			return $clsArr[$clsKey];
+		if ( $is_single && isset($clsArr[$iRoute]) &&  is_object($clsArr[$iRoute]) ){
+			return $clsArr[$iRoute];
 		}else{
 
 			$cFile = APP::_getIncFile($iRoute,$type);
@@ -738,12 +613,12 @@ class APP {
 					$prm[] = "\$p[".$i."]";
 				}
 				eval("\$retClass = new ".$class." (".implode(",",$prm).");");
-				if ( $is_single ) { $clsArr[$clsKey] = $retClass; }
+				if ( $is_single ) { $clsArr[$iRoute] = $retClass; }
 				return $retClass;
 			}else{
 				if ( $is_single ) {
-					$clsArr[$clsKey] = new $class;
-					return $clsArr[$clsKey];
+					$clsArr[$iRoute] = new $class;
+					return $clsArr[$iRoute];
 				}else{
 					$c = new $class;
 					return $c;
@@ -947,49 +822,20 @@ class APP {
 		if ( !APP::_chkPath($fRoute) ){
 			trigger_error("file route: [ $fRoute  - $type  ] is  invalid ", E_USER_ERROR);
 		}
-		$tpldir		= ($type=='tpl'  &&  $ext===true) ?  SITE_SKIN_TPL_DIR."/" : trim($ext,'/\\ ') . '/';
+
+		$tpldir		= ($type=='tpl'  &&  !$ext)		 	? '' : SITE_SKIN_TPL_DIR."/";
 		$langdir	= ($type=='lang' &&  !empty($ext)) 	? $ext : SITE_LANG;
 
-		$m 	  = APP::_parseRoute($fRoute);
-		$fp   = $m[1].$m[2];
+		$m = APP::_parseRoute($fRoute);
+		$fp = $m[1].$m[2];
 		$type = strtolower($type);
-		
-		// 只有需要支持多模板的时候才运行,多模板tpl,pls,mod
-		if ($ext===true && isset($GLOBALS[V_GLOBAL_NAME]['MIX_TPL']) && in_array($type, array('tpl','pls','mod'))) 
-		{
-			$tpl = P_TEMPLATE."/".PAGE_TYPE_CURRENT.'/'.$fp.EXT_TPL;
-			if (file_exists($tpl)) {
-				return $tpl;
-			}
-			F('err404',"file:[ ". $tpl ." ] not exists  ");
-/*
-			$f = array( 'tpl'  => array('default'=>P_TEMPLATE."/".$tpldir.$fp.EXT_TPL, 'current'=>P_TEMPLATE."/".PAGE_TYPE_CURRENT.'/'.$fp.EXT_TPL),
-				   		'pls'  => array('default'=>P_PLS."/".$fp.EXT_PLS, 'current'=>P_PLS."/".PAGE_TYPE_CURRENT.'/'.$fp.EXT_PLS),
-				   		'mod'  => array('default'=>P_MODULES."/".$fp.EXT_MODULES, 'current'=>P_MODULES."/".PAGE_TYPE_CURRENT.'/'.$fp.EXT_MODULES)
-			);
-			
-			// 先查找系统设置的模板，再找默认路径的模板
-			if ( file_exists($f[$type]['current']) ){
-				return $f[$type]['current'];
-			}
-			if ( file_exists($f[$type]['default']) ){
-				return $f[$type]['default'];
-			}
-
-			F('err404',"file:[ ".$f[$type]['current']." or ".$f[$type]['default']." ] not exists  ");
-			*/
-		}
-		
-		// 正常一般时运行，例如安装程序、后台等
-		$f = array('tpl'  => P_TEMPLATE ."/".$tpldir . $fp . EXT_TPL,
-				   'cls'  => P_CLASS ."/" . $fp . EXT_CLASS,
-				   'pls'  => P_PLS ."/" . $fp . EXT_PLS,
-				   'mod'  => P_MODULES ."/" . $fp . EXT_MODULES,
-				   'func' => P_FUNCTION . "/" . $fp . EXT_FUNCTION,
-				   'com'  => P_COMS . "/" . $fp . EXT_COM,
-				   'lang' => P_LANG . "/" . $langdir . "/" . $fp . EXT_LANG
+		$f = array('tpl'=>P_TEMPLATE ."/".$tpldir . $fp . EXT_TPL,
+				   'cls'=>P_CLASS ."/" . $fp . EXT_CLASS,
+				   'mod'=>P_MODULES ."/" . $fp . EXT_MODULES,
+				   'func'=>P_FUNCTION . "/" . $fp . EXT_FUNCTION,
+				   'com'=>P_COMS . "/" . $fp . EXT_COM,
+				   'lang'=>P_LANG . "/" . $langdir . "/" . $fp . EXT_LANG
 		);
-		///echo $f[$type];
 		if ( !isset($f[$type]) ){
 			trigger_error("file type: [ $type  ] is  invalid ", E_USER_ERROR);
 		}
@@ -1007,22 +853,19 @@ class APP {
 	 * APP::LOG ($msg);
 	 * 根据配置信息将 $msg 信息写入日志文件 默认在 /var/log/
 	 * @param $msg		日志信息
-	 * @param $type		日志类型，如　error　默认为 log
 	 * @return	是否写成功
 	 */
-	function LOG ($msg,$type=false) {
+	function LOG ($msg) {
 		if (strtolower(XWB_SERVER_ENV_TYPE)!='common' || !ENABLE_LOG ) {return false;}
 		
-		$log_file = $type ?  substr(P_VAR_LOG_FILE,0,-7).$type.".php" : P_VAR_LOG_FILE ;
 		$msg = sprintf("[%s]:\t%s\r\n",date("Y-m-d H:i:s"),$msg);
-		if (!file_exists($log_file)){
+		if (!file_exists(P_VAR_LOG_FILE)){
 			$msg = "<?php  ".IS_IN_APPLICATION_CODE." ?> \r\n\r\n".$msg;
 		}
 
-		IO::write($log_file, $msg, true);
+		IO::write(P_VAR_LOG_FILE, $msg, true);
 	}
 	//------------------------------------------------------------------
-	//todo...
 	function debug(){
 		
 	}
@@ -1074,8 +917,8 @@ class APP {
 	//------------------------------------------------------------------
 	
 	///todo
-	function JSONP($rst, $errno=0,$err='', $callback='callback', $script=''){
-		echo "<script language='javascript'>{$callback}(".json_encode(array('rst'=>$rst,'errno'=>$errno*1,'err'=>$err)).");".$script."</script>";
+	function JSONP($rst, $callBack='callback', $script=false){
+		
 	}
 	//------------------------------------------------------------------
 	///todo
@@ -1084,7 +927,7 @@ class APP {
 	//------------------------------------------------------------------
 	function deny($info=''){
 		header("HTTP/1.1 403 Forbidden");
-		exit('Access deny'.$info);
+		exit('Access deny '.$info);
 	}
 	//------------------------------------------------------------------
 	/**
@@ -1124,17 +967,11 @@ class APP {
 			}
 
 			if ($params['tpl']) {
-				if (in_array($params['tpl'], array('e403', 'e404'))) {
-					APP::F('err404', implode('<br />', $params['msg']));
-				} else if (in_array($params['tpl'], array('error', 'error_busy', 'error_force', 'error_rest'))) {
-					APP::F('error', implode('<br />', $params['msg']));
-				} else {
-					TPL::assign($params);
-					if (!isset($params['baseskin'])) {
-						$params['baseskin'] = true;
-					}
-					TPL::display($params['tpl'], $params['lang'], $params['caching'], $params['baseskin']);
+				TPL::assign($params);
+				if (!isset($params['baseskin'])) {
+					$params['baseskin'] = true;
 				}
+				TPL::display($params['tpl'], $params['lang'], $params['caching'], $params['baseskin']);
 				exit;
 			} else {
 				if($time) {
@@ -1204,36 +1041,27 @@ class TPL {
 	}
 	//------------------------------------------------------------------
 	/**
-	 * TPL::display($_tpl, $_langs=array(), $_ttl=0, $_baseSkin=true);
+	 * TPL::display($tpl, $langs=array(), $ttl=0, $tplDir="");
 	 * 显示一个模板
-	 * @param $_tpl		模板路由
-	 * @param $_langs	语言包，可以是半角逗号隔开的列表，也可以是数组
-	 * @param $_ttl		缓存时间 单位秒 （ 未实现 ）
-	 * @param $_baseSkin	模板基准目录选项，默认为 true ，将使用系统配置的皮肤目录
-	 * @param $_isPipe		是否使用PIPE
+	 * @param $tpl		模板路由
+	 * @param $langs	语言包，可以是半角逗号隔开的列表，也可以是数组
+	 * @param $ttl		缓存时间 单位秒 （ 未实现 ）
+	 * @param $baseSkin	模板基准目录选项，默认为 true ，将使用系统配置的皮肤目录
 	 * @return 无返回值
 	 */
-	function display($_tpl, $_langs=array(), $_ttl=0, $_baseSkin=true, $_isPipe=true){
-		if ( !empty($_langs) ){
-			if ( !is_array($_langs) ){
-				$_langs = explode(",", $_langs);
-			}
-			foreach ($_langs as $t){
-				if(!empty($t)){
-					APP::importLang($t);
-				}
+	function display($tpl, $langs=array(),$ttl=0, $baseSkin=true){
+		if ( !empty($langs) ){
+			if ( !is_array($langs) ) $langs = explode(",", $langs);
+			foreach ($langs as $t){
+				if(!empty($t)) APP::importLang($t);
 			}
 		}
-		
+		//接管参数，防止变量覆盖
+		$___tpl_args = array($tpl, $langs, $ttl, $baseSkin);
         if (is_array($GLOBALS[V_GLOBAL_NAME]['TPL'])) {
-			extract($GLOBALS[V_GLOBAL_NAME]['TPL'], EXTR_SKIP);
+			extract($GLOBALS[V_GLOBAL_NAME]['TPL']);
 		}
-		include APP::tplFile( $_tpl, $_baseSkin );
-		
-		// 只有需要xpipe的时候才运行
-		if ($_isPipe && isset($GLOBALS[V_GLOBAL_NAME]['NEED_XPIPE'])) {
-			Xpipe::run();
-		}
+		include APP::tplFile( $___tpl_args[0], $___tpl_args[3] );
 	}
 	//------------------------------------------------------------------
 	/**
@@ -1247,239 +1075,39 @@ class TPL {
 	 */
 	function fetch($tpl, $langs=array(), $ttl=0, $baseSkin=true){
 		ob_start();
-		TPL::display($tpl,$langs,$ttl, $baseSkin, false);
-		$data = ob_get_clean();
+		TPL::display($tpl,$langs,$ttl, $baseSkin);
+		$data = ob_get_contents();
+		ob_end_clean();
 		return $data;
 	}
 	//------------------------------------------------------------------
 	/**
 	 * 输出或者获取一个 HTML 插件
-	 * @param $___arg_tpl		模板路由
+	 * @param $tpl		模板路由
 	 * @param $args		插件变量，是一个关联数组，在插件模板中，数组的下标即是变量名
-	 * @param $___arg_baseSkin	模板基准目录选项，默认为 true ，将使用系统配置的皮肤目录
-	 * @param $___arg_output	是否直接输出插件HTML代码，当其为FALSE时，返回插件内容	
+	 * @param $baseSkin	模板基准目录选项，默认为 true ，将使用系统配置的皮肤目录
+	 * @param $output	是否直接输出插件HTML代码，当其为FALSE时，返回插件内容	
 	 * @return  相应的 HTML  插件代码
 	 */
-	function plugin($___arg_tpl, $args=array(), $___arg_baseSkin=true, $___arg_output=true){
-		if (is_array($args)){
-			extract($args, EXTR_SKIP);
-		}
-		if ($___arg_output){
-			include APP::tplFile($___arg_tpl, $___arg_baseSkin);
-		}else{
-			ob_start();
-			include APP::tplFile($___arg_tpl, $___arg_baseSkin);
-			$data = ob_get_clean();
-			return $data;
-		}
-	}
-	
-	function module($___arg_tpl, $args=array(), $___arg_output=true){
+	function plugin($tpl, $args=array(), $baseSkin=true, $output=true){
 		// 防止被 $args 覆盖
-		$___arg_baseSkin = 'modules';
+		$___arg_tpl		 = $tpl;
+		$___arg_baseSkin = $baseSkin;
+		$___arg_output	 = $output;
 		if (is_array($args)){
-			extract($args, EXTR_SKIP);
+			extract($args);
 		}
 		if ($___arg_output){
-			include APP::tplFile($___arg_tpl, $___arg_baseSkin);
+			include APP::tplFile( $___arg_tpl, $___arg_baseSkin );
 		}else{
 			ob_start();
-			include APP::tplFile($___arg_tpl, $___arg_baseSkin);
-			$data = ob_get_clean();
-			return $data;
+			include APP::tplFile( $___arg_tpl, $___arg_baseSkin );
+			$data = ob_get_contents();
+			ob_end_clean();
+			return $data ;
 		}
 	}
 }
-//----------------------------------------------------------------------
-/**
-* 类BigPipe的管道输出控制类
-*/
-class Xpipe {
-	function Xpipe(){
-	}
-	/**
-	* 新建一个 pagelet
-	* 
-	* @param mixed $r	pagelet 的路由
-	* @param mixed $p	传递给 pagelet 的参数
-	* @param mixed $o	执行顺序,如果为 false则符合先进先出的规则，返之，数据大的先执行
-	* @param mixed $isPerch 是否输出占位标签,非占位pagelet可用
-	*/
-	function pagelet($r, $p=array(), $o=false,$isPerch=true){
-		static $ost= 1000000,$custom_st = 1000001,$ki=10000;
-		$ki++;
-		$k =  $o==false ? $ost-- : $custom_st+$o;		
-		//echo $k,"-",$ost,"\n";
-		$GLOBALS[V_GLOBAL_NAME]['PAGELETS'][$k] = array($r, $p, $ki,$isPerch);
-		if ($isPerch){
-			Xpipe::_perchLable($ki,$r);
-		}
-	}
-	
-	/**
-	* 占位标签,用于确定模块要显示的位置
-	*/
-	function _perchLable($k,$r){
-		echo sprintf("<div class='hidden' id='%s' xRoute='%s' ></div>",Xpipe::_idKey($k),$r);
-	}
-	///　生成一个占位标签的　ID
-	function _idKey($k){
-		return 'XpipeModule_'.$k;
-	}
-	
-	function isRunning($run=false){
-		static $isRun = false;
-		if ($run) $isRun = $run;
-		return $isRun ;
-	}
-	/**
-	* 执行管道队列中的相关子模块
-	*/
-	function run(){
-		if (!Xpipe::usePipe()){
-			return false;
-		}
-		//将布局缓冲输出到客户端
-		@ob_end_flush();
-		Xpipe::_start();
-		
-		$pls = Xpipe::_getAndCleanPagelets();
-		if (!$pls || !is_array($pls)){
-			Xpipe::_end();
-			return false;
-		}
-		//print_r($pls);exit;
-		
-		
-		while(count($pls)>0){
-			$pl		= array_shift($pls);
-			$rst	= Xpipe::runOnePagelet($pl);
-			//输出SCRIPT到缓冲
-			Xpipe::output($rst);
-			
-			//检查是否存在子管道，并插入到当前队列的最开始,避免使用递归
-			$child_pls = Xpipe::_getAndCleanPagelets();
-			if ($child_pls && is_array($child_pls)) {
-				//print_r($pls);print_r($child_pls);exit;
-				$pls = array_merge($child_pls, $pls);
-				
-			}
-		}
-		Xpipe::_end();
-	}
-	
-	//当前请求是否使用 PIPE ，默认使用
-	function usePipe($state=true){
-		static $isUse = true;
-		if (func_num_args()){
-			$isUse = $state;
-		}
-		return $isUse;
-	}
-	
-	/**
-	* 一次管道输出，某个子模块运算完成,通知前端处理相关逻辑
-	* 
-	* @param mixed	$rst
-	* @param string JS端统一调用的管道方法
-	* @return		无返回，输出一段 script　到缓冲并输出
-	*/
-	function output($rst, $jsFunc='load'){
-		echo sprintf("\n<script>%s.%s(%s);</script>", V_JS_XPIPE_OBJ, $jsFunc, json_encode($rst));
-		@flush();
-	}
-	
-	/**
-	* 执行一个管道模块
-	* @param mixed $pl
-	*/
-	function runOnePagelet($pl){
-		ob_start();
-		list($r, $p, $k,$isPerch) = $pl;
-		$plObj	= APP::_cls($r,'pls',true);
-		$rArr	= APP::_parseRoute($r);
-		//print_r($rArr);
-		$data = $plObj->$rArr[3]($p);
-		$pl_content = ob_get_clean();
-
-		return array(
-				'html'=>$pl_content,
-				'pagelet'=>$r,
-				'perch'=>$isPerch,
-				'id'=>Xpipe::_idKey($k),
-				'data'=>$data
-				//,'cfg'=>Xpipe::addCfg(false,false,true)
-				);
-	}
-	
-	
-	//管道开始
-	function _start(){
-		Xpipe::isRunning(true);
-		//初始化的全局配置量
-		$iniCfg = array(
-			'basePath'=>W_BASE_URL,'routeMode'=>R_MODE,'routeVname'=>R_GET_VAR_NAME,'akey'=>WB_AKEY,
-			'shortLink'=>V('-:sysConfig/site_short_link', ''),
-			'loginCfg'=>V('-:sysConfig/login_way', 1),
-			'webName'=>V("-:sysConfig/site_name"),
-			'uid'=>USER::uid(),
-			'siteUid'=>USER::get('site_uid'),
-			'siteUname'=>USER::get('site_uname'),
-			'siteName'=>USER::get('site_name'),
-			'siteReg'=>V('-:siteInfo/reg_url'),
-			'sinaReg' => URL('account.goSinaReg'),
-			'page'=>APP::getRequestRoute(),
-			'remind'=>/*V('-:userConfig/user_newfeed')*/intval(PAGE_TYPE_CURRENT) === 1 ? 0 : 1,
-			'maxid' => CACHE::get(USER::uid() . '_maxid')
-		);
-		
-		Xpipe::output($iniCfg, 'start');
-	}
-	
-	//管道结束
-	function _end(){
-		Xpipe::output(true, 'end');
-		Xpipe::isRunning(false);
-	}
-	
-	//调试，查看变量
-	function debug($var){
-		echo '<pre style="color:green; border: 1px solid green;padding: 5px;">Xpipe变量跟踪：'."\n";
-		var_dump($var);
-		echo '</pre>';
-	}
-	
-	function addCfg($k, $v=null, $getClean=false){
-		static $cfgArr = array();
-		if ($getClean){
-			$rst = $cfgArr;
-			$cfgArr = array();
-			return $rst;
-		}
-		if (is_array($k) && $v===null ){
-			$cfgArr=array_merge($cfgArr,$k);
-		}else{
-			$cfgArr[$k]=$v;
-		}
-	}
-	
-	/**
-	* 记取当前　pagelet　队列，并清空
-	* @return	如果没有 pagelet　队列　则返回 false　，　如有则返回 pagelets数据
-	*/
-	function _getAndCleanPagelets(){
-		$ret = $GLOBALS[V_GLOBAL_NAME]['PAGELETS'];
-		$GLOBALS[V_GLOBAL_NAME]['PAGELETS'] = array();
-		if (!empty($ret) && is_array($ret)) {
-			krsort($ret);
-			return $ret;	
-		}else{
-			return false;
-		}
-		return empty($ret) ? false : $ret;		
-	}
-}
-
 //----------------------------------------------------------------------
 /**
  * 获取一个变量值  APP::V 的同名函数
@@ -1513,22 +1141,6 @@ function F(){
 function URL($mRoute, $qData=false, $entry=false){
 	return APP::mkModuleUrl($mRoute, $qData, $entry);
 }
-/**
-* 生成WAP兼容的URL页面链接
-* 
-* @param mixed $mRoute
-* @param mixed $qData
-* @param mixed $entry
-* @return mixed
-*/
-function WAP_URL($mRoute, $qData=false, $entry=false){
-	$url = APP::mkModuleUrl($mRoute, $qData, $entry);
-	return htmlspecialchars($url, ENT_QUOTES);
-}
-
-
-
-
 //----------------------------------------------------------------------
 /// cache
 class CACHE {
@@ -1540,14 +1152,14 @@ class CACHE {
 	 * 获取当前缓存适配器的实例
 	 * @return unknown_type
 	 */
-	function &getInstance(){
+	function getInstance(){
 		return APP::ADP('cache',false);
 	}
 	//------------------------------------------------------------------
 	function &instance(){
 		static $c;
 		if(empty($c)) {
-			$c =& APP::ADP('cache');
+			$c = APP::ADP('cache');
 		}
 		return $c;
 	}
@@ -1747,6 +1359,8 @@ class DBG{
 		if (!$dbg){$dbg = APP::N('myXdebuger');}
 
 	}
+	
+	
 }
 //----------------------------------------------------------------------
 
@@ -1793,7 +1407,7 @@ class dsMgr {
 		$cacheType	= 'g';
 		$useStatic	= false;
 		$gCacheName = COM_CACHE_KEY_PRE.$dsRoute;
-		// 静态缓存数据
+		// 静态缓存数据,todo页面级缓存
 		static $rstData = array();
 		// 静态对象
 		static $objArr	= array();
@@ -1919,44 +1533,6 @@ class dsMgr {
 		//--------------------------------------------------------------
 		// 错误处理 
 		if (!empty($comRst['errno'])){
-			if ($comRst['errno'] == '1040008') {
-				$sina_uid = USER::uid();
-
-				///退出,清空SESSION 
-				USER::uid(0);
-				USER::resetInfo();
-
-				$login_way = V('-:sysConfig/login_way', 1)*1; 
-				if ($login_way == 2 || $login_way == 3) {
-					$accAdapter = APP::ADP('account');
-					$sUser = $accAdapter->getInfo();
-					$site_uid	= $sUser['site_uid'];
-					if (empty($sina_uid)) {
-						$result = DR('mgr/userCom.getBySiteUid', 'p', $site_uid);
-						$result = $result['rst'];
-						$sina_uid = $result['sina_uid'];
-					}
-					/// 解除之前的绑定，重新bind
-					$inData = array('access_token'=>'', 'token_secret'=>'', 'uid'=>0);
-					DR('mgr/userCom.insertUser', '', $inData, $sina_uid);
-
-					$xwb_discuz_enable = V('-:sysConfig/xwb_discuz_enable'); 
-					if (1 == $xwb_discuz_enable) {
-						///同步插件的绑定数据
-						DR('xwbBBSpluginCf.deleteBindUser', '', $site_uid, $sina_uid);
-					}
-
-					//　发送退出通知到其它应用
-					$syncLogoutScript = $accAdapter->syncLogout($site_uid);
-					if ($syncLogoutScript){
-						echo  $syncLogoutScript,"\n";
-					}
-				}
-				APP::redirect(URL(APP::getRequestRoute()), 4);
-				return;
-			} elseif ($comRst['errno'] == '1040016' && !IS_IN_JS_REQUEST) {
-				APP::tips(array('tpl' => 'error', 'msg' => '出错啦，该网站调用API次数已超过限制，请联系站长解决！'));
-			}
 			return  $eHandler ? dsMgr::errorDump($comRst) : $comRst;
 		}
 		//--------------------------------------------------------------
@@ -2067,15 +1643,15 @@ function DD($dsRoute){
 function RST($rst, $errno=0, $err='', $level=0, $log=''){
 	return array('rst'=>$rst, 'errno'=>$errno*1, 'err'=>$err, 'level'=>$level, 'log'=>$log);
 }
-
 //----------------------------------------------------------------------
 /**
  *
+ *
+ *
+ *
  */
-function LOGSTR($type, $str){
-	//时间        项目名称    项目版本号    APP_KEY    错误类型    错误描述 sprintf()
-	$log = WB_SOFT_NAME . "\t" . WB_VERSION . "\t" . WB_AKEY . "\t" . $type . "\t" . $str;
-	APP::LOG($log, 'error');
+function LOGSTR($level, $str, $env){
+	
 }
 //----------------------------------------------------------------------
 /// 用户类
@@ -2172,7 +1748,7 @@ class USER {
 		return $k ? (isset($uCfg[$k]) ?$uCfg[$k] :  NULL) : $uCfg;
 	}
 	
-	/// 获取一个系统配置
+	/// 设置或者获取一个系统配置
 	function sys($k=NULL){
 		static $sCfg = array();
 		
@@ -2183,3 +1759,5 @@ class USER {
 	}
 }
 //----------------------------------------------------------------------
+//----------------------------------------------------------------------
+?>

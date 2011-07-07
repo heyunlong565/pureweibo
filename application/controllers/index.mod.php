@@ -23,15 +23,6 @@ class index_mod
 	 */
 	function default_action()
 	{
-		//皮肤预览
-		$preview=V('g:preview',FALSE);
-		if($preview){
-			define('SKIN_PREIVEW',$preview);
-		}
-		
-		//过滤类型
-		$filter_type = V('g:filter_type');
-
 		/// 页码数
 		$page = max(V('g:page'), 1);
 
@@ -40,24 +31,22 @@ class index_mod
 		$count = $limit;
 		/// 调用获取当前用户所关注用户的最新微博信息api
 		DR('xweibo/xwb.getUnread');
-		$result = DR('xweibo/xwb.getFriendsTimeline', CACHE_HOME_TIMELINE, $count, $page, null, null, null, $filter_type);
+		$result = DR('xweibo/xwb.getFriendsTimeline', CACHE_HOME_TIMELINE, $count, $page);
 		$list = $result['rst'];
-		if ($page == 1 && empty($filter_type)) {
+		if ($page == 1) {
 			if ($list) {
-				CACHE::set(USER::uid().'_maxid', $list[0]['id']);
-				//APP::setData('maxid', $list[0]['id'], 'WBDATA');
+				APP::setData('maxid', $list[0]['id'], 'WBDATA');
 			}
 		}
 
 		/// 右侧模块数据
-		//$modules = DS('PageModule.getPageModules', '', 2, 1);
+		$modules = DS('PageModule.getPageModules', '', 2, 1);
 
-		//TPL::assign('uid', USER::uid());
+		TPL::assign('uid', USER::uid());
 		TPL::assign('list', $list);
 		TPL::assign('limit', $limit);
-		//TPL::assign('page', $page);
-		//TPL::assign('side_modules', isset($modules[2]) ? $modules[2]: array());
-		TPL::assign('filter_type', $filter_type);
+		TPL::assign('page', $page);
+		TPL::assign('side_modules', isset($modules[2]) ? $modules[2]: array());
 		TPL::display('index');
 	}
 
@@ -71,32 +60,32 @@ class index_mod
 	{
 		/// 页码数
 		$page = max(V('g:page'), 1);
-/*
+
 		/// 设置每页显示微博数
 		$limit = WB_API_LIMIT;
 		$count = $limit;
-*/
+
 		DR('xweibo/xwb.getUnread');
 		/// 调用获取@当前用户的微博列表api
 		if ($page == 1) {
 			/// 清零
 			DR('xweibo/xwb.resetCount', '', 2);
 		}
-		//$result = DR('xweibo/xwb.getMentions', CACHE_MENTIONS, $count, $page);
-		//$list = $result['rst'];
+		$result = DR('xweibo/xwb.getMentions', CACHE_MENTIONS, $count, $page);
+		$list = $result['rst'];
 
 		/// 调用微博个人资料接口
 		$userinfo = DR('xweibo/xwb.getUserShow', 'p', USER::uid());
 		$userinfo = $userinfo['rst'];
 
 		/// 右侧模块数据
-		//$modules = DS('PageModule.getPageModules', '', 2, 1);
+		$modules = DS('PageModule.getPageModules', '', 2, 1);
 
-//		TPL::assign('list', $list);
-//		TPL::assign('limit', $limit);
+		TPL::assign('list', $list);
+		TPL::assign('limit', $limit);
 		TPL::assign('uid', USER::uid());
 		TPL::assign('userinfo', $userinfo);
-		//TPL::assign('side_modules', isset($modules[2]) ? $modules[2]: array());
+		TPL::assign('side_modules', isset($modules[2]) ? $modules[2]: array());
 		TPL::display('atme');
 	}
 
@@ -104,35 +93,23 @@ class index_mod
 	/**
 	 *  收到的评论
 	 *
-	 *<?php if (empty($list)):?>
-                            <!-- comments list empty tip -->
-                            <div class="default-tips">
-                                <div class="icon-tips all-bg"></div>
-								<?php if (V('g:page', 1) > 1):?>
-                                <p>已到最后一页</p>
-								<?php else:?>
-                                <p>暂时还没有收到任何评论</p>
-								<?php endif;?>
-                            </div>
-                            <!-- end comments list empty tip -->
-                        <?php else:?>
+	 *
 	 */
 	function comments()
 	{
 		/// 页码数
 		$page = max(V('g:page'), 1);
-/*
+
 		/// 设置每页显示微博数
-		$limit = WB_API_LIMIT;//V('-:userConfig/user_page_comment');
+		$limit = V('-:userConfig/user_page_comment');
 		$count = $limit;
-*/
+
 		DR('xweibo/xwb.getUnread');
 		/// 获取当前用户发送及收到的评论列表
 		if ($page == 1) {
 			/// 清零
 			DR('xweibo/xwb.resetCount', '', 1);
 		}
-/*
 		$result = DR('xweibo/xwb.getCommentsToMe', CACHE_COMMENT_TO_ME, $count, $page);
 		$list = $result['rst'];
 		/// 过滤微博
@@ -143,9 +120,8 @@ class index_mod
 
 		TPL::assign('list', $list);
 		TPL::assign('limit', $limit);
-*/
-//		TPL::assign('uid', USER::uid());
-//		TPL::assign('side_modules', isset($modules[2]) ? $modules[2]: array());
+		TPL::assign('uid', USER::uid());
+		TPL::assign('side_modules', isset($modules[2]) ? $modules[2]: array());
 		TPL::display('comments');
 	}
 
@@ -157,7 +133,6 @@ class index_mod
 	 */
 	function commentsend()
 	{
-/*
 		//页码数
 		$page = max(V('g:page'), 1);
 
@@ -178,7 +153,6 @@ class index_mod
 		TPL::assign('limit', $limit);
 		TPL::assign('uid', USER::uid());
 		TPL::assign('side_modules', isset($modules[2]) ? $modules[2]: array());
-*/
 		TPL::display('commentsend');
 	}
 
@@ -201,7 +175,6 @@ class index_mod
 			/// 清零
 			DR('xweibo/xwb.resetCount', '', 3);
 		}
-/*
 		/// 调用获取当前用户收到的最新私信列表 api
 		$result = DR('xweibo/xwb.getDirectMessages', CACHE_MESSAGES, $limit, $page);
 		$re_list = $result['rst'];
@@ -218,15 +191,14 @@ class index_mod
 			/// 根据时间排序
 			usort($list, $compare);
 		}
-*/
 
 		/// 右侧模块数据
-		//$modules = DS('PageModule.getPageModules', '', 2, 1);
+		$modules = DS('PageModule.getPageModules', '', 2, 1);
 
-		//TPL::assign('list', $list);
-		//TPL::assign('limit', $limit);
-		//TPL::assign('uid', USER::uid());
-		//TPL::assign('side_modules', isset($modules[2]) ? $modules[2]: array());
+		TPL::assign('list', $list);
+		TPL::assign('limit', $limit);
+		TPL::assign('uid', USER::uid());
+		TPL::assign('side_modules', isset($modules[2]) ? $modules[2]: array());
 		TPL::display('messages');
 	}
 
@@ -266,7 +238,6 @@ class index_mod
 	 */
 	function follow()
 	{
-/*
 		//光标开始位置
 		$start_pos = V('g:start_pos');
 		//下一个光标开始位置
@@ -286,7 +257,7 @@ class index_mod
 		} elseif (!empty($end_pos)) {
 			$cursor = $end_pos;
 		}
-*/
+
 		//调用微博个人资料接口
 		$userinfo = DR('xweibo/xwb.getUserShow', 'p', USER::uid());
 		$userinfo = $userinfo['rst'];
@@ -296,7 +267,7 @@ class index_mod
 			/// 提示不存在
 			APP::tips(array('tpl' => 'e404', 'msg' => '抱歉你所访问的用户不存在'));
 		}
-/*
+
 		//调用获取当前用户关注对象列表及最新一条微博信息api
 		$list = DR('xweibo/xwb.getFriends', '', USER::uid(), null, null, $cursor, $count);
 		$list = $list['rst'];
@@ -310,17 +281,17 @@ class index_mod
 		$fids = $fids['rst'];
 
 		/// 右侧模块数据
-		//$modules = DS('PageModule.getPageModules', '', 2, 1);
-*/
-		//传递页面代号给JS
-//		APP::setData('page', 'follow', 'WBDATA');
+		$modules = DS('PageModule.getPageModules', '', 2, 1);
 
-//		TPL::assign('list', $list);
+		//传递页面代号给JS
+		APP::setData('page', 'follow', 'WBDATA');
+
+		TPL::assign('list', $list);
 		TPL::assign('userinfo', $userinfo);
-//		TPL::assign('fids', $fids['ids']);
+		TPL::assign('fids', $fids['ids']);
 		TPL::assign('uid', USER::uid());
-//		TPL::assign('limit', $limit);
-		//TPL::assign('side_modules', isset($modules[2]) ? $modules[2]: array());
+		TPL::assign('limit', $limit);
+		TPL::assign('side_modules', isset($modules[2]) ? $modules[2]: array());
 		TPL::assign('relationship', '1');
 		TPL::display('follow');
 	}
@@ -402,10 +373,6 @@ class index_mod
 	 */
 	function profile()
 	{
-/*
-		//过滤类型
-		$filter_type = V('g:filter_type');
-
 		/// 页码数
 		$page = max(V('g:page'), 1);
 
@@ -414,9 +381,9 @@ class index_mod
 		$count = $limit;
 
 		/// 调用获取用户发布的微博信息列表api
-		$list = DR('xweibo/xwb.getUserTimeline', '', USER::uid(), null, null, null, null, $count, $page, $filter_type);
+		$list = DR('xweibo/xwb.getUserTimeline', '', USER::uid(), null, null, null, null, $count, $page);
 		$list = $list['rst'];
-*/
+
 		/// 调用微博个人资料接口
 		$userinfo = DR('xweibo/xwb.getUserShow', 'p', USER::uid());
 		$userinfo = $userinfo['rst'];
@@ -425,31 +392,15 @@ class index_mod
 		if (empty($userinfo)) {
 			/// 提示不存在
 			APP::tips(array('tpl' => 'e404', 'msg' => '抱歉你所访问的用户不存在'));
-		} 
+		}
 
 		$modules = DS('PageModule.getPageModules', '', 2, 1);
 
-//		TPL::assign('list', $list);
+		TPL::assign('list', $list);
 		TPL::assign('uid', USER::uid());
-//		TPL::assign('limit', $limit);
-//		TPL::assign('filter_type', $filter_type);
+		TPL::assign('limit', $limit);
 		TPL::assign('side_modules', isset($modules[2]) ? $modules[2]: array());
 		TPL::assign('userinfo', $userinfo);
 		TPL::display('profile');
-	}
-	
-	/**
-	* 我的通知列表
-	* 
-	*/
-	function notices()
-	{
-		$page = max(V('g:page'), 1);
-		if ($page == 1) {
-			/// 未读数清零
-			F('sysnotice.resetCount');
-		}
-		
-		TPL::display('notices');
 	}
 }

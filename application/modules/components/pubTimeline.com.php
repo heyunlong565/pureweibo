@@ -20,24 +20,14 @@ class pubTimeline extends PageModule{
 		parent :: PageModule();
 	}
 
-	function get($param = array()) 
-	{
-		$cfg 		= $this->configList();
-		$show_num	= isset($param['show_num']) ? $param['show_num'] : $cfg['show_num'];
-		$source 	= isset($param['source'])	? $param['source']	 : (isset($cfg['source']) ? $cfg['source']: '0');
+	function get() {
+	
+		$cfg = $this->configList();
+		
+		$num = $cfg['show_num'];
 
-		if (USER::isUserLogin() /* && $source*/) {
-			$list = DR('xweibo/xwb.getPublicTimeline', '', $source, true, 100);
-		} else {
-			$list = DR('xweibo/xwb.getPublicTimeline', '', $source, false, 100);
-		}
-		
-		if(!is_array($list['rst'])){
-			return RST(array(), $list['errno'], $list['err']);
-		}
-		
-		$list['rst'] = $this->random($list['rst'], $show_num);
-		
-		return RST($list['rst'], $list['errno'], $list['err']);
+		$list = DR('xweibo/xwb.getPublicTimeline', '', null, false);
+
+		return RST($this->random($list['rst'], $num), $list['errno'], $list['err']);
 	}
 }

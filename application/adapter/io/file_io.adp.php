@@ -26,11 +26,7 @@ class file_io
 		}
 		$len  = false;
 		$mode = $append ? 'ab' : 'wb';
-		$fp = @fopen($file, $mode);
-		if (!$fp) {
-			LOGSTR('io', 'fopen file error,file:' . $file);
-			exit("Can not open file $file !");
-		}
+		$fp = @fopen($file, $mode) or exit("Can not open file $file !");
 		flock($fp, LOCK_EX);
 		$len = @fwrite($fp, $data);
 		flock($fp, LOCK_UN);
@@ -40,10 +36,6 @@ class file_io
 	
 	function read($file) {
 		if (!file_exists($file)){
-			return false;
-		}
-		if (!is_readable($file)) {
-			LOGSTR('io', 'file can not be read,file:' . $file);
 			return false;
 		}
 		if (function_exists('file_get_contents')){
@@ -76,40 +68,29 @@ class file_io
 	}
 	
 	function mkdir($path) {
-		$rst = true;
 		if (!file_exists($path)){
 			$this->mkdir(dirname($path));
-			$rst = @mkdir($path, 0777);
+			@mkdir($path, 0777);
 		}
-		return $rst;
+		return true;
 	}
 	
 	function rm($path){
 		$path = rtrim($path,'/\\ ');
-		if ( !is_dir($path) ){ return @unlink($path); }
-		if ( !$handle= opendir($path) ){ 
-			LOGSTR('io', 'opendir error,dir:' . $path);
-			return false; 
-		}
+		if ( !is_dir($path) ){ return unlink($path); }
+		if ( !$handle= opendir($path) ){ return false; }
 		
 		while( false !==($file=readdir($handle)) ){
 			if($file=="." || $file=="..") continue ;
 			$file=$path .DIRECTORY_SEPARATOR. $file;
-			if(is_dir($file)){ 
-				$this->rm($file);
-			} else {
-				if(!@unlink($file)){
-					LOGSTR('io','delete file error when delete dir,file:'.$file);
-					return false;
-				}
+			if(is_dir($file)){ $this->rm($file);}
+			else{
+				if(!@unlink($file)){return false;}
 			}
 
 		}
 		closedir($handle);
-		if(!rmdir($path)){
-			LOGSTR('io', 'delete dir error,dir:'. $path);
-			return false;
-		}
+		if(!rmdir($path)){return false;}
 		return true;
 	}
 	

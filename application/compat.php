@@ -59,7 +59,7 @@ if (!function_exists('array_combine')) {
 }
 
 if (!function_exists('file_get_contents')) {
-   function file_get_contents($filename) {
+   function file_get_contents($filename) {	
 		$isUrl = count(explode("://",$filename)) > 1;
 		if ($isUrl){
 			$http = APP::ADP('http');
@@ -73,21 +73,21 @@ if (!function_exists('file_get_contents')) {
 
 
 
-if (!function_exists('http_build_query')) {
-	function http_build_query($data, $prefix='', $sep='', $key='') {
-	    $ret = array();
-	    foreach ((array)$data as $k => $v) {
-	        if (is_int($k) && $prefix != null) {
-	            $k = urlencode($prefix . $k);
-	        }
-	        if ((!empty($key)) || ($key === 0))  $k = $key.'['.urlencode($k).']';
-	        if (is_array($v) || is_object($v)) {
-	            array_push($ret, http_build_query($v, '', $sep, $k));
-	        } else {
-	            array_push($ret, $k.'='.urlencode($v));
-	        }
-	    }
-	    //if (empty($sep)) $sep = ini_get('arg_separator.output');
+if (!function_exists('http_build_query')) { 
+	function http_build_query($data, $prefix='', $sep='', $key='') { 
+	    $ret = array(); 
+	    foreach ((array)$data as $k => $v) { 
+	        if (is_int($k) && $prefix != null) { 
+	            $k = urlencode($prefix . $k); 
+	        } 
+	        if ((!empty($key)) || ($key === 0))  $k = $key.'['.urlencode($k).']'; 
+	        if (is_array($v) || is_object($v)) { 
+	            array_push($ret, http_build_query($v, '', $sep, $k)); 
+	        } else { 
+	            array_push($ret, $k.'='.urlencode($v)); 
+	        } 
+	    } 
+	    //if (empty($sep)) $sep = ini_get('arg_separator.output'); 
 	    $sep = '&';
 		return implode($sep, $ret);
 	}
@@ -95,38 +95,12 @@ if (!function_exists('http_build_query')) {
 
 if (!function_exists('mb_strwidth')) {
 	function mb_strwidth($str, $encoding) {
-		$str = F('xwb_iconv', $str, $encoding, 'gbk');
+		$str = F('xwb_iconv', $encoding, 'gbk');
 		return strlen($str);
 	}
 }
 
-if (!function_exists('mb_substr')) {
-	function mb_substr($str, $start = 0, $length = 0, $encode = 'utf-8') {
-	    $encode_len = strtolower($encode) == 'utf-8' ? 3 : 2;
-	    
-	    for($byteStart = $i = 0; $i < $start; ++$i) {
-	        $byteStart += ord($str{$byteStart}) < 128 ? 1 : $encode_len;
-	        if($str{$byteStart} == '') return '';
-	    }
-	    
-	    for($i = 0, $byteLen = $byteStart; $i < $length; ++$i)
-	        $byteLen += ord($str{$byteLen}) < 128 ? 1 : $encode_len;
-	        
-	    return substr($str, $byteStart, $byteLen - $byteStart);
-	}
-}
-
-if (!function_exists('mb_strlen')) {
-	function mb_strlen($text, $encode = 'utf-8') {
-		if (strtolower($encode) == 'utf-8') {
-			return preg_match_all('%(?:[\x09\x0A\x0D\x20-\x7E]|[\xC2-\xDF][\x80-\xBF]|\xE0[\xA0-\xBF][\x80-\xBF]|[\xE1-\xEC\xEE\xEF][\x80-\xBF]{2}|\xED[\x80-\x9F][\x80-\xBF]|\xF0[\x90-\xBF][\x80-\xBF]{2}|[\xF1-\xF3][\x80-\xBF]{3}|\xF4[\x80-\x8F][\x80-\xBF]{2})%xs',$text,$out);
-	   } else {
-			return strlen($text);
-	   }
-	}
-}
-
-/// Xweibo 为适应SAE的可兼容　ini_set
+/// Xweibo 为适应SAE的可兼容　ini_set　
 function xwb_ini_set($var,	$value){
 	if (strtolower(XWB_SERVER_ENV_TYPE)==='sae'){
 		//todo
@@ -135,47 +109,11 @@ function xwb_ini_set($var,	$value){
 	}
 }
 
-/// Xweibo 为适应SAE的可兼容　ini_get
+/// Xweibo 为适应SAE的可兼容　ini_get　
 function xwb_ini_get($k){
 	if (strtolower(XWB_SERVER_ENV_TYPE)==='sae'){
 		//todo
 	}else{
 		return ini_get($var,$value);
 	}
-}
-
-///二位数组根据key进行排序
-function array_sort($array, $on, $order=SORT_ASC)
-{
-    $new_array = array();
-    $sortable_array = array();
-
-    if (count($array) > 0) {
-        foreach ($array as $k => $v) {
-            if (is_array($v)) {
-                foreach ($v as $k2 => $v2) {
-                    if ($k2 == $on) {
-                        $sortable_array[$k] = $v2;
-                    }
-                }
-            } else {
-                $sortable_array[$k] = $v;
-            }
-        }
-
-        switch ($order) {
-            case SORT_ASC:
-                asort($sortable_array);
-            break;
-            case SORT_DESC:
-                arsort($sortable_array);
-            break;
-        }
-
-        foreach ($sortable_array as $k => $v) {
-            $new_array[$k] = $array[$k];
-        }
-    }
-
-    return $new_array;
 }

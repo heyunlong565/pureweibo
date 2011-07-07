@@ -51,36 +51,6 @@ class welcome_mod {
 
 		TPL::display('guide');
 	}
-
-
-	function recommendUsers() {
-		//Xpipe::usePipe(false);
-		$users = $uids = array();
-		$cid = V('g:cid', 1);
-		$users = DS('components/categoryUser.get', 'g0/300', $cid);
-		foreach ($users as $user) {
-			$uids[] = $user['uid'];
-		}
-		$uids = array_unique($uids);
-		if (count($uids)) {
-			$uids = array_slice($uids, 0, 20);
-			$users = DS('xweibo/xwb.getUsersBatchShow', 'g0/300', implode(',', $uids));
-		}
-		$users = F('user_filter', $users, false);
-		
-		$fids = DR('xweibo/xwb.getFriendIds', '', USER::uid(), null, null, -1, 5000);
-		$fids = $fids['rst']['ids'];
-		
-		TPL::assign('users', $users);
-		TPL::assign('fids', $fids);
-		$data = TPL::fetch('user_list','', '', 'modules');
-		APP::ajaxRst($data);
-	}
 	
-	function retry() {
-		$api = APP::O('apiStop');
-		$api->restart();
-		APP::redirect('index', 2);
-	}
 }
 ?>

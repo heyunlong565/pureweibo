@@ -30,7 +30,6 @@ class guessYouLike extends PageModule{
 
 		//$rs = DR('xweibo/xwb.getUserSuggestions', null, $offset, $num);
 		$rs = DR('xweibo/xwb.getUserSuggestions', null, 0, $num);
-		
 
 		//如果得到的结果超过了num，切减
 		if ($rs['errno'] == 0 && count($rs['rst']) > $num) {

@@ -153,13 +153,4 @@ class interface_db
 	function getHistory() {
 		return $this->querys;
 	}
-
-	/**
-	 * 调用框架日志接口写日志
-	 *@param $msg string log message
-	 *@param $type 错误类型
-	 */
-	function log($msg, $type='db') {
-		LOGSTR($type, $msg);
-	}
 }

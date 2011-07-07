@@ -6,30 +6,7 @@
 */
 function sae_set_global_define() {
 	
-	// set the conifg in cache
-	$key 	 = 'sae_set_global_define#'.CONFIG_DOMAIN;
-	$content = CACHE::get($key);
-	if (empty($content)) {
-		$storage = new SaeStorage();
-		$content = $storage->read(CONFIG_DOMAIN, md5(CONFIG_DOMAIN));
-		//$content   = IO::read(CONFIG_DOMAIN);
-		$cacheTime = 300;		// 缓存时间秒为单位
-		CACHE::set($key, $content, $cacheTime);
-	}
-	else 
-	{
-		$site_base_info = array();
-		parse_str($content, $site_base_info);
-		$isAuth = isset($site_base_info['user_oauth_token']) && isset($site_base_info['user_oauth_token_secret']);
-		if (!$isAuth) {	// get from storage again
-			//$content   = IO::read(CONFIG_DOMAIN);
-			$storage = new SaeStorage();
-			$content = $storage->read(CONFIG_DOMAIN, md5(CONFIG_DOMAIN));
-			$cacheTime = 300;		// 缓存时间秒为单位
-			CACHE::set($key, $content, $cacheTime);
-		}
-	}
-	
+	$content = IO::read(CONFIG_DOMAIN);
 	$site_base_info = array();
 	parse_str($content, $site_base_info);
 	
@@ -44,19 +21,14 @@ function sae_set_global_define() {
 
 		define('WB_USER_SITENAME',			$site_base_info['site_name']);
 		define('WB_USER_SITEINFO',			$site_base_info['site_info']);
-		define('WB_USER_NAME' , 			isset($site_base_info['user_name'])?$site_base_info['user_name']:'');
-		define('WB_USER_EMAIL' , 			isset($site_base_info['user_email'])?$site_base_info['user_email']: '');
-		define('WB_USER_QQ' , 				isset($site_base_info['user_qq'])?$site_base_info['user_qq']: '');
-		define('WB_USER_MSN' , 				isset($site_base_info['user_msn'])? $site_base_info['user_msn']: '');
-		define('WB_USER_TEL' , 				isset($site_base_info['user_tel'])? $site_base_info['user_tel']: '');
-		define('SYSTEM_SINA_UID' , 			isset($site_base_info['sina_id'])? $site_base_info['sina_id']: '');
-		define('WB_USER_OAUTH_TOKEN' , 		isset($site_base_info['user_oauth_token'])? $site_base_info['user_oauth_token'] : '');
-		define('WB_USER_OAUTH_TOKEN_SECRET' , isset($site_base_info['user_oauth_token_secret'])?$site_base_info['user_oauth_token_secret'] :'');
-		//define('APP_FLAG_VER',				isset($site_base_info['app_flag_ver'])?$site_base_info['app_flag_ver']:'');
-		/// MC　KEY　的前缀
-		//define('MC_PREFIX',					'XWB11_MC_'.APP_FLAG_VER);
-		// 重新设置memcache前缀
-		V('-:adapter_cfg:cache/memcache', MC_PREFIX.$site_base_info['app_flag_ver'], true);
+		define('WB_USER_NAME' , 			$site_base_info['user_name']);
+		define('WB_USER_EMAIL' , 			$site_base_info['user_email']);
+		define('WB_USER_QQ' , 				$site_base_info['user_qq']);
+		define('WB_USER_MSN' , 				$site_base_info['user_msn']);
+		define('WB_USER_TEL' , 				$site_base_info['user_tel']);
+		define('SYSTEM_SINA_UID' , 			$site_base_info['sina_id']);
+		define('WB_USER_OAUTH_TOKEN' , 		$site_base_info['user_oauth_token']);
+		define('WB_USER_OAUTH_TOKEN_SECRET' , $site_base_info['user_oauth_token_secret']);
 		return true;
 	}else{
 		return false;

@@ -42,16 +42,7 @@ class disableWeibo_mod extends action {
 		$type = V('r:type', false);
 		if ($type) {
 			$rst = DR('xweibo/disableItem.resumeByItem', '', $id, 1);
-			DS('xweibo/weiboCopy.disabled', '', $id, 1);
 		} else {
-			$wb_ids = DS('xweibo/disableItem.getDisabledItems', '', 1, $id);
-			$ids = array();
-			foreach ($wb_ids as $key=>$v) {
-				$ids[] =  $key;
-			}
-			if (sizeof($ids)) {
-				DS('xweibo/weiboCopy.disabled', '', $ids, 0);
-			}
 			$rst = DR('xweibo/disableItem.resume', '', $id);
 		}
 		if ($rst['rst'] && $rst['rst'] > 0) {
@@ -65,15 +56,11 @@ class disableWeibo_mod extends action {
 	 * 屏蔽一微博
 	 */
 	function disable() {
-		$ajax = V('g:ajax', false);
 		$id = V('g:id', false);
 		if (!$id){
-			if ($ajax) {
-				APP::ajaxRst(false, '1', '缺少参数');
-			}
 			return;
 		}
-		
+
 		DR('xweibo/xwb.setToken','', 2);
 		$rst = DR('xweibo/xwb.getStatuseShow','', $id);
 		$data = $rst['rst'];
@@ -91,21 +78,15 @@ class disableWeibo_mod extends action {
 				'admin_id' => $this->_getUid()
 				);
 		$rst = DR('xweibo/disableItem.save', '', $values);
+
 		// 添加成功则更新缓存
 		if ($rst['rst'] > 0) {
 			DD('xweibo/disableItem.getDisabledItems', 'g1/0', 1);
-			DR('xweibo/weiboCopy.disabled', '', $id, 1);
 			//APP::ajaxRst(true);
-			if ($ajax) {
-				APP::ajaxRst(true);
-			}
 			$this->_succ('已成功屏蔽微博', array('weiboList'));
 			exit;
 		}
-		
-		if ($ajax) {
-			APP::ajaxRst(false, '2','屏蔽微博失败,可能该微博已经在屏蔽列表');
-		}
+
 		$this->_error('屏蔽微博失败,可能该微博已经在屏蔽列表', array('weiboList'));
 		//APP::ajaxRst(false, 2122202, '屏蔽微博失败,可能该微博已经在屏蔽列表');
 	}

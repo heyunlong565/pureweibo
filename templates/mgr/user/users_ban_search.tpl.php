@@ -2,12 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>封禁用户 - 用户管理 - 运营管理</title>
-<link href="<?php echo W_BASE_URL;?>css/admin/admin.css" rel="stylesheet" type="text/css" />
+<title>用户封禁管理 - 用户管理 - 运营管理</title>
+<link href="<?php echo W_BASE_URL;?>css/admin.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
 <div class="main-wrap">
-	<div class="path"><span class="path-icon"></span>当前位置：运营管理<span> &gt; </span>用户<span> &gt; </span>封禁用户</div>
+	<div class="path"><span class="path-icon"></span>当前位置：运营管理<span> &gt; </span>用户管理<span> &gt; </span>用户封禁管理</div>
     <div class="set-wrap">
         <h4 class="main-title">封禁指定用户</h4>
 		<div class="set-area-int">
@@ -15,8 +15,8 @@
 				<p class="serch-tips">请输入昵称搜索用户，然后选择相应的封禁操作。注意：封禁后此用户将无法登录使用微博功能。<a href="<?php echo URL('mgr/users.getBanUser');?>">查看封禁用户列表</a></p>
             	<div class="serch-user">
             		<form action="<?php echo URL('mgr/users.searchAllBanUser');?>" method="post">
-            			<span><strong>搜索包含以下昵称的用户</strong></span>
-                		<span><input name="keyword" class="input-box box-address-width" type="text"  value="<?php echo F('escape', strval(V('r:keyword')));?>" /></span>
+            			<span><strong>搜索包含以下昵称的用户：</strong></span>
+                		<span><input name="keyword" class="input-box box-address-width" type="text" /></span>
                 		<span class="serch-btn"><input name="" type="submit" value="搜索" /></span>
                     </form>
            		</div>
@@ -50,7 +50,7 @@
         <!--<h4 class="main-title">封禁用户列表</h4>
 		<div class="set-area-int">
 			<div class="user-list">
-				<table width="100%" border="0" cellpadding="0" cellspacing="0" class="table">
+				<table width="100%" border="0" cellpadding="0" cellspacing="0" class="table-border">
 					<thead class="td-title-bg">
 					<tr>
 						<td class="serial-number">编号</td>

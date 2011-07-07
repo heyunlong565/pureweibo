@@ -3,59 +3,60 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>管理员用户列表 - 帐号管理</title>
-<link href="<?php echo W_BASE_URL;?>css/admin/admin.css" rel="stylesheet" type="text/css" />
-<script type="text/javascript" src="<?php echo W_BASE_URL;?>js/jquery.min.js"></script>
-<script src="<?php echo W_BASE_URL;?>js/admin-all.js"></script>
+<link href="<?php echo W_BASE_URL;?>css/admin.css" rel="stylesheet" type="text/css" />
 </head>
-<body class="main-body">
+<body>
 <div class="main-wrap">
-	<div class="path"><p>当前位置：系统设置<span>&gt;</span>管理员设置</p></div>
-	<div class="main-cont">
-    <h3 class="title">管理员用户列表</h3>
-    <div class="set-area">
-        <table class="table" cellpadding="0" cellspacing="0" width="100%" border="0">
-            <colgroup>
-                <col class="h-w70"/>
-                <col />
-                <col class="h-w150" />
-                <col class="h-w130" />
-            </colgroup>
-            <thead class="tb-tit-bg">
-                <tr>
-                    <th><div class="th-gap">编号</div></th>
-                    <th><div class="th-gap">管理员昵称</div></th>
-                    <th><div class="th-gap">添加时间</div></th>
-                    <th><div class="th-gap">操作</div></th>
-                </tr>
-            </thead>
-            <tfoot class="tb-tit-bg">
-                <tr>
-                    <td colspan="4">
-                    	<div class="pre-next">
-                            <?php echo $pager;?>
+	<div class="path"><span class="path-icon"></span>当前位置：帐号管理<span> &gt; </span>管理员用户列表</div>
+    <div class="set-wrap">
+        <h4 class="main-title">管理员用户列表</h4>
+		<div class="set-area-int">
+        	<table width="100%" border="0" cellpadding="0" cellspacing="0" class="table-border">
+            	<colgroup>
+					<col class="serial-number"/>
+                    <col class="admin-name" />
+    				<col />
+    				<col class="t-time" />
+    				<col class="operate-adminlist" />
+    			</colgroup>
+                <thead class="td-title-bg">
+  					<tr>
+    					<td>编号</td>
+    					<td>管理员昵称</td>
+                        <td>微博地址</td>
+                        <td>添加时间</td>
+    					<td>操作</td>
+  					</tr>
+                </thead>
+              	<tfoot class="tfoot-bg">
+					<tr>
+						<td colspan="5">
+                        <div class="pre-next">
+							<?php echo $pager;?>
                         </div>
-                    </td>
-                </tr>
-            </tfoot>
-            <tbody>
-                <?php if($list):?>
-                <?php foreach($list as $value):?>
-                    <tr>
-                        <td><?php echo ++$num;?></td>
-                        <td><a href="<?php echo URL('ta', 'id='.$value['sina_uid'] ,'index.php');?>" target="_blank"><?php if(isset($value['userinfo']['nickname'])) echo F('escape', $value['userinfo']['nickname']); ?></a></td>
-                        <td><?php echo date('Y-m-d H:i:s', $value['add_time']);?></td>
-                        <td>
-                            <?php if($admin_root && $value['id'] != $admin_id):?>
-                                <a class="icon-permission" href="javascript:delConfirm('<?php echo URL('mgr/admin.del', 'id=' . $value['id']);?>','您确定取消<?php echo $value['userinfo']['nickname'];?>的管理员权限吗？')">取消管理员权限</a>
-                            <?php endif;?>
                         </td>
-                    </tr>
-                <?php endforeach;?>
-                <?php endif;?>
-            </tbody>
-        </table>
+					</tr>
+              	</tfoot>
+                <tbody>
+					<?php if($list):?>
+					<?php foreach($list as $value):?>
+						<tr>
+							<td><?php echo ++$num;?></td>
+							<td><?php if(isset($value['userinfo']['nickname'])) echo $value['userinfo']['nickname'];?></td>
+							<td><a href="<?php echo URL('ta', 'id='.$value['sina_uid'] ,'index.php');?>" target="_blank"><?php echo $value['http_url'];?></a></td>
+							<td><?php echo date('Y-m-d H:i:s', $value['add_time']);?></td>
+							<td><a class="view-weibo" href="<?php echo URL('ta', 'id='.$value['sina_uid'] ,'index.php');?>" target="_blank">查看微博</a>
+								<?php if($admin_root && $value['id'] != $admin_id):?>
+									<a class="cancel-ext" href="javascript:if(confirm('您确定取消<?php echo $value['userinfo']['nickname'];?>的管理员权限吗？')) {window.location.href='<?php echo URL('mgr/admin.del', 'id=' . $value['id']);?>'}">取消管理员权限</a>
+								<?php endif;?>
+							</td>
+						</tr>
+					<?php endforeach;?>
+					<?php endif;?>
+                </tbody>
+			</table>
+    	</div>
     </div>
-</div>
 </div>
 </body>
 </html>

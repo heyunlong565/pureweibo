@@ -6,11 +6,7 @@ function err404($msg = '') {
 		trigger_error($msg);
 		exit;
 	}
-	//APP::tips(array('tpl' => 'e404', 'msg' => '你访问的页面不存在'));
-	if (Xpipe::isRunning()) {
-		echo '<div class="api-error"><p>' . ($msg ? $msg : '你访问的页面不存在') . '</p></div>';
-	} else {
-		TPL::module('e404');
-	}
+	APP::tips(array('tpl' => 'e404', 'msg' => '你访问的页面不存在'));
 	exit;
 }
+

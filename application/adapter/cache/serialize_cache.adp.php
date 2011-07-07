@@ -20,7 +20,7 @@ class serialize_cache
 	}
 
 	function adp_init($config=array()) {
-		extract($config, EXTR_SKIP);
+		extract($config);
 		if (isset($baseDir)){
 			$this->baseDir		= $baseDir;
 		}

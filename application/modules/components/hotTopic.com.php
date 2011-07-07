@@ -1,6 +1,6 @@
 <?php
 /**
-* 鐑棬璇濋
+* 热门话题
 *
 * @version $1.1: hotTopic.com.php,v 1.0 2010/10/23 22:04:00 $
 * @package xweibo
@@ -20,36 +20,35 @@ class hotTopic extends PageModule{
 	function hotTopic() {
 		parent :: PageModule();
 
-		//濡傛灉鏈櫥褰曪紝浣跨敤绠＄悊鍛樼殑token璁块棶
+		//如果未登录，使用管理员的token访问
 		if (!USER::uid()) {
 			DS('xweibo/xwb.setToken', '', 2);
 		}
 	}
 
 	/**
-	 * \鑾峰彇 璇濋鍒楄〃
+	 * 
+	 *
 	 */
-	function get($param = array()) 
-	{
+	function get() {
 //		$this->clearCfgCache();
-		$cfg 		= $this->configList();
-		$topic_get 	= isset($param['topic_get']) ? (int)$param['topic_get'] : 1;
-		//$topic_id 	= ($topic_get == 0 && isset($param['topic_id'])) ? $param['topic_id'] : 0;
-		$topics		= isset($param['topics'])?$param['topics']:NULL;
-		$show_num	= isset($param['show_num']) ? (int)$param['show_num'] : (int)$cfg['show_num'];
-		//$show_num 	= ($show_num > 0) ? (int)$show_num: 10;
+		$cfg = $this->configList();
+		
+		$topic_id = $cfg['topic_id'];
 
-		//琛ㄧず浣跨敤鏈湴鍐呭鍒楄〃
-		if ($topic_get == 0 && $topics != NULL && is_array($topics) && isset($topics[0])) {
-			$rs = array();
-			foreach($topics as $topic){
-				$rs[] = array('topic'=>$topic,'query'=>F('escape',$topic));
-			}
-			return RST($rs);
-		} else { //鍚﹀垯浣跨敤鏂版氮API
-			$source = $topic_get == 2 ? 1 : 0;
-			$rs =DR('xweibo/xwb.getTrendsDaily', '', false, $source);
-			
+		$show_num = $cfg['show_num'] > 0? (int)$cfg['show_num']: 10;
+
+		//表示使用本地内容列表
+		if ($topic_id > 0) {
+			//$db = $this->db;
+			//$rs = $db->query('select * from ' . $db->getTable(T_COMPONENT_TOPIC) . ' where topic_id=' . (int)$topic_id . ' order by sort_num asc limit '. $show_num);
+			$rs = DR('xweibo/topics.getTopicByCty', '', $topic_id, $show_num);
+
+			return $rs;
+
+		} else { //否则使用新浪API
+			$rs =DR('xweibo/xwb.getTrendsDaily');
+
 			if ($rs['errno'] == 0) {
 				$tmp = array();
 				$count = 0;
@@ -58,6 +57,7 @@ class hotTopic extends PageModule{
 					if (++$count > $show_num) {
 						break;
 					}
+
 					array_push($tmp, array('topic' => $row['name'], 'query' => $row['query']));
 				}
 

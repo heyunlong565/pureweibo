@@ -39,7 +39,7 @@ class setting_mod extends action{
 				break;			
 			}
 			//var_dump($logo);exit;
-			echo '<script>parent.uploadFinished("' . $state. '","' . F('fix_url', $logo['savepath']).'?r='.rand() . '");</script>';
+			echo '<script>parent.uploadFinished("' . $state. '","' . F('fix_url', $logo['savepath']) . '");</script>';
 		}
 	}
 	
@@ -82,68 +82,27 @@ class setting_mod extends action{
 		if ($this->_isPost()) {
 			$file_logo = V('p:logo');
 			$file_icon = V('p:address_icon');
-			$logo = $icon = $logo_wap = $logo_output = '';
+			$logo = $icon = '';
 		
 			if ($file_logo) {
-				
-				$image = APP::ADP('image');
-				
 				if(XWB_SERVER_ENV_TYPE == "sae") {
 					$file_arr = explode('.', WB_LOGO_PREVIEW_FILE_NAME);
 					$file_content = IO::read(array_shift($file_arr));
 					$url = IO::write(P_VAR . WB_LOGO_FILE_NAME, $file_content);
-					
 					$logo = $url;
 				}elseif(is_file(P_VAR . WB_LOGO_PREVIEW_FILE_NAME)) {
 					$file_content = IO::read(P_VAR . WB_LOGO_PREVIEW_FILE_NAME);
 					IO::write(P_VAR . WB_LOGO_FILE_NAME, $file_content);
-					//小图处理
 					$logo = P_VAR_NAME .WB_LOGO_FILE_NAME;
-				}
-				
-				//wap 图片
-				$image->loadFile($logo);
-				$imageInfo = $image->getImgInfo();
-				if($imageInfo['height']>35){
-					$image->resize($imageInfo['width']*35/$imageInfo['height'],35);
-					$rst=$image->save(P_VAR . WB_LOGO_WAP_FILE_NAME);
-					if(XWB_SERVER_ENV_TYPE == "sae"){
-						$logo_wap=$rst;
-					}
-					else{
-						$logo_wap=P_VAR_NAME . WB_LOGO_WAP_FILE_NAME;	
-					}
-					
-				}
-				else{
-					$logo_wap=$url;
-				}
-				
-				//输出模块图片处理
-				if($imageInfo['height']>18){
-					$image->resize($imageInfo['width']*18/$imageInfo['height'],18);
-					$rst=$image->save(P_VAR . WB_LOGO_OUTPUT_FILE_NAME);
-					if(XWB_SERVER_ENV_TYPE == "sae"){
-						$logo_output=$rst;
-					}
-					else{
-						$logo_output=P_VAR_NAME . WB_LOGO_OUTPUT_FILE_NAME;
-					}
-				}
-				else{
-					$logo_output=$url;
 				}
 			}
 
 			$data = array(
 				'logo' => $logo,	//logo图标
-				'logo_wap' => $logo_wap, //wap logo
-				'logo_output' => $logo_output, //output logo
 				'address_icon' => $icon,	//网站地址图标
 				'third_code' => V('p:third_code', ''),//网站第三方统计代码
 				'site_record' => htmlspecialchars(trim(V('p:site_record', ''))),//网站备案信息代码
 				'site_name' => htmlspecialchars(trim(V('p:site_name', ''))),//网站名称
-				'open_user_local_relationship' => trim( V('p:local_relation', 0) )	// 是否开启本地关系
 				);
 			foreach($data as $key=>$value) {
 				$result = DR('common/sysConfig.set', '', $key, $value);
@@ -165,15 +124,8 @@ class setting_mod extends action{
 	/*	
 	* 优化设置
 	*/
-	function editRewrite() 
-	{
-		if ($this->_isPost()) 
-		{
-			// 校验，是apache服务器并且开启了rewrite module才保存成功
-			if ( V('p:rewrite_way', '0') && !$this->_checkApacheReweite() ) {
-				$this->_error('配置失败,Apache服务器没有开启rewrite模块',  array('editRewrite'));
-			}
-			
+	function editRewrite() {
+		if ($this->_isPost()) {
 			$result = DR('common/sysConfig.set', '', 'rewrite_enable', V('p:rewrite_way', '0'));
 			
 			if($result['errno']) {
@@ -287,7 +239,9 @@ class setting_mod extends action{
 		$foot_count = count($foot_link);
 
 		//判断链接地址是否以http开头
-		$link = F('fix_url', $link, 'http://', 'http://');
+		if (!preg_match('#^http://#sm', $link)) {
+			$link = 'http://' . $link;
+		}
 
 		//添加,编辑首页链接
 		if ($action == 'head') {
@@ -388,201 +342,5 @@ class setting_mod extends action{
 		$this->_succ('已经成功保存你的配置', array('getLink'));
 		exit;
 	}
-	
-	
-	
-	function header()
-	{
-		// header model
-		$rst = DR('common/sysConfig.get', FALSE, HEADER_MODEL_SYSCONFIG);
-		TPL::assign('model', $rst['rst']);
-		
-		// header html code
-		$rst = DR('common/sysConfig.get', FALSE, HEADER_HTMLCODE_SYSCONFIG);
-		TPL::assign('headerHtml', $rst['rst']);
-		
-		$this->_display('setting_header');
-	}
-	
-	
-	function updateHeader()
-	{
-		// get var
-		$url  = URL('mgr/setting.header');
-		$data = V('p:data');
-		
-		// set db
-		$model = DR('common/sysConfig.set', FALSE, HEADER_MODEL_SYSCONFIG, $data['model']);
-		$customHeaderModel = 2;
-		if ($customHeaderModel == $data['model']) {
-			$model = DR('common/sysConfig.set', FALSE, HEADER_HTMLCODE_SYSCONFIG, $data['headerHtml']);
-		}
-
-		// show result message
-		if ($model['rst']) {
-			$this->_succ('操作成功', $url);
-		}
-		$this->_error('操作失败！', $url);
-	}
-	
-	
-	/**
-	 * 设置网站的短链
-	 */
-	function setShortLink()
-	{
-		// 校验，是apache服务器并且开启了rewrite module才保存成功
-		if ( $this->_isPost() && ($data=V('p:data')) && $data['config'] && !$this->_checkApacheReweite() ) {
-			$this->_error('配置失败,Apache服务器没有开启rewrite模块',  array('setShortLink'));
-		}
-		
-		$this->setConfig('site_short_link', URL('mgr/setting.setShortLink'), 'setting_shortlink');
-	}
-	
-	
-	/**
-	 * 设置个性化域名
-	 */
-	function setPersonalDomain()
-	{
-		// 校验，是apache服务器并且开启了rewrite module才保存成功
-		if ($this->_isPost() && ($data=V('p:data')) && $data['config'] && !$this->_checkApacheReweite() ) {
-			$this->_error('配置失败,Apache服务器没有开启rewrite模块',  array('setPersonalDomain'));
-		}
-			
-		$this->setConfig('use_person_domain', URL('mgr/setting.setPersonalDomain'), 'setting_domain');
-	}
-	
-	
-	/**
-	 * Set Sysconfig
-	 * 
-	 * @param string $key
-	 * @param url $url
-	 * @param string $value
-	 */
-	function setConfig($key, $url, $tpl, $value='config')
-	{
-		// Update
-		if ( V('p:doEdit') ) 
-		{
-			$data  = V('p:data');
-			$value = trim( $data[$value] );
-			
-			// 短链不能设置为本host
-			if ( $key=='site_short_link'){
-				if ( $value && $value==$_SERVER['HTTP_HOST'] ) {
-					$this->_error('短链不能设置为本站域名', $url);
-				}
-				$value = rtrim($value, '/\\');
-				$value = F('fix_url', $value, '', 'http://');
-			}
-			
-			$conf = DR('common/sysConfig.set', FALSE, $key, $value);
-	
-			// show result message
-			if ($conf['rst']) {
-				$this->_succ('操作成功', $url);
-			}
-			$this->_error('操作失败！', $url);
-		}
-		
-		
-		// Show View
-		$rst = DR('common/sysConfig.get');
-		TPL::assign('config', $rst['rst']);
-		$this->_display($tpl);
-	}
-	/**
-	  *  wap页面 
-	  */
-	function wap(){
-		$this->_display('wap');
-	}
-	
-	/**
-	  *  数据备份 
-	  */
-	function dataBackup(){
-		$this->_display('data_backup');
-	}
-	
-	
-	/**
-	 * 在线访谈的设置
-	 */
-	function setInterView()
-	{
-		$this->setConfig('microInterview_setting', URL('mgr/setting.setInterView'), 'setting_interview');
-	}
-	
-	
-	/**
-	 * 在线直播的设置
-	 */
-	function setMicroLive()
-	{
-		$this->setConfig('microLive_setting', URL('mgr/setting.setLive'), 'setting_microLive');
-	}
-	/**
-	  *  后台自定义皮肤 
-	  */
-	function setSkin() {
-		$json_array=array();
-		$colors=V('p:colors',NULL);
-		if($colors!=NULL){
-			$json_array['colors']=$colors;
-		}
-		$bg=V('p:bg',NULL);
-		if($bg!=NULL){
-			$json_array['bg']=$bg;
-		}
-		$colorid=V('p:colorid',NULL);
-		if($colorid!=NULL){
-			$json_array['colorid']=$colorid;
-		}
-		$align=V('p:align',NULL);
-		if($align!=NULL){
-			$json_array['align']=$align;
-		}
-		$fixed=V('p:fixed',NULL);
-		if($fixed!=NULL){
-			$json_array['fixed']=$fixed;
-		}
-		$tiled=V('p:tiled',NULL);
-		if($tiled==1){
-			$json_array['tiled']=1;
-		}
-		$cs=V('p:custom_skin',json_encode($json_array));
-		$rs = DR('common/sysConfig.set', '', 'skin_custom', $cs);
-		if($rs['errno']==0){
-			DR('common/sysConfig.set', '', 'default_use_custom', 1);
-			APP::ajaxRst(TRUE);
-		}
-		else{
-			APP::ajaxRst(FALSE,1,'系统自定义皮肤设置失败');
-		}
-		
-		
-	}
-	
-	
-	
-	/**
-	 * 检查当前服务器是否Apache并开启了Rewrite模块
-	 */
-	function _checkApacheReweite()
-	{
-		if ( function_exists('apache_get_version') && apache_get_version() && function_exists('apache_get_modules') ) 
-		{
-			$apacheModuleList = apache_get_modules();
-			if ( !in_array('mod_rewrite', $apacheModuleList) )
-			{
-				return FALSE;
-			}
-		}
-		return TRUE;
-	}
-	
 }
 ?>

@@ -53,22 +53,20 @@ class keyword_mod extends action {
 	function add() {
 		if ($this->_isPost()) {
 			$keywords = V('p:keywords', false);
-			//if (!$keywords || trim((string)$keywords) == '') {
-			//	$this->_error('请填写要屏蔽的关键字', array('keywordList'));
-			//	//return RST(2121205, '添加关键字时，参数为空');
-			//}
+			if (!$keywords || trim((string)$keywords) == '') {
+				$this->_error('请填写要屏蔽的关键字', array('keywordList'));
+				//return RST(2121205, '添加关键字时，参数为空');
+			}
 			$rst = DR('xweibo/disableItem.saveKeywords', '', $keywords, $this->_getUid(), $this->_getUserInfo('screen_name'));
+
 			// 添加成功则更新缓存
 			if ($rst['rst'] > 0) {
 				DD('xweibo/disableItem.getDisabledItems');
-				$this->_succ('已经成功设置过滤关键字', array('add'));
 				//APP::ajaxRst(true);
 				//exit;
 			}
-			//$this->_redirect('keywordList');
+			$this->_redirect('keywordList');
 		}
-		$list=DR('xweibo/disableItem.getDisabledItems','g/0',4);
-		TPL::assign('list',array_keys($list['rst']));
 		TPL :: display('mgr/weibo/keyword_add', '', 0, false);
 		//APP::ajaxRst(false, 2122204, '添加关键字失败');
 	}

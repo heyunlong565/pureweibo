@@ -9,15 +9,13 @@
 *
 ***************************************************/
 //---------------------------------------------------------
-//phpinfo();exit;
 ob_start();
 /// 入口名称
 define('ENTRY_SCRIPT_NAME','index');
 /// 当前入口的默认模块路由
 define('R_DEF_MOD', "pub");
-/// 强制的路由模式　如果你尝试使用　rewrite　功能　失败，可以通过此选项快速恢复网站正常
+/// 强制的路由模式　如果你尝试使用　rewrite　功能　失败，可以通过此选项快速恢复并存网站正常
 //define('R_FORCE_MODE', 0);
-
 /// 初始化框架
 require_once 'application/init.php';
 
@@ -26,24 +24,10 @@ if (XWB_SERVER_ENV_TYPE!=='sae' && !WB_AKEY ) {
 	header("Location: install/index.php");
 	exit;
 }
-
-if(APP::F('is_robot')){
-	APP::deny();
-}
-
-
-
-/// 启用Xpipe
-$GLOBALS[V_GLOBAL_NAME]['NEED_XPIPE'] = TRUE;
-/// 启用多模板机制
-$GLOBALS[V_GLOBAL_NAME]['MIX_TPL'] = TRUE;
-
 //---------------------------------------------------------
 /// 预处理模块 , 必须在 APP::init 方法之前 定义
-APP::addPreDoAction('apiStop.check', 'c', false, array('welcome.retry'));// 检查API是否中
-APP::addPreDoAction('account.initSiteInfo',	 'm', false, array('pipe.t'));
-APP::addPreDoAction('account.allowedLogin',	 'm', false,array('account.logout'));
-APP::addPreDoAction('account.gloCheckLogin', 'm', false, array('feedback.*','custom.*','welcome.retry', 'pipe.t','authImage.paint', 'search.recommend', 'account.*', 'pub', 'pub.*', 'api/*', 'output.*','setting.getSkin'));
+APP::addPreDoAction('account.initSiteInfo',	 'm', false, array());
+APP::addPreDoAction('account.gloCheckLogin', 'm', false, array('authImage.paint', 'search.recommend', 'account.*', 'ta', 'pub', 'pub.*', 'api/*'));
 /// 初始化应用程序
 APP::init();
 //---------------------------------------------------------
@@ -292,7 +276,7 @@ APP::addPreDoAction('test_func','f', array(1,2,3,4,5));
 /*
 验证码使用 不区分大小写 每次重新加载图片会自动更改
 图片标签：
-<img name="" alt="验证码" width="70" height="25" src="<?php echo URL('authImage.paint','w=70&h=25');?>" />
+<img name="" alt="验证码" width="70" height="25" src="<?php echo APP::mkModuleUrl('authImage.paint','w=70&h=25');?>" />
 
 检查：
 $authcode = APP :: N('authCode');

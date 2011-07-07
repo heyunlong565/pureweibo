@@ -32,16 +32,11 @@ class pub_mod
 	 *
 	 */
 	function look() {
-		$cfg = DS('PageModule.configList', '', true, 9);
-		$source = isset($cfg['source']) ? $cfg['source']: '0';
-		$modules = DS('PageModule.getPageModules', /*'g1/300'*/'', 5, 1);
+		$modules = DS('PageModule.getPageModules', /*'g1/300'*/'', 1, 1);
 		TPL :: assign('side_modules', isset($modules[2]) ? $modules[2]: array());
 
-		if (USER::isUserLogin() && $source) {
-			$list = DR('xweibo/xwb.getPublicTimeline', '', $source);
-		} else {
-			$list = DR('xweibo/xwb.getPublicTimeline', '', null, false);
-		}
+
+		$list = DR('xweibo/xwb.getPublicTimeline', '', null, false);
 		TPL :: assign('list', $list);
 
 		TPL :: display('looklook');
@@ -52,8 +47,7 @@ class pub_mod
 	 *
 	 */
 	function topics() {
-		
-		$base_app = (int)V('g:base_app', 1) == 1 ? 1 : 0;
+		$baseApp = null;
 		
 		$uid = USER::uid();
 
@@ -66,26 +60,25 @@ class pub_mod
 		}
 		
 		//小时排行
-		$hours = DR('xweibo/xwb.getTrendsHourly', 'g2/300', false, $base_app);
+		$hours = DR('xweibo/xwb.getTrendsHourly', 300);
 		if ($hours['errno'] != 0) {
 			$hours['rst']['trends'] = array();
 		}
 
 		//日排行
-		$days = DR('xweibo/xwb.getTrendsDaily', 'g2/600', false, $base_app);
+		$days = DR('xweibo/xwb.getTrendsDaily', 600);
 		if ($days['errno'] != 0) {
 			$days['rst']['trends'] = array();
 		}
 
 		//周排行
-		$weeks = DR('xweibo/xwb.getTrendsWeekly', 'g2/3600', false, $base_app);
+		$weeks = DR('xweibo/xwb.getTrendsWeekly', 3600);
 		if ($weeks['errno'] != 0) {
 			$weeks['rst']['trends'] = array();
 		}
 
 		DR('xweibo/xwb.setToken', '', 1);
 
-		TPL :: assign('base_app', $base_app);
 		TPL :: assign('hours', current($hours['rst']['trends']));
 		TPL :: assign('days', current($days['rst']['trends']));
 		TPL :: assign('weeks', current($weeks['rst']['trends']));

@@ -25,10 +25,7 @@ class xcache_cache
 	}
 
 	function set($key, $value, $ttl = 0) {
-		$rst = xcache_set($key, $value, $ttl);
-		if (!$rst) {
-			LOGSTR('cache', 'set cache error,size of data is:'. sizeof($value));
-		}
+		return xcache_set($key, $value, $ttl);
 	}
 
 	function delete($key) {

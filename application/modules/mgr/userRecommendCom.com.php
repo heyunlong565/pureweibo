@@ -12,7 +12,7 @@ class userRecommendCom {
 
 	/*
 	 * 推荐用户内置分类说明
-	 * group_id  1.名人推荐列表 2.推荐用户列表 3.自动关注用户列表 4.微博频道用户列表
+	 * group_id  1.名人推荐列表 2.推荐用户列表 3.自动关注用户列表 4.官方微博用户列表
 	 */
 
 	/***************用户推荐分类操作类**************************/
@@ -83,7 +83,7 @@ class userRecommendCom {
     * @param string $group_name
     * @return boolean
 	*/
-	function addSort($group_name, $type=FALSE) {
+	function addSort($group_name) {
 		if (!$group_name) {
 			return RST(false, $errno=1210000, $err='Parameter can not be empty');
 		}
@@ -96,13 +96,6 @@ class userRecommendCom {
 					'group_name' => $group_name,
 					'native' => 0
 		);
-		
-		// add 官方微薄用户分组
-		if ($type)
-		{
-			$data['native']	= 1;
-			$data['type']	= 4;
-		}
 				
 		return RST($db->save($data));
 	}
@@ -281,22 +274,6 @@ class userRecommendCom {
 		$sql = 'DELETE FROM ' . $db->getPrefix() . T_COMPONENT_USERS . ' WHERE `uid` = ' . $uid . ' AND `group_id` = ' . $group_id;
 		return RST($db->execute($sql));
 	}
-	
-	/**
-	* 根据uid批量删除某用户数据
-    * @param int $uid
-    * @return boolean
-	*/
-	function delUserByUid($uid) {
-		if (!is_numeric($uid)) {
-			return RST(false, $errno=1210002, $err='Parameter must be a number');
-		}
-		$this->_cleanCache();
-		$db = APP :: ADP('db');
-		$sql = 'DELETE FROM ' . $db->getPrefix() . T_COMPONENT_USERS . ' WHERE `uid` = ' . $uid;
-		return RST($db->execute($sql));
-	}
-	
 
 	/**
 	* 根据group_id和uid串删除所有用户数据
@@ -380,9 +357,6 @@ class userRecommendCom {
 	function _cleanCache() {
 		DD('mgr/userCom.getById');
 		DD('mgr/userCom.getUserById');
-		DD('components/concern.get');
-		DD('components/star.get');
-		DD('components/recommendUser.get');
 	}
 
 	/*

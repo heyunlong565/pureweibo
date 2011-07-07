@@ -2,136 +2,120 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>微博成员管理 - 微博 - 运营管理</title>
-<link href="<?php echo W_BASE_URL;?>css/admin/admin.css" rel="stylesheet" type="text/css" />
+<title>推荐用户管理 - 用户管理 - 运营管理</title>
+<link href="<?php echo W_BASE_URL;?>css/admin.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="<?php echo W_BASE_URL;?>js/jquery.min.js"></script>
-<script type="text/javascript" src="<?php echo W_BASE_URL;?>js/admin-all.js"></script>
+<script type="text/javascript" src="<?php echo W_BASE_URL;?>js/admin_lib.js"></script>
+<script src="<?php echo W_BASE_URL;?>js/mgr.js"></script>
 </head>
-<body class="main-body">
-	<div class="path"><p>当前位置：运营管理<span> &gt; <a href="/admin.php?m=mgr/page_manager">页面设置</a> &gt; </span>自定义微博列表</p></div>
-    <div class="main-cont">
-        <h3 class="title"><a class="general-btn" href="javascript:add('user');"><span>添加新成员</span></a><?php echo $listName; ?></h3>
-		<div class="set-area">
-			<?php if(!empty($userlist)):?>
-            <table class="table" width="100%" cellpadding="0" cellspacing="0" border="0">
-                <colgroup>
-                    <col class="h-w70"/>
-                    <col class="h-w70" />
-                    <col class="h-w120" />
-                    <col />
-                    <col class="h-w90" />
-                </colgroup>
-                <thead class="tb-tit-bg">
-                    <tr>
-                        <th><div class="th-gap"></div></th>
-                        <th><div class="th-gap">编号</div></th>
-                        <th><div class="th-gap">昵称</div></th>
-                        <th><div class="th-gap">微博地址</div></th>
-                        <th><div class="th-gap">操作</div></th>
-                    </tr>
-                </thead>
-                <tfoot class="tb-tit-bg">
-                    <tr><td colspan="5">
-                        <input name="" class="ipt-checkbox" id="selectAll" type="checkbox" value="" />全选
-                        <a class="del-all" href="javascript:delSelectId('<?php echo URL('mgr/site_list.delMember', array('listId'=>$listId) );?>');">将所选用户从列表中删除</a>
-                    </td></tr>
-                    
-                    <tr><td colspan="5">
-                        <?php if($prev_cursor){?><a href="<?php echo URL('mgr/site_list.memberList', array('listId'=>$listId, 'cursor'=>$prev_cursor));?>" class="general-btn"><span>上一页</span></a><?php }?>
-                        <?php if($next_cursor){?>&nbsp;&nbsp;<a href="<?php echo URL('mgr/site_list.memberList', array('listId'=>$listId, 'cursor'=>$next_cursor));?>" class="general-btn"><span>下一页</span></a><?php } echo "  总记录数  $total"?>
-                    </td></tr>
-                </tfoot>
-                <tbody class="order-main" id="recordList">
-                    <?php $i=1;foreach($userlist as $value):?>
-                        <tr>
-                            <td><div class="default"><input name="uids" type="checkbox" value="<?php echo $value['id'];?>" /></div></td>
-                            <td><?php echo $i++;?></td>
-                            <td rel="name"><?php echo $value['screen_name'];?></td>
-                            <td><a href="<?php echo $value['http_url'];?>" target="_blank"><?php echo $value['http_url'];?></a></td>
-                            <td><a class="icon-del" title="删除" href="javascript:delConfirm('<?php echo URL('mgr/site_list.delMember','listId='. $listId .'&uids=' . $value['id']);?>')">删除</a></td>
-                        </tr>
-                    <?php endforeach;?>
-                </tbody>
-            </table>
-            <?php elseif($listId):?>
-            <table class="table" cellpadding="0">
-                <colgroup>
-                    <col class="h-w50"/>
-                    <col class="h-w70" />
-                    <col class="h-w120" />
-                    <col />
-                    <col class="h-w120" />
-                </colgroup>
-                <thead class="tb-tit-bg">
-                    <tr>
-                        <th><div class="th-gap"></div></th>
-                        <th><div class="th-gap">编号</div></th>
-                        <th><div class="th-gap">昵称</div></th>
-                        <th><div class="th-gap">微博地址</div></th>
-                        <th><div class="th-gap">操作</div></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td colspan="5"><p class="no-data">没有数据，请<a href="javascript:add('user');">添加新成员</a></p></td>
-                    </tr>
-                </tbody>
-            </table>
-            <?php endif;?>
+<body>
+<div class="main-wrap">
+	<div class="path"><span class="path-icon"></span>当前位置：运营管理<span> &gt; </span>用户管理<span> &gt; </span>官方微博用户管理</div>
+    <div class="set-wrap">
+        <h4 class="main-title"><a class="add-new-user" href="javascript:add('user');"></a>官方微博用户列表</h4>
+		<div class="set-area-int">
+            <div class="user-list">
+				<?php if($userlist):?>
+                <table width="100%" border="0" cellpadding="0" cellspacing="0" class="table-border">
+                    <colgroup>
+						<col class="checkbox-tab"/>
+                        <col class="serial-number" />
+    					<col class="user-name" />
+    					<col />
+    					<col class="operate-w2" />
+    				</colgroup>
+                    <thead class="td-title-bg">
+  						<tr>
+    						<td class="checkbox-tab"></td>
+                            <td>编号</td>
+    						<td>昵称</td>
+    						<td>微博地址</td>
+    						<td>操作</td>
+  						</tr>
+                	</thead>
+                	<tfoot>
+                    	<tr>
+                    		<td colspan="5">
+                            	<input name="" class="select-all" id="selectAll" type="checkbox" value="" />全选
+                                <a class="del-all" href="javascript:delSelectId('<?php echo URL('mgr/user_recommend.delAllUserById','group_id=' . $group_id );?>');">将所选用户从列表中删除</a></td>
+                   		</tr>
+                    </tfoot>
+                	<tbody class="order-main" id="recordList">
+						<?php $i=1;foreach($userlist as $value):?>
+							<tr>
+								<td><div class="default"><input name="uids" type="checkbox" value="<?php echo $value['id'];?>" /></div></td>
+								<td><?php echo $i++;?></td>
+								<td><?php echo $value['screen_name'];?></td>
+								<td><a href="<?php echo $value['http_url'];?>" target="_blank"><?php echo $value['http_url'];?></a></td>
+								<td><a class="del-icon" title="删除" href="<?php echo URL('mgr/user_recommend.delUserById','group_id=4&uid=' . $value['id']);?>">删除</a></td>
+							</tr>
+						<?php endforeach;?>
+                	</tbody>
+				</table>
+				<?php elseif($group_id):?>
+				<table width="100%" border="0" cellpadding="0" cellspacing="0" class="table-border">
+            		<colgroup>
+						<col class="checkbox-tab"/>
+                        <col class="serial-number" />
+    					<col class="user-name" />
+    					<col />
+    					<col class="operate-w2" />
+    				</colgroup>
+                    <thead class="td-title-bg">
+  						<tr>
+    						<td></td>
+                            <td>编号</td>
+    						<td>昵称</td>
+    						<td>微博地址</td>
+    						<td>操作</td>
+  						</tr>
+                	</thead>
+                	<tbody>
+						<tr>
+							<td colspan="5"  class="no-data">没有数据，请<a href="javascript:add('user');">添加新成员</a></td>
+						</tr>
+                	</tbody>
+				</table>
+				<?php endif;?>
+            </div>
         </div>
     </div>
+</div>
+<div class="pop-float fixed-pop" style="display:none" id="add_user">
+	<div class="pop-t">
+		<div></div>
+	</div>
+	<div class="pop-m">
+		<div class="pop-inner">
+        	<h4><a class="clos" href="javascript:closeBox('user');"></a>添加新成员</h4>
+            <div class="add-float-content">
+            	<form id="addUserForm" action="<?php echo URL('mgr/user_recommend.addReUser');?>" method="post"  name="add-newlink">
+            		<div class="float-info">
+            			<label for="link-text">
+            				<p>请输入新成员的昵称：</p>
+            				<input name="nickname" class="input-box pop-w5" type="text" value="" warntip="#nameTip" vrel="sz=max:10,m:长度不要超过8个字|ne=m:不能为空"/><span class="a-error hidden" id="nameTip"></span>
+            			</label>
+            		</div>
+                    <div class="float-button">
+						<input name="group_id" type="hidden" value="<?php echo $group_id;?>"/>
+                    	<span class="float-button-y"><input type="submit" name="确定" value="确定" /></span>
+                        <span class="float-button-n"><input type="button" name="取消" value="取消" onclick="closeBox('user');"/></span>
+                    </div>
+                </form>
+            </div>
+    	</div>
+		<div class="pop-inner-bg"></div>
+	</div>
+	<div class="pop-b">
+		<div></div>
+	</div>
+</div>
+<div id="edit_class"></div>
 <script type="text/javascript">
-
-var HtmlMode=['<form id="addUserForm" action="<?php echo URL('mgr/site_list.addMember');?>" method="post"  name="add-newlink">',
-            		'<div class="pop-form">',
-            		'	<div class="form-row">',
-            		'		<label for="link-text">新成员昵称</label>',
-            		'		<div class="form-cont">',
-            		'			<input name="nickname" class="input-txt" type="text" value="" warntip="#nameTip" vrel="_f|sz=max:20,m:超过10个字,ww|ne=m:不能为空|uni=m:该名字已存在"/><span class="tips-error hidden" id="nameTip"></span>',
-            		'		</div',
-            		'	</div>',
-                    '	<div class="btn-area">',
-					'		<input name="listId" type="hidden" value="<?php echo $listId;?>"/>',
-                	'    	<a href="#" id="pop_submit" class="general-btn btn-s2"><span>确定</span></a>',
-                	'    	<a href="#" id="pop_cancel" class="general-btn"><span>取消</span></a>',
-                    '	</div>',
-                    '</div>',
-					'</form>'].join('');
 	function add(o) {
-	    Xwb.use('MgrDlg',{
-			modeHtml:HtmlMode,
-			formMode:true,
-			valcfg:{
-				form:'#addUserForm',
-				trigger: '#pop_submit',
-				validators : {
-		            uni : function(elem, v, data, next){
-							// 检查list name是否已存在
-							var pass 	 = true;
-							var listName = $('input[name=nickname]').val();
-							$('#recordList > tr > td[rel=name]').each(function(){
-							  if (listName == $(this).html()) {
-								  pass = false;
-							  };
-							});
-							
-							this.report(pass, data);
-							next();
-		            }
-		        }
-			},
-			dlgcfg:{
-				onViewReady:function(View){
-					var self=this;
-					$(View).find('#pop_cancel').click(function(){
-						self.close();
-					});
-				},
-				destroyOnClose:true,
-				actionMgr:false,
-				title:'添加新成员'
-			}
-		})
+		$('#add_user').show();
+		$("input[warntip='#nameTip']").val('');
+		$('#edit_class').addClass('mask');
 	}
 
 	function delSelectId(url) {
@@ -145,15 +129,37 @@ var HtmlMode=['<form id="addUserForm" action="<?php echo URL('mgr/site_list.addM
 		}
 		//alert(url+'&uids='+ids);
 		if(ids)
-			delConfirm(url+'&uids='+ids, '您确定要删除这些数据吗？');
+			confirmDel(url+'&uids='+ids, '您确定要删除这些数据吗？');
 		else
 			window.location.href="#";
+	}
+
+	function closeBox(o) {
+		$("#nameTip").cssDisplay(false);
+		if(o == 'user'){
+			$('#add_user').hide();
+		}else{
+			$('#edit_user').hide();
+		}
+		$('#edit_class').removeClass('mask');
+	}
+
+	function edit(id, group_id, name, text) {
+		$('#user_uid').val(id);
+		$('#user_group_id').val(group_id);
+		$('#username').html(name);
+		$('#remark').val(text);
+		$('#edit_user').show();
+		$('#edit_class').addClass('mask');
 	}
 
 	$(function() {
 		bindSelectAll('#selectAll','#recordList > tr > td > div > input[type=checkbox]');
 	});
 	
+    new Validator({
+    	form: '#addUserForm'
+    });
 </script>
 
 </body>
