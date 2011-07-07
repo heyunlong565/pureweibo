@@ -1,0 +1,49 @@
+<?php
+
+require_once dirname(__FILE__). '/component_abstract.pls.php';
+/**
+ * 当前站点最新微博模块
+ * @author yaoying
+ * @version $Id: component_14.pls.php 14945 2011-04-29 01:26:27Z guanghui1 $
+ *
+ */
+class component_14_pls extends component_abstract_pls{
+	
+	function run($mod){
+		parent::run($mod);
+		
+		$ret = DR('components/pubTimelineBaseApp.get', 'g/60', $mod['param']);
+		
+		if ($ret['errno']) {
+			$this->_error('components/pubTimelineBaseApp.get返回API错误：'. $ret['err']. '('. $ret['errno']. ')');
+			return;
+		//如果数据为空，则不输出
+	 	}/*elseif(empty($ret['rst'])){
+	 		$this->_error('components/pubTimelineBaseApp.get没有数据');
+	 		return;
+	 	}elseif(!is_array($ret['rst'])){
+	 		$this->_error('components/pubTimelineBaseApp.get返回错误的非数组数据类型或者没有数据');
+	 		return;
+	 	}*/
+		
+	 	$show_num	= isset($mod['param']['show_num']) ? (int)$mod['param']['show_num'] : 20;
+	 	
+	 	$wbList = array();
+	 	if (is_array($ret['rst'])) {
+			foreach ($ret['rst'] as $k => $wb) {
+				if (isset($wb['text'])) {
+					$wbList[] = $wb;
+				}
+			}
+	 	}
+	 	
+	 	if(count($wbList) > $show_num){
+	 		$wbList = array_slice($wbList, 0, $show_num);
+	 	}
+	 	
+		TPL::module('component/component_' . $mod['component_id'], array('mod' => $mod, 'list' => $wbList));
+		return array('cls'=>'wblist', 'list' =>F('format_weibo',$wbList) );
+	}
+	
+	
+}

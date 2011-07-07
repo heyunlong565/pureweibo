@@ -1,0 +1,4 @@
+<?php $router = APP::getRuningRoute(true); ?>
+<div class="row">
+	<?php if ($router['function'] == 'message' && V('g:type', 1) == 1): ?>私信<?php else: ?><a href="<?php echo WAP_URL('index.messages', 'type=1'); ?>">私信</a><?php endif; ?>&nbsp;<?php if ($router['function'] == 'message' && V('g:type') == 2): ?>评论<?php else: ?><a href="<?php echo WAP_URL('index.messages', 'type=2'); ?>">评论</a><?php endif; ?>&nbsp;<?php if ($router['function'] == 'message' && V('g:type', 1) == 4): ?>通知<?php else: ?><a href="<?php echo WAP_URL('index.messages', 'type=4'); ?>">通知</a><?php endif; ?>&nbsp;<?php if ($router['function'] == 'message' && V('g:type') == 3): ?>@我的<?php else: ?><a href="<?php echo WAP_URL('index.messages', 'type=3'); ?>">@我的</a><?php endif; ?>
+</div>
