@@ -18,8 +18,12 @@
 define('IS_DEBUG',				'');
 /// SERVER　环境 类型 目前只有两种 common (一般的通用环境), sae　(sina SAE　环境)
 define('XWB_SERVER_ENV_TYPE',	'sae');
+/// 标识xweibo是否要覆盖安装, 默认是1,不覆盖安装, 2是覆盖安装
+define('XWB_INSTALL_COVER',		'1');
 /// 产品标识串,每次安装重新生成 ,　date("mdHis") 用于重新安装时，自动更新MC前缀等
 define('APP_FLAG_VER',	'');
+/// MC　KEY　的前缀
+define('MC_PREFIX',			'XWB20_MC_'.APP_FLAG_VER);
 //----------------------------------------------------------------------
 if (XWB_SERVER_ENV_TYPE!=='sae'){
 	/// 产品安装路径
@@ -46,13 +50,15 @@ if (XWB_SERVER_ENV_TYPE!=='sae'){
 //----------------------------------------------------------------------
 /// SAE中的 Storage Domain　域
 define('SAE_DOMAIN', 'xweibo');
+/// 广告联盟是否开启
+define('AD_UNION', '0');
 /// 存储　XWEIO　配置文件域的KEY
 define('CONFIG_DOMAIN',     'config');
 //----------------------------------------------------------------------
 /// 是否启用验证码，在SAE下验证码实现不完美，需关闭 设置为　０　或者 空 
 define('IS_USE_CAPTCHA',	'');
 //----------------------------------------------------------------------
-/// HTTP		适配器选择配置
+/// HTTP		适配器选择配置  fsockopen curl
 define('HTTP_ADAPTER',		'saeproxy');
 /// CACHE 		适配器选择配置
 define('CACHE_ADAPTER',		'sae');
@@ -70,22 +76,29 @@ define('FILE_ADAPTER',		'saefile');
 define('AUTH_ADAPTER',		'sae');
 //图片处理
 define('IMAGE_ADAPTER', 	'sae');
+//session存储	适配器选择配置 可选值 default|db|mc
+define('SESSION_ADAPTER', 'default');
+
+//mail处理
+define('MAIL_ADAPTER',		'sae');
 /// MC 的 HOST 配置
 define('MC_HOST', 			'');
-/// MC　KEY　的前缀
-define('MC_PREFIX',			'XWB11_MC_'.APP_FLAG_VER);
 //----------------------------------------------------------------------
 /// DB　相关的配置
-define('DB_PORT',		$_SERVER["HTTP_MYSQLPORT"]);
-define('DB_HOST',		DB_PORT.".mysql.sae.sina.com.cn");
-define('DB_USER',		SAE_ACCESSKEY);
-define('DB_PASSWD',		SAE_SECRETKEY);
+define('DB_PORT',		SAE_MYSQL_PORT);
+
+define('DB_HOST',		SAE_MYSQL_HOST_M);
+define('DB_HOST_2',		DB_HOST);
+
+define('DB_USER',		SAE_MYSQL_USER);
+define('DB_PASSWD',		SAE_MYSQL_PASS);
 define('DB_CHARSET',	'utf8');
-define('DB_PREFIX',		'xwb11_');
-define('DB_NAME',		"app_".$_SERVER["HTTP_APPNAME"]);
+define('DB_PREFIX',		'xwb20_');
+//define('DB_NAME',		SAE_MYSQL_DB);
+define('DB_NAME',		SAE_MYSQL_DB);
 //----------------------------------------------------------------------
 /// 是否打开用户分组缓存 (目前实现尚不完美) ,设置为 false 以下用户分组缓存将被停用 , 如果想单独修改某项个缓存，请更改如下特定的缓存配置
-define('CACHE_USER_ALL_ENABLE',	TRUE);
+define('CACHE_USER_ALL_ENABLE',	false);
 /// 我的首页缓存
 define('CACHE_HOME_TIMELINE',	CACHE_USER_ALL_ENABLE ? 'u0/300' : '');
 /// 我收到的评论缓存
@@ -104,3 +117,16 @@ define('API_TIMESTAMP',		60 * 10);
 //----------------------------------------------------------------------
 /// 最大的上传大小，单位　M
 define('MAX_UPLOAD_FILE_SIZE',	'1');
+//----------------------------------------------------------------------
+/// xwb 插件通讯的api签名认证key
+define('XPLUGIN_API_KEY', '');
+/// xwb 插件通讯的api请求过期时间
+define('XPLUGIN_API_TIMESTAMP', 600);
+/// xwb 微博秀页面缓存时间
+define("WEIBO_SHOW_PAGE_TIME", 500);
+/// 内容输出开关配置用于故障恢复：　true (全部开启),false (全部关闭),"111111111"($str[$type-1]的值，决定类型为$type的内容输出是否关闭)
+define("WEIBO_SHOW_CACHE_SWITCH",	TRUE);
+//----------------------------------------------------------------------
+/// 强制使用　xwb 本地化关系开关, TRUE:关系本地化， false:sina关系　
+//define('XWB_PARENT_RELATIONSHIP', TRUE);
+//----------------------------------------------------------------------

@@ -85,10 +85,10 @@ a:link, a:visited {color:#0082cb;}
 .icon-warn {background-position:-760px -272px;_display:inline;float:left;height:20px;margin:0 5px;width:16px;}
 
 /*流程图*/
-.step1 {background-position:0 0;height:86px;width:800px;}
-.step2 {background-position:0 -96px;height:86px;width:800px;}
-.step3 {background-position:0 -192px;height:86px;width:800px;}
-.step4 {background-position:0 -288px;height:86px;width:800px;}
+.step1 {background-position:0 0;height:85px;width:800px;}
+.step2 {background-position:0 -86px;height:85px;width:800px;}
+.step3 {background-position:0 -172px;height:85px;width:800px;}
+.step4 {background-position:0 -288px;height:85px;width:800px;}
 
 /*标题信息*/
 .title-info {border-bottom:1px solid #ebe9e9;margin-bottom:10px;padding-bottom:10px;_zoom:1;}

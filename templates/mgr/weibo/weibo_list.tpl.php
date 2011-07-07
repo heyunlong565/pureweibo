@@ -2,29 +2,29 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>微博屏蔽 - 微博管理 - 运营管理</title>
-<link href="<?php echo W_BASE_URL;?>css/admin.css" rel="stylesheet" type="text/css" />
+<title>微博屏蔽 - 微博 - 运营管理</title>
+<link href="<?php echo W_BASE_URL;?>css/admin/admin.css" rel="stylesheet" type="text/css" />
 <script src="<?php echo W_BASE_URL;?>js/jquery.min.js"></script>
-<script src="<?php echo W_BASE_URL;?>js/mgr.js"></script>
+<script src="<?php echo W_BASE_URL;?>js/admin-all.js"></script>
 <script>
 $(function() {
-			bindSelectAll('#selectAll','#recordList > tr > td > input[type=checkbox]');
+			bindSelectAll('#selectAll','#recordList > tr > td input[type=checkbox]');
 			});
 
 function delSelectedConfirm() {
-	var v = getSelectedValues('#recordList > tr > td > input[type=checkbox]');
+	var v = getSelectedValues('#recordList > tr > td input[type=checkbox]');
 	if (!v) {
 		alert('最少选中其中一项');
 		return;
 	}
 	var url = '<?php echo URL('mgr/weibo/disableWeibo.resume', 'id=', 'admin.php');?>' + v;
-	confirmDel(url, '确认要恢复所有选中的关键字吗?');
+	delConfirm(url, '确认要恢复所有选中的关键字吗?');
 }
 </script>
 </head>
 <body>
 <div class="main-wrap">
-	<div class="path"><span class="path-icon"></span>当前位置：运营管理<span> &gt; </span>微博管理<span> &gt; </span>微博屏蔽</div>
+	<div class="path"><span class="path-icon"></span>当前位置：运营管理<span> &gt; </span>微博<span> &gt; </span>微博屏蔽</div>
     <div class="set-wrap">
 
         <h4 class="main-title">屏蔽微博列表</h4>
@@ -41,37 +41,39 @@ function delSelectedConfirm() {
 			</div>
 
 			<div class="user-list">
-            	<table width="100%" border="0" cellpadding="0" cellspacing="0" class="table-border">
+            	<table width="100%" border="0" cellpadding="0" cellspacing="0" class="table">
             		<colgroup>
 						<col class="checkbox-tab" />
-                        <col class="serial-number" />
+                        <col class="operate-w12" />
     					<col />
-    					<col class="user-name" />
-                        <col class="s-time" />
-    					<col class="user-name" />
-    					<col class="operate-w7" />
+    					<col class="operate-w9" />
+                        <col class="operate-w9" />
+    					<col class="operate-w9" />
+    					<col class="operate-w9" />
     				</colgroup>
                     <thead class="td-title-bg">
   						<tr>
-    						<td></td>
-                            <td>编号</td>
-    						<td>微博内容</td>
-    						<td>作者</td>
-                            <td>屏蔽时间</td>
-                    		<td>操作者</td>
-    						<td>操作</td>
+    						<th><div class="td-inside"></div></th>
+                            <th><div class="td-inside">编号</div></th>
+    						<th><div class="td-inside">微博内容</div></th>
+    						<th><div class="td-inside">作者</div></th>
+                            <th><div class="td-inside">屏蔽时间</div></th>
+                    		<th><div class="td-inside">操作者</div></th>
+    						<th><div class="td-inside">操作</div></th>
   						</tr>
                 	</thead>
                 	<tfoot class="tfoot-bg">
                     	<tr>
                     		<td colspan="7">
+							
                             	<div class="pre-next">
 								<?php if (is_array($list) && !empty($list)) { ?>
 								<?php echo $pager;?>
 								<?php }?>	
 								</div>
                             	<input class="select-all" name="slectALL" id="selectAll" type="checkbox" value="" />全选
-                                <a href="javascript:delSelectedConfirm()">恢复所选的微博</a></td>
+                                <a href="javascript:delSelectedConfirm()">恢复所选的微博</a>
+								</td>
                    		</tr>
                     </tfoot>
 					<tbody id="recordList">
@@ -83,10 +85,10 @@ function delSelectedConfirm() {
     						<td><?php echo htmlspecialchars($row['user']);?></td>
     						<td><?php echo date('Y-m-d H:i:s', $row['add_time']);?></td>
                             <td><?php echo htmlspecialchars($row['admin_name']);?></td>
-    						<td><a href="javascript:confirmDel('<?php echo URL('mgr/weibo/disableWeibo.resume', 'id=' . $row['kw_id'], 'admin.php');?>','确认要恢复该微博吗');">取消屏蔽</a></td>
+    						<td><a href="javascript:delConfirm('<?php echo URL('mgr/weibo/disableWeibo.resume', 'id=' . $row['kw_id'], 'admin.php');?>','确认要恢复该微博吗');">取消屏蔽</a></td>
                         </tr>
 					<?php }} else {?>
-						<tr><td colspan="7" class="no-data">搜索不到任何数据</td></tr>
+						<tr><td colspan="7"><p class="no-data">搜索不到任何数据</p></td></tr>
 					<?php }?>
                     </tbody>
                 </table>

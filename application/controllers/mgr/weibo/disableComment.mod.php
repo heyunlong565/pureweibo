@@ -11,24 +11,20 @@ class disableComment_mod extends action {
 	 * 微博列表
 	 */
 	function commentList() {
+		$pager    	= APP :: N('pager');
 		$page = (int)V('g:page', 1);
 		$each = (int)V('g:each', 15);
 		$offset = ($page -1) * $each;
 		$keyword = V('r:keyword', null);
-
-		$offset = $page - 1 >= 0 ? $page - 1: 0;
-		$offset *= $each;
-		$rst = DR('xweibo/disableItem.getDisabledByKeyword', '', 2, $keyword, $each, $offset);
-		TPL::assign('list', $rst['rst']);
-		$rst = DR('xweibo/disableItem.getCount');
-		$count = $rst['rst'];
-
-		$pager = APP :: N('pager');
-		$page_param = array('currentPage'=> $page, 'pageSize' => $each, 'recordCount' => $count, 'linkNumber' => 10);
+		$rstList = DR('xweibo/disableItem.getDisabledByKeyword', '', 2, $keyword, $each, $offset);
+		$rstCount 	= DR('xweibo/disableItem.getCount');
+		$page_param = array('currentPage'=> $page, 'pageSize' => $each, 'recordCount' => $rstCount['rst'], 'linkNumber' => 10);
 		$pager->setParam($page_param);
 		$pager->setVarExtends(array('keyword' => $keyword));
+		
+		TPL :: assign('list', $rstList['rst']);
 		TPL :: assign('pager', $pager->makePage());
-		TPL::assign('offset', $offset);
+		TPL :: assign('offset', $offset);
 		TPL :: assign('states', array('0'=>'正常','1'=>'暂停使用'));
 		TPL :: display('mgr/weibo/comment_list', '', 0, false);
 	}

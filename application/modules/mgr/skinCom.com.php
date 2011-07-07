@@ -127,7 +127,7 @@ class skinCom {
 		$d = $io->ls(P_CSS,false,true);
 
 		foreach($d as $value) {
-			if($value[0] == 'd' && preg_match('/^' . SITE_SKIN_CSS_PRE . '.+/', $value[2]['name'])) {
+			if($value[0] == 'd' && preg_match('/^' . SITE_SKIN_CSS_PRE . '.+/', $value[2]['name']) && $value[2]['name'] != SITE_SKIN_CSS_CUSTOM) {
 				$dir[] = $value[2];
 			}
 		}
@@ -175,7 +175,8 @@ class skinCom {
     * @param string $id
     * @return array()
 	*/
-	function getSkinById($id = null) {
+	function getSkinById($id = null,$state = null) {
+		//缺少分组信息
 
 		$db = APP :: ADP('db');
 
@@ -184,8 +185,14 @@ class skinCom {
 		if (is_numeric($keyword)) {
 			$where = ' WHERE `skin_id` = ' . $keyword;
 		}
+		if($where==''&&is_numeric($state)){
+			$where = ' WHERE `state` = ' . $state;
+		}
+		elseif(is_numeric($state)){
+			$where .= ' AND `state` = ' . $state;
+		}
 
-		$sql = 'SELECT * FROM ' . $db->getPrefix() . T_SKINS . $where . ' ORDER BY `sort_num`';
+		$sql = 'SELECT * FROM ' . $db->getPrefix() . T_SKINS . $where . ' ORDER BY `sort_num` , `skin_id`';
 		$row = $db->query($sql);
 		if($row) {
 			foreach($row as $value) {

@@ -3,9 +3,9 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>激活管理员帐号</title>
-<link href="<?php echo W_BASE_URL;?>css/admin.css" rel="stylesheet" type="text/css" />
+<link href="<?php echo W_BASE_URL;?>css/admin/admin.css" rel="stylesheet" type="text/css" />
 <style type="text/css">
-html{ background:#F2F5F8;}
+html,body{ background:#F2F5F8;}
 </style>
 <script type="text/javascript" src="<?php echo W_BASE_URL;?>js/jquery.min.js"></script>
 <script type="text/javascript">
@@ -121,23 +121,23 @@ html{ background:#F2F5F8;}
                 		</div>
                 		<div class="active-two">
                 			<label><span class="required">*</span>APPKEY：</label>
-                    		<input class="input-box admin-txt2" name="appkey" id="appkey" type="text" value="<?php echo $app_key;?>" />
+                    		<input class="input-txt admin-txt2" name="appkey" id="appkey" type="text" value="<?php echo $app_key;?>" />
 							<span class="a-error" id="appkeys" style="display:none">请输入APPKEY</span>
                             <p class="tips">请登录<A href="http://open.t.sina.com.cn/loginnew.php?source=xweibo" target="_blank">新浪微博开放平台</A>，查询您申请的APPKEY</p>
 						</div>
 						 <div class="active-two">
                 			<label><span class="required">*</span>APPKEY SECRET：</label>
-                    		<input class="input-box admin-txt2" name="secret" id="secret" type="text" value="<?php echo $app_secret;?>" />
+                    		<input class="input-txt admin-txt2" name="secret" id="secret" type="text" value="<?php echo $app_secret;?>" />
                     		<span class="a-error" id="secrets" style="display:none">请输入APPKEY SECRET</span>
                 		</div>
                 		<div class="active-two">
                 			<label><span class="required">*</span>管理后台密码：</label>
-                    		<input class="input-box admin-txt2" name="pwd" id="pwd" type="password" />
+                    		<input class="input-txt admin-txt2" name="pwd" id="pwd" type="password" />
                     		<span class="a-error" id="pwds" style="display:none">请输入密码</span>
                 		</div>
                         <div class="active-two">
                 			<label><span class="required">*</span>确认密码：</label>
-                    		<input class="input-box admin-txt2" name="repwd" id="repwd" type="password" />
+                    		<input class="input-txt admin-txt2" name="repwd" id="repwd" type="password" />
                     		<span class="a-error" id="repwds" style="display:none">二次密码不一致</span>
                 		</div>
         			</div>
@@ -147,36 +147,36 @@ html{ background:#F2F5F8;}
                 	<div class="area-one">
                 		<div class="active-two">
                 			<label><span class="required">*</span>姓名：</label>
-                    		<input class="input-box admin-txt4" name="name" id="name" type="text" />
+                    		<input class="input-txt admin-txt4" name="name" id="name" type="text" />
                     		<span class="a-error" id="names" style="display:none">请输入姓名</span>
                 		</div>
                 		<div class="active-two">
                 			<label><span class="required">*</span>电子邮箱：</label>
-                    		<input class="input-box admin-txt3" name="email" id="email" type="text" />
+                    		<input class="input-txt admin-txt3" name="email" id="email" type="text" />
                     		<span class="a-error" id="emails" style="display:none">邮箱为空或格式不正确</span>
                             <p class="tips">此邮箱地址将作为找回管理员帐号密码的安全邮箱，设定后不可更改</p>
                 		</div>
                         <div class="active-two">
                 			<label><span class="required">*</span>联系电话：</label>
-                    		<input class="input-box admin-txt4" name="tel" id="tel" type="text" />
+                    		<input class="input-txt admin-txt4" name="tel" id="tel" type="text" />
                     		<span class="a-error" id="tels" style="display:none">请输入电话</span>
                 		</div>
                         <P class="tips">QQ和MSN任意选填一项即可</P>
                 		<div class="active-two">
                 			<label><span class="required">*</span>QQ：</label>
-                    		<input class="input-box admin-txt4" name="qq" id="qq" type="text" />
+                    		<input class="input-txt admin-txt4" name="qq" id="qq" type="text" />
 							<span class="a-error" id="qqs" style="display:none">QQ号码格式不正确</span>
                 		</div>
                 		<div class="active-two">
                 			<label><span class="required">*</span>MSN：</label>
-                    		<input class="input-box admin-txt3" name="msn" id="msn" type="text" />
+                    		<input class="input-txt admin-txt3" name="msn" id="msn" type="text" />
                     		<span class="a-error" id="msns" style="display:none">请输入QQ或MSN</span>
                 		</div>
         			</div>
                 </div>
                 <div class="active-save">
-                	<input name="" class="active-btn" type="submit" value="保 存" />
-                    <!--<input name="" class="active-btn-no" type="submit" value="保 存" />-->
+                	<input name="" class="admin-btn" type="submit" value="保 存" />
+                    <!--<input name="" class="admin-btn-no" type="submit" value="保 存" />-->
                 </div>
             </form>
         </div>

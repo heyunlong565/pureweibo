@@ -130,20 +130,10 @@ class mysql_db extends interface_db
 			return false;
 		}
 
-		$sql = 'SELECT *FROM ' . $table . ' WHERE ' .$id_name . ' =\'' . $this->escape($id) . '\'';
+		$sql = 'SELECT * FROM ' . $table . ' WHERE ' .$id_name . ' =\'' . $this->escape($id) . '\'';
 
-		$rs = $this->execute($sql);
-		if (!$rs) {
-			return false;
-		}
-		$rst =  mysql_fetch_array($rs, MYSQL_ASSOC);
-		if (!$rst) {
-			return array();
-		}
-		if ($this->autoFree) {
-			$this->free();
-		}
-		return $rst;
+		return $this->getRow($sql);
+		
 	}
 	
 	/**
@@ -187,8 +177,8 @@ class mysql_db extends interface_db
 			$keys = array();
 			$values = array();
 			foreach ($data as $key => $value) {
-				$keys[] = '`' .$key . '`';
-				$values[] = '"' .mysql_escape_string($value) . '"';
+				$keys[] = '`' . $this->escape($key). '`';
+				$values[] = '"' . $this->escape($value) . '"';
 			}
 			if (sizeof($keys) != sizeof($values)) {
 				return false;
@@ -207,7 +197,7 @@ class mysql_db extends interface_db
 		}
 		$values = array();
 		foreach ($data as $key=>$value) {
-			$values[] = '`' .trim($key) . '`="' . mysql_escape_string($value) . '"';
+			$values[] = '`' .trim($key) . '`="' . $this->escape($value) . '"';
 		}
 		if (!sizeof($values)) {
 			return false;
@@ -218,6 +208,58 @@ class mysql_db extends interface_db
 			return false;
 		}
 		return $this->getAffectedRows();
+	}
+	
+	
+	/**
+	 * 添加或插入数据
+	 * @param $data 键/值对应的数组，其中键为字段名，值为要插入的内容
+	 * @param $id int 更新时使用的关键字，如果指定该项，则执行更新操作
+	 * @param $table string 表单名，如果不指定，则使用setTable()设置的默认表名
+	 * @param $id_name string 字段名，更新时用于查询的字段，默认查询名为'id'的字段
+	 * @return int|false 返回最后插入的记录ID或更新是否成,失败返回false
+	 */
+	function boolSave($data, $id = '', $table = '', $id_name = 'id') 
+	{
+		$type  = ($id=='') ? 'insert' : 'update';
+		$table = $this->getTable($table);
+		
+		// insert
+		if ($type == 'insert') 
+		{
+			$keys   = array();
+			$values = array();
+			foreach ($data as $key => $value) {
+				$keys[]   = '`' . $this->escape($key) . '`';
+				$values[] = '"' . $this->escape($value). '"';
+			}
+			if (sizeof($keys) != sizeof($values)) {
+				return false;
+			}
+			
+			$ignore = '';
+			if ($this->ignore_insert) {
+				$ignore = ' IGNORE ';
+			}
+
+			$sql = 'INSERT ' . $ignore . ' INTO ' . $table . '(' .implode(',', $keys). ') VALUES('. implode(',', $values) .')';
+			if ($this->execute($sql)) {
+				return $this->getInsertId();
+			}
+			return false;
+		}
+		
+		// update
+		$values = array();
+		foreach ($data as $key=>$value) {
+			$values[] = '`' .trim($key) . '`="' . $this->escape($value) . '"';
+		}
+		if (!sizeof($values)) {
+			return false;
+		}
+		
+		$sql = 'UPDATE ' . $table . ' SET ' . implode(',', $values) . ' WHERE ' . $id_name . '=' . $id;
+		return $this->execute($sql);
 	}
 	
 	/**
@@ -265,6 +307,7 @@ class mysql_db extends interface_db
 
 			// 如果连接失败，则尝试连接下一台读服务器
 			if (!$connect[$mode]) {
+				$this->log('连接失败.Error:'.mysql_error());
 				F('error', mysql_error());
 				if ($mode == 'read') {
 					++ $error_connect;
@@ -284,7 +327,8 @@ class mysql_db extends interface_db
 			}
 			// 默认使用UTF8编码
 			$p['charset'] = isset($p['charset']) ? $p['charset'] : 'UTF8';
-			mysql_query('SET NAMES ' . $p['charset'], $connect[$mode]);
+			$this->_setCharset($p['charset'], $connect[$mode]);
+			//mysql_query('SET NAMES ' . $p['charset'], $connect[$mode]);
 			// 默认使用和写数据库相同的库名
 			if (!isset($p['db'])) {
 				$p['db'] = $this->params['db'];
@@ -307,8 +351,22 @@ class mysql_db extends interface_db
 		//$this->last_query_connect = $connect;
 		return $connect[$mode];
 	}
-
-
+	
+	/**
+	 * 设置db charset
+	 * @param string $charset
+	 * @param resource $link_identifier
+	 */
+	function _setCharset($charset, $link_identifier){
+		$version = mysql_get_server_info($link_identifier);
+		$charset = strtolower($charset);
+		if($version > '4.1'){
+			$sql = $charset ? "character_set_connection={$charset}, character_set_results={$charset}, character_set_client=binary" : '';
+			$sql .= $version > '5.0.1' ? ((empty($sql) ? '' : ', ')."sql_mode=''") : '';
+			$sql && mysql_query("SET {$sql}", $link_identifier);
+		}
+	}
+	
 	/**
 	 * 根据SQL语句返回相应的数据库连接
 	 * @param $sql string SQL语句
@@ -335,7 +393,9 @@ class mysql_db extends interface_db
 		$conn = $this->autoConnect($sql);
 		if (!$conn) return false;
 		$rs= mysql_query($sql, $conn);
-
+		if (!$rs) {
+			$this->log('query error:'. mysql_error($conn) . '. SQL:' . $sql );
+		}
 		// 查询后的状态
 		$this->state = array(
 					'sql' => $sql,
@@ -398,13 +458,15 @@ class mysql_db extends interface_db
 	 * @return array|false 成功则返回第一条记录，找不到记录则返回空数组，失败返回false
 	 */
 	function getRow($sql) {
-		if (!$rs = $this->execute($sql)) return false;
+		if (!$rs = $this->execute($sql)){
+			return false;
+		}
 		$rst = mysql_fetch_array($rs, MYSQL_ASSOC);
 		if (!$rst) {
 			return array();
 		}
 		if ($this->autoFree) {
-			$this->free();
+			$this->free($rs);
 		}
 		return $rst;
 	}
@@ -437,7 +499,6 @@ class mysql_db extends interface_db
 	 * @param int query handle
 	 */
 	function free($query_id=""){
-		if ($query_id == "") $query_id = $this->last_query_id;
 		if ($query_id == '') {
 			return;
 		}

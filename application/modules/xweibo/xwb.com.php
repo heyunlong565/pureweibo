@@ -9,9 +9,14 @@
  * @Brief			微博api操作类
  */
 
-include_once P_CLASS.'/weibo.class.php';
+// 根据配进include不同的文件，以达到xwb继承同一名字但是方法不同的父类
+if ( XWB_PARENT_RELATIONSHIP ) {
+	include_once P_CLASS.'/weiboLocal.class.php';
+} else {
+	include_once P_CLASS.'/weiboSina.class.php';
+}
 
-class xwb extends weibo
+class xwb extends xwbParentClass
  {
 
 
@@ -24,7 +29,7 @@ class xwb extends weibo
 	 */
 	function xwb($oauth_token = NULL, $oauth_token_secret = NULL)
 	{
-		parent::weibo($oauth_token, $oauth_token_secret);
+		parent::xwbParentClass($oauth_token, $oauth_token_secret);
 	}
 
 
@@ -79,7 +84,7 @@ class xwb extends weibo
 						}
 						break;
 					case 'valid_sina_email':
-						if (!empty($var) && preg_match('#^\w+(\.\w)*@(\w\.)*sina\.[com|cn]$#')) {
+						if (!empty($var) && preg_match('#^\w+(\.\w)*@(\w\.)*sina\.[com|cn]$#', $var)) {
 							return RST('', '1010006', 'Parameters for the email to format');
 						}
 						break;
@@ -140,7 +145,7 @@ class xwb extends weibo
 	 * @param $useType string
 	 * @return array|string
 	 */
-	 function getUserTimeline($id = null, $user_id = null, $name = null, $since_id = null, $max_id = null, $count = null, $page = null, $oauth = true)
+	 function getUserTimeline($id = null, $user_id = null, $name = null, $since_id = null, $max_id = null, $count = null, $page = null, $feature = 0, $oauth = true, $base_app = '0')
 	 {
 		 $valid_params = array();
 		 $valid_params['id|required'] = $id.$user_id.$name;
@@ -149,7 +154,7 @@ class xwb extends weibo
 			return $valid; 
 		 }
 
-		$response = parent::getUserTimeline($id, $user_id, $name, $since_id, $max_id, $count, $page, $oauth);
+		$response = parent::getUserTimeline($id, $user_id, $name, $since_id, $max_id, $count, $page, $feature, $oauth, $base_app);
 
 		return $response;
 	 }
@@ -315,7 +320,7 @@ class xwb extends weibo
 		//检查参数
 		$valid_params = array();
 		$valid_params['status|required|filter'] = $status;
-		$valid_params['picid|required'] = $picid;
+		//$valid_params['picid|required'] = $picid;
 		$valid = $this->validation($valid_params);
 		if ($valid !== false) {
 		   return $valid; 
@@ -358,7 +363,7 @@ class xwb extends weibo
 	 * @param $useType string
 	 * @return array|string
 	 */
-	 function repost($id, $status = null)
+	 function repost($id, $status = null, $is_comment = 0)
 	 {
 		$url = WEIBO_API_URL.'statuses/repost.'.$this->format;
 		//检查参数
@@ -370,7 +375,7 @@ class xwb extends weibo
 		   return $valid; 
 		} 
 
-		$response = parent::repost($id, $status);
+		$response = parent::repost($id, $status, $is_comment);
 
 		return $response;
 	 }
@@ -394,6 +399,11 @@ class xwb extends weibo
 		} 
 
 		$response = parent::commentDestroy($id);
+		
+	 	// 本地备份
+	 	if ( isset($response['rst']['id']) && $this->_needLocalCopy() ) {
+	 		DR('CommentCopy.delCopy', FALSE, $response['rst']['id']);
+	 	}
 
 		return $response;
 	 }
@@ -415,6 +425,13 @@ class xwb extends weibo
 		} 
 
 		$response = parent::commentDestroyBatch($ids);
+		
+	 	// 本地备份
+	 	$idList	= $this->_getRspIdList($response['rst']);
+	 	if ( !empty($idList) && $this->_needLocalCopy() ) {
+	 		DR('CommentCopy.delCopy', FALSE,  $idList);
+	 	}
+	 	
 		return $response;
 	 }
 
@@ -439,6 +456,11 @@ class xwb extends weibo
 		} 
 
 		$response = parent::comment($id, $comment, $cid);
+		
+	 	 // 本地备份
+	 	if ( isset($response['rst']['id']) && $this->_needLocalCopy() ) {
+	 		DR('CommentCopy.addCopy', FALSE, $response['rst']);
+	 	}
 
 		return $response;
 	 }
@@ -1244,5 +1266,148 @@ class xwb extends weibo
 
 		return RST($result);
 	}
+	
+	
+	
 
+	/**
+	  *  添加话题收藏 
+	  */
+	
+	function addSubject($sina_uid,$subject_txt) {
+	   $this->db=APP::ADP('db');
+       $this->table_subject=$this->db->getTable(T_PAGE_SUBJECT);
+	   
+	   $sql=sprintf("select id,is_use from %s where sina_uid='%s' and subject='%s';",$this->table_subject,$sina_uid,$subject_txt);
+	   $ret=$this->db->query($sql);
+	   if(empty($ret)){
+			  $data=array('sina_uid'=>$sina_uid, 'subject'=>$subject_txt);
+			  $ret=$this->db->save($data,'',T_PAGE_SUBJECT);
+			  if($ret){
+					 return RST('',0);//正常
+			  }
+			  else{
+					 return RST('',2);//数据库错误
+			  }			  
+	   }
+	   elseif(!empty($ret)&&isset($ret[0])&&$ret[0]['is_use']=='0'){
+			  $data=array('is_use'=>1);
+			  $id=$ret[0]['id'];
+			  $ret=$this->db->save($data,$id,T_PAGE_SUBJECT);
+			  if($ret){
+					 return RST('',0);//正常
+			  }
+			  else{
+					 return RST('',2);//数据库错误
+			  }
+			  
+	   }
+	   else{
+			  return RST('',1);//重复记录
+	   }
+	}
+	
+	
+	/**
+	  *  删除话题收藏
+	  */
+	function deleteSubject($sina_uid,$subject_txt) {
+	   $this->db=APP::ADP('db');
+       $this->table_subject=$this->db->getTable(T_PAGE_SUBJECT);
+	   
+	   $sql=sprintf("select id from %s where sina_uid='%s' and subject='%s' and is_use=1;",$this->table_subject,$sina_uid,$subject_txt);
+	   $ret=$this->db->query($sql);
+	   
+	   if(!empty($ret)&&isset($ret[0])){
+			  $id=$ret[0]['id'];
+			  $data=array('is_use'=>0);
+			  $ret=$this->db->save($data,$id,T_PAGE_SUBJECT);
+			  if($ret){
+					 return RST('',0);//正常
+			  }
+			  else{
+					 return RST('',2);//数据库错误
+			  }
+			  
+	   }
+	   else{
+			  return RST('',1);//不存在该话题订阅的历史记录
+	   }
+	}
+	
+
+	
+	/**
+	  *  检查话题是否已被收藏 
+	  */
+	function isSubjectFollowed($sina_uid,$subject_txt) {
+	   $this->db=APP::ADP('db');
+       $this->table_subject=$this->db->getTable(T_PAGE_SUBJECT);
+	   //查询是不区分话题内容的大小写的
+	   $sql=sprintf("select 1 from %s where sina_uid='%s' and subject='%s' and is_use=1;",$this->table_subject,$sina_uid,$subject_txt);
+	   $ret=$this->db->query($sql);
+	   
+	   if(empty($ret)){
+			  return RST('',0);//未被收藏
+	   }
+	   else{
+			  return RST('',1);//已被收藏
+	   }
+	   
+		
+	}
+	
+	
+	/**
+	  *  获取用户订阅的话题列表
+	  */
+	function getSubjectList($sina_uid) {
+	   $this->db=APP::ADP('db');
+       $this->table_subject=$this->db->getTable(T_PAGE_SUBJECT);
+	   $sql=sprintf("select subject from %s where sina_uid='%s' and is_use=1;",$this->table_subject,$sina_uid);
+	   $ret=$this->db->query($sql);
+	   return RST($ret);
+
+	}
+	
+	/**
+	 * 获取一批指定用户的微博timeline
+	 * 
+	 * @param mixed $user_id 用户ID,一次最多20个
+	 * @param mixed $screen_name 用户昵称，一次最多20个
+	 * @param int $count 指定要返回的记录条数。默认20，最大200
+	 * @param int $page 指定返回结果的页码
+	 * @param int $feature 微博类型，0全部，1原创，2图片，3视频，4音乐. 返回指定类型的微博信息内容
+	 * @param int $base_app 是否基于当前应用来获取数据。1为限制本应用微博，0为不做限制
+	 * @param bool $oauth
+	 */
+	function getBatchTimeline($params, $oauth = true)
+	{
+		//检查参数
+		$valid_params = array();
+		$valid_params['user_id|required'] = isset($params['user_id']) ? $params['user_id'] : (isset($params['screen_name']) ? $params['screen_name'] : null);
+		$valid = $this->validation($valid_params);
+		if ($valid !== false) {
+		   return $valid; 
+		} 
+
+		$response = parent::getBatchTimeline($params, $oauth);
+
+		return $response;
+	}
+	
+	function getStatusesBatchShow($ids, $del_ctrl = true, $oauth = true)
+	{
+		//检查参数
+		$valid_params = array();
+		$valid_params['ids|required'] = $ids;
+		$valid = $this->validation($valid_params);
+		if ($valid !== false) {
+		   return $valid; 
+		}
+
+		$response = parent::getStatusesBatchShow($ids, $del_ctrl, $oauth);
+
+		return $response;
+	}
 }

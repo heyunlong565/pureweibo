@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>安装流程_第三步</title>
+<title>安装流程_第二步</title>
 <link rel="stylesheet" media="screen"  href="css/base.css"/>
 </head>
 
@@ -14,7 +14,7 @@
 		<div id="main">
 			<div class="content-box">
 				<div class="step2 step-bg"></div>
-				<form name="theForm" action="index.php?step=3" method="post" class="step">
+				<form name="theForm" action="index.php?step=2" method="post" class="step">
 				<div class="ct-mid">
 					<div class="title-info">
 						<h3>数据库设置<span></span></h3>
@@ -35,7 +35,7 @@
 					</div>
 					<div class="form-row">
 						<label for=""><span>*</span><?php echo $_LANG['db_passwd'];?>：</label>
-						<input type="password" value="<?php echo $db_passwd;?>" disabled="disabled"/>
+						<input type="password" name="db_passwd" disabled="disabled"/>
 					</div>
 					<div class="form-row">
 						<label for=""><span>*</span><?php echo $_LANG['db_prefix'];?>：</label>

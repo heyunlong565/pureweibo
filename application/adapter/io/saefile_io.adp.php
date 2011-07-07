@@ -16,7 +16,7 @@ class saefile_io
 	function saefile_io() {
 		$this->storage = new SaeStorage();
 	}
-
+	
 	function adp_init($config=array()) {
 		
 	}

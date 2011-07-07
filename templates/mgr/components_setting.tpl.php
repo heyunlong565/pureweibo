@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>组件列表 - 组件设置 - 组件管理</title>
-<link href="<?php echo W_BASE_URL;?>css/admin.css" rel="stylesheet" type="text/css" />
+<link href="<?php echo W_BASE_URL;?>css/admin/admin.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
 <div class="main-wrap">
@@ -76,7 +76,7 @@
         		<form action="" method="post">
                 	<div class="set1">
                     	<div class="sub-set-l">组件使用的用户列表：</div>
-                    	<div class="sub-set-r"><a href="recommended_users.html">官方微博用户列表</a></div>
+                    	<div class="sub-set-r"><a href="recommended_users.html">微博频道用户列表</a></div>
                     </div>
                 	<div class="set2">
                 		<div class="sub-set-l">组件显示官方用户的数量：</div>

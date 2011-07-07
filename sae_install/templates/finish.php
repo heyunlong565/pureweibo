@@ -34,4 +34,4 @@
 	</div>
 </body>
 </html>
-<script src="http://beacon.x.weibo.com/a.gif?xt=in&akey=<?php echo $site_config['app_key'];?>&name=<?php echo urlencode($site_config['site_name']);?>&content=<?php echo urlencode($site_config['site_info']);?>&uname=<?php echo '';?>&em=<?php echo '';?>&qq=<?php echo '';?>&msn=<?php echo '';?>&tel=<?php echo '';?>&ip=<?php echo get_real_ip();?>&pjt=<?php echo XWEIBO_PROJECT;?>&ver=<?php echo XWEIBO_VERSION;?>&domain=<?php echo urlencode($_SERVER['HTTP_HOST']);?>&random=<?php echo mt_rand();?>"></script>
+<img src="http://beacon.x.weibo.com/a.gif?xt=in&akey=<?php echo $site_config['app_key'];?>&name=<?php echo urlencode($site_config['site_name']);?>&content=<?php echo urlencode($site_config['site_info']);?>&uname=<?php echo '';?>&em=<?php echo '';?>&qq=<?php echo '';?>&msn=<?php echo '';?>&tel=<?php echo '';?>&ip=<?php echo get_real_ip();?>&pjt=<?php echo XWEIBO_PROJECT;?>&ver=<?php echo XWEIBO_VERSION;?>&domain=<?php echo urlencode($_SERVER['HTTP_HOST']);?>&random=<?php echo mt_rand();?>" style="display:none" />

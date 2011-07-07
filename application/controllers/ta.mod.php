@@ -14,99 +14,80 @@ class ta_mod
 
 	function ta_mod()
 	{
+		$id 	 = (string)V('g:id');
+		if(F('user_action_check',array(3),$id)){
+			TPL::module('error_delete', array('msg'=>'对不起，该用户已经被屏蔽了') );
+			exit();
+		}
 	}
-
+	
+	
 	/**
 	 * ta的首页
-	 *
-	 *
 	 */
 	function default_action()
 	{
-		$id = V('g:id');
-		$name = V('g:name');
-
-		if (USER::isUserLogin()) {
-			if (empty($id) && empty($name)) {
-				/// 提示不存在	
-				APP::tips(array('tpl' => 'e404', 'msg' => '抱歉你所访问的用户不存在'));
-			}
-
-			//如果是自己，跳转到首页
-			if ($id == USER::uid() || ($name && USER::v('screen_name') == $name)) {
-				APP::redirect('index', 2);
+		$id 	 = (string)V('g:id');
+		$name 	 = (string)V('g:name');
+        $uDomain = V('g:_udomain');
+        
+		
+        if( USED_PERSON_DOMAIN && $uDomain && strlen($uDomain)>=6 )
+        {
+            $id 	= DR('mgr/userCom.getUidByDomain', FALSE, $uDomain);
+            $name 	= '';
+        }
+        
+		if ( empty($id) && empty($name) ) {  /// 提示不存在	
+			APP::tips(array('tpl' => 'e404', 'msg' => '抱歉你所访问的用户不存在'));
+		}
+		
+        $userinfo = array();
+		if ( USER::isUserLogin() ) 
+		{
+			// 如果是自己，跳转到首页
+			if ( $id==USER::uid() || ($name && USER::v('screen_name')==$name) ) {
+				$_GET['isRewriteFromTa'] = TRUE;
+				APP::M('index.profile');
 				exit;	
 			}
-			/// 调用微博个人资料接口
+			
+			// 调用微博个人资料接口
 			$userinfo = DR('xweibo/xwb.getUserShow', 'p', null, $id, $name);
-			/// 过滤过敏用户
-			$userinfo = F('user_filter', $userinfo['rst'], true);
-			if (empty($userinfo)) {
-				/// 提示不存在	
-				APP::tips(array('tpl' => 'e404', 'msg' => '抱歉你所访问的用户不存在'));
-			} elseif (isset($userinfo['filter_state']) && $userinfo['filter_state'] == 2) {
-				/// 屏蔽用户
-				APP::tips(array('tpl' => 'e403', 'msg' => '该用户已经给屏蔽了'));
-			}
-
-			/// 获取ta的粉丝列表前9条数据
-			$followers = DR('xweibo/xwb.getMagicFollowers', '', $userinfo['id'], 9);
-			$followers = $followers['rst'];
 			
-			/// 页码数
-			$page = max(V('g:page'), 1);
-
-			/// 设置每页显示微博数
-			$limit = V('-:userConfig/user_page_wb');
-			$count = $limit;
-
-			/// 调用获取当前用户所关注用户的最新微博信息api
-			$list = DR('xweibo/xwb.getUserTimeline', '', $userinfo['id'], null, null, null, null, $count, $page);
-			$list = $list['rst'];
-			
-			/// 获取当前用户的粉丝列表id
-			$fids = DR('xweibo/xwb.getFollowerIds', '', USER::uid(), null, null, -1, 5000);
-			$fids = $fids['rst'];
-
-			TPL::assign('fids', $fids['ids']);
-			TPL::assign('limit', $limit);
-		} else {
-			if (empty($name)) {
+		} else 
+		{
+			if ( empty($name) ) {
 				DS('xweibo/xwb.setToken', '', 2);
-				/// 调用微博个人资料接口
-				$userinfo = DR('xweibo/xwb.getUserShow', '', $id, null, $name);
-				/// 提示不存在
-				//APP::tips(array('tpl' => 'e404', 'msg' => '抱歉你所访问的用户不存在'));
+				$oauth 	= true;
 			} else {
-				/// 调用微博个人资料接口
-				$userinfo = DR('xweibo/xwb.getUserShow', '', null, null, $name, false);
+				$id 	= null;
+				$oauth 	= false;
 			}
-			/// 过滤过敏用户
-			$userinfo = F('user_filter', $userinfo['rst'], true);
-			if (empty($userinfo)) {
-				/// 提示不存在	
-				APP::tips(array('tpl' => 'e404', 'msg' => '抱歉你所访问的用户不存在'));
-			} elseif (isset($userinfo['filter_state']) && $userinfo['filter_state'] == 2) {
-				/// 屏蔽用户
-				APP::tips(array('tpl' => 'e403', 'msg' => '该用户已经给屏蔽了'));
-			}
-
-			/// 获取当前用户的最新微博信息
-			$list = DR('xweibo/xwb.getUserTimeline', '', null, null, $userinfo['screen_name'], null, null, null, null, false);
-			$list = $list['rst'];
-
-			/// 获取前9位优质粉丝信息
-			$followers = DR('xweibo/xwb.getMagicFollowers', '', $userinfo['id'], 9, false);
-			$followers = $followers['rst'];
+			$userinfo = DR('xweibo/xwb.getUserShow', '', $id, null, $name, $oauth);
 		}
-
+		
+		$userinfo = F('user_filter', $userinfo['rst'], true);
+		if (empty($userinfo)) {
+			/// 提示不存在	
+			APP::tips(array('tpl' => 'e404', 'msg' => '抱歉你所访问的用户不存在'));
+		} elseif (!empty($userinfo['filter_state'])) {
+			/// 屏蔽用户
+			TPL::module('error_delete', array('msg'=>'对不起，该用户已经被屏蔽了') );
+			exit(-1);
+		}
+		
+		//检查是否本站用户
+		$userinfo['is_localsite_user'] = 1;
+		$us_rst = DR('mgr/userCom.getByUid', FALSE, $userinfo['id']);
+		if (empty($us_rst['rst'])) {
+			$userinfo['is_localsite_user'] = 0;
+		}
+		
 		//页面代号
 		APP::setData('page', 'ta', 'WBDATA');
-	
-		TPL::assign('uid', USER::uid());
-		TPL::assign('list', $list);
+		TPL::assign('uid', USER::uid() );
 		TPL::assign('userinfo', $userinfo);
-		TPL::assign('followers', $followers['users']);
 		TPL::display('ta_profile');
 	}
 
@@ -121,7 +102,7 @@ class ta_mod
 		$name = V('g:name');
 		if (empty($id) && empty($name)) {
 			//提示访问的页面不存在，跳转到首页
-			APP::tips(array('tpl' => 'e404', 'msg' => '抱歉你所访问的页面不存在'));
+			APP::tips(array('tpl' => 'e404', 'msg' => '抱歉你所访问的用户不存在'));
 		}
 
 		/// 如果是自己，跳转到首页
@@ -137,48 +118,11 @@ class ta_mod
 			/// 提示不存在	
 			APP::tips(array('tpl' => 'e404', 'msg' => '抱歉你所访问的用户不存在'));
 		}
-
-		/// 光标开始位置
-		$start_pos = V('g:start_pos');
-		/// 下一个光标开始位置
-		$end_pos = V('g:end_pos');
-
-		/// 页码数
-		$page = max(V('g:page'), 1);
-
-		/// 设置每页显示微博数
-		$limit = WB_API_LIMIT;
-		$count = $limit;
-
-		if (empty($end_pos) && empty($start_pos)) {
-			$cursor = -1;
-		} elseif (!empty($start_pos)) {
-			$cursor = $start_pos;
-		} elseif (!empty($end_pos)) {
-			$cursor = $end_pos;
-		}
-
-		/// 调用获取当前用户关注对象列表及最新一条微博信息api
-		$list = DR('xweibo/xwb.getFriends', '', $userinfo['id'], null, null, $cursor, $count);
-		$list = $list['rst'];
-		$list['x_total'] = $userinfo['friends_count'];
-		/// 过滤关注列表
-		$list['users'] = F('user_filter', $list['users']);
-
 		/// 获取前9位优质粉丝信息
 		$followers = DR('xweibo/xwb.getMagicFollowers', '', $userinfo['id'], 9);
 		$followers = $followers['rst'];
-
-		/// 获取当前用户的关注列表id
-		$fids = DR('xweibo/xwb.getFriendIds', '', USER::uid(), null, null, -1, 5000);
-		$fids = $fids['rst'];
-
-		TPL::assign('list', $list);
-		TPL::assign('limit', $limit);
 		TPL::assign('uid', USER::uid());
 		TPL::assign('userinfo', $userinfo);
-		TPL::assign('followers', $followers['users']);
-		TPL::assign('fids', $fids['ids']);
 		TPL::display('ta_follow');
 	}
 
@@ -194,7 +138,7 @@ class ta_mod
 		$name = V('g:name');
 		if (empty($id) && empty($name)) {
 			//提示访问的页面不存在，跳转到首页
-			APP::tips(array('tpl' => 'e404', 'msg' => '抱歉你所访问的页面不存在'));
+			APP::tips(array('tpl' => 'e404', 'msg' => '抱歉你所访问的用户不存在'));
 		}
 		
 		/// 调用微博个人资料接口
@@ -202,7 +146,6 @@ class ta_mod
 		//过滤过敏用户
 		$userinfo = F('user_filter', $userinfo['rst'], true);
 		if (empty($userinfo)) {
-			/// 提示不存在	
 			APP::tips(array('tpl' => 'e404', 'msg' => '抱歉你所访问的用户不存在'));
 		}
 
@@ -210,48 +153,8 @@ class ta_mod
 		if (($name && $name == USER::v('srceen_name')) || $id == USER::uid()) {
 			APP::redirect('index.fans', 2);
 		}
-
-		/// 光标开始位置
-		$start_pos = V('g:start_pos');
-		/// 下一个光标开始位置
-		$end_pos = V('g:end_pos');
-
-		/// 页码数
-		$page = max(V('g:page'), 1);
-
-		/// 设置每页显示微博数
-		$limit = WB_API_LIMIT;
-		$count = $limit;
-
-		if (empty($end_pos) && empty($start_pos)) {
-			$cursor = -1;
-		} elseif (!empty($start_pos)) {
-			$cursor = $start_pos;
-		} elseif (!empty($end_pos)) {
-			$cursor = $end_pos;
-		}
-
-		/// 调用获取ta的粉丝列表及最新一条微博信息api
-		$list = DR('xweibo/xwb.getFollowers', '', $userinfo['id'], null, null, $cursor, $count);
-		$list = $list['rst'];
-		$list['x_total'] = $userinfo['followers_count'];
-		/// 过滤粉丝列表
-		$list['users'] = F('user_filter', $list['users']);
-	
-		/// 获取当前用户的关注列表id
-		$fids = DR('xweibo/xwb.getFriendIds', '', USER::uid(), null, null, -1, 5000);
-		$fids = $fids['rst'];
-
-		/// 获取前9位优质粉丝信息
-		$followers = DR('xweibo/xwb.getMagicFollowers', '', $userinfo['id'], 9);
-		$followers = $followers['rst'];
-
-		TPL::assign('list', $list);
 		TPL::assign('uid', USER::uid());
 		TPL::assign('userinfo', $userinfo);
-		TPL::assign('limit', $limit);
-		TPL::assign('followers', $followers['users']);
-		TPL::assign('fids', $fids['ids']);
 		TPL::display('ta_fans');
 	}
 

@@ -24,6 +24,25 @@ class pager
 		if(!isset($pageParam['linkNumber']))
 			$this->pageParam['linkNumber'] = 10;
 	}
+	
+	
+	
+	/**
+	 * \brief set the page params and get the offset
+	 * @param int $count, records count
+	 */
+	function initParam($count)
+	{
+		$page 	= (int)V('g:page', 1);
+		$each 	= (int)V('g:each', 15);
+		$pageCnt= ceil($count/($each>0 ? $each : 1));
+		$page	= ($pageCnt>0 && $page>$pageCnt) ? $pageCnt : $page;
+		$offset = ($page-1 >= 0) ? $page-1: 0;
+		$offset *= $each;
+		
+		$this->setParam (array('currentPage'=> $page, 'pageSize' => $each, 'recordCount' => $count, 'linkNumber' => 10, 'offset' => $offset));
+		return $offset;
+	}
 
 	/**
 	 * 添加除$_GET外的内容

@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>认证设置 - 认证管理 - 运营管理</title>
-<link href="<?php echo W_BASE_URL;?>css/admin.css" rel="stylesheet" type="text/css" />
+<link href="<?php echo W_BASE_URL;?>css/admin/admin.css" rel="stylesheet" type="text/css" />
 <script type='text/javascript' src='<?php echo W_BASE_URL;?>js/jquery.min.js'></script>
 <script>
 
@@ -44,86 +44,95 @@
 	}
 
 	function icon(o) {
-		if(o) {
+		if(o.checked) {
 			$('#update_form').show();
+			$('#update_form_2').show();
 		}else{
 			$('#update_form').hide();
+			$('#update_form_2').hide();
 		}
 	}
 </script>
-<?php if($sysconfig['authen_enable'] == 1):?><script>window.onload = function() {$('#update_form').show();}</script><?php endif;?>
+<?php if($sysconfig['authen_type'] == 2 || $sysconfig['authen_type'] == 3):?><script>window.onload = function() {$('#update_form').show();$('#update_form_2').show();}</script><?php endif;?>
 </head>
-<body>
-<div class="main-wrap">
-	<div class="path"><span class="path-icon"></span>当前位置：运营管理<span> &gt; </span>认证管理<span> &gt; </span>认证设置</div>
-    <div class="set-wrap">
-        <h4 class="main-title">认证设置</h4>
-		<div class="set-area-int">
+<body class="main-body">
+	<div class="path"><p>当前位置：用户管理<span>&gt;</span><a href="<?php echo URL('mgr/user_verify.search'); ?>">认证管理</a><span>&gt;</span>认证设置</p></div>
+    <div class="main-cont">
+        <h3 class="title">认证设置</h3>
+		<div class="set-area">
         	<form action="<?php echo URL('mgr/user_verify.webAuthenWay');?>" method="post" name="authenticate" id="this_form">
-			<div class="authenticate">
-				<p class="auth-title">认证方式设置:</p>
-				<p class="radio-auth">
+			<div class="form-s1">
+				<p class="tips"><strong>认证方式设置:</strong></p>
+				<p class="opeate">
                     <label>
-                		<input name="authen" class="radio-same" type="radio" value="0" <?php if($sysconfig['authen_enable'] == 0) echo 'checked="checked"';?> onclick="icon(0);"/>使用新浪名人认证
-                	</label>
+                    	<input name="authen_type[]" class="ipt-checkbox" type="checkbox" value="1" <?php if($sysconfig['authen_type'] == 1 || $sysconfig['authen_type'] == 3) echo 'checked="checked"';?> />
+                    	使用新浪名人认证
+                    </label>
                 </p>
-                <p class="radio-auth">
+                <p class="opeate">
                 	<label>
-            			<input name="authen" class="radio-same" type="radio" value="1" <?php if($sysconfig['authen_enable'] == 1) echo 'checked="checked"';?> onclick="icon(1);"/>使用站点自定义认证
+            			<input name="authen_type[]" class="ipt-checkbox" type="checkbox" value="2" <?php if($sysconfig['authen_type'] == 2 || $sysconfig['authen_type'] == 3) echo 'checked="checked"';?> onclick="icon(this); "/>
+                        使用站点自定义认证
                 	</label>
                 </p>
 			</div>
 			<input type="hidden" name="big_file" id="big_file" value="<?php echo $sysconfig['authen_big_icon'];?>" />
 			<input type="hidden" name="small_file" id="small_file" value="<?php echo $sysconfig['authen_small_icon']; ?>" />
 			
-            <div class="authenticate-img" id="update_form" style="display:none">
-				<div class="icon-alt">
-                	<div class="sle-auth-img">设置认证说明：</div>
-            		<input class="input-box icon-alt-w" name="alt" type="text" value="<?php echo $sysconfig['authen_small_icon_title'];?>"/>
-                </div>
-			</form>
-				<div class="auth-box">
-            		<div class="sle-auth-img">请选择认证图标：</div>
-                	<div class="auth-img">
-						<form id="big_form" method="post" target="logo_upload" action="<?php echo URL('mgr/user_verify.uploadAuthBigIcon')?>" enctype="multipart/form-data">
-                    	<p class="trr">
-							<label for="logo">大图标：
-								<input type="file" class="botton-file" value="<?php echo $sysconfig['authen_big_icon']; ?>"  name="big" onChange="bigPreview(this)"/>
-							</label>
-							<iframe name="logo_upload" style="display:none;"></iframe>
-						</p>
-                    	</form>
-						<form id="small_form" method="post" target="logo_upload" action="<?php echo URL('mgr/user_verify.uploadAuthSmallIcon')?>" enctype="multipart/form-data">
-                    	<p>
-							<label for="logo">小图标：
-								<input type="file" class="botton-file" value="<?php echo $sysconfig['authen_small_icon']; ?>"  name="small" onChange="smallPreview(this)"/>
-							</label>
-							<iframe name="logo_upload" style="display:none;"></iframe>
-						</p>
-                    	</form>
-                	</div>
-                	<div class="effect-preview">
-                		<div class="pre-view">效果预览：</div>
-                        <div>
-                		<div class="preview-big">
-							<img id="big_logo_preview" src="<?php echo $sysconfig['authen_big_icon'] ? F('fix_url', $sysconfig['authen_big_icon']) :  W_BASE_URL . AUTH_BIG_ICON_DEFAULT_NAME;?>" />
-							<div class="preview_loading" id="big_preview_loading" style="display:none">正在上传图片，请稍候...</div>
-						</div>
-                		<div class="preview-small">
-							<img id="small_logo_preview" src="<?php echo $sysconfig['authen_small_icon'] ? F('fix_url', $sysconfig['authen_small_icon']) :  W_BASE_URL . AUTH_SMALL_ICON_DEFAULT_NAME;?>" title="<?php echo $sysconfig['authen_small_icon_title'];?>" />
-							<div class="preview_loading" id="small_preview_loading" style="display:none">正在上传图片，请稍候...</div>
-						</div>
+            <div class="certification-desc" id="update_form" style="display:none">
+            	<div class="form-area">
+                	<div class="form-row">
+                        <label class="form-field">设置认证说明</label>
+                        <div class="form-cont">
+                            <input class="input-txt" name="alt" type="text" value="<?php echo $sysconfig['authen_small_icon_title'];?>"/>
                         </div>
-            		</div>
-                
-				</div>
-            	<p class="tips">* 请选择PNG格式的本地图片文件，文件大小不能超过100KB；<br />* 大图标大小不能超过100*30，小图标大小不能超过12*12；为显示美观，建议使用透明底素材。</p>
-        	</div>
-			<div class="button authenticate-position">
-            	<input type="button" name="保存修改" value="保存修改" onclick="submit();"/>
+                    </div>
+                </div>
             </div>
+            </form>
+            <div class="certification" id="update_form_2" style="display:none">
+            	<div class="form-area">
+                	<div class="form-row file-cont">
+                        <label class="form-field">请选择认证图标</label>
+                        <div class="form-cont file-cont">
+                            <form id="big_form" method="post" target="logo_upload" action="<?php echo URL('mgr/user_verify.uploadAuthBigIcon')?>" enctype="multipart/form-data">
+                            <p>
+                                <label for="logo">大图标：
+                                    <input type="file" class="btn-file" value="<?php echo $sysconfig['authen_big_icon']; ?>"  name="big" onChange="bigPreview(this)"/>
+                                </label>
+                                <iframe name="logo_upload" style="display:none;"></iframe>
+                            </p>
+                            </form>
+                            <form id="small_form" method="post" target="logo_upload" action="<?php echo URL('mgr/user_verify.uploadAuthSmallIcon')?>" enctype="multipart/form-data">
+                            <p>
+                                <label for="logo">小图标：
+                                    <input type="file" class="btn-file" value="<?php echo $sysconfig['authen_small_icon']; ?>"  name="small" onChange="smallPreview(this)"/>
+                                </label>
+                                <iframe name="logo_upload" style="display:none;"></iframe>
+                            </p>
+                            </form>
+                        </div>
+                        <label class="form-field">效果预览：</label>
+                        <div class="form-cont preview-cont">
+                            <div class="preview">
+                                <img id="big_logo_preview" src="<?php echo $sysconfig['authen_big_icon'] ? F('fix_url', $sysconfig['authen_big_icon']) : W_BASE_URL. 'var/data/logo/big_auth_icon.png';?>" />
+                                <div class="preview_loading" id="big_preview_loading" style="display:none">正在上传图片，请稍候...</div>
+                            </div>
+                            <div class="preview">
+                                <img id="small_logo_preview" src="<?php echo $sysconfig['authen_small_icon'] ? F('fix_url', $sysconfig['authen_small_icon']) :W_BASE_URL. 'var/data/logo/small_auth_icon.png';?>" title="<?php echo $sysconfig['authen_small_icon_title'];?>" />
+                                <div class="preview_loading" id="small_preview_loading" style="display:none">正在上传图片，请稍候...</div>
+                            </div>
+                        </div>
+                        
+                        <p class="form-tips">* 请选择PNG格式的本地图片文件，文件大小不能超过100KB；<br />* 大图标大小不能超过100*30，小图标大小不能超过12*12；为显示美观，建议使用透明底素材。</p>
+                    </div>
+                    
+                </div>
+        	</div>  
+            <div class="btn-area">
+                <a href="#this" onclick='submit();' class="general-btn btn-s2" name="保存修改"><span>保存修改</span></a>
+            </div>  
 		</div>
 	</div>
-</div>
 </body>
 </html>

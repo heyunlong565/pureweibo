@@ -73,6 +73,8 @@ class PageModule {
 		);
 
 	var $cacheKeys = array();
+	
+	var $_sidemodule_getTopicWB_cache_cleared = false;
 
 	/*
 	 *　构造函数
@@ -158,11 +160,12 @@ class PageModule {
 	 * 设置或获取组件配置
 	 *
 	 */
-	function config($cfgName = null, $cfgValue = null) {
+	function config($cfgName = null, $cfgValue = null, $componentId=NULL) {
 		if ( is_null($cfgName) ) {
 			return RST($this->configList());
 		}
 
+		$this->component_id = $componentId ? $componentId : $this->component_id;
 		if ( is_null($this->component_id) ) {
 			return RST(null, $this->setErr(1), 'component id not set.');
 		}
@@ -220,16 +223,15 @@ class PageModule {
 	 * 
 	 * @return array
 	 */
-	function configList($useRstFormat = false, $component_id = null) {
+	function configList($useRstFormat = false, $component_id = null, $forceResetCache = false) {
 
 		$component_id = !is_null($component_id) ? $component_id: $this->component_id;
 
 		$cache_key = CACHE_COMPONENT_CFG . $component_id;
 
-		if (($rs = CACHE::get($cache_key)) === false) {
-			$db = $this->db;
-			$rs = $db->query('select * from ' . $db->getTable(T_COMPONENTS_CFG) . ' where component_id=' . $component_id);
-
+		if ( $forceResetCache || ($rs = CACHE::get($cache_key)) === false) {
+			$rs = $this->db->query('select * from ' . $this->db->getTable(T_COMPONENTS_CFG) . ' where component_id=' . $component_id);
+			
 			if ($rs) {
 				$rs = $this->cfg2Array($rs);
 			}
@@ -254,25 +256,20 @@ class PageModule {
 			foreach ($topicid as $id) {
 				$this->clearTopicCache($id);
 			}
-
 			return;
 		}
 
-		//推荐话题的配置
-		$cfg = $this->configList(false, 6);
-
-		foreach ($cfg as $key => $v) {
-			if ($key == 'topic_id') {
-				if ($v == $topicid) {
-					DD('components/hotTopic.get');
-					break;
-				}
-			}
+		//强制删除组件推荐话题的缓存
+		if($this->_sidemodule_getTopicWB_cache_cleared == false){
+			DD('components/hotTopic.get');
+			$this->_sidemodule_getTopicWB_cache_cleared = true;
 		}
 
 		//今日话题
-		if ($topicid == 2)
+		if ($topicid == 2){
 			DD('components/todayTopic.get');
+		}
+		
 	}
 
 	/**
@@ -383,6 +380,7 @@ class PageModule {
 		return RST($db->execute($sql));
 	}
 
+	
 
 	/*
 	 * 获取某页面模块的使用情况
@@ -390,13 +388,13 @@ class PageModule {
 	 * @param $page int 页面代码：1 广场 2 我的首页
 	 *
 	 */
-	function getPageModules($page_id = null, $group = false) {
-		$db = $this->db;
-
-		$sql = 'select position,p.sort_num,p.in_use,c.* from ' . $db->getTable(T_PAGE_MANAGER) . ' as p'
+	function getPageModules($page_id = null, $group = false) 
+	{
+		$db  = $this->db;
+		$sql = 'select position,isNative,param,p.id,p.title as newTitle,p.sort_num,p.in_use,c.* from ' . $db->getTable(T_PAGE_MANAGER) . ' as p'
 			. ' join ' . $db->getTable(T_COMPONENTS) . ' as c'
 			. ' on c.component_id=p.component_id'
-			. ' where page_id=' . $page_id 
+			. ' where page_id=' . (int)$page_id
 			. ' order by sort_num asc';
 
 		$rs = $db->query($sql);
@@ -404,23 +402,32 @@ class PageModule {
 		return RST($group ? $this->groupByPos($rs): $rs);
 	}
 
+	
 	/*
 	 * 根据位置分组
 	 *
 	 */
-	function groupByPos($list, $in_use = 1) {
+	function groupByPos($list, $in_use = 1) 
+	{
 		$tmp = array();
-
-		if (!empty($list)) {
-			foreach ($list as $row) {
+		if (!empty($list)) 
+		{
+			foreach ($list as $row) 
+			{
 				if (is_null($in_use) || ($in_use == $row['in_use']))
+				{
+					$row['title']			 = $row['newTitle'] ? $row['newTitle'] : $row['title'];
+					$row['param']			 = json_decode($row['param'], TRUE);
 					$tmp[$row['position']][] = $row;
+				}
 			}
 		}
 
 		return $tmp;
 	}
 
+	
+	
 	/**
 	 * 获取指定条数的随机内容
 	 *
@@ -440,5 +447,20 @@ class PageModule {
 
 		return $arr;
 	}
+	
 
+	
+//	function getPageByType($type)
+	function getPagelistByType()
+	{
+		$table = $this->db->getTable(T_PAGES);
+//		return $this->db->query("Select * From $table where type='$type' ");
+		$result   = $this->db->query("Select * From $table");
+		$pageList = array();
+		foreach ($result as $aPage)
+		{
+			$pageList[$aPage['page_id']] = $aPage;
+		}
+		return $pageList;
+	}
 }

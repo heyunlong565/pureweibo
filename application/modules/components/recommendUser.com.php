@@ -35,24 +35,23 @@ class recommendUser extends PageModule{
 	 * 获取推荐用户列表
 	 *
 	 */
-	function get() {
-		$cfg = $this->configList();
+	function get($param = array()) 
+	{
+		$cfg 		= $this->configList();
+		$group_id 	= isset($param['group_id']) ? $param['group_id'] : $cfg['group_id'];
+		$show_num	= isset($param['show_num']) ? $param['show_num'] : $cfg['show_num'];
+		$show_num 	= ($show_num > 0) ? (int)$show_num: 10;
+
+		$list = DR('mgr/userRecommendCom.getUserById', '', (int)$group_id);
 		
-		$list = DR('mgr/userRecommendCom.getUserById', '', (int)$cfg['group_id']);
-
-		$show_num = isset($cfg['show_num']) ? $cfg['show_num'] : 0;
-
-		if ($list['errno'] == 0) {
-			if ($show_num && count($list['rst']) > $show_num) {
-				$list['rst'] = array_slice($list['rst'], 0, $show_num);
-			}
-		}
+		/* 获取分组所有用户信息 */
+//		if ($list['errno'] == 0) 
+//		{
+//			if ($show_num && count($list['rst']) > $show_num) {
+//				$list['rst'] = array_slice($list['rst'], 0, $show_num);
+//			}
+//		}
 		
 		return $list;
-		//$db = $this->db;
-
-		//$rs = $db->query('select * from ' . $db->getTable(T_COMPONENT_USERS) . ' where group_id=' . (int)$cfg['group_id'] . ' order by sort_num desc limit ' . $cfg['show_num']);
-
-		//return RST($rs);
 	}
 }

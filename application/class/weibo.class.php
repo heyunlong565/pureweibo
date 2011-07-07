@@ -66,13 +66,15 @@ include_once P_CLASS.'/oauth.class.php';
 	{
 		if ($type == 1) {
 			$token = USER::getOAuthKey(true);
-			$this->token = new OAuthConsumer($token['oauth_token'], $token['oauth_token_secret']);
+			$oauth_token = isset($token['oauth_token']) ? $token['oauth_token'] : '';
+			$oauth_token_secret = isset($token['oauth_token_secret']) ? $token['oauth_token_secret'] : '';
+			$this->token = new OAuthConsumer($oauth_token, $oauth_token_secret);
 		} elseif ($type == 2) {
 			$this->token = new OAuthConsumer(WB_USER_OAUTH_TOKEN, WB_USER_OAUTH_TOKEN_SECRET);
 		} elseif ($type == 3) {
-			$this->token = new OAuthConsumer($oauth_token, $oauth_token_secret); 
+			$this->token = new OAuthConsumer($oauth_token, $oauth_token_secret);
 		} else {
-			$this->token = null;	
+			$this->token = null;
 		}
 	}
 
@@ -89,6 +91,9 @@ include_once P_CLASS.'/oauth.class.php';
 		switch ($error_array[0]) {
 			case '40113':
 				$msg = array('error_code' => '1040000', 'error' => $error['error']);
+				break;
+			case '40302':
+				$msg = array('error_code' => '1040011', 'error' => $error['error']);
 				break;
 			case '40312':
 				$msg = array('error_code' => '1040009', 'error' => $error['error']);
@@ -128,6 +133,9 @@ include_once P_CLASS.'/oauth.class.php';
 			case '40025':
 				$msg = array('error_code' => '1020002', 'error' => $error['error']);
 				break;
+			case '40035':
+				$msg = array('error_code' => '1021002', 'error' => $error['error']);
+				break;
 			case '40009':
 				$msg = array('error_code' => '1020100', 'error' => $error['error']);
 				break;
@@ -146,17 +154,27 @@ include_once P_CLASS.'/oauth.class.php';
 				} elseif (strpos($error['error'], '发表违法和不良信息')) {
 					$error_code = '1040004';
 				} elseif (strpos($error['error'], ':发微博太多')) {
-					$error_code = '1040006';	
+					$error_code = '1040006';
 				} elseif (strpos($error['error'], '发评论太多')) {
 					$error_code = '1040007';
-				} elseif (strpos($error['error'], '昵称')) {
-					$error_code = '1021301';	
+				} elseif (strpos($error['error'], '昵称') || strpos($error['error'], '用户名')) {
+					$error_code = '1021301';
 				} elseif (strpos($error['error'], '添加')) {
 					$error_code = '1020800';
-				} elseif (strpos($error['request'], 'create')) {
+				} elseif (strpos($error['request'], 'create') && strpos($error['error'], 'fuid')) {
 					$error_code = '1020801';
 				} elseif (strpos($error['request'], 'destroy')) {
 					$error_code = '1020802';
+				} elseif (strpos($error['error'], '你无法进行评论')) {
+					$error_code = '1020404';
+				} elseif (strpos($error['error'], '你不能进行此操作')) {
+					$error_code = '1020405';
+				} elseif (strpos($error['error'], '关注过于频繁')) {
+					$error_code = '1020806';
+				} elseif (strpos($error['error'] , '加关注前请先解除')) {
+					$error_code = '1020807';
+				} elseif (strpos($error['error'] , '不能关注自己')) {
+					$error_code = '1020808';
 				} else {
 					$error_code = '1020104';
 				}
@@ -231,10 +249,27 @@ include_once P_CLASS.'/oauth.class.php';
 			case '40026':
 				$msg = array('error_code' => '1021200', 'error' => $error['error']);
 				break;
+			case '40072':
+				$msg = array('error_code' => '1040008', 'error' => $error['error']);
+				break;
+			case '40085':
+				$api = APP::O('apiStop');
+				$api->setStop();
+				break;
+			case '40358':
+			case '40314':
+			case '40070':
+			case '40312':
+			case '40310':
+			case '40308':
+			case '40305':
+			case '40011':
+			case '40304':
+				$msg = array('error_code' => '1040016', 'error' => $error['error']);
+				break;
 			default:
-				$msg = array('error_code' => '1050000', 'error' => 'unknow systme error');
+				$msg = array('error_code' => '1050000', 'error' => 'unknow system error  api: ' . $error['error']);
 		}
-		
 		return RST('', $msg['error_code'], $msg['error'], 0);
 	}
 
@@ -246,18 +281,20 @@ include_once P_CLASS.'/oauth.class.php';
 	 *
 	 * @param bool $base_app 是否只获取当前应用的数据
 	 * @param bool $oauth 是否使用oauth方式请求api
+	 * @param int $count 条数，默认20
 	 * @return array
 	 */
-	 function getPublicTimeline($base_app = '0', $oauth = true)
+	 function getPublicTimeline($base_app = '0', $oauth = true, $count = 20)
 	 {
 		$url = WEIBO_API_URL.'statuses/public_timeline.'.$this->format;
 		$params = array();
-		$params['base_app'] = $base_app;	
+		$params['base_app'] = $base_app;
+		$params['count'] = $count;
 
 		if ($oauth == false) {
-			$response = $this->sourceRequest($url, 'get', $params);	
+			$response = $this->sourceRequest($url, 'get', $params);
 		} else {
-			$response = $this->oAuthRequest($url, 'get', $params); 
+			$response = $this->oAuthRequest($url, 'get', $params);
 		}
 
 		return $response;
@@ -270,7 +307,7 @@ include_once P_CLASS.'/oauth.class.php';
 	 * @param int $count 获取条数
 	 * @param int $page 页码数
 	 * @param int|string $since_id 返回比sinace_id大的微博数据
-	 * @param int|string $max_id 返回不大于max_id的微博数据 
+	 * @param int|string $max_id 返回不大于max_id的微博数据
 	 * @return array
 	 */
 	 function getHomeTimeline($count = null, $page = null, $since_id = null, $max_id = null, $base_app = '0')
@@ -290,7 +327,7 @@ include_once P_CLASS.'/oauth.class.php';
 		if ($page) {
 			$params['page'] = $page;
 		}
-		
+
 		$response = $this->oAuthRequest($url, 'get', $params);
 
 		return $response;
@@ -305,11 +342,11 @@ include_once P_CLASS.'/oauth.class.php';
 	 * @param int|string $since_id 返回比since_id大的微博数据
 	 * @param int|string $max_id 返回不大于max_id的微博数据
 	 * @param int|string $pub_type 返回某一发布类型结果的微博  类型有全部-0, 原创-1, 转发-2默认返回全部
-	 * @param int|stirng $content_type 返回某一内容类型结果的微博 类型有全部-0, 图片-1, 音乐-2, 视频-3, 纯文本-4, 
-	 * 默认返回全部 
+	 * @param int|stirng $content_type 返回某一内容类型结果的微博 类型有全部-0, 图片-1, 音乐-2, 视频-3, 纯文本-4,
+	 * 默认返回全部
 	 * @return array
 	 */
-	 function getFriendsTimeline($count = null, $page = null, $since_id = null, $max_id = null, $base_app = '0', $pub_type = 0, $content_type = 0)
+	 function getFriendsTimeline($count = null, $page = null, $since_id = null, $max_id = null, $base_app = '0', $feature = 0)
 	 {
 		$url = WEIBO_API_URL.'statuses/friends_timeline.'.$this->format;
 		$params = array();
@@ -326,11 +363,8 @@ include_once P_CLASS.'/oauth.class.php';
 		if ($page) {
 			$params['page'] = $page;
 		}
-		if ($pub_type) {
-			$params['pub_type'] = $pub_type;	
-		}
-		if ($content_type) {
-			$params['content_type'] = $content_type;	
+		if ($feature) {
+			$params['feature'] = $feature;
 		}
 
 		$response = $this->oAuthRequest($url, 'get', $params);
@@ -352,7 +386,7 @@ include_once P_CLASS.'/oauth.class.php';
 	 * @param bool $oauth 是否使用oauth方式访问api
 	 * @return array
 	 */
-	 function getUserTimeline($id = null, $user_id = null, $name = null, $since_id = null, $max_id = null, $count = null, $page = null, $oauth = true, $base_app = '0')
+	 function getUserTimeline($id = null, $user_id = null, $name = null, $since_id = null, $max_id = null, $count = null, $page = null, $feature = 0, $oauth = true, $base_app = '0')
 	 {
 		if ($id) {
 			$url = WEIBO_API_URL.'statuses/user_timeline/'.$id.'.'.$this->format;
@@ -380,11 +414,14 @@ include_once P_CLASS.'/oauth.class.php';
 		if ($page) {
 			$params['page'] = $page;
 		}
+		if ($feature) {
+			$params['feature'] = $feature;
+		}
 
 		if ($oauth === false) {
-			$response = $this->sourceRequest($url, 'get', $params); 
+			$response = $this->sourceRequest($url, 'get', $params);
 		} else {
-			$response = $this->oAuthRequest($url, 'get', $params); 
+			$response = $this->oAuthRequest($url, 'get', $params);
 		}
 		return $response;
 	 }
@@ -461,7 +498,7 @@ include_once P_CLASS.'/oauth.class.php';
 	 *
 	 * @param int $count 获取条数
 	 * @param int $page 页码数
-	 * @param int|string $since_id 返回比since_id大的微博数据 
+	 * @param int|string $since_id 返回比since_id大的微博数据
 	 * @param int|string $max_id 返回不大于max_id的微博数据
 	 * @return array
 	 */
@@ -470,7 +507,7 @@ include_once P_CLASS.'/oauth.class.php';
 		$url = WEIBO_API_URL.'statuses/comments_by_me.'.$this->format;
 
 		$params = array();
-		
+
 		if ($since_id) {
 			$params['since_id'] = $since_id;
 		}
@@ -517,7 +554,7 @@ include_once P_CLASS.'/oauth.class.php';
 			$params['page'] = $page;
 		}
 
-		$response = $this->oAuthRequest($url, 'get', $params); 
+		$response = $this->oAuthRequest($url, 'get', $params);
 
 		return $response;
 	}
@@ -526,7 +563,7 @@ include_once P_CLASS.'/oauth.class.php';
 	/**
 	 * 获取指定微博的评论列表
 	 *
-	 * @param int|string $id 微博id 
+	 * @param int|string $id 微博id
 	 * @param int $count 获取条数
 	 * @param int $page 页码数
 	 * @return array
@@ -569,9 +606,9 @@ include_once P_CLASS.'/oauth.class.php';
 		}
 
 		if ($oauth === false) {
-			$response = $this->sourceRequest($url, 'get', $params); 
+			$response = $this->sourceRequest($url, 'get', $params);
 		} else {
-			$response = $this->oAuthRequest($url, 'get', $params); 
+			$response = $this->oAuthRequest($url, 'get', $params);
 		}
 
 		return $response;
@@ -582,7 +619,7 @@ include_once P_CLASS.'/oauth.class.php';
 	 * 获取当前用户未读消息数
 	 *
 	 * @param int|string $with_new_status 默认为0。1表示结果包含是否有新微博，0表示结果不包含是否有新微博
-	 * @param int|string $since_id 微博id，返回此条id之后，是否有新微博产生，有返回1，没有返回0 
+	 * @param int|string $since_id 微博id，返回此条id之后，是否有新微博产生，有返回1，没有返回0
 	 * @return array
 	 */
 	 function getUnread($with_new_status = null, $since_id = null)
@@ -591,13 +628,12 @@ include_once P_CLASS.'/oauth.class.php';
 
 		$params = array();
 		if ($with_new_status) {
-			$params['with_new_status'] = $with_new_status;	
+			$params['with_new_status'] = $with_new_status;
 		}
 		if ($since_id) {
 			$params['since_id'] = $since_id;
 		}
 		$response = $this->oAuthRequest($url, 'get', $params);
-
 		return $response;
 	 }
 
@@ -621,6 +657,32 @@ include_once P_CLASS.'/oauth.class.php';
 		return $response;
 	 }
 
+	/**
+	 * 批量获取微博信息
+	 * 根据提供的MID批量获取一组微博的信息，同时指定返回哪些字段内容
+	 * @param string|int $ids 根据指定id返回微博的相应内容
+	 * @param int $del_ctrl 是否打开estate字段的开关。1：打开开关，则在微博被删除时返回带estate字段，值为deleted。不带此开关默认为关闭，返回不带estate字段
+	 * @return array
+	 */
+	function getStatusesBatchShow($ids, $del_ctrl = true, $oauth = true)
+	{
+		$url = WEIBO_API_URL.'statuses/batch_show.'.$this->format;
+		$params = array();
+
+		$params['ids'] = $ids;
+	
+		if($del_ctrl) {
+			$params['del_ctrl'] = $del_ctrl;
+		}
+
+		if ($oauth === false) {
+			$response = $this->sourceRequest($url, 'get', $params);
+		} else {
+			$response = $this->oAuthRequest($url, 'get', $params);
+		}
+
+		return $response;
+	}
 
 	/**
 	 * 发布一条微博信息
@@ -633,7 +695,8 @@ include_once P_CLASS.'/oauth.class.php';
 		$url = WEIBO_API_URL.'statuses/update.'.$this->format;
 
 		$params = array();
-		$params['status'] = urlencode($status);
+		//$params['status'] = urlencode($status);
+		$params['status'] = $status;
 
 		$response = $this->oAuthRequest($url, 'post', $params);
 
@@ -655,7 +718,8 @@ include_once P_CLASS.'/oauth.class.php';
 		$url = WEIBO_API_URL.'statuses/upload.'.$this->format;
 
 		$params = array();
-		$params['status'] = urlencode($status);
+		//$params['status'] = urlencode($status);
+		$params['status'] = $status;
 		$params['pic'] = '@'.$pic;
 
 		if ($lat) {
@@ -700,7 +764,8 @@ include_once P_CLASS.'/oauth.class.php';
 		$url = WEIBO_API_URL.'statuses/upload_url_text.'.$this->format;
 
 		$params = array();
-		$params['status'] = urlencode($status);
+		//$params['status'] = urlencode($status);
+		$params['status'] = $status;
 		if ($picid) {
 			$params['pic_id'] = $picid;
 		}
@@ -737,9 +802,10 @@ include_once P_CLASS.'/oauth.class.php';
 	 *
 	 * @param int|string 微博id
 	 * @param string $status 微博内容
+	 * @param int $is_comment 是否在转发的同时发表评论
 	 * @return array
 	 */
-	 function repost($id, $status = null)
+	 function repost($id, $status = null, $is_comment = 0)
 	 {
 		$url = WEIBO_API_URL.'statuses/repost.'.$this->format;
 
@@ -747,7 +813,9 @@ include_once P_CLASS.'/oauth.class.php';
 		$params['id'] = $id;
 		if ($status) {
 			$params['status'] = urlencode($status);
+			//$params['status'] = $status;
 		}
+		$params['is_comment'] = $is_comment;
 
 		$response = $this->oAuthRequest($url, 'post', $params);
 
@@ -770,6 +838,7 @@ include_once P_CLASS.'/oauth.class.php';
 		$params = array();
 		$params['id'] = $id;
 		$params['comment'] = urlencode($comment);
+		//$params['comment'] = $comment;
 		if ($cid) {
 			$params['cid'] = $cid;
 		}
@@ -798,10 +867,10 @@ include_once P_CLASS.'/oauth.class.php';
 	 }
 
 	 /**
-	  * 批量删除评论 
+	  * 批量删除评论
 	  *
 	  * @param string $ids 评论id, 多个用逗号隔开(最多20个)
-	  * @return array	
+	  * @return array
 	  */
 	 function commentDestroyBatch($ids)
 	 {
@@ -830,6 +899,7 @@ include_once P_CLASS.'/oauth.class.php';
 		$params = array();
 		$params['id'] = $id;
 		$params['comment'] = urlencode($comment);
+		//$params['comment'] = $comment;
 		$params['cid'] = $cid;
 
 		$response = $this->oAuthRequest($url, 'post', $params);
@@ -867,9 +937,37 @@ include_once P_CLASS.'/oauth.class.php';
 		}
 
 		if ($oauth === false) {
-			$response = $this->sourceRequest($url, 'get', $params); 
+			$response = $this->sourceRequest($url, 'get', $params);
 		} else {
-			$response = $this->oAuthRequest($url, 'get', $params); 
+			$response = $this->oAuthRequest($url, 'get', $params);
+		}
+		return $response;
+	}
+	
+	
+ 	/**
+	 * 批量获取用户资料（授权用户） 最多获取20个
+	 *
+	 * @param int|string $user_id 用户user id, 例如1234,123
+	 * @param string $name 用户昵称 例如1234,123
+	 * @return array
+	 */
+ 	function getUsersBatchShow($user_id=null, $screen_name=null, $oauth=true)
+	{
+		$url = WEIBO_API_URL.'users/batch_show.'.$this->format;
+
+		$params = array();
+		if($user_id) {
+			$params['user_id'] = $user_id;
+		}
+		if($screen_name) {
+			$params['screen_name'] = $screen_name;
+		}
+		
+		if ($oauth === false) {
+			$response = $this->sourceRequest($url, 'get', $params);
+		}else{
+			$response = $this->oAuthRequest($url, 'get', $params);
 		}
 		return $response;
 	}
@@ -974,11 +1072,67 @@ include_once P_CLASS.'/oauth.class.php';
 			$params['with_reason'] = $with_reason;
 		}
 
-		$response = $this->oAuthRequest($url, 'get', $params); 
+		$response = $this->oAuthRequest($url, 'get', $params);
 
 		return $response;
 	}
 
+	/**
+	 * 添加好友备注
+	 *
+	 * @param int|string $id 用户id
+	 * @param string $remark 备注
+	 * @return array
+	 */
+	 function updateFriendRemark($id, $remark)
+	 {
+		$url = WEIBO_API_URL.'user/friends/update_remark.'.$this->format;
+
+		$params = array();
+		if ($id) {
+			$params['id'] = $id;
+		}
+		if ($remark) {
+			$params['remark'] = $remark;
+		}
+
+		$response = $this->oAuthRequest($url, 'post', $params);
+
+		return $response;
+	 }
+
+
+	/**
+	 *  返回系统推荐的用户列表
+	 *
+	 * @param string $category 分类，返回某一类别的推荐用户，默认为default。如果不在以下分类中，返回空列表
+     * default：人气关注
+     * ent：影视名星
+     * hk_famous：港台名人
+     * model：模特
+     * cooking：美食&健康
+     * sport：体育名人
+     * finance：商界名人
+     * tech：IT互联网
+     * singer：歌手
+     * writer：作家
+     * moderator：主持人
+     * medium：媒体总编
+     * stockplayer：炒股高手
+	 *
+	 * @return array
+	 */
+	 function getUsersHot($category = 'default')
+	 {
+		$url = WEIBO_API_URL.'users/hot.'.$this->format;
+
+		$params = array();
+		$params['category'] = $category;
+
+		$response = $this->oAuthRequest($url, 'get', $params);
+
+		return $response;
+	 }
 
 	 //私信接口
 
@@ -1135,7 +1289,7 @@ include_once P_CLASS.'/oauth.class.php';
 	  * 批量添加关注
 	  *
 	  * @param string $ids 用户id, 多个用逗号隔开(最多20个)
-	  * @return array	
+	  * @return array
 	  */
 	 function createFriendshipBatch($ids)
 	 {
@@ -1202,9 +1356,9 @@ include_once P_CLASS.'/oauth.class.php';
 	/**
 	 * 获取两个用户关系的详细情况
 	 *
-	 * @param int|string $target_id 要判断的目的用户UID 
+	 * @param int|string $target_id 要判断的目的用户UID
 	 * @param string $target_screen_name 要判断的目的微博昵称
-	 * @param int $source_id 源用户UID 
+	 * @param int $source_id 源用户UID
 	 * @param string $source_screen_name 源微博昵称
 	 * @return array
 	 */
@@ -1231,6 +1385,23 @@ include_once P_CLASS.'/oauth.class.php';
 		return $response;
 	 }
 
+	/**
+	 * 批量判断用户关注信息
+	 * 判断当前登录用户是否关注批量提供的用户。如果当前用户关注其中某一用户，则返回其ID
+	 * @param string|int $uids 指定等待判断是否已经关注的用户id列表 默认20
+	 * @return array
+	 */
+	function getFriendshipsBatchExists($uids)
+	{
+		$url = WEIBO_API_URL.'friendships/batch_exists.'.$this->format;
+		$params = array();
+
+		$params['uids'] = $uids;
+
+		$response = $this->oAuthRequest($url, 'get', $params);
+
+		return $response;
+	}
 
 
 	 //Social Graph接口
@@ -1311,7 +1482,7 @@ include_once P_CLASS.'/oauth.class.php';
 	 }
 
    /**
-	* 获取用户优质粉丝列表，每次最多返回20条，包括用户的最新的微博 
+	* 获取用户优质粉丝列表，每次最多返回20条，包括用户的最新的微博
 	*
 	* @param int|string $user_id 用户user id
 	* @param int $count 获取条数
@@ -1324,15 +1495,15 @@ include_once P_CLASS.'/oauth.class.php';
 
 		$params = array();
 
-		$params['user_id'] = $user_id; 
+		$params['user_id'] = $user_id;
 		if ($count) {
 			$params['count'] = $count;
 		}
 
 		if ($oauth === false) {
-			$response = $this->sourceRequest($url, 'get', $params); 
+			$response = $this->sourceRequest($url, 'get', $params);
 		} else {
-			$response = $this->oAuthRequest($url, 'get', $params); 
+			$response = $this->oAuthRequest($url, 'get', $params);
 		}
 
 		return $response;
@@ -1411,10 +1582,10 @@ include_once P_CLASS.'/oauth.class.php';
 	/**
 	 * 更改资料
 	 *
-	 * @param array $params array('name' => string, 
-	 *								'gender' => string, 
-	 *								'province' => int|string, 
-	 *								'city' => int|string, 
+	 * @param array $params array('name' => string,
+	 *								'gender' => string,
+	 *								'province' => int|string,
+	 *								'city' => int|string,
 	 *								'description' => string)
 	 * @return array
 	 */
@@ -1431,12 +1602,12 @@ include_once P_CLASS.'/oauth.class.php';
 	/**
 	 * 注册新浪微博帐号
 	 *
-	 * @param array $params array('nick' => string, 
-	 *								'gender' => string, 
+	 * @param array $params array('nick' => string,
+	 *								'gender' => string,
 	 *								'password' => string,
-	 *								'email' => string, 
-	 *								'province' => int|string, 
-	 *								'city' => int|string, 
+	 *								'email' => string,
+	 *								'province' => int|string,
+	 *								'city' => int|string,
 	 *								'ip' => string)
 	 * @return array|string
 	 */
@@ -1451,13 +1622,35 @@ include_once P_CLASS.'/oauth.class.php';
 	 }
 
 	/**
+	 * 二次注册新浪微博帐号
+	 *
+	 * @param array $params array('uid' => string,
+	 *								'nickname' => string,
+	 *								'gender' => string,
+	 *								'email' => string,
+	 *								'province' => int|string,
+	 *								'city' => int|string,
+	 *								'ip' => string)
+	 * @return array|string
+	 */
+	 function activate($params)
+	 {
+		$params['source'] = WB_AKEY;
+		$url = WEIBO_API_URL.'account/activate.'.$this->format;
+
+		$response = $this->oAuthRequest($url, 'post', $params);
+
+		return $response;
+	 }
+
+	/**
 	 * 设置隐私信息
 	 *
-	 * @param array $params array('comment' => int|string 谁可以评论当前用户的微博 0所有 1我关注的人 默认0, 
-	 *								'message' => int|string 谁可以给当前用户发私信 0所有 1我关注的人 默认0, 
+	 * @param array $params array('comment' => int|string 谁可以评论当前用户的微博 0所有 1我关注的人 默认0,
+	 *								'message' => int|string 谁可以给当前用户发私信 0所有 1我关注的人 默认0,
 	 *								'realname' => int|string 是否允许别人通过真实名称搜索到我 0允许 1不允许 默认1,
-	 *								'geo' => int|string 发布微博 是否允许微博保存并显示所处的地理位置 0允许 1不允许 
-	 *								默认0, 
+	 *								'geo' => int|string 发布微博 是否允许微博保存并显示所处的地理位置 0允许 1不允许
+	 *								默认0,
 	 *								'badge' => int|string 勋章展现状态，值—1私密状态，0公开状态，默认值0)
 	 * @return array|string
 	 */
@@ -1607,11 +1800,11 @@ include_once P_CLASS.'/oauth.class.php';
 	 * @param array|string $token
 	 * @param bool $sign_in_with_Weibo
 	 * @param string $url
-     * @return string 
+     * @return string
      */
     function getAuthorizeURL($token, $sign_in_with_Weibo = TRUE , $url)
 	{
-        if (is_array($token)) { 
+        if (is_array($token)) {
             $token = $token['oauth_token'];
         }
         if (empty($sign_in_with_Weibo)) {
@@ -1639,7 +1832,7 @@ include_once P_CLASS.'/oauth.class.php';
 		$url = WEIBO_API_URL.'oauth/authorize';
 		$params = array();
 		$params['oauth_token'] = $token;
-		$params['oauth_callback'] = $useType;
+		$params['oauth_callback'] = $this->format;
 		$params['display'] = 'web';
 		$params['userId'] = $user;
 		$params['passwd'] = $password;
@@ -1649,10 +1842,15 @@ include_once P_CLASS.'/oauth.class.php';
 		$response = $this->http->request();
 
 		$code = $this->http->getState();
-		if ($code == 0) {
-			$response = array("error_code" => "40002", "error" => "Access Timeout or Access denied");
-			$response = json_encode($response); 
+		if ($code != 200) {
+			if ($code == 0) {
+				$response = array("error_code" => "40002", "error" => "Access Timeout or Access denied");
+				return RST($response);
+			}
+			return $this->throwException($response);
 		}
+
+		$response = json_decode($response);
 		return RST($response);
 	}
 
@@ -1672,9 +1870,12 @@ include_once P_CLASS.'/oauth.class.php';
             $parameters['oauth_verifier'] = $oauth_verifier;
         }
 
-		$auth_token = USER::getOAuthKey(false);
-		$this->token = new OAuthConsumer($auth_token['oauth_token'], $auth_token['oauth_token_secret']); 
+		$oauth_token = $oauth_token ? $oauth_token : USER::getOAuthKey(false);
+		$this->token = new OAuthConsumer($oauth_token['oauth_token'], $oauth_token['oauth_token_secret']);
         $request = $this->oAuthRequest(WEIBO_API_URL.'oauth/access_token', 'GET', $parameters, false, true);
+		if (is_array($request) && !empty($request['errno'])) {
+			return $request;
+		}
         $token = OAuthUtil::parse_parameters($request);
         $this->token = new OAuthConsumer($token['oauth_token'], $token['oauth_token_secret']);
         return RST($token);
@@ -1682,7 +1883,7 @@ include_once P_CLASS.'/oauth.class.php';
 
     /**
      * Format and sign an OAuth / API request
-	 * 
+	 *
 	 * @param string $url
 	 * @param string $method
 	 * @param array $parameters
@@ -1691,67 +1892,34 @@ include_once P_CLASS.'/oauth.class.php';
      */
     function oAuthRequest($url, $method, $parameters, $multi = false, $userType = false)
 	{
+		/*
+		if (!isset($parameters['ip']) || empty($parameters['ip'])) {
+			$parameters['ip'] = F('get_client_ip');
+		}
+		 */
         $request = OAuthRequest::from_consumer_and_token($this->consumer, $this->token, $method, $url, $parameters);
         $request->sign_request($this->sha1_method, $this->consumer, $this->token);
 		$method = strtoupper($method);
+		//API-RemoteIP setHeader F('get_client_ip');
+		//$this->http->setHeader('API-RemoteIP', F('get_client_ip'));
+		$this->http->base_string = $request->base_string;
+		$this->http->key_string = $request->key_string;
         switch ($method) {
         case 'GET':
 			//echo $request->to_url();
-			$this->http->base_string = $request->base_string;
-			$this->http->key_string = $request->key_string;
 			$this->http->setUrl($request->to_url());
+			$this->http->setHeader('API-RemoteIP', F('get_client_ip'));
 			$result = $this->http->request();
-			$code = $this->http->getState();
-
-			$http_url = $this->http->getUrl();
-			//dubug
-			/*
-			$dubug_string = 'API URI: '.$http_url.'<br>'.' http code: '.$code;
-			if (200 != $code) {
-				$dubug_string .= '<br>response: '.$result.'<br>';
-			}
-			$this->debug_info[] = $dubug_string;
-			*/
-			if (200 != $code) {
-				//log
-				APP::LOG('url: '.$http_url." \r\ncode: ".$code." \r\nret: ".$result . "\r\nerror: " . $this->http->getError()."\r\nbase_string:: ".$request->base_string."\r\nkey_string: ".$request->key_string);
-				if (0 == $code) {
-					return RST('', '1040002', 'Access Timeout or Access denied', 0);
-				}
-				return $this->throwException($result);
-			}
-			if ($userType === true) {
-				return $result;	
-			}
-			$result = json_decode($result, true);
-			return RST($result);
+			break;
 
 		case 'DELETE':
-			$this->http->base_string = $request->base_string;
-			$this->http->key_string = $request->key_string;
 			$this->http->setUrl($request->get_normalized_http_url());
 			$this->http->setData($request->to_postdata($multi));
+			$this->http->setHeader('API-RemoteIP', F('get_client_ip'));
 			$result = $this->http->request('delete');
-			$code = $this->http->getState();
-			
-			if (200 != $code) {
-				//log
-				APP::LOG('url: '.$this->http->getUrl()." \r\ncode: ".$code." \r\nret: ".$result . "\r\nerror: " . $this->http->getError()."\r\nbase_string:: ".$request->base_string."\r\nkey_string: ".$request->key_string);
-				if (0 == $code) {
-					return RST('', '1040002', 'Access Timeout or Access denied', 0);
-				}
-				return $this->throwException($result);
-			}
-
-			if ($userType === true) {
-				return $result;	
-			} 
-			$result = json_decode($result, true);
-			return RST($result);
+			break;
 
         default:
-			$this->http->base_string = $request->base_string;
-			$this->http->key_string = $request->key_string;
 			$this->http->setUrl($request->get_normalized_http_url());
 			$this->http->setData($request->to_postdata($multi));
 			if ($multi) {
@@ -1764,28 +1932,37 @@ include_once P_CLASS.'/oauth.class.php';
 				$config = array('http_header' => $header_array2);
 				$this->http->setConfig($config);
 			}
-
+			$this->http->setHeader('API-RemoteIP', F('get_client_ip'));
 			$result = $this->http->request('post');
-			$code = $this->http->getState();
-			if (200 != $code) {
-				//log
-				APP::LOG('url: '.$this->http->getUrl()." \r\ncode: ".$code." \r\nret: ".$result . "\r\nerror: " . $this->http->getError()."\r\nbase_string:: ".$request->base_string."\r\nkey_string: ".$request->key_string);
-				if (0 == $code) {
-					return RST('', '1040002', 'Access Timeout or Access denied', 0);
-				}
-				return $this->throwException($result);
-			}
-
-			if ($userType === true) {
-				return $result;	
-			} 
-			$result = json_decode($result, true);
-			return RST($result);
+			break;
         }
+
+		$code = $this->http->getState();
+		$http_url = $this->http->getUrl();
+/*
+echo '<pre>';
+var_dump($http_url);
+var_dump($result);
+*/
+		if (200 != $code) {
+			//log
+			APP::LOG('url: '.$http_url." \r\ncode: ".$code." \r\nret: ".$result . "\r\nerror: " . $this->http->getError()."\r\nbase_string:: ".$request->base_string."\r\nkey_string: ".$request->key_string);
+			if (0 == $code) {
+				return RST('', '1040002', 'Access Timeout or Access denied', 0);
+			}
+			return $this->throwException($result);
+		}
+		if ($userType === true) {
+			return $result;
+		}
+		
+		//$result = json_decode($result, true);
+		$result = json_decode(preg_replace('#(?<=[,\{\[])\s*("\w+"):(\d{6,})(?=\s*[,\]\}])#si', '${1}:"${2}"', $result), true);
+		return RST($result);
     }
 
 	/**
-	 * 使用source方式访问api 
+	 * 使用source方式访问api
 	 *
 	 * @param string $url
 	 * @param string $method
@@ -1794,6 +1971,9 @@ include_once P_CLASS.'/oauth.class.php';
 	 */
 	function sourceRequest($url, $method, $parameters)
 	{
+		if (!isset($parameters['ip']) || empty($parameters['ip'])) {
+			$parameters['ip'] = F('get_client_ip');
+		}
 		$parameters['source'] = WB_AKEY;
 		$method = strtoupper($method);
         switch ($method) {
@@ -1816,7 +1996,8 @@ include_once P_CLASS.'/oauth.class.php';
 			}
 
 			$result = json_decode($result, true);
-			return RST($result); 
+			//$result = json_decode(preg_replace('#(?<=[,\{\[])\s*("\w+"):(\d{6,})(?=\s*[,\]\}])#si', '${1}:"${2}"', $result), true);
+			return RST($result);
         }
     }
 
@@ -1827,14 +2008,14 @@ include_once P_CLASS.'/oauth.class.php';
 	 * 搜索微博用户
 	 *
 	 * @param array $params array('base_app' => string 是否只搜索该应用数据 true false 默认为false
-	 *								'q' => string 关键字, 
-	 *								'snick' => int|string 是否包含昵称 0不包含 1包含, 
-	 *								'sdomain' => int|sting 是否包含个性域名 0不包含 1包含, 
-	 *								'sintro' => int|string 是否包含简介 同上, 
-	 *								'province' => int|string 省份id, 
-	 *								'city' => int|string 城市id, 
-	 *								'gender' => string 性别 m为男 f为女, 
-	 *								'comorsch' => string 公司学校名称, 
+	 *								'q' => string 关键字,
+	 *								'snick' => int|string 是否包含昵称 0不包含 1包含,
+	 *								'sdomain' => int|sting 是否包含个性域名 0不包含 1包含,
+	 *								'sintro' => int|string 是否包含简介 同上,
+	 *								'province' => int|string 省份id,
+	 *								'city' => int|string 城市id,
+	 *								'gender' => string 性别 m为男 f为女,
+	 *								'comorsch' => string 公司学校名称,
 	 *								'sort' => int|sting 排序方式 1按更新时间 2按粉丝数,
 	 *								'page' => int 页码数,
 	 *								'count' => int 获取条数,
@@ -1847,9 +2028,9 @@ include_once P_CLASS.'/oauth.class.php';
 		$url = WEIBO_API_URL.'users/search.'.$this->format;
 
 		if ($oauth === false) {
-			$response = $this->sourceRequest($url, 'get', $params); 
+			$response = $this->sourceRequest($url, 'get', $params);
 		} else {
-			$response = $this->oAuthRequest($url, 'get', $params); 
+			$response = $this->oAuthRequest($url, 'get', $params);
 		}
 		return $response;
 	}
@@ -1870,11 +2051,11 @@ include_once P_CLASS.'/oauth.class.php';
 	function search($params, $oauth = true)
 	{
 		$url = WEIBO_API_URL.'search.'.$this->format;
-	
+
 		if ($oauth === false) {
-			$response = $this->sourceRequest($url, 'get', $params); 
+			$response = $this->sourceRequest($url, 'get', $params);
 		} else {
-			$response = $this->oAuthRequest($url, 'get', $params); 
+			$response = $this->oAuthRequest($url, 'get', $params);
 		}
 		return $response;
 	}
@@ -1883,7 +2064,7 @@ include_once P_CLASS.'/oauth.class.php';
 	/**
 	 * 搜索微博文章
 	 *
-	 * @param array $params array('q' => string 关键字, 
+	 * @param array $params array('q' => string 关键字,
 	 *								'filter_ori' => int|string 过滤器 是否原创 0为全部 5为原创 4为转发 默认为0,
 	 *								'filter_pic' => int|string 过滤器 是否包含图片 0为全部 1为包含图 2为不含图,
 	 *								'province' => int|string 省份id,
@@ -1902,13 +2083,38 @@ include_once P_CLASS.'/oauth.class.php';
 		$url = WEIBO_API_URL.'statuses/search.'.$this->format;
 
 		if ($oauth === false) {
-			$response = $this->sourceRequest($url, 'get', $params); 
+			$response = $this->sourceRequest($url, 'get', $params);
 		} else {
-			$response = $this->oAuthRequest($url, 'get', $params); 
+			$response = $this->oAuthRequest($url, 'get', $params);
 		}
 		return $response;
 	}
 
+	/**
+	 * 在@某人时，实时获取用户名建议。以可作关注人、粉丝搜索。
+	 *
+	 * @param string $q 搜索的关键字
+	 * @param int $count 每页返回结果数。默认10 
+	 * @param int $type 1代表粉丝，0代表关注人。另外， 粉丝最多返回1000个，关注人最多2000个 
+	 * @param int $range 0代表只查关注人，1代表只搜索当前用户对关注人的备注，2表示都查. 默认为2.
+	 *
+	 * @return array
+	 */
+	function getSuggestionsAtUsers($q, $type, $count = false, $range = false)
+	{
+		$url = WEIBO_API_URL.'search/suggestions/at_users.'.$this->format;
+		$params['q'] = $q;
+		if ($count) {
+			$params['count'] = $count;
+		}
+		$params['type'] = $type;
+		if ($range) {
+			$params['range'] = $range;
+		}
+
+		$response = $this->oAuthRequest($url, 'get', $params);
+		return $response;
+	}	
 
 	/**
 	 * 获取省份及城市编码ID与文字对应
@@ -1959,7 +2165,7 @@ include_once P_CLASS.'/oauth.class.php';
 
 
 	//热门话题
-	
+
 	/**
 	 * 获取某人的话题
 	 *
@@ -1969,7 +2175,7 @@ include_once P_CLASS.'/oauth.class.php';
 	 * @return array
 	 */
 	function getTrendsByUser($user_id, $page = null, $count = null)
-	{		
+	{
 		$url = WEIBO_API_URL.'trends.'.$this->format;
 		$params = array();
 
@@ -2012,7 +2218,25 @@ include_once P_CLASS.'/oauth.class.php';
 	}
 
 	/**
-	 * 获取按小时返回的热门话题 
+	 * 关注某话题
+	 *
+	 * @param string $trend_name 话题
+	 * @return array
+	 */
+	function createTrendsFollow($trend_name)
+	{
+		$url = WEIBO_API_URL.'trends/follow.'.$this->format;
+		$params = array();
+
+		$params['trend_name'] = $trend_name;
+
+		$response = $this->oAuthRequest($url, 'post', $params);
+
+		return $response;
+	}
+
+	/**
+	 * 获取按小时返回的热门话题
 	 *
 	 * @param int|string $hour 返回几个小时前的话题
 	 * @param bool $base_app 是否基于当前应用来获取数据
@@ -2035,7 +2259,7 @@ include_once P_CLASS.'/oauth.class.php';
 	}
 
    /**
-	* 获取按日期返回的热门话题 
+	* 获取按日期返回的热门话题
 	*
 	* @param int|string $date 返回此日期前的话题
 	* @param bool $base_app 是否基于当前应用来获取数据
@@ -2058,7 +2282,7 @@ include_once P_CLASS.'/oauth.class.php';
 	}
 
    /**
-	* 获取按周的热门话题 
+	* 获取按周的热门话题
 	*
 	* @param int|string $date 返回此日期前的话题
 	* @param bool $base_app 是否基于当前应用来获取数据
@@ -2081,12 +2305,12 @@ include_once P_CLASS.'/oauth.class.php';
 	}
 
    /**
-	* 获取按日的热门转发 
+	* 获取按日的热门转发
 	*
-	* @param int $count 获取返回的条数 
+	* @param int $count 获取返回的条数
 	* @return array
 	*/
-	function getHotRepostDaily($count = null)
+	function getHotRepostDaily($count = null, $base_app = '0')
 	{
 	   $url = WEIBO_API_URL.'statuses/hot/repost_daily.'.$this->format;
 	   $params = array();
@@ -2094,15 +2318,16 @@ include_once P_CLASS.'/oauth.class.php';
 	   if ($count) {
 		   $params['count'] = $count;
 	   }
+	   $params['base_app'] = $base_app;
 	   $response = $this->oAuthRequest($url, 'get', $params);
 
 	   return $response;
 	}
 
    /**
-	* 获取按周的热门转发 
+	* 获取按周的热门转发
 	*
-	* @param int $count 返回条数 
+	* @param int $count 返回条数
 	* @return array
 	*/
 	function getHotRepostWeekly($count = null)
@@ -2119,12 +2344,12 @@ include_once P_CLASS.'/oauth.class.php';
 	}
 
    /**
-	* 获取按日的热门评论 
+	* 获取按日的热门评论
 	*
-	* @param int $count 返回条数 
+	* @param int $count 返回条数
 	* @return array
 	*/
-	function getHotCommentsDaily($count = null)
+	function getHotCommentsDaily($count = null, $base_app = '0')
 	{
 	   $url = WEIBO_API_URL.'statuses/hot/comments_daily.'.$this->format;
 	   $params = array();
@@ -2132,15 +2357,16 @@ include_once P_CLASS.'/oauth.class.php';
 	   if ($count) {
 		   $params['count'] = $count;
 	   }
+	   $params['base_app'] = $base_app;
 	   $response = $this->oAuthRequest($url, 'get', $params);
 
 	   return $response;
 	}
 
    /**
-	* 获取按周的热门评论 
+	* 获取按周的热门评论
 	*
-	* @param int $count 返回条数 
+	* @param int $count 返回条数
 	* @return array
 	*/
 	function getHotCommentsWeekly($count = null)
@@ -2157,14 +2383,14 @@ include_once P_CLASS.'/oauth.class.php';
 	}
 
 	//标签
-	
+
 	/**
-	 * 获取标签列表 
+	 * 获取标签列表
 	 *
 	 * @param int|string $user_id 用户user id
 	 * @param int $count 获取条数 默认20
 	 * @param int $page 页码数
-	 * @return array	
+	 * @return array
 	 */
 	function getTagsList($user_id, $count = null, $page = null)
 	{
@@ -2181,14 +2407,14 @@ include_once P_CLASS.'/oauth.class.php';
 
 		$response = $this->oAuthRequest($url, 'get', $params);
 
-		return $response; 
-	}	
+		return $response;
+	}
 
 	/**
-	 * 创建标签 
+	 * 创建标签
 	 *
 	 * @param string $tags 标签 多个用逗号隔开
-	 * @return array	
+	 * @return array
 	 */
 	function createTags($tags)
 	{
@@ -2196,18 +2422,18 @@ include_once P_CLASS.'/oauth.class.php';
 		$params = array();
 
 		$params['tags'] = $tags;
-		
+
 		$response = $this->oAuthRequest($url, 'post', $params);
 
-		return $response; 
+		return $response;
 	}
 
 	/**
-	 * 获取用户感兴趣的标签 
+	 * 获取用户感兴趣的标签
 	 *
 	 * @param int $page 获取页码数
 	 * @param int $count 获取条数 默认为10
-	 * @return array	
+	 * @return array
 	 */
 	function getTagsSuggestions($page = null, $count = null)
 	{
@@ -2222,14 +2448,14 @@ include_once P_CLASS.'/oauth.class.php';
 		}
 		$response = $this->oAuthRequest($url, 'get', $params);
 
-		return $response; 
+		return $response;
 	}
 
 	/**
-	 * 删除标签 
+	 * 删除标签
 	 *
 	 * @param int|string $tag_id 标签id
-	 * @return array	
+	 * @return array
 	 */
 	function deleteTags($tag_id)
 	{
@@ -2237,35 +2463,35 @@ include_once P_CLASS.'/oauth.class.php';
 		$params = array();
 
 		$params['tag_id'] = $tag_id;
-		
+
 		$response = $this->oAuthRequest($url, 'post', $params);
 
-		return $response; 
+		return $response;
 	}
 
 
 	//lists 订阅
 
 	/**
-	 * 创建新的订阅分类 
+	 * 创建新的订阅分类
 	 *
 	 * @param int|string $id 用户id
-	 * @param string $name 分类名称 
+	 * @param string $name 分类名称
 	 * @param string $mode 其值（values）可以是public或private，默认为public
      * @param	$description
-	 * @return array	
+	 * @return array
 	 */
-	function createUserLists($id, $name, $mode = null, $description = null)
+	function createUserLists($id, $name, $mode = 'public', $description = null)
 	{
 		$url = WEIBO_API_URL.$id.'/lists.'.$this->format;
 		$params = array();
 
 		$params['name'] = $name;
 		if ($mode) {
-			$params['mode'] = $mode;	
+			$params['mode'] = $mode;
 		}
 		if ($description) {
-			$params['description'] = $description;	
+			$params['description'] = $description;
 		}
 
 		$response = $this->oAuthRequest($url, 'post', $params);
@@ -2278,15 +2504,20 @@ include_once P_CLASS.'/oauth.class.php';
 	 *
 	 * @param int|string $id 用户id
 	 * @param int|string $cursor 分页位置 默认从-1开始
+	 * @param int $listType 返回的列表属性，0返回公开列表，1返回私有列表，2返回系统列表，默认值0
 	 * @return array
 	 */
-	function getUserLists($id, $cursor = null)
+	function getUserLists($id, $cursor = null, $listType=NULL)
 	{
 		$url = WEIBO_API_URL.$id.'/lists.'.$this->format;
 		$params = array();
 
 		if ($cursor) {
-			$params['cursor'] = $cursor;	
+			$params['cursor'] = $cursor;
+		}
+		
+		if ($listType) {
+			$params['listType'] = 2;
 		}
 
 		$response = $this->oAuthRequest($url, 'get', $params);
@@ -2295,14 +2526,14 @@ include_once P_CLASS.'/oauth.class.php';
 	}
 
 	/**
-	 * 更新指定的订阅分类 
+	 * 更新指定的订阅分类
 	 *
 	 * @param int|string $id 用户id
 	 * @param int|string $list_id 订阅分类id
 	 * @param string $name 用户昵称
 	 * @param string $mode 其值（values）可以是public或private，默认为public
      * @param	$description
-	 * @return array	
+	 * @return array
 	 */
 	function updateUserLists($id, $list_id, $name, $mode = null, $description = null)
 	{
@@ -2311,10 +2542,10 @@ include_once P_CLASS.'/oauth.class.php';
 
 		$params['name'] = $name;
 		if ($mode) {
-			$params['mode'] = $mode;	
+			$params['mode'] = $mode;
 		}
 		if ($description) {
-			$params['description'] = $description;	
+			$params['description'] = $description;
 		}
 
 		$response = $this->oAuthRequest($url, 'post', $params);
@@ -2323,11 +2554,11 @@ include_once P_CLASS.'/oauth.class.php';
 	}
 
 	/**
-	 * 展示特定订阅分类的信息 
+	 * 展示特定订阅分类的信息
 	 *
 	 * @param int|string $id 用户id
 	 * @param int|string $list_id 订阅分类id
-	 * @return array	
+	 * @return array
 	 */
 	function getUserListId($id, $list_id)
 	{
@@ -2340,11 +2571,11 @@ include_once P_CLASS.'/oauth.class.php';
 	}
 
 	/**
-	 * 删除指定的订阅分类 
+	 * 删除指定的订阅分类
 	 *
 	 * @param int|string $id 用户id
 	 * @param int|string $list_id 订阅分类id
-	 * @return array	
+	 * @return array
 	 */
 	function deleteUserListId($id, $list_id)
 	{
@@ -2357,7 +2588,7 @@ include_once P_CLASS.'/oauth.class.php';
 	}
 
 	/**
-	 * 展示list成员的最新微博信息 
+	 * 展示list成员的最新微博信息
 	 *
 	 * @param int|string $id 用户id
 	 * @param int|string $list_id list id
@@ -2365,9 +2596,11 @@ include_once P_CLASS.'/oauth.class.php';
 	 * @param int $page 获取页码数
 	 * @param int $since_id 返回带有比指定list id大的id
 	 * @param int $max_id 返回带一个小于或等于指定list id的id结果
-	 * @return array	
+	 * @param int|string $base_app: 选填参数，是否基于当前应用来获取数据。1为限制本应用微博，0为不做限制
+	 * @param int|stirng $content_type 返回某一内容类型结果的微博 类型有全部-0, 图片-1, 音乐-2, 视频-3, 纯文本-4,
+	 * @return array
 	 */
-	function getUserListIdStatuses($id, $list_id, $per_page = null, $page = null, $since_id = null, $max_id = null)
+	function getUserListIdStatuses($id, $list_id, $per_page = null, $page = null, $since_id = null, $max_id = null, $base_app='0', $feature=0)
 	{
 		$url = WEIBO_API_URL.$id.'/lists/'.$list_id.'/statuses.'.$this->format;
 		$params = array();
@@ -2384,25 +2617,11 @@ include_once P_CLASS.'/oauth.class.php';
 		if ($max_id) {
 			$params['max_id'] = $max_id;
 		}
-		$response = $this->oAuthRequest($url, 'get', $params);
-
-		return $response;
-	}
-
-	/**
-	 * 列出用户作为成员的所有list列表  
-	 *
-	 * @param int|string $id 用户id
-	 * @param int|string $cursor 分页位置 默认从-1开始 每页包含20个list
-	 * @return array	
-	 */
-	function getUserListsMemberships($id, $cursor = null)
-	{
-		$url = WEIBO_API_URL.$id.'/lists/memberships.'.$this->format;
-		$params = array();
-
-		if ($cursor) {
-			$params['cursor'] = $cursor;	
+		if ($base_app) {
+			$params['base_app'] = $base_app;
+		}
+		if ($feature) {
+			$params['feature'] = $feature;
 		}
 		$response = $this->oAuthRequest($url, 'get', $params);
 
@@ -2410,10 +2629,30 @@ include_once P_CLASS.'/oauth.class.php';
 	}
 
 	/**
-	 * 获取用户的lists、subscriptions、listed数量  
+	 * 列出用户作为成员的所有list列表
 	 *
 	 * @param int|string $id 用户id
-	 * @return array	
+	 * @param int|string $cursor 分页位置 默认从-1开始 每页包含20个list
+	 * @return array
+	 */
+	function getUserListsMemberships($id, $cursor = null)
+	{
+		$url = WEIBO_API_URL.$id.'/lists/memberships.'.$this->format;
+		$params = array();
+
+		if ($cursor) {
+			$params['cursor'] = $cursor;
+		}
+		$response = $this->oAuthRequest($url, 'get', $params);
+
+		return $response;
+	}
+
+	/**
+	 * 获取用户的lists、subscriptions、listed数量
+	 *
+	 * @param int|string $id 用户id
+	 * @return array
 	 */
 	function getUserListsCounts($id)
 	{
@@ -2426,11 +2665,11 @@ include_once P_CLASS.'/oauth.class.php';
 	}
 
 	/**
-	 * 列出用户订阅的所有list列表  
+	 * 列出用户订阅的所有list列表
 	 *
 	 * @param int|string $id 用户id
 	 * @param int|string $cursor 分页位置 默认从-1开始 每页包含20个list
-	 * @return array	
+	 * @return array
 	 */
 	function getUserListsSubscriptions($id, $cursor = null)
 	{
@@ -2438,7 +2677,7 @@ include_once P_CLASS.'/oauth.class.php';
 		$params = array();
 
 		if ($cursor) {
-			$params['cursor'] = $cursor;	
+			$params['cursor'] = $cursor;
 		}
 		$response = $this->oAuthRequest($url, 'get', $params);
 
@@ -2446,11 +2685,11 @@ include_once P_CLASS.'/oauth.class.php';
 	}
 
 	/**
-	 * 返回list中所有的成员  
+	 * 返回list中所有的成员
 	 *
 	 * @param int|string $id 用户id
 	 * @param int|string $cursor 分页位置 默认从-1开始 每页包含20个list
-	 * @return array	
+	 * @return array
 	 */
 	function getUserListsMember($id, $list_id, $cursor = null)
 	{
@@ -2458,7 +2697,7 @@ include_once P_CLASS.'/oauth.class.php';
 		$params = array();
 
 		if ($cursor) {
-			$params['cursor'] = $cursor;	
+			$params['cursor'] = $cursor;
 		}
 		$response = $this->oAuthRequest($url, 'get', $params);
 
@@ -2466,38 +2705,66 @@ include_once P_CLASS.'/oauth.class.php';
 	}
 
 	/**
-	 * 将用户添加到list中。用户只能将其他用户添加到自己创建的list中。每个list最多拥有500个用户。   
+	 * 将用户添加到list中。用户只能将其他用户添加到自己创建的list中。每个list最多拥有500个用户。
 	 *
 	 * @param int|string $id 用户id
 	 * @param int|string $list_id 订阅list ID
 	 * @param int $user_id 要添加的用户id
-	 * @return array	
+	 * @return array
 	 */
 	function createUserListsMember($id, $list_id, $user_id)
 	{
 		$url = WEIBO_API_URL.$id.'/'.$list_id.'/members.'.$this->format;
 		$params = array();
 
-		$params['id'] = $user_id;	
+		$params['id'] = $user_id;
 		$response = $this->oAuthRequest($url, 'post', $params);
 
 		return $response;
 	}
+	
+	
+ 	/**
+	 * 将用户批量添加到list中。用户只能将其他用户添加到自己创建的list中。每个list最多拥有500个用户。
+	 *
+	 * @param int|string $uid 用户ID
+	 * @param int|string $list_id 订阅list ID
+	 * @param int|string $ids  要添加的用户ids
+	 * @param int|string $names  要添加的用户names
+	 * @return array
+	 */
+	function createUserListsMemberBatch($uid, $listId, $ids=NULL, $names=NULL)
+	{
+		$url = WEIBO_API_URL.$uid.'/'.$listId.'/members_batch.'.$this->format;
+		
+		$params = array();
+		
+		if ($ids) {
+			$params['uids'] = $ids;
+		}
+		if ($names) {
+			$params['screen_name'] = $names;
+		}
+		
+		$response = $this->oAuthRequest($url, 'post', $params);
+		return $response;
+	}
+	
 
 	/**
-	 * 将用户从list中删除   
+	 * 将用户从list中删除
 	 *
 	 * @param int|string $id 用户id
 	 * @param int|string $list_id 订阅list ID
 	 * @param int $user_id 要删除的用户id
-	 * @return array	
+	 * @return array
 	 */
 	function deleteUserListsMember($id, $list_id, $user_id)
 	{
 		$url = WEIBO_API_URL.$id.'/'.$list_id.'/members.'.$this->format;
 		$params = array();
 
-		$params['id'] = $user_id;	
+		$params['id'] = $user_id;
 		$response = $this->oAuthRequest($url, 'delete', $params);
 
 		return $response;
@@ -2507,7 +2774,7 @@ include_once P_CLASS.'/oauth.class.php';
 	//黑名单
 
 	/**
-	 * 将用户加入黑名单 
+	 * 将用户加入黑名单
 	 *
 	 * @param int|string $user_id 用户id
 	 * @param string $screen_name 用户昵称
@@ -2519,19 +2786,19 @@ include_once P_CLASS.'/oauth.class.php';
 		$params = array();
 
 		if ($user_id) {
-			$params['user_id'] = $user_id;	
+			$params['user_id'] = $user_id;
 		}
 		if ($screen_name) {
 			$params['screen_name'] = $screen_name;
 		}
-			
+
 		$response = $this->oAuthRequest($url, 'post', $params);
 
 		return $response;
 	}
 
 	/**
-	 * 删除黑名单 
+	 * 删除黑名单
 	 *
 	 * @param int|string $user_id 用户id
 	 * @param string $screen_name 用户昵称
@@ -2543,19 +2810,19 @@ include_once P_CLASS.'/oauth.class.php';
 		$params = array();
 
 		if ($user_id) {
-			$params['user_id'] = $user_id;	
+			$params['user_id'] = $user_id;
 		}
 		if ($screen_name) {
 			$params['screen_name'] = $screen_name;
 		}
-			
+
 		$response = $this->oAuthRequest($url, 'post', $params);
 
 		return $response;
 	}
 
 	/**
-	 * 检测是否是黑名单用户  
+	 * 检测是否是黑名单用户
 	 *
 	 * @param int|string $user_id 用户id
 	 * @param string $screen_name 用户昵称
@@ -2563,23 +2830,23 @@ include_once P_CLASS.'/oauth.class.php';
 	 */
 	function existsBlocks($user_id = null, $screen_name = null)
 	{
-		$url = WEIBO_API_URL.'/blocks/exists.'.$this->format;
+		$url = WEIBO_API_URL.'blocks/exists.'.$this->format;
 		$params = array();
 
 		if ($user_id) {
-			$params['user_id'] = $user_id;	
+			$params['user_id'] = $user_id;
 		}
 		if ($screen_name) {
 			$params['screen_name'] = $screen_name;
 		}
-			
+
 		$response = $this->oAuthRequest($url, 'get', $params);
 
 		return $response;
 	}
 
 	/**
-	 * 分页黑名单用户(输出用户详细信息)   
+	 * 分页黑名单用户(输出用户详细信息)
 	 *
 	 * @param int $page 页码数
 	 * @param int $count 获取条数
@@ -2587,11 +2854,11 @@ include_once P_CLASS.'/oauth.class.php';
 	 */
 	function getBlocks($page = null, $count = null, $with_addtime=1)
 	{
-		$url = WEIBO_API_URL.'/blocks/blocking.'.$this->format;
+		$url = WEIBO_API_URL.'blocks/blocking.'.$this->format;
 		$params = array();
 
 		if ($page) {
-			$params['page'] = $page;	
+			$params['page'] = $page;
 		}
 		if ($count) {
 			$params['count'] = $count;
@@ -2599,14 +2866,14 @@ include_once P_CLASS.'/oauth.class.php';
 		if ($with_addtime) {
 			$params['with_addtime'] = $with_addtime;
 		}
-			
+
 		$response = $this->oAuthRequest($url, 'get', $params);
 
 		return $response;
 	}
 
 	/**
-	 * 分页黑名单用户（只输出id）   
+	 * 分页黑名单用户（只输出id）
 	 *
 	 * @param int $page 页码数
 	 * @param int $count 获取条数
@@ -2614,17 +2881,156 @@ include_once P_CLASS.'/oauth.class.php';
 	 */
 	function getBlocksIds($page = null, $count = null)
 	{
-		$url = WEIBO_API_URL.'/blocks/blocking/ids.'.$this->format;
+		$url = WEIBO_API_URL.'blocks/blocking/ids.'.$this->format;
 		$params = array();
 
 		if ($page) {
-			$params['page'] = $page;	
+			$params['page'] = $page;
 		}
 		if ($count) {
 			$params['count'] = $count;
 		}
-			
+
 		$response = $this->oAuthRequest($url, 'get', $params);
+
+		return $response;
+	}
+
+	/**
+	 * 举报某条信息
+	 *
+	 * @param string $content 举报的内容
+	 * @param string $url 举报的url
+	 * @param int|string $status_id 举报的微博id 为可选参数。当status_id不为空时，允许url参数为空
+	 * @return array
+	 */
+	function report_spam($content, $url = null, $status_id = null)
+	{
+		$url = WEIBO_API_URL.'report_spam.'.$this->format;
+		$params = array();
+
+		$params['ip'] = F('get_client_ip');
+		$params['content'] = $content;
+		if ($url) {
+			$params['url'] = $url;
+		}
+		if ($status_id) {
+			$params['status_id'] = $status_id;
+		}
+
+		$response = $this->oAuthRequest($url, 'post', $params);
+
+		return $response;
+	}
+    
+    /**
+     * xauth登录
+     * Exchange the request token and secret for an access token and
+     * secret, to sign API calls.
+     *
+     * @param string $username 用户名
+     * @param string $pwd 密码
+     * @return 
+     */
+    function getXauthAccessToken($username, $pwd)
+    {
+        $parameters = array();
+        $parameters=array(
+            'x_auth_username'=>$username,
+            'x_auth_password'=>$pwd,
+            'x_auth_mode'=>'client_auth',
+            'oauth_signature_method'=>'HMAC-SHA1'
+        );
+
+        $request = $this->oAuthRequest(WEIBO_API_URL.'oauth/access_token', 'post', $parameters, false, true);
+        if (is_array($request) && isset($request['errno']) && !empty($request['errno'])) {
+			return $request;
+        }
+        
+        $token = OAuthUtil::parse_parameters($request);
+        $this->token = new OAuthConsumer($token['oauth_token'], $token['oauth_token_secret']);
+        return RST($token);
+    }
+    
+	 /**
+	 * 获取一批指定用户的微博timeline
+	 * 
+	 * @param mixed $user_id 用户ID,一次最多20个
+	 * @param mixed $screen_name 用户昵称，一次最多20个
+	 * @param int $count 指定要返回的记录条数。默认20，最大200
+	 * @param int $page 指定返回结果的页码
+	 * @param int $feature 微博类型，0全部，1原创，2图片，3视频，4音乐. 返回指定类型的微博信息内容
+	 * @param int $base_app 是否基于当前应用来获取数据。1为限制本应用微博，0为不做限制
+	 * @param bool $oauth
+	 */
+	 function getBatchTimeline($params, $oauth = true)
+	 {
+		$url = WEIBO_API_URL.'statuses/batch_timeline.'.$this->format;
+		
+		if ($oauth == false) {
+			$response = $this->sourceRequest($url, 'get', $params);
+		} else {
+			$response = $this->oAuthRequest($url, 'get', $params);
+		}
+
+		return $response;
+	 }
+	 
+
+	 /**
+	  * 是否需要本地数据备份
+	  */
+	 function _needLocalCopy()
+	 {
+	 	///查询是否开启数据备份
+		$plugins = DR('Plugins.get', '', 6);
+		$plugins = isset($plugins['rst']) ? $plugins['rst'] : array();
+		if (isset($plugins['in_use']) && $plugins['in_use'] == 1) {
+			return TRUE;
+		}
+		
+		return FALSE;
+	 }
+	 
+	 
+	 /**
+	  * 获取返回结果的id数组
+	  * @param array $rspList
+	  */
+ 	 function _getRspIdList($rspList)
+	 {
+	 	$idList = array();
+	 	
+		if ( is_array($rspList) )
+		{
+			foreach ($rspList as $aRsp) {
+				array_push($idList, $aRsp['id']);
+			}
+		}
+		return $idList;
+	 }
+
+	/**
+	 * 短链接转换
+	 *
+	 * @param string $url 需要转换的url
+	 * @param boolean $is_short 默认为true，表示从长url转换成短url；false表示从短url转换成长url,true:1,false:0
+	 * @param boolean $is_batch 默认为false。true则使用批量方式，false使用单条方式,true:1,false:0。批量url用英文","分割
+	 * @return array
+	 */
+	function shortUrl($urls, $is_short = true, $is_batch = false)
+	{
+		$url = WEIBO_API_URL.'shortUrl.'.$this->format;
+		$params = array();
+		$params['url'] = $urls;
+		$params['is_short'] = $is_short;
+		$params['is_batch'] = $is_batch;
+
+		if ($this->consumer->key == WB_AKEY ) {
+			$response = $this->oAuthRequest($url, 'get', $params);
+		} else {
+			$response = $this->ssoSourceRequest($url, 'get', $params);
+		}
 
 		return $response;
 	}

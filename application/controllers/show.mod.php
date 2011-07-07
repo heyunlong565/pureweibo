@@ -40,8 +40,11 @@ class show_mod {
 		$mblog_info = APP::F('weibo_filter', $mblog_info, true);
 		if (empty($mblog_info)) {
 			APP::tips(array('tpl' => 'e404', 'msg'=> '您要访问的页面不存在'));
-		} elseif (isset($mblog_info['filter_state']) && ($mblog_info['filter_state'] == 3)) {
-			APP::tips(array('tpl' => 'e403', 'msg'=> '该微博已被删除或屏蔽'));
+		} elseif (in_array(3, $mblog_info['filter_state'])) {
+			// 如果不是管理员则返回出错信息
+			if (!USER::aid()) {
+				APP::tips(array('tpl' => 'e403', 'msg'=> '该微博已被删除或屏蔽'));
+			}
 		}
 
 		//获取个人资料
@@ -62,14 +65,77 @@ class show_mod {
 
 
 		/// 右侧模块数据
-		$modules = DS('PageModule.getPageModules', '', 2, 1);
+		//$modules = DS('PageModule.getPageModules', '', 2, 1);
 
 		TPL::assign('id', $id);
 		TPL::assign('userinfo', $userinfo);
-		TPL::assign('side_modules', isset($modules[2]) ? $modules[2]: array());
+		//TPL::assign('side_modules', isset($modules[2]) ? $modules[2]: array());
 		TPL::assign('mblog_info', $mblog_info);
 		TPL::assign('uid', USER::uid()); 
+		TPL::assign('is_show', 1);
 		TPL::display('mblog_detail');
+	}
+
+	function disabled() {
+		if (!USER::aid()) {
+			APP::ajaxRst(false, '-1', '不是管理员');
+		}
+		$id = V('r:id', false);
+		if (!$id || !is_numeric($id)){
+			APP::ajaxRst(false, '1', '缺少参数');
+		}
+		
+		DR('xweibo/xwb.setToken','', 2);
+		$rst = DR('xweibo/xwb.getStatuseShow','', $id);
+		$data = $rst['rst'];
+		if (isset($data['error_code']) && $data['error_code']) {
+			APP::ajaxRst(false, '3', '接口出错');
+		}
+		$values = array(
+				'type' => 1,
+				'item' => $data['id'],
+				'comment' => $data['text'],
+				'user' => $data['user']['screen_name'],
+				'publish_time' => date('Y-m-d H:i:s', strtotime($data['created_at'])),
+				'add_time' =>APP_LOCAL_TIMESTAMP,
+				'admin_name' =>  USER::get('screen_name'),
+				'admin_id' => USER::aid()
+				);
+		$rst = DR('xweibo/disableItem.save', '', $values);
+
+		// 添加成功则更新缓存
+		if ($rst['rst'] > 0) {
+			DD('xweibo/disableItem.getDisabledItems', 'g1/0', 1);
+			DR('xweibo/weiboCopy.disabled', '', $id, 1);
+			APP::ajaxRst(true);
+		}
+		
+		APP::ajaxRst(false, '2','屏蔽微博失败,可能该微博已经在屏蔽列表');
+		//APP::ajaxRst(false, 2122202, '屏蔽微博失败,可能该微博已经在屏蔽列表');
+	}
+	
+	
+	
+	/**
+	 * \brief 举报微博内容
+	 */
+	function reportSpam()
+	{
+		// check data
+		$cid = V('p:cid', FALSE);
+		if (empty($cid) || !is_numeric($cid)) {
+			APP::ajaxRst(false, '1', '微博ID不能为空');
+		}
+		
+		$content = V('p:content', FALSE);
+		if (empty($content)) {
+			APP::ajaxRst(false, '1', '举报内容不能为空');
+		}
+		
+		// report to API, 不考虑接口出错问题，认为提交都成功
+		DR('xweibo/xwb.report_spam','', $content, null, $cid);
+		
+		APP::ajaxRst(true);
 	}
 }
 ?>

@@ -2,12 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>用户封禁管理 - 用户管理 - 运营管理</title>
-<link href="<?php echo W_BASE_URL;?>css/admin.css" rel="stylesheet" type="text/css" />
+<title>封禁用户 - 用户管理 - 运营管理</title>
+<link href="<?php echo W_BASE_URL;?>css/admin/admin.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
 <div class="main-wrap">
-	<div class="path"><span class="path-icon"></span>当前位置：运营管理<span> &gt; </span>用户管理<span> &gt; </span>用户封禁管理</div>
+	<div class="path"><span class="path-icon"></span>当前位置：运营管理<span> &gt; </span>用户<span> &gt; </span>封禁用户</div>
     <div class="set-wrap">
         <h4 class="main-title">封禁用户列表</h4>
 		<div class="set-area-int">
@@ -15,7 +15,7 @@
 				<p class="serch-tips">请输入昵称搜索已封禁的用户，然后选择相应的解封操作。<a href="<?php echo URL('mgr/users.searchAllBanUser');?>">封禁指定用户</a></p>
             	<div class="serch-user">
 					<form action="<?php echo URL('mgr/users.getBanUser');?>" method="post">
-            			<span><strong>搜索包含以下昵称的用户：</strong></span>
+            			<span><strong>搜索包含以下昵称的用户</strong></span>
                 		<span><input name="keyword" class="input-box box-address-width" type="text" /></span>
                 		<span class="serch-btn"><input name="submit" type="submit" value="搜索" /></span>
                     </form>
@@ -23,7 +23,7 @@
             </div>
 			<div class="user-list">
 			  
-				<table width="100%" border="0" cellpadding="0" cellspacing="0" class="table-border">
+				<table border="0" cellpadding="0" cellspacing="0" class="table">
 					<colgroup>
 						<col class="serial-number"/>
                         <col class="user-name" />
@@ -33,19 +33,21 @@
     				</colgroup>
                     <thead class="td-title-bg">
 					<tr>
-						<td>编号</td>
-   					  	<td>用户昵称</td>
-   					  	<td>微博地址</td>
-   					  	<td>封禁时间</td>
-   					  	<td>操作</td>
+						<th><div class="td-inside">编号</div></th>
+   					  	<th><div class="td-inside">用户昵称</div></th>
+   					  	<th><div class="td-inside">微博地址</div></th>
+   					  	<th><div class="td-inside">封禁时间</div></th>
+   					  	<th><div class="td-inside">操作</div></th>
 				  	</tr>
               		</thead>
               		<tfoot class="tfoot-bg">
 					<tr>
 						<td colspan="5">
-                        <div class="pre-next">
-							<?php echo $pager;?>
-                        </div>
+					
+                        	<div class="pre-next">
+								<?php echo $pager;?>
+                        	</div>
+						
                         </td>
 					</tr>
               		</tfoot>
@@ -58,13 +60,14 @@
 							<td><a href="<?php echo URL('ta', 'id='.$value['sina_uid'], 'index.php');?>" target="_blank">
 									<?php echo W_BASE_HTTP . URL('ta', 'id='.$value['sina_uid'], 'index.php');?>
 								</a>
+							
 							</td>
 							<td><?php echo date('Y-m-d H:i:s', $value['ban_time']);?></td>
 							<td><a href="<?php echo URL('ta', 'id='.$value['sina_uid'], 'index.php');?>" class="view-weibo" target="_blank">查看微博</a><a href="<?php echo URL('mgr/users.ban', 'id=' . $value['sina_uid'] . '&ban=0&p=ban');?>" class="unban">解封</a></td>
 						</tr>
 					  <?php endforeach;?>
 					<?php else:?>
-						<tr><td colspan="5" class="no-data">没有搜索到相关结果</td></tr>
+						<tr><td colspan="5"><p class="no-data">没有搜索到相关结果</p></td></tr>
 					<?php endif;?>
 					</tbody>
 				</table>

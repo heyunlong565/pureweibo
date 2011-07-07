@@ -89,3 +89,23 @@ function format_time($time)
 	}
 	return $format_time;
 }
+
+/**
+ * 格式化显示时间
+ *
+ *
+ */
+function foramt_show_time($time) {
+	if(empty($time)){
+		return $time;
+	}
+	if (date('Y', APP_LOCAL_TIMESTAMP) == date('Y', $time)) {
+		$format_time = sprintf('%s月%s日 %s',date('n',$time),date('j',$time),date('H:i',$time));
+	} else {
+		$week=array(0=>'周日',1=>'周一',2=>'周二',3=>'周三',4=>'周四',5=>'周五',6=>'周六');
+		$format_time = sprintf('%s年%s月%s日 %s %s',date('Y',$time),date('n',$time),date('j',$time),$week[date('w',$time)],date('H:i',$time));
+	}
+
+	return $format_time;
+
+}

@@ -47,3 +47,18 @@ function profile_image_url($url, $type = 'index')
 		return $url_new;
 	}
 }
+
+/**
+ * 构造微博图片url
+ *
+ * @params string $picid 图片id
+ * @params string $type 图片类型
+ *
+ * @return string
+ */
+function thumbnail_pic($picid, $type = 'thumbnail')
+{
+	$no = rand(1, 4);
+	$url = 'http://ww'.$no.'.sinaimg.cn/'.$type.'/'.$picid.'.jpg';
+	return $url;
+}

@@ -47,14 +47,15 @@ class todayTopic extends PageModule{
 	 *
 	 * @return array array('keyword' => 'xxx', 
 	 */
-	function get() {
+	function get($param = array()) {
 
 		$cfg = $this->configList();
 
 		//$kw_group = &$cfg['group_id'];
 
 		//最多显示Ｎ条, 普通用户接口返回最多２０条
-		$show_num = &$cfg['show_num'];
+		$show_num	= isset($param['show_num']) ? $param['show_num'] : $cfg['show_num'];
+		$source 	= isset($param['source'])	? $param['source']	 : (isset($cfg['source']) ? $cfg['source']: '0');
 
 /*
 		$kw = DR('components/todayTopic.getKeyword', $this->keyworld_cache_time, $kw_group);
@@ -66,12 +67,7 @@ class todayTopic extends PageModule{
 		if (empty($topics)) {
 			return RST(false, 11002, '关键字列表为空');
 		}
-
-		//根据生效时间排序
-		function sortTopicByTime(&$b, &$a) {
-			return $b['ext1'] - $a['ext1'];
-		}
-
+		
 		uasort($topics, 'sortTopicByTime');
 
 		$now = time();
@@ -96,8 +92,16 @@ class todayTopic extends PageModule{
 			$last = end($topics);
 			$kw = $last['topic'];
 		}
-
-		$list = DR('xweibo/xwb.searchStatuse', null, array('q' => $kw, 'rpp' => $show_num, 'page' => 1), false);
+		
+		if (empty($kw)) {
+			return RST(false, 11002, '关键字为空');
+		}
+		
+		if (USER::isUserLogin()/* && $source*/) {
+			$list = DR('xweibo/xwb.searchStatuse', null, array('base_app' => $source, 'q' => $kw, 'rpp' => $show_num, 'page' => 1));
+		} else {
+			$list = DR('xweibo/xwb.searchStatuse', null, array('base_app' => $source, 'q' => $kw, 'rpp' => $show_num, 'page' => 1), false);
+		}
 
 		//结果集处理:　只要show_num条内容
 		if ($list['errno'] == 0) {
@@ -106,16 +110,71 @@ class todayTopic extends PageModule{
 			}
 
 			$errno = 0;
+			$err = '';
 		} else {
 			$errno = $list['errno'];
+			$err = $list['err'];
 		}
 
-
+		
 		return RST(array(
 			'errno' => $errno,
+			'err' => $err,
 			'keyword' => $kw,
 			'data' => $list
 		));
 
 	}
+	
+	
+	
+	/**
+	 * 获取话题微博相关的微博
+	 * @return array array('keyword' => 'xxx', 
+	 */
+	function getTopicWB($param = array()) 
+	{
+		$cfg = $this->configList();
+
+		//最多显示Ｎ条, 普通用户接口返回最多２０条
+		$show_num	= isset($param['show_num']) ? $param['show_num'] : $cfg['show_num'];
+		$source 	= isset($param['source'])	? $param['source']	 : (isset($cfg['source']) ? $cfg['source']: '0');
+		$topic		= isset($param['topic'])	? $param['topic']	 : (isset($cfg['topic'])  ? $cfg['topic']: '微小说');
+		$page		= isset($param['page'])	? (int)$param['page']	 : 1;
+		
+		if (USER::isUserLogin()/* && $source*/) {
+			$list = DR('xweibo/xwb.searchStatuse', null, array('base_app' => $source, 'q' => $topic, 'count' => $show_num, 'page' => $page));
+		} else {
+			$list = DR('xweibo/xwb.searchStatuse', null, array('base_app' => $source, 'q' => $topic, 'count' => $show_num, 'page' => 1), false);
+		}
+
+		if(!is_array($list)){
+			$list = RST(array(), -1, '数据出错');
+		}
+		/*
+		if ($list['errno'] == 0) {
+			$errno = 0;
+		} else {
+			$errno = $list['errno'];
+		}
+		*/
+		
+		// add topic to list
+		$list['topic'] = $topic;
+
+		return $list;
+
+//		return RST(array(
+//			'errno' => $errno,
+//			'keyword' => $topic,
+//			'data' => $list
+//		));
+
+	}
+}
+
+
+//根据生效时间排序
+function sortTopicByTime(&$b, &$a) {
+	return $b['ext1'] - $a['ext1'];
 }

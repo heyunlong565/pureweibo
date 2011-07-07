@@ -12,7 +12,7 @@
 /// 产品名称
 define('WB_SOFT_NAME', 'Xweibo');
 /// 当前版本号
-define('WB_VERSION', '1.1.0');
+define('WB_VERSION', '2.0');
 /// 项目号 用于统计
 define('WB_PROJECT', 'xwb');
 /// 系统默认的模块路由 当入口文件中未定义时使用如下值
@@ -22,13 +22,15 @@ if ( !defined('R_DEF_MOD') ){define('R_DEF_MOD', "index");}
 define('AUTH_KEY',			'XMBLOG654321');
 /// 站点语言名称（目录）
 define('SITE_LANG',			'zh_cn');
-/// 站点皮肤  CSS 文件目录名称的 前缀 
+/// 站点皮肤  CSS 文件目录名称的 前缀
 define('SITE_SKIN_CSS_PRE',	'skin_');
+/// 站点皮肤 CSS 自定义皮肤目录
+define('SITE_SKIN_CSS_CUSTOM',	'skin_define');
 /// 站点皮肤  CSS 文件目录名称的 后缀
 /// 当用户和系统都没有设置,且不能从预览变量路由中取得CSS皮肤值的时候即为当前值
 define('SITE_SKIN_TYPE',	'default');
 /// 站点皮肤  模板目录名称（目录）
-define('SITE_SKIN_TPL_DIR',	'default');
+define('SITE_SKIN_TPL_DIR',	'1');
 /// 预览皮肤时的 变量路由
 define('SITE_SKIN_PREV_V',	'R:prev_skin');
 /// 皮肤配置文件名称
@@ -44,12 +46,12 @@ define('WB_API_LIMIT',			20);
 define('APP_TIMEZONE_OFFSET',	8);
 /// 本地时间，与标准时间的差，单位为秒，当本地时钟较快时为　负数　，较慢时为　正数　, 默认为　０　即本地时间是准确的
 define('LOCAL_TIME_OFFSET',		0);
-/// 经过较准的，本地时间戳　所有使用APP_LOCAL_TIMESTAMP　的地方用这个常替代，防止，无法更改服务器时间导致的问题　
+/// 经过较准的，本地时间戳　所有使用APP_LOCAL_TIMESTAMP　的地方用这个常替代，防止，无法更改服务器时间导致的问题
 define('APP_LOCAL_TIMESTAMP',	time() + LOCAL_TIME_OFFSET);
 
 /// 本程序中的HTTP  USER_AGENT 代理
 if (XWB_SERVER_ENV_TYPE === 'common') {
-	define('XWB_HTTP_USER_AGENT',	$_SERVER['HTTP_USER_AGENT']);
+	define('XWB_HTTP_USER_AGENT',	isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '');
 } else {
 	define('XWB_HTTP_USER_AGENT',	'SAE/fetchurl-' . SAE_ACCESSKEY);// . ' ' . $_SERVER['HTTP_USER_AGENT']);
 }
@@ -57,8 +59,12 @@ if (XWB_SERVER_ENV_TYPE === 'common') {
 define('CRON_LOCK_FILE_PREFIX', 'cron_lock_');
 //----------------------------------------------------------------------
 /// 站点LOGO文件名
-define('WB_LOGO_DEFAULT_NAME',		'var/data/logo/default_logo.png');
+define('WB_LOGO_DEFAULT_NAME',		'img/logo.png');
+define('WB_LOGO_WAP_DEFAULT_NAME',		'img/logo_wap.png');
+define('WB_LOGO_OUTPUT_DEFAULT_NAME',		'img/logo_output.png');
 define('WB_LOGO_FILE_NAME',			'/data/logo/logo_upload.png');
+define('WB_LOGO_WAP_FILE_NAME',			'/data/logo/logo_upload_wap.png');
+define('WB_LOGO_OUTPUT_FILE_NAME',			'/data/logo/logo_upload_output.png');
 define('WB_LOGO_PREVIEW_FILE_NAME',	'/data/logo/logo_previews.png');
 /// 站点地址栏文件名
 define('WB_ICON_DEFAULT_NAME',		'var/data/logo/default_icon.png');
@@ -72,20 +78,28 @@ define('AUTH_BIG_ICON_PREVIEW_FILE_NAME',	'/data/logo/big_auth_icon_previews.png
 define('AUTH_SMALL_ICON_DEFAULT_NAME',		'var/data/logo/default_v2.png');
 define('AUTH_SMALL_ICON_FILE_NAME',			'/data/logo/small_auth_icon_upload.png');
 define('AUTH_SMALL_ICON_PREVIEW_FILE_NAME',	'/data/logo/small_auth_icon_previews.png');
+
+define('WB_SKIN_BGIMG_UPLOAD_DIR',	'/data/skinbg/');
 //----------------------------------------------------------------------
 /// API 相关
 /// 微博 api url
 define('WEIBO_API_URL', 	'http://api.t.sina.com.cn/');
 /// sinaurl.cn 地址信息查询API地址
-define('SINAURL_INFO', 		'http://t.sina.com.cn/mblog/sinaurl_info.php');
+define('SINAURL_INFO', 		'http://weibo.com/mblog/sinaurl_info.php');
 /// 微博表情 url
 define('WB_EMOTICONS_URL',	'http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/basic/');
 /// X微博升级检查URL
 define('WB_UPGRADE_CHK_URL','http://x.weibo.com/service/stdVersion.php?p=std&v=' . WB_VERSION);
 //define('WB_UPGRADE_CHK_URL', '');
 /// SINA 微博的注册地址
-define('SINA_WB_REG_URL',	'http://t.sina.com.cn/reg.php?ps=u3&lang=zh');
+define('SINA_WB_REG_URL',	'http://weibo.com/reg.php?ps=u3&lang=zh');
+/// X微博用户反馈上报地址
+define('WB_FEEDBACK_URL',	'http://x.weibo.com/xapi.php');
 //----------------------------------------------------------------------
+/// 数据库名表名 content_unit
+define('T_CONTENT_UNIT',	'content_unit');
+/// 数据库名表名 ad
+define('T_AD',				'ad');
 /// 数据库名表名 admin
 define('T_ADMIN',			'admin');
 /// 数据库名表名 users
@@ -150,6 +164,52 @@ define('T_PROFILE_AD',	'profile_ad');
 /// 分组数据存储表
 define('T_ITEM_GROUPS', 'item_groups');
 
+/// 页面导航表
+define('T_NAV', 'nav');
+
+/// 页面原型表
+define('T_PAGE_PROTOTYPE', 'page_prototype');
+
+/// 名人用户表
+define('T_CELEB', 'celeb');
+
+/// 名人用户分类表
+define('T_CELEB_CATEGORY', 'celeb_category');
+
+/// 本地微博
+define('T_WEIBO_COPY',		'weibo_copy');
+
+define('T_FEEDBACK',		'feedback');
+
+///话题收藏表
+define('T_PAGE_SUBJECT',	'subject');
+
+/// 个性域名保留词
+define('KEEP_USERDOMAIN',	'keep_userdomain');
+/// 用户关注关系表
+define('T_USER_FOLLOW', 'user_follow');
+/// 评论本地备份表
+define('T_COMMENT_COPY', 'comment_copy');
+/// 用户关系本地备份表，当XWB_PARENT_RELATIONSHIP配置为FALSE起作用
+define('T_USER_FOLLOW_COPY', 'user_follow_copy');
+/// 活动表
+define('T_EVENTS',			'events');
+define('T_EVENT_JOIN',		'event_join');
+define('T_EVENT_COMMENT',	'event_comment');
+/// 在线访谈表
+define('T_MICRO_INTERVIEW', 'micro_interview');
+define('T_INTERVIEW_WB', 'interview_wb');
+define('T_INTERVIEW_WB_ATME', 'interview_wb_atme');
+/// 通知信息表
+define('T_NOTICE', 'notice');
+define('T_NOTICE_RECIPIENTS', 'notice_recipients');
+
+///有用户操作表
+define('T_USER_ACTION',	'user_action');
+
+/// 在线直播表 
+define('T_MICRO_LIVE',		'micro_live');
+define('T_MICRO_LIVE_WB',	'micro_live_wb');
 //---------------------------------------------------------------------
 /// cache下标定义 屏蔽回复
 define('CACHE_DISABLED_COMMENT',			'disabled_comment');
@@ -184,7 +244,8 @@ $cfg['adapter'] = array(
 	'account'	=> ACCOUNT_ADAPTER,
 	'upload'	=> UPLOAD_ADAPTER,
 	'auth'		=> AUTH_ADAPTER,
-	'image' 	=> IMAGE_ADAPTER
+	'image' 	=> IMAGE_ADAPTER,
+	'mail'		=> MAIL_ADAPTER
 );
 //----------------------------------------------------------------------
 /// 适配器初始化数据配置变量
@@ -209,7 +270,7 @@ $_adapter['db']['mysql'] = array(
 	'db'	 => DB_NAME,
 	'slaves' => array(
 			array(
-				'host'	 => DB_HOST,
+				'host'	 => DB_HOST_2,
 				'port'	 => DB_PORT,
 				'user'	 => DB_USER,
 				'pwd'	 => DB_PASSWD,
@@ -234,6 +295,9 @@ $_adapter['http'] = array();
 $_adapter['http']['curl'] 		= array();
 $_adapter['http']['fsockopen'] 	= array();
 $_adapter['http']['snoopy'] 	= array();
+//----------------------------------------------------------------------
+$_adapter['mail'] = array();
+$_adapter['mail']['sae']		= array();
 //----------------------------------------------------------------------
 $_adapter['cache'] = array();
 $_adapter['cache']['file'] 				= array(
@@ -282,13 +346,15 @@ $tpl['title'] = array(
 			'_pre' => '',
 			//标题后缀
 			'_suf' => ' - Powered By Xweibo',
-			
+
 			//根据页面路由配置页面标题，可使用格式 如下
 			'comDemo.tit'=>"%s的Baby is %s",
 			'pub'=>'微博广场',
 			'pub.look' => '随便看看',
 			'pub.topics' => '话题排行榜',
-			'search.recommend' => '名人堂',
+			'pub.hotForward' => '热门转发',
+			'pub.hotComments' => '热门评论',
+			'search.recommend' => '可能感兴趣的人',
 			'search' => '综合搜索',
 			'search.user' => '用户搜索',
 			'search.weibo' => '微博搜索',
@@ -299,14 +365,18 @@ $tpl['title'] = array(
 			'index.comments' => '我的评论',
 			'index.commentsend' => '我的评论',
 			'index.messages' => '我的私信',
+			'index.notices' => '我的通知',
 			'index.favorites' => '我的收藏',
 			'index.profile' => '我的微博',
 			'index.fans' => '我的粉丝',
 			'index.follow' => '我的关注',
+			'index.setinfo' => '设置',
+			'index.info' => '详细信息',
 			'ta' => '%s的微博',
 			'ta.profile' => '%s的微博',
 			'ta.fans' => '关注%s的人',
 			'ta.follow' => '%s关注的人',
+			'ta.mention' =>'提到%s的微博',
 			'setting' => '个人资料设置',
 			'setting.user' => '个人资料设置',
 			'setting.tag' => '个人标签设置',
@@ -315,6 +385,72 @@ $tpl['title'] = array(
 			'setting.blacklist' => '黑名单',
 			'setting.notice' => '提醒设置',
 			'setting.account' => '帐号设置',
-			'show' => '%s的微博'
+			'show' => '%s的微博',
+			'show.repos'=>'%s的微博',
+			'event' => '活动',
+			'event.mine' => '我的活动',
+			'event.details' => '%s',
+			'event.member' => '%s',
+			'event.create' => '发起活动',
+			'event.modify' => '编辑活动',
+			'live' => '在线直播',
+			'live.details' => '%s',
+			'live.livelist' => '在线直播列表',
+			'wbcom.viewPhoto' => '查看图片',
+			'wbcom.replyComment' => '回复微博',
+			'wbcom.sendWBFrm' => '发微博',
+			'wbcom.sendMsgFrm' => '发私信',
+			'account.showLogin' => '登录微博'
 			);
 //----------------------------------------------------------------------
+/// sina微博名人推荐类别
+$cfg['userhot'] = array(
+		'1' => array('value' => 'default', 'key' => '人气关注'),
+		'2' => array('value' => 'ent', 'key' => '影视名星'),
+		'3' => array('value' => 'hk_famous', 'key' => '港台名人'),
+		'4' => array('value' => 'model', 'key' => '模特'),
+		'5' => array('value' => 'cooking', 'key' => '美食&健康'),
+		'6' => array('value' => 'sport', 'key' => '体育名人'),
+		'7' => array('value' => 'finance', 'key' => '商界名人'),
+		'8' => array('value' => 'tech', 'key' => 'IT互联网'),
+		'9' => array('value' => 'singer', 'key' => '歌手'),
+		'10' => array('value' => 'writer', 'key' => '作家'),
+		'11' => array('value' => 'moderator', 'key' => '主持人'),
+		'12' => array('value' => 'medium', 'key' => '媒体总编'),
+		'13' => array('value' => 'stockplayer', 'key' => '炒股高手')
+	);
+//----------------------------------------------------------------------
+/// 哪些控制器需要检查是是否允许禁止发言用户操作
+$cfg['writeableCheckRouter']=array('api/weibo/action.comment',
+									 'api/weibo/action.sendDirectMessage',
+									 'api/weibo/action.update',
+									 'api/weibo/action.applyDomain',
+									 'api/weibo/action.repost',
+									 'api/weibo/action.createFriendship',
+									 'event.create',
+									 'event.saveEvent',
+									 'event.joinEvent'
+									 );
+
+//----------------------------------------------------------------------
+
+/// xweibo模板配置
+define('PAGE_TYPE_SYSCONFIG', 	'wb_page_type');
+define('PAGE_TYPE_DEFAULT', 	'1');
+/// 两栏不显示的后台
+$cfg['adminNotShowNav'][1] = array(
+		'mgr/setting.header' => 1
+	);
+/// 三栏不显示的后台
+$cfg['adminNotShowNav'][2] = array(
+		'mgr/skin' 						=> 1,
+		'mgr/setting.getlink.header'	=> 1,
+		'mgr/ad' 						=> 1
+	);
+
+/// weibo页头设置
+define('HEADER_MODEL_SYSCONFIG', 	'wb_header_model');
+define('HEADER_HTMLCODE_SYSCONFIG', 'wb_header_htmlcode');
+//----------------------------------------------------------------------
+/// 是否启用个人资料功能，FALSE：不启用；TRUE：启用
+define("HAS_DIRECT_UPDATE_PROFILE", FALSE);

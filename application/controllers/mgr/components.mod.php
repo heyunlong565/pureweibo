@@ -6,8 +6,6 @@ define('USER_CATEGORY_RECOMMEND_ID', 1);
 
 class components_mod extends action {
 	
-	var $titleCanSet = array(2, 6, 7, 8, 9, 10);
-
 	//ID ->　组件类的映射
 	var $nameMap = array(
 			'1' => 'hotWB',
@@ -20,24 +18,23 @@ class components_mod extends action {
 			'8' => 'cityWB',
 			'9' => 'pubTimeline',
 			'10' => 'todayTopic',
-			'11' => 'categoryUser'
+			'11' => 'categoryUser',
+			'12' => 'todayTopic'
 		);
 
 	function components() {
 		parent :: action();
 	}
 
-	function default_action() {
-		$components = DS('PageModule.listModules');
-
-		$plugins = DS('Plugins.getList');
-
-		TPL::assign('plugins', $plugins);
-
-		TPL::assign('components', $components);
-
-		$this->_display('components_list');
+	
+	/**
+	 * 模块列表
+	 */
+	function default_action() 
+	{
+		exit('NO SUCH PAGE OR DIRECTORY.');
 	}
+	
 
 	/**
 	 * 显示组件设置
@@ -54,8 +51,6 @@ class components_mod extends action {
 		TPL::assign('id' , $id);
 		TPL::assign('cfg', $cfg);
 		TPL::assign('com', $com);
-
-		TPL::assign('titleCanSet', $this->titleCanSet);
 
 		switch ($id) {
 			case 11:
@@ -147,21 +142,22 @@ class components_mod extends action {
 	function set() {
 		$id = V('p:id');
 
-		$saveTitle = in_array($id, $this->titleCanSet);
-
-		//保存title
-		if ($saveTitle) {
-			$title = trim(V('p:title', ''));
-			DR('PageModule.update', null, array('title' => $title), $id);
-		}
-
 		//保存显示条数
 		$show_num = V('p:show_num');
 
 		$com = 'components/' . $this->nameMap[$id];
 
 		if ($show_num) {
-			$numResult = DR($com . '.config', null, 'show_num', $show_num);
+			$numResult = DR($com . '.config', null, 'show_num', $show_num, $id);
+		}
+		
+
+		///保存是否要数据隔离
+		$source = V('p:source');
+		if ($source == 1) {
+			DR($com . '.config', null, 'source', 0, $id);
+		} elseif ($source == 2) {
+			DR($com . '.config', null, 'source', 1, $id);
 		}
 
 		$cache_key = 'get';
@@ -171,33 +167,7 @@ class components_mod extends action {
 				$cache_key = array('getRepost', 'getComment');
 				break;
 
-			case 3:
-				$group_id = V('p:group_id');
-				$oldId = '';
-				$set = false;
-
-				//查询现在使用的
-				$old = DS($com . '.config', null, 'group_id');
-
-				if ($old) {
-					$oldId = $old[0]['cfgValue'];
-
-					//如果更改了
-					if ($oldId && ($oldId != $group_id)) {
-						$set = true;
-						DS('mgr/userRecommendCom.delRelatedId', '', $oldId, $id, 1);
-					}
-				} else {
-					$set = true;
-				}
-
-				if ($set){
-					DS($com . '.config', null, 'group_id', $group_id);
-					DS('mgr/userRecommendCom.addRelatedId', '', $group_id, $id, 1);
-				}
-
-				break;
-
+			case 2:
 			case 6:
 				$type = V('p:topic_get');
 				
@@ -210,6 +180,14 @@ class components_mod extends action {
 
 				break;
 
+			case 12:
+				$cache_key = 'getTopicWB';
+				
+				// update 话题内容
+				$topic = V('p:topic');
+				if ($topic) {
+					DR('PageModule.config', null, 'topic', $topic, $id);
+				}
 			
 		}
 

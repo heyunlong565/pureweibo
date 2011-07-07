@@ -13,7 +13,7 @@
 		<!-- end header -->
 		<div id="main">
 			<div class="content-box">
-				<div class="step2 step-bg"></div>
+				<div class="step3 step-bg"></div>
 				<div class="ct-mid">
 					<div class="title-info">
 						<h3 id="show_install_text">正在安装</h3>

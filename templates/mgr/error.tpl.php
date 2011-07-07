@@ -6,7 +6,7 @@
 <?php if ($timeout):?>
 <meta http-equiv='Refresh' content='<?php echo $timeout;?>;URL=<?php echo $location;?>'>
 <?php endif;?>
-<link href="<?php echo W_BASE_URL;?>css/admin.css" rel="stylesheet" type="text/css" />
+<link href="<?php echo W_BASE_URL;?>css/admin/admin.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
 <div id="wrapper">

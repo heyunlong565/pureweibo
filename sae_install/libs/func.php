@@ -17,7 +17,7 @@
  */
 function set_ini_file($config)
 {
-	extract($config);
+	extract($config, EXTR_SKIP);
 	
 	$app_config = get_ini_file();
 	
@@ -28,13 +28,13 @@ function set_ini_file($config)
 	$cache = isset($cache) ? $cache : null;
 	$finish = isset($finish)?$finish : '0';
 	$root_path = ROOT_PATH;
-	
-	$db_port = $_SERVER['HTTP_MYSQLPORT'];
-	$db_host = $db_port.'.mysql.sae.sina.com.cn';
-	$db_name = 'app_'.$_SERVER['HTTP_APPNAME'];
+	$cover = isset($cover)? $cover: $app_config['cover'];
+	$db_port = SAE_MYSQL_PORT;
+	$db_host = SAE_MYSQL_HOST_M;
+	$db_name = SAE_MYSQL_DB;
 	$db_passwd = SAE_SECRETKEY;
 	$db_user = SAE_ACCESSKEY;
-	$db_prefix = 'xwb11_';
+	$db_prefix = 'xwb20_';
 	
 	/// 生成安装目录
 	$local_uri = '';
@@ -77,9 +77,25 @@ function set_ini_file($config)
 				  .'&db_passwd='.urlencode($db_passwd)
 				  .'&db_user='.urlencode($db_user)
 				  .'&db_prefix='.urlencode($db_prefix)
-				  .'&finish='.urlencode($finish);
+				  .'&finish='.urlencode($finish)
+				  .'&cover='.urlencode($cover)
+				  .'&app_flag_ver=' . date('mdHis');
 	
 	write_config(CONFIG_DOMAIN,$config_file);
+	session_start();
+	/// 清零cookie, session
+	if (isset($_COOKIE) && !empty($_COOKIE)) {
+		foreach ($_COOKIE as $key => $var) {
+			setcookie($key , '' , time()-3600 , $path_string, '' , 0 );
+			unset($_COOKIE[$key]);
+		}	
+	}
+	if (isset($_SESSION) && !empty($_SESSION)) {
+		foreach ($_SESSION as $key => $var) {
+			unset($_SESSION[$key]);	
+		}
+		session_destroy();
+	}
 	return true;
 }
 
@@ -136,7 +152,7 @@ function get_real_ip() {
  */
 function read_config($key){
 	$s = new SaeStorage();
-	return $s->read(SAE_DOMAIN,md5($key));
+	return $s->read(CONFIG_DOMAIN,md5($key));
 }
 /**
  * 
@@ -147,7 +163,7 @@ function read_config($key){
  */
 function write_config($key,$value){
 	$s = new SaeStorage();
-	$result = $s->write( SAE_DOMAIN , md5($key) , $value );
+	$result = $s->write( CONFIG_DOMAIN , md5($key) , $value );
 	if($result){
 		return $result;
 	}else{
@@ -165,6 +181,20 @@ function get_ini_file(){
 	parse_str($content, $site_base_info);
 	return $site_base_info;
 }
+
+/**
+ * 读/写SQL数据备份
+ */
+function backupSql($data = null) {
+	$file_name = 'sql_backup';
+	$s = new SaeStorage();
+	if ($data !== null) {
+		return $s->write( CONFIG_DOMAIN , md5($file_name) , $data );
+	} else {
+		return $s->read(CONFIG_DOMAIN,md5($key));
+	}
+}
+
 /**
  * 检查app的真确性
  *
@@ -203,7 +233,7 @@ function check_app($app_key, $app_secret)
  */
 function install_log($msg)
 {
-	show_msg($msg);
+//	show_msg($msg);
 }
 /**
  * 错误提示信息
@@ -277,7 +307,7 @@ function db_resource($db_host = null, $db_user = null, $db_passwd = null, $db_na
 		if ($ajax) {
 			die($_LANG['database_connect_error']);
 		}
-		show_msg($_LANG['database_connect_error'], 'index.php?step=3');
+		show_msg($_LANG['database_connect_error'], 'index.php?step=1');
 	}
 	if (!mysql_select_db($db_name, $link)) {
 		if ($ajax) {
@@ -352,6 +382,48 @@ function check_app_key($link, $db_name, $db_prefix = null)
 }
 
 /**
+ * 清空所有旧数据表:所有sys_config表里db_prefix指定前缀所有数据表
+ */
+function clear_tables($db_host, $db_user, $db_passwd, $db_name, $db_prefix) {
+	
+	$link = db_resource($db_host, $db_user, $db_passwd, $db_name);
+	$sql = "show tables like '%sys_config'";
+	$result = mysql_query($sql, $link);
+	$list = array();
+	$table_name = false;
+	$tables = array();
+	while ($row = mysql_fetch_array($result, MYSQL_NUM)) {
+		if (empty($row[0])) {
+			return '10000';
+		}
+		$sql = 'SELECT value FROM '.$row[0].' WHERE `key` = "db_prefix"';
+		$ret = mysql_query($sql, $link);
+		$fields_rows = mysql_fetch_assoc($ret);
+		if ($fields_rows) {
+			$db_prefix_old = $fields_rows['value'];
+			// 删除当前版本外的所有数据表
+			if ($db_prefix_old == $db_prefix || trim($db_prefix_old) == '') {
+				continue;
+			}
+
+			$sql = "show tables like '{$db_prefix_old}%'";
+			$rs = mysql_query($sql, $link);
+			while ($table = mysql_fetch_row($rs)) {
+				$tables[] = $table['0'];
+			}
+		}
+	}
+	if (!empty($tables)) {
+		$sql = 'DROP TABLE IF EXISTS ' . implode(',', $tables);
+		mysql_query($sql, $link);
+	}
+
+	mysql_close($link);
+
+}
+
+
+/**
  * 创建表并且返回表的列表
  *
  * @param unknown_type
@@ -360,8 +432,8 @@ function check_app_key($link, $db_name, $db_prefix = null)
 function create_tables($db_host, $db_user, $db_passwd, $db_name, $db_prefix)
 {
 	global $_LANG;
-	$fp = fopen(ROOT_PATH.'/sae_install/data/structure_1.1.sql', 'r');
-	$sql_items = fread($fp, filesize(ROOT_PATH.'/sae_install/data/structure_1.1.sql'));
+	$fp = fopen(ROOT_PATH.'/sae_install/data/'. XWEIBO_DB_STRUCTURE_FILE_NAME, 'r');
+	$sql_items = fread($fp, filesize(ROOT_PATH.'/sae_install/data/'.XWEIBO_DB_STRUCTURE_FILE_NAME));
 	fclose($fp);
 
 	/// 删除SQL行注释
@@ -405,7 +477,9 @@ function create_tables($db_host, $db_user, $db_passwd, $db_name, $db_prefix)
 		}
 	}
 
-
+	// 向sys_config 添加当前项目版本号
+	$sql = 'INSERT INTO ' . $db_prefix . 'sys_config(`key`,`value`,`group_id`) VALUES("db_prefix", "' .$db_prefix . '","1") ON DUPLICATE KEY UPDATE `value`="' . $db_prefix . '" ';
+	mysql_query($sql, $link);
 	mysql_close($link);
 	if (!$sign) {
 		show_msg($_LANG['tables_create_error']);
@@ -422,7 +496,7 @@ function get_tables_list()
 {
 	global $_LANG;
 	$config_info = get_ini_file();
-	@extract($config_info);
+	@extract($config_info, EXTR_SKIP);
 
 	$link = db_resource($db_host, $db_user, $db_passwd, $db_name);
 	/// 罗列表
@@ -452,7 +526,7 @@ function action_dbs($db_host, $db_user, $db_passwd, $db_name, $db_prefix, $cover
 	if (2 == $cover) {
 		/// 覆盖安装
 		create_db($db_host, $db_user, $db_passwd, $db_name);
-
+		clear_tables($db_host, $db_user, $db_passwd, $db_name, $db_prefix);
 		create_tables($db_host, $db_user, $db_passwd, $db_name, $db_prefix);
 
 		init_site_data($db_host, $db_user, $db_passwd, $db_name, $db_prefix);
@@ -472,38 +546,33 @@ function action_dbs($db_host, $db_user, $db_passwd, $db_name, $db_prefix, $cover
 			/// 相同版本
 			return true;
 		} else {
-//			/// 先备份数据
-//			$link = db_resource($db_host, $db_user, $db_passwd, $db_name, true);
-//			$sql = 'SHOW tables';
-//			$result = mysql_query($sql, $link);
-//			$list = array();
-//			$db_prefix = $db_prefix;
-//			$tables = array();
-//			$sql_dump = '';
-//			while ($row = mysql_fetch_array($result, MYSQL_NUM)) {
-//				if (!preg_match("/$db_prefix.+/i", $row[0])) {
-//					continue;
-//				}
-//				$sql_dump .= backup_data_sql($link, $row[0]);
-//				$tables[] = $row[0];
-//			}
-//			/// 生成备份数据表的sql文件
-//			$file_name = 'sae_install_'.$db_name.'_data_backup.sql';
-//			$fp = fopen(ROOT_PATH.'/var/data/'.$file_name, 'wb+');
-//			if ($fp == false) {
-//				die($_LANG['datadir_access']);
-//			}
-//			if (fwrite($fp, $sql_dump) === false) {
-//				die($_LANG['xweibo_uninstall_backup_error']);
-//			}
-//			fclose($fp);
+			/// 先备份数据
+			$link = db_resource($db_host, $db_user, $db_passwd, $db_name, true);
+			$sql = 'SHOW tables';
+			$result = mysql_query($sql, $link);
+			$list = array();
+			$db_prefix = $db_prefix;
+			$tables = array();
+			$sql_dump = '';
+			while ($row = mysql_fetch_array($result, MYSQL_NUM)) {
+				if (!preg_match("/$db_prefix.+/i", $row[0])) {
+					continue;
+				}
+				$sql_dump .= backup_data_sql($link, $row[0]);
+				$tables[] = $row[0];
+			}
 
-			/// 查询不到版本信息，就覆盖安装
-			create_db($db_host, $db_user, $db_passwd, $db_name);
+			// 生成备份数据表的sql文件
+			backupSql($sql_dump);
 
-			create_tables($db_host, $db_user, $db_passwd, $db_name, $db_prefix);
-
-			init_site_data($db_host, $db_user, $db_passwd, $db_name, $db_prefix);
+			$fun_name = 'action_db'.str_replace('.', '', XWEIBO_VERSION);
+			include_once 'upgrade.class.php';
+			$upgrade = new upgrade($db_host, $db_user, $db_passwd, $db_name);
+			$fun_lists = get_class_methods($upgrade);
+			if (in_array($fun_name, $fun_lists)) {
+				call_user_func(array($upgrade, $fun_name), $db_prefix);
+			}
+			return true;
 		} 
 	}
 }
@@ -552,12 +621,18 @@ function init_site_data($db_host, $db_user, $db_passwd, $db_name, $db_prefix = '
 	$link = db_resource($db_host, $db_user, $db_passwd, $db_name);
 	$table = $db_prefix.'sys_config';
 	$sql = "INSERT INTO $table (`key`,`value`)VALUES('site_name','".mysql_real_escape_string($site_config['site_name'])."'),('wb_version','".mysql_real_escape_string(XWEIBO_VERSION)."'),('app_key', '".mysql_real_escape_string($site_config['app_key'])."'),('app_secret', '".mysql_real_escape_string($site_config['app_secret'])."')";
+	
 	if (mysql_query($sql, $link) == false) {
 		/// 错误日志
 		install_log('sql: '.$sql." \r\nerrno: ".mysql_errno($link)." \r\nerror: ".mysql_error($link));
 		show_msg($_LANG['add_admin_errno']);
 	}
-
+	$sql = 'UPDATE ' . $table .' SET `value`="Xweibo ' . XWEIBO_VERSION . '" WHERE `key`="title"';
+	if (mysql_query($sql, $link) == false) {
+		/// 错误日志
+		install_log('sql: '.$sql." \r\nerrno: ".mysql_errno($link)." \r\nerror: ".mysql_error($link));
+		show_msg($_LANG['add_admin_errno']);
+	}
 	mysql_close($link);
 }
 /**
@@ -659,9 +734,9 @@ function checkInstall(){
  */
 function checkDomain(){
 	$s = new SaeStorage();
-	$result = $s->write(SAE_DOMAIN,'test','test' );
+	$result = $s->write(CONFIG_DOMAIN,'test','test' );
 	if($result){
-		$s->delete( SAE_DOMAIN,'test');
+		$s->delete( CONFIG_DOMAIN,'test');
 		return true;
 	}else{
 		return false;
@@ -671,10 +746,30 @@ function checkDomain(){
  * 判断是否开启mysql
  */
 function checkDB(){
-	if(SAE_ACCESSKEY){
+	if( isset($_SERVER['HTTP_MYSQLPORT']) && $_SERVER['HTTP_MYSQLPORT']>0 ){
 		return true;
 	}else{
 		return false;
 	}
 }
+
+
+/**
+ * 替换配置选的值
+ *
+ *
+ */
+function setDefineValue($s,$k,$v=''){
+	if (is_array($k)){
+		foreach($k as $kk=>$vv){
+			$p = "#define\s*\(\s*'".preg_quote($kk)."'\s*,(\s*)'.*?'\s*\)\s*;#sm";
+			$s = preg_replace($p, "define('".$kk."',\\1'".$vv."');",$s);
+		}
+		return $s;
+	}else{
+		$p = "#define\s*\(\s*'".preg_quote($k)."'\s*,(\s*)'.*?'\s*\)\s*;#sm";
+		return preg_replace($p, "define('".$k."',\\1'".$v."');",$s);
+	}
+}
+
 ?>

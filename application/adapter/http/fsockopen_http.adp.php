@@ -173,7 +173,7 @@ class fsockopen_http
 	}
 
 	/**
-	 * 获取访问的url
+	 * 鑾峰彇璁块棶鐨剈rl
 	 *
 	 */
 	function getUrl()
@@ -182,7 +182,7 @@ class fsockopen_http
 	}
 
 	/**
-	 * 获取错误代码
+	 * 鑾峰彇閿欒浠ｇ爜
 	 */
 	function getError() {
 		return $this->_error;
@@ -367,7 +367,6 @@ class fsockopen_http
 		if (empty($this->headers['content-type'])) {
 			$this->setHeader('content-type', 'application/x-www-form-urlencoded');
 		}
-		$this->_request_params = $data;
         return $this->_do_url($url, 'post', $data, $redir);
     }
 
@@ -414,8 +413,8 @@ class fsockopen_http
         {
             $this->status = 0;
             $this->headers = $this->post_files = $this->post_fields = array();
+            $this->_request_params = null;
         }
-		$this->_request_params = null;
     }
 
     // format post field
@@ -507,7 +506,7 @@ class fsockopen_http
             }
         }
         $buf .= "\r\n";
-        if ($method == 'POST') $buf .= $data . "\r\n";
+        if ($method == 'POST') $buf .= $data . "\r\n";$this->_request_params = $data;
 
         // force reset status for next query even if failed this time.
         $this->status = -1;
@@ -559,7 +558,7 @@ class fsockopen_http
             if (!strncasecmp('HTTP/', $line, 5))
             {
                 $line = trim(substr($line, strpos($line, ' ')));
-                list($this->status, $this->resttl) = explode(' ', $line, 2);
+                @list($this->status, $this->resttl) = explode(' ', $line, 2);
                 $this->status = intval($this->status);
             }
             else if (!strncasecmp('Set-Cookie: ', $line, 12))
@@ -571,7 +570,11 @@ class fsockopen_http
                 {
                     $tmp = trim($tmp);
                     if (empty($tmp)) continue;
-                    list($tmpk, $tmpv) = explode('=', $tmp, 2);
+					$list_tmp = explode('=', $tmp, 2);
+					if (!isset($list_tmp[0]) || !isset($list_tmp[1])) {
+						continue;
+					}
+                    list($tmpk, $tmpv) = $list_tmp; 
                     $tmpk2 = strtolower($tmpk);
                     if ($ck_key == '')
                     {
@@ -699,7 +702,7 @@ class fsockopen_http
 			$data_log = array();
 			$data_log['url'] = $this->_serverUrl;
 			$data_log['http_code'] = $this->status;
-			//post, 记录post数据
+			//post, 璁板綍post鏁版嵁
 			if (strtolower($this->_method) == 'post') {
 				$data_log['post_data'] = $this->_request_params;
 			}
@@ -712,7 +715,7 @@ class fsockopen_http
 		}
 		/****************************/
 
-		//记录错误日志
+		//璁板綍閿欒鏃ュ織
 		if ($this->status != 200) {
 			list($usec, $sec) = explode(" ", microtime());
 			$end_ex_time = (float)$usec + (float)$sec;
@@ -724,7 +727,7 @@ class fsockopen_http
 			$data_log = array();
 			$data_log['url'] = $this->_serverUrl;
 			$data_log['http_code'] = $this->status;
-			//post, 记录post数据
+			//post, 璁板綍post鏁版嵁
 			if (strtolower($this->_method) == 'post') {
 				$data_log['post_data'] = $this->_request_params;
 			}
@@ -736,6 +739,7 @@ class fsockopen_http
 			$db->save($data_log);
 		}
 
+		$this->_request_params = null;
         // return the body buf
         return $body;
     }

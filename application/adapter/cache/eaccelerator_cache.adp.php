@@ -25,7 +25,11 @@ class eaccelerator_cache
 	}
 
 	function set($key, $value, $ttl = 0) {
-		return eaccelerator_put($key, $value, $ttl);
+		$rst = eaccelerator_put($key, $value, $ttl);
+		if (!$rst) {
+			LOGSTR('cache', 'put data error,may be size of the data is to big');
+		}
+		return $rst;
 	}
 
 	function delete($key) {

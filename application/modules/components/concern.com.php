@@ -31,7 +31,7 @@ class concern extends PageModule{
 		$group_id = $cfg['group_id'];
 
 		if ($group_id === '0') {
-
+			$rs = array();
 		} else {
 			$db = $this->db;
 			$rs = $db->query('select * from ' . $db->getTable(T_COMPONENT_USERS) . ' where group_id=' . (int)$group_id . ' order by sort_num desc limit ' . (int)$cfg['show_num']);

@@ -15,6 +15,10 @@ if (!defined('IS_DEBUG')){
 }
 /// 是否在系统初始化的时候执行 session_start();
 define('IS_SESSION_START',		TRUE);
+
+///定义用于wap session存储在url中的session名称
+define('WAP_SESSION_NAME','PHPSESSID');
+
 /// 是否启用日志 未启用时 写日志操作将被忽略
 define('ENABLE_LOG',			TRUE);
 /// 是否使用 CACHE 未启用时，缓存操作将被忽略
@@ -44,15 +48,26 @@ define('P_ROOT',		dirname(__FILE__));
 define('P_FUNCTION',	P_ROOT."/function");
 /// class		扩展文件的存放目录
 define('P_CLASS',		P_ROOT."/class");
+/// pagelets 	文件的存放目录
+define('P_PLS',		P_ROOT."/pagelets");
 /// 系统模块文件的存放目录
-define('P_MODULES',		P_ROOT."/controllers");
+if (defined('ENTRY_SCRIPT_NAME') && ENTRY_SCRIPT_NAME == 'wap') {
+	define('P_MODULES',		P_ROOT."/controllers/wap");
+} else {
+	define('P_MODULES',		P_ROOT."/controllers");
+}
+
 /// 管理后台模块文件存放目录
 define('P_ADMIN_MODULES', P_MODULES . '/mgr');
 /// 系统模块文件的存放目录
 define('P_COMS',		P_ROOT."/modules");
 
 /// 系统皮肤文件的存放目录
-define('P_CSS',			P_ROOT."/../css");
+define('P_CSS',			P_ROOT."/../css/default");
+
+/// 系统皮肤文件的访问URL前缀
+define('P_CSS_PRE',		"css/default");
+
 /// 系统语言文件的存放目录
 define('P_LANG',		P_ROOT."/languages");
 /// 系统适配器文件的存放目录
@@ -75,6 +90,11 @@ define('P_VAR_LOCK',	P_VAR . '/lock');
 /// 用于组合URL 的 VAR 路径
 define('P_URL_UPLOAD',	P_VAR_NAME . "/upload" );
 
+/// 插件通讯文件存放目录
+define('P_PLUGIN',		P_ROOT."/xpluginapis");
+
+/// 自定义皮肤颜色模板文件
+define('P_CUSTOM_COLORS_INI',	P_ROOT ."/../css/default/skin_define/skin_colors.ini");
 /// 
 //----------------------------------------------------------------------
 /// 适配器文件扩展名
@@ -91,6 +111,8 @@ define('EXT_LANG',			".lang.php");
 define('EXT_TPL',			".tpl.php");
 /// 数据组件文件扩展名
 define('EXT_COM',			".com.php");
+/// pagelets 组件文件扩展名
+define('EXT_PLS',			".pls.php");
 //----------------------------------------------------------------------
 /**
 系统路由方式选项，目前可选 0,1,2,3 ;  默认为 0
@@ -127,6 +149,9 @@ define('V_API_REQUEST_ROUTE',	"R:api_sign");
 /// 判断当前请求是否是 JS 请求的变量理由; 通常 AJAX请求同样被认为是API请求
 define('V_JS_REQUEST_ROUTE',	"R:_");
 
+/// JS端配合后端进行 Xpipe　输出控制的对象名称
+define('V_JS_XPIPE_OBJ',	"xwbPipe");
+
 /// 与FLASH同步会话时 FLASH 传递 PHPSESSID 使用的变量路由
 define('V_FLASH_PHPSESSID',		'p:_PHPSESSID');
 
@@ -148,6 +173,3 @@ define('WB_CLIENT_SESSION',	'XWB_CLIENT_SESSION');
 /// 存储管理员会话数据的 SESSION 变量名
 define('WB_ADMIN_SESSION',	'XWB_ADMIN_SESSION');
 //----------------------------------------------------------------------
-
-//----------------------------------------------------------------------
-?>

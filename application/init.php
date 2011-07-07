@@ -18,6 +18,7 @@ require_once 'core.php';
 $GLOBALS[V_GLOBAL_NAME] = array();
 $GLOBALS[V_GLOBAL_NAME]['TPL'] 	= array();
 $GLOBALS[V_GLOBAL_NAME]['LANG'] = array();
+$GLOBALS[V_GLOBAL_NAME]['PAGELETS'] = array();
 $GLOBALS[V_GLOBAL_NAME]['STATIC_STORE'] = array();
 
 /// 初始化可通过 V('-:****'); 访问的部分变量
@@ -31,8 +32,18 @@ if (defined('V_FLASH_PHPSESSID') && V(V_FLASH_PHPSESSID,false) ){
 	session_id(V(V_FLASH_PHPSESSID));
 }
 //----------------------------------------------------------------------
+///session 存储方式
+if (defined('SESSION_ADAPTER') && SESSION_ADAPTER && SESSION_ADAPTER != 'default') {
+	$session_adapter = APP::adapter('session', SESSION_ADAPTER);
+	session_set_save_handler(array($session_adapter, "open"), array($session_adapter, "close"), array($session_adapter, "read"), array($session_adapter, "write"), array($session_adapter, "destroy"), array($session_adapter, "gc"));
+}
+
 if (defined('IS_SESSION_START') && IS_SESSION_START ){
-	session_start();
+	if(ENTRY_SCRIPT_NAME == 'wap' && (!isset($_COOKIE) || empty($_COOKIE))){
+		APP::session_wap_init();
+	}else{
+		session_start();
+	}
 }
 //----------------------------------------------------------------------
 

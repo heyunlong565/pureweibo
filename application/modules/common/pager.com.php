@@ -37,7 +37,7 @@ class pager
 		} elseif (!is_array($index)) {
 			$index = array($index => $value);
 		}
-		
+
 		$this->varExtends = $index;
 	}
 
@@ -232,7 +232,7 @@ class pager
 	}
 
 	/**
-	 * 生成分页 
+	 * 生成分页
 	 *
 	 * @param array $var
 	 * @param string $pname
@@ -275,7 +275,7 @@ class pager
 
 
 	/**
-	 * 生成分页 
+	 * 生成分页
 	 *
 	 * @param array $var
 	 * @param int $recordCount
@@ -286,7 +286,7 @@ class pager
 	 * @param string $preText
 	 * @param string $nextText
 	 *
-	 * @return string	
+	 * @return string
 	 */
 	function pagehtml($var=array(), $recordCount, $limit = WB_API_LIMIT, $preField = 'start_pos', $nextField = 'end_pos', $pname = 'page', $preText='上一页', $nextText='下一页')
 	{
@@ -349,7 +349,7 @@ class pager
 	}
 
 	/**
-	 * 生成分页 
+	 * 生成分页
 	 *
 	 * @param array $list
 	 * @param int $limit
@@ -360,7 +360,7 @@ class pager
 	 * @param string $preText
 	 * @param string $nextText
 	 *
-	 * @return string	
+	 * @return string
 	 */
 	function getPageList($list, $limit = WB_API_LIMITl, $preField = 'start_pos', $nextField = 'end_pos', $pname = 'page', $preText='上一页', $nextText='下一页')
 	{
@@ -394,7 +394,7 @@ class pager
 			case 'index.favorites':
 				//收藏接口固定显示20条记录
 				$limit = 20;
-				break; 
+				break;
 		}
 
 		$vGet = V('g',array());
@@ -433,7 +433,7 @@ class pager
 		$navHtml = '';
 		if ($return_index) {
 			if ($curPage >= 3) {
-					$navHtml = sprintf('<a href="'.URL('index').'" class="general-btn"><span>首页</span></a>');
+					$navHtml = sprintf('<a href="'.URL(APP::getRequestRoute(), $q_str).'1" class="general-btn"><span>首页</span></a>');
 			}
 		}
 		if ($curPage > 1) {
@@ -450,6 +450,57 @@ class pager
 				$navHtml .= sprintf('  <a href="%s" class="general-btn"><span>'.$nextText.'</span></a>', URL(APP::getRequestRoute(), $q_str.($curPage+1)));
 			}
 		}
+		return RST($navHtml);
+	}
+
+	/**
+	 * 生成分页
+	 *
+	 *
+	 */
+	function getPageHtml($list, $pageSize, $recordCount, $pname = 'page', $preText='上一页', $nextText='下一页') {
+		/// 当前页码数
+		$curPage = isset($_GET[$pname]) ? $_GET[$pname]*1 : 1;
+		$curPage = max(1,$curPage);
+
+		/// 当前记录数
+		$curCount = count($list);
+		$pageCount	= max(1, ceil($recordCount / $pageSize));
+
+		$vGet = V('g',array());
+		if (is_array($vGet) && isset($vGet[$pname])){
+			unset($vGet[$pname]);
+		}
+
+		$q_str = '';
+		foreach($vGet as $k=>$v){
+			if ($k == 'm') {
+				continue;
+			}
+			
+			// 处理数组情况
+			if ( is_array($v) )
+			{
+				$vTmp = '';
+				foreach ($v as $keyTmp=>$valueTmp)
+				{
+					$vTmp[] = $k.'['.$keyTmp.']='.$valueTmp;
+				}
+				$v = implode('&', $vTmp);
+			}
+			$q_str .= "&".$k."=".urlencode($v);
+		}
+		$q_str = empty($q_str) ? $pname."=" : ltrim($q_str, "&")."&".$pname."=";
+
+
+		$navHtml = '';
+		if ($curPage > 1) {
+			$navHtml .= sprintf('<a href="%s" class="general-btn"><span>'.$preText.'</span></a>', URL(APP::getRequestRoute(), $q_str.($curPage-1)));
+		}
+		if ($pageCount > $curPage) {
+			$navHtml .= sprintf('  <a href="%s" class="general-btn"><span>'.$nextText.'</span></a>', URL(APP::getRequestRoute(), $q_str.($curPage+1)));
+		}
+
 		return RST($navHtml);
 	}
 }

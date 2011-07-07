@@ -21,7 +21,7 @@ class skin_mod extends action {
 	function addSkinSort() {
 		$rs = DR('mgr/skinCom.getSkinSortById');
 		$count = count($rs['rst']);
-		if($count >= 8) {
+		if($count >= 5) {
 			$this->_error('类别个数已达上限，无法添加!', URL('mgr/skin.getAllSkinSort'));
 		}
 
@@ -120,12 +120,11 @@ class skin_mod extends action {
 		exit('{"rst":true,"errno":0,"err":"操作已成功!"}');
 		//$this->_succ('操作已成功', array('getAllSkinSort'));
 	}
-
-	/************以下为皮肤管理*********************************************/
-	/*
-	 * 获取所有皮肤目录
-	 */
-	function getAllSkin() {
+	
+	/**
+	  *  皮肤tab页 
+	  */
+	function getAllSkin(){
 		$rs = $rss = $rst = $info = $sort = $rows = $skin_sort_rows = $sysconfig = '';
 		//扫描皮肤目录并入库
 		$rs = DR('mgr/skinCom.scanSkinDirectory');
@@ -151,7 +150,7 @@ class skin_mod extends action {
 		//从数据库中获取所有皮肤
 		$rs = DR('mgr/skinCom.getSkinById');
 		foreach($rs['rst'] as $value) {
-			if($sort[$value['style_id']]) {
+			if(isset($value['style_id'])&&$sort[$value['style_id']]) {
 				$value['skin_group'] = $sort[$value['style_id']];
 			}
 			if($value['directory'] == SITE_SKIN_CSS_PRE . SITE_SKIN_TYPE) {		//如果是系统默认模板，就不显示
@@ -167,7 +166,25 @@ class skin_mod extends action {
 		TPL :: assign('skin_sort_list', $skin_sort_rows);	//其他分类皮肤
 		TPL :: assign('sort', $sort);
 		TPL :: assign('sysconfig', $sysconfig['rst']);
-	    TPL :: display('mgr/skin/skinlist', '', 0, false);
+		$customSkin=USER::sys('skin_custom');
+		if(isset($customSkin)){
+			TPL::assign('customSkin',json_decode($customSkin,TRUE));	
+		}
+		
+		TPL::assign('colorConf',DS('getSkinColors','g/0'));
+		TPL :: display('mgr/skin/skin_tab', '', 0, false);
+	}
+	/**
+	  *  后台自定义皮肤 
+	  */
+	function customSkin(){
+		//获取用户自定义属性
+		$customSkin=USER::sys('skin_custom');
+		if(isset($customSkin)){
+			TPL::assign('customSkin',json_decode($customSkin,TRUE));	
+		}
+		//var_dump($customSkin);
+		TPL :: display('mgr/skin/skin_custom', '', 0, false);
 	}
 
 	/*
@@ -265,7 +282,9 @@ class skin_mod extends action {
 		if(!$rs['rst']) {
 			$this->_error('操作失败！', URL('mgr/skin.getAllSkin'));
 		}
-
+		else{
+			DR('common/sysConfig.set', '', 'default_use_custom', 0);
+		}
 		$this->_succ('操作已成功', array('getAllSkin'));
 	}
 

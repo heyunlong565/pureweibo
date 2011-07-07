@@ -5,7 +5,7 @@
 *  文件说明
 *
 *  @Xweibo (C)1996-2099 SINA Inc.
-*  @Author liwen <liwen2@staff.sina.com.cn>
+*  @Author zhenquan <zhenquan@staff.sina.com.cn>
 *
 ***************************************************/
 include('action.abs.php');
@@ -15,7 +15,34 @@ class admin_mod extends action {
 	}
 
 	function index() {
+		TPL::assign('menu', $this->menu);
 		$this->_display('index');
+	}
+
+	function map() {
+		TPL::assign('menu', $this->menu);
+		$this->_display('map');
+	}
+
+	function default_page () {
+		$counts = array(
+			'wb' =>0,
+			'user' =>0,
+			'comment' =>0,
+			't_wb' => 0,
+			't_user' => 0,
+			't_comment' => 0
+		);
+		$counts['wb'] = DS('xweibo/weiboCopy.counts');
+		$counts['comment'] = DS('CommentCopy.counts');
+		$counts['user'] = DS('mgr/userCom.counts');
+
+		$counts['t_wb'] = DS('xweibo/weiboCopy.counts','','today');
+		$counts['t_comment'] = DS('CommentCopy.counts', '', 'today');
+		$counts['t_user'] = DS('mgr/userCom.counts', '', 'today');
+
+		TPL::assign('counts', $counts);
+		$this->_display('default');
 	}
 
 	/**
@@ -50,8 +77,11 @@ class admin_mod extends action {
 				}
 			}
 
+			session_regenerate_id();   //防御Session Fixation
 			USER::set('__CLIENT_ADMIN_ROOT', $rs['is_root']);	//设置管理员权限
-			USER::aid($rs['id']);			
+			USER::aid($rs['id']);	
+			
+			
 			exit('{"state":"200"}');
 		}
 
@@ -66,10 +96,20 @@ class admin_mod extends action {
 		if(!USER::isUserLogin()) {
 			exit('{"state":"401", "msg":"您未登录！"}');
 		}
-
+		
 		$sina_uid = USER::uid();
 		$name = USER::get('screen_name');
 		
+	    $user = DS('mgr/userCom.getByUid','p',$sina_uid);
+		//第一次登录，用户信息入库
+		if (empty($user) || !isset($user['sina_uid'])){
+			$inData = array();
+			$inData['first_login']	= APP_LOCAL_TIMESTAMP;
+			$inData['sina_uid']	= $sina_uid;
+			$inData['nickname']	= $name;
+			$r = DR('mgr/userCom.insertUser', '', $inData);  
+		}
+
 		TPL :: assign('is_admin_report', USER::get('isAdminReport'));	//获取是否上报
 		TPL::assign('sina_uid', $sina_uid);
 		TPL::assign('real_name', $name);
@@ -82,6 +122,7 @@ class admin_mod extends action {
 	function logout() {
 		USER::aid('');
 		USER::set('__CLIENT_ADMIN_ROOT', '');
+		session_regenerate_id();   //防御Session Fixation
 		//USER::resetInfo();
 		APP :: redirect('mgr/admin.login', 2);
 	}
@@ -168,6 +209,25 @@ class admin_mod extends action {
 		}
 		
 		$this->_error('删除失败',  array('userlist'));
+	}
+	
+	function page_link(){
+		$router=V('g:router','home/0/0');
+		$router=explode('/',$router);
+		//var_dump($router);
+		$menu=$this->menu;
+		//var_dump($menu);
+		$link=array();
+		$link[0]=array('title'=>$menu[$router[0]]['title'],
+					   'url'=>$menu[$router[0]]['sub'][0]['sub'][0]['url']
+					   );
+		//$link[1]=$menu[$router[0]]['sub'][$router[1]]['title'];
+		$link[2]=array('title'=>$menu[$router[0]]['sub'][$router[1]]['sub'][$router[2]]['title'],
+					   'url'=>$menu[$router[0]]['sub'][$router[1]]['sub'][$router[2]]['url']);
+		
+		
+		//var_dump($link);
+		TPL::module('page_link',array('link'=>$link));
 	}
 
     /*

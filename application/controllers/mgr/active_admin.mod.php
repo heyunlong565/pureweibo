@@ -8,7 +8,7 @@ class active_admin_mod {
 		if (!USER::isUserLogin()) {
 			$app_secret = urldecode(trim(V('g:app_secret', '')));
 			$app_key = urldecode(trim(V('g:app_key', '')));
-			$toUrl = URL('account.sinaLogin','cb=login&loginCallBack=' . urlencode(URL('mgr/active_admin.active', 'app_key='.$app_key.'&app_secret='.$app_secret, 'admin.php')), 'index.php');
+			$toUrl = URL('account.sinaLogin','cb=login&active=1&loginCallBack=' . urlencode(URL('mgr/active_admin.active', 'app_key='.$app_key.'&app_secret='.$app_secret, 'admin.php')), 'index.php');
 			APP :: redirect($toUrl, 3);
 		}
 
@@ -88,12 +88,16 @@ class active_admin_mod {
 	        $config_file = F('set_define_value', $config_file, $config_arr);
 			IO::write(ROOT_PATH . 'user_config.php', $config_file);
 		}
+		
+		session_regenerate_id();   //防御Session Fixation
         USER::set('isAdminAccount', $sina_uid);
         USER::set('isAdminReport', 1);	//设置为上报
 		exit('{"state":"200"}');
 	}
 	function sae_set_config($data){
-		$config_file = IO::read(CONFIG_DOMAIN);
+		//$config_file = IO::read(CONFIG_DOMAIN);
+		$storage = new SaeStorage();
+		$config_file = $storage->read(CONFIG_DOMAIN, md5(CONFIG_DOMAIN));
 		$site_base_info = array();
 		parse_str($config_file, $site_base_info);
 		
@@ -111,7 +115,8 @@ class active_admin_mod {
 			$temp[] = $key .'='. $value;
 		}
 		$base_info_str = implode('&', $temp);
-		IO::write(CONFIG_DOMAIN,$base_info_str);
+		//IO::write(CONFIG_DOMAIN,$base_info_str);
+		$storage->write(CONFIG_DOMAIN, md5(CONFIG_DOMAIN), $base_info_str);
 	}
 
 	/**
@@ -134,7 +139,7 @@ class active_admin_mod {
 
 		USER::uid(0);
 		USER::resetInfo();
-		$toUrl = URL('account.sinaLogin','cb=login&loginCallBack=' . urlencode(URL('mgr/active_admin.active', 'app_key='.$app_key.'&app_secret='.$app_secret, 'admin.php')), 'index.php');
+		$toUrl = URL('account.sinaLogin','cb=login&active=1&loginCallBack=' . urlencode(URL('mgr/active_admin.active', 'app_key='.$app_key.'&app_secret='.$app_secret, 'admin.php')), 'index.php');
 		APP :: redirect($toUrl, 3);
 	}
 }

@@ -256,6 +256,16 @@ var $_curlInit;
 		}
 		return $this;
 	}
+	
+	function setHeader($k, $v){
+		$h = isset($this->_option[CURLOPT_HTTPHEADER]) ? $this->_option[CURLOPT_HTTPHEADER] : array();
+		if (is_array($h)){
+			$h[] = $k.": ".$v;
+		}else{
+			$h = array($k.": ".$v);
+		}
+		$this->_option[CURLOPT_HTTPHEADER] = $h;
+	}
 
 
 	/**

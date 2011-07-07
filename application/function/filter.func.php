@@ -26,12 +26,15 @@ function filter($str, $type) {
 		$type = 'user_verify';
 	}
 	$cache = get_filter_cache($type);
+	if (empty($cache)) {
+		return true;
+	}
 	switch ($type) {
 		case 'nick':
 		case 'content':
 				
 				do {
-					if (strpos($str, key($cache)) > -1) {
+					if (strpos($str, (string)key($cache)) > -1) {
 						return key($cache);
 					}
 				} while(next($cache));

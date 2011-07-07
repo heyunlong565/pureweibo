@@ -7,7 +7,7 @@
 	<p>&nbsp;&nbsp;&nbsp;&nbsp;1.	您可以在完全遵守本授权协议的基础上，将本软件应用于非商业用途，而不必支付软件版权授权费用。</p>
 	<p>&nbsp;&nbsp;&nbsp;&nbsp;2.	您可以在本授权协议规定的约束和限制范围内修改 Xweibo 源代码(如果被提供的话)或界面风格以适应您的网站要求。</p>
 	<p><b>II.	协议规定的约束和限制</b></p>
-	<p>&nbsp;&nbsp;&nbsp;&nbsp;1.	未获商业授权之前，您不得将Xweibo产品软件用于商业用途（包括但不限于企业网站、经营性网站、以营利为目或实现盈利的网站）。如欲获取商业授权请访问http://x.weibo.com了解详情。</p>
+	<p>&nbsp;&nbsp;&nbsp;&nbsp;1.	未获商业授权之前，您不得将Xweibo产品软件用于商业用途（包括但不限于企业网站、经营性网站、以营利为目的或实现盈利的网站）。如欲获取商业授权请访问http://x.weibo.com了解详情。</p>
 	<p>&nbsp;&nbsp;&nbsp;&nbsp;2.	您不得对Xweibo产品软件或与之关联的商业授权进行出租、出售、抵押或发放子许可证。</p>
 	<p>&nbsp;&nbsp;&nbsp;&nbsp;3.	禁止在 Xweibo产品的整体或任何部分基础上发展任何派生版本、修改版本或第三方版本用于重新分发。</p>
 	<p>&nbsp;&nbsp;&nbsp;&nbsp;4.	不允许删除Xweibo产品版权标识（Powered by Xweibo）。</p>

@@ -110,6 +110,15 @@ class sae_http
 		return $this->$key;
 	}
 
+	function setHeader($k, $v){
+		$h = isset($this->_option[CURLOPT_HTTPHEADER]) ? $this->_option[CURLOPT_HTTPHEADER] : array();
+		if (is_array($h)){
+			$h[] = $k.": ".$v;
+		}else{
+			$h = array($k.": ".$v);
+		}
+		$this->_option[CURLOPT_HTTPHEADER] = $h;
+	}
 	/**
 	 * 使用rawurlencode编码的参数
 	 *

@@ -20,7 +20,7 @@ class file_cache {
 	}
 
 	function adp_init($config=array()) {
-		extract($config);
+		extract($config, EXTR_SKIP);
 		if (isset($baseDir)){
 			$this->baseDir		= $baseDir;
 		}
