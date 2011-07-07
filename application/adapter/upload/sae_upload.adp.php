@@ -40,10 +40,10 @@ class sae_upload
 	 * @param unknown_type $field
 	 * @return
 	 */
-function upload($field,	$fileName ,$filePath=false, $fType='jpg,jpeg,gif',	$maxSize=MAX_UPLOAD_FILE_SIZE){
+function upload($field,	$fileName ,$filePath=false, $fType='jpg,jpeg,gif,png',	$maxSize=MAX_UPLOAD_FILE_SIZE){
 		
 		$this->fileInfo['savename'] = $fileName;
-		$this->allowTypes = $fType;
+		$this->allowTypes = $fType ? $fType : $this->allowTypes;
 		$this->maxSize = $maxSize;
 		
 		if ($field) {
@@ -83,11 +83,11 @@ function upload($field,	$fileName ,$filePath=false, $fType='jpg,jpeg,gif',	$maxS
 	 * @param unknown_type $type
 	 * @return
 	 */
- 	function _checkType($type)
+ 	function _checkType($filename)
     {
         if(!empty($this->allowTypes)) {
-        	$type = explode('/',strtolower($type));
-            return in_array($type[1],explode(',',$this->allowTypes));
+        	$ext = $this->_getExt($filename);
+            return in_array(strtolower($ext), explode(',',$this->allowTypes));
         }
         return true;
     }
@@ -152,12 +152,12 @@ function upload($field,	$fileName ,$filePath=false, $fType='jpg,jpeg,gif',	$maxS
             $this->fileInfo['errcode'] = 40012;
             return false;
         }
-        //检查文件Mime类型.flash 根据流形式上传的不检测
-//        if(!$this->_checkType($file['type'])) {
-//            $this->fileInfo['errmsg'] = '上传文件MIME类型不允许！';
-//            $this->fileInfo['errcode'] = 40013;
-//            return false;
-//        }
+	   	//检查文件Mime类型.flash 根据流形式上传的不检测
+        if(!$this->_checkType($file['name'])) {
+            $this->fileInfo['errmsg'] = '上传文件MIME类型不允许！';
+            $this->fileInfo['errcode'] = 40013;
+            return false;
+        }
         //检查是否合法上传
         if(!$this->_checkUpload($file['tmp_name'])) {
             $this->fileInfo['errmsg'] = '非法上传文件！';
