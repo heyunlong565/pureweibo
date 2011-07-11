@@ -75,7 +75,7 @@ if(!defined('IN_APPLICATION')){
 
     <div class="inner-header">
 		<h1 class="logo">
-			<a href="<?php echo URL('pub');?>">
+			<a href="<?php echo URL('index');?>">
 				<img src="<?php echo F('get_logo_src','web');?>" id="logo" alt="" />
 			</a>
 		</h1>
