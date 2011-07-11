@@ -35,9 +35,11 @@ if(!is_array($list) || empty($list)){
 			$rel = 'w:'.$wb['id'];
 		}
 
-		echo '<li rel="'.$rel.'">';
-			TPL::module('feed', $wb);
-		echo '</li>';
+		if (array_key_exists('id',$wb)) {
+			echo '<li rel="'.$rel.'">';
+				TPL::module('feed', $wb);
+			echo '</li>';
+		}
 	}
 }
 ?>
