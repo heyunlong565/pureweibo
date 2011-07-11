@@ -7,6 +7,19 @@
 </head>
 
 <body class="main-body">
+	<?php
+	// 如果没有设置代理帐号	
+	if (!DS('accountProxy.issetProxy')) {
+		// 设置代理帐号的URL
+		$url = URL('mgr/proxy_account.accountList');
+		// 如果不是站长
+		if (USER::uid() == SYSTEM_SINA_UID) {
+
+		} else{
+
+		}
+	}
+	?>
 	
 	<?php
 	$contentList=array(array('title'=>'微博秀','preview'=>'wb_show.png','link'=>URL('mgr/content_unit.add','type=1')),
@@ -18,7 +31,7 @@
 	
 	<div class="path"><p>当前位置：扩展工具<span>&gt;</span>站外调用</p></div>
 	<div class="main-cont clear">
-		<div class="con-s2">
+		<div class="invoke">
 			<ul class="pic-item pic-item-s1 clear">
 				<?php
 				foreach($contentList as $content):

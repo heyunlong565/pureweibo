@@ -4,8 +4,15 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title><?php echo F('web_page_title', F('escape', $liveInfo['title']));?></title>
 <link href="<?php echo W_BASE_URL ?>css/default/base.css" rel="stylesheet" type="text/css" />
+<?php if (WB_LANG_TYPE_CSS):?>
+<link href="<?php echo W_BASE_URL ?>css/default/skin_default/skin_<?php echo WB_LANG_TYPE_CSS;?>.css" rel="stylesheet" type="text/css" />
+<?php else:?>
 <link href="<?php echo W_BASE_URL ?>css/default/skin_default/skin.css" rel="stylesheet" type="text/css" />
+<?php endif;?>
 <link href="<?php echo W_BASE_URL ?>css/default/app.css" rel="stylesheet" type="text/css" />
+<?php if (WB_LANG_TYPE_CSS):?>
+<link href="<?php echo W_BASE_URL ?>css/default/language/<?php echo WB_LANG_TYPE_CSS;?>.css" rel="stylesheet" type="text/css" />
+<?php endif;?>
 <?php TPL::plugin('include/js_link');?>
 <script src="<?php echo W_BASE_URL;?>js/mod/bufferedweibolist.js"></script>
 <script src="<?php echo W_BASE_URL;?>js/mod/interview.js"></script>
@@ -15,7 +22,7 @@
 	<?php $customs = explode(',', $liveInfo['custom_color']);?>
 	html { background-color:<?php echo $customs[0];?>;}
 	a,
-	a:hover
+	a:hover,
 	.feed-list .feed-info span a,
 	.feed-list .feed-info p a,
 	.gotop .txt,
@@ -39,6 +46,13 @@
                 <!-- banner 结束-->
 				<div class="content">
 					<div class="main">
+						<?php if ( !USER::isUserLogin() && ($liveInfo['end_time']>APP_LOCAL_TIMESTAMP) ) {?>
+						<div class="not-login-tips">
+							<p><?php LO('modules_microlive_live_detail_login_tip');?></p>
+							<a href="#" class="btn-login" rel="e:lg"><?php LO('modules_microlive_live_detail_login_tag');?></a>
+						</div>
+						<?php }?>
+						
 						<?php if ($liveInfo['end_time'] > APP_LOCAL_TIMESTAMP):?>
 						<!-- 微博发布框 开始-->
 						<?php Xpipe::pagelet('weibo.input', $input_params); ?>
@@ -63,8 +77,6 @@
                     <!-- 直播列表 开始-->
                     <?php Xpipe::pagelet('live.sideNewsLive', array('liveInfo' => $liveInfo));?>
                     <!-- 直播列表 结束-->
-					
-                    
 				</div>
 			</div>
 			<!-- 底部 开始-->

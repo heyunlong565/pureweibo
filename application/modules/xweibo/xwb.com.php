@@ -59,7 +59,7 @@ class xwb extends xwbParentClass
 				$v_array = explode(':', $v);
 				switch ($v_array[0]) {
 					case 'required':
-						if (empty($var)) {
+						if ($var == '') {
 							return RST('', '1010000', 'Parameter can not be empty');
 						}
 						break;
@@ -116,16 +116,21 @@ class xwb extends xwbParentClass
 		if (isset($ret['new_status']) && $ret['new_status'] > 0) {
 			//删除'我的首页'缓存
 			DD('xweibo/xwb.getFriendsTimeline'); 
-		} elseif (isset($ret['comments']) && $ret['comments'] > 0) {
+		} 
+		if (isset($ret['comments']) && $ret['comments'] > 0) {
 			//删除'我收到的评论'缓存
 			DD('xweibo/xwb.getCommentsToMe'); 
-		} elseif (isset($ret['dm']) && $ret['dm'] > 0) {
+		} 
+		if (isset($ret['dm']) && $ret['dm'] > 0) {
 			//删除'我的私信'缓存
+			if ( !HAS_DIRECT_MESSAGES ){ $result['rst']['dm']=0; }
 			DD('xweibo/xwb.getDirectMessages'); 
-		} elseif (isset($ret['mentions']) && $ret['mentions'] > 0) {
+		} 
+		if (isset($ret['mentions']) && $ret['mentions'] > 0) {
 			//删除'提到我的'缓存
-			DD('xweibo/xwb.getDirectMessages'); 
-		} elseif (isset($ret['followers']) && $ret['followers'] > 0) {
+			DD('xweibo/xwb.getMentions'); 
+		} 
+		if (isset($ret['followers']) && $ret['followers'] > 0) {
 			//删除'我的粉丝'缓存
 			DD('xweibo/xwb.getFollowers'); 
 		} 
@@ -1188,8 +1193,22 @@ class xwb extends xwbParentClass
 	 *
 	 * @return	
 	 */
-	function getTokenAuthorizeURL($callbackUrl)
+	function getTokenAuthorizeURL($callbackUrl, $lang = false)
 	{
+		if (!$lang) {
+			switch(APP::getLang()) {
+				case 'zh_cn':
+					$lang = 'zh-Hans';
+					break;
+				case 'zh_tw':
+					$lang = 'zh-Hant';
+					break;
+				case 'en':
+					$lang = 'en';
+					break;
+			}
+		}
+
 		$token = $this->getRequestToken();
 		if (!is_array($token) || !empty($token['errno'])){
 			return 	$token;
@@ -1197,7 +1216,7 @@ class xwb extends xwbParentClass
 		$token = $token['rst'];
 		USER::setOAuthKey($token, false);
 
-		return RST($this->getAuthorizeURL($token, true, $callbackUrl));
+		return RST($this->getAuthorizeURL($token, true, $callbackUrl, $lang));
 	}
 
 	/**
@@ -1247,8 +1266,8 @@ class xwb extends xwbParentClass
 	 *
 	 *
 	 */
-	function getRepFaces() {
-		$rs = DR('xweibo/xwb.emotions');
+	function getRepFaces($lang = false) {
+		$rs = DR('xweibo/xwb.emotions', '', $lang);
 
 		$result = array(
 			'search' => array(),

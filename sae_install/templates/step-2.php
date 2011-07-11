@@ -27,7 +27,7 @@
 					<div class="form-row">
 						<label for=""><span>*</span><?php echo $_LANG['db_name'];?>：</label>
 						<input type="text"  value="<?php echo $db_name;?>" disabled="disabled"/>
-						<div class="tips-correct"><span class="icon-correct icon-bg"></span></div>
+						<div class="tips-correct"></div>
 					</div>
 					<div class="form-row">
 						<label for=""><span>*</span><?php echo $_LANG['db_user'];?>：</label>
@@ -41,11 +41,19 @@
 						<label for=""><span>*</span><?php echo $_LANG['db_prefix'];?>：</label>
 						<input type="text" value="<?php echo $db_prefix;?>" disabled="disabled"/>
 					</div>
+					<div class="form-row">
+						<label for=""><span>*</span><?php echo $_LANG['wb_lang_type'];?>：</label>
+						<select name="wb_lang_type" id="wb_lang_type">
+							<option value="zh_cn" selected>简体中文</option>
+							<option value="zh_tw">繁體中文</option>
+						</select>
+						<p><?php echo $_LANG['wb_lang_type_comment'];?></p>
+					</div>
 					<div class="attach">
 						<label for=""><input type="checkbox" name="cover" checked="checked" value="2" /><?php echo $_LANG['is_cover_database_tip'];?></label>
 					</div>
 					<div class="btn-area">
-						<a href="index.php?step=1" class="btn-common all-bg mr50"><span>上一步</span></a>
+						<a href="index.php" class="btn-common all-bg mr50"><span>上一步</span></a>
 						<a href="javascript:f_submit();" class="btn-common all-bg"><span>下一步</span></a>
 					</div>
 				</div>

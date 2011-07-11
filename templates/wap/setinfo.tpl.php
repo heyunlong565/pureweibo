@@ -11,11 +11,11 @@
 	TPL::plugin('wap/include/nav', array('is_top' => true), false);
 	TPL::plugin('wap/include/my_preview', $uInfo, false);
 	?>
-    <div class="row"><span>修改资料</span>&nbsp;<a href="<?php echo WAP_URL('index.setinfo', 'type=2'); ?>">显示</a></div>
+	<div class="row"><?php if (HAS_DIRECT_UPDATE_PROFILE):?><span><?php LO('index__setinfo__label_modifyInfo');?></span>&nbsp;<?php endif;?><a href="<?php echo WAP_URL('index.setinfo', 'type=2'); ?>"><?php LO('index__setinfo__label_display');?></a></div>
     <form method="post" action="<?php echo WAP_URL('wbcom.saveInfo'); ?>">
-	    <div class="c"><span class="r">*</span>昵称:<input type="text" name="nick" value="<?php echo F('escape', $uInfo['screen_name'], ENT_QUOTES); ?>" /></div>
-	    <div class="c"><span class="r">*</span>性别:<input type="radio" name="gender" value="m" <?php echo (!isset($uInfo['gender']) || $uInfo['gender'] != 'f') ? 'checked="checked"' : ''; ?> />男&nbsp;<input type="radio" name="gender" value="f" <?php echo (isset($uInfo['gender']) && $uInfo['gender'] == 'f') ? 'checked="checked"' : ''; ?> />女</div>
-	    <div class="c">一句话介绍(不能超过70个字):<br /><textarea rows="2" name="description"><?php echo F('escape', $uInfo['description'], ENT_QUOTES); ?></textarea><br /><input type="submit" value="保存" /></div>
+	    <div class="c"><span class="r">*</span><?php LO('index__setinfo__label_nickname');?><input type="text" name="nick" value="<?php echo F('escape', $uInfo['screen_name'], ENT_QUOTES); ?>" /></div>
+	    <div class="c"><span class="r">*</span><?php LO('index__setinfo__label_gender');?><input type="radio" name="gender" value="m" <?php echo (!isset($uInfo['gender']) || $uInfo['gender'] != 'f') ? 'checked="checked"' : ''; ?> /><?php LO('index__setinfo__label_genderMale');?>&nbsp;<input type="radio" name="gender" value="f" <?php echo (isset($uInfo['gender']) && $uInfo['gender'] == 'f') ? 'checked="checked"' : ''; ?> /><?php LO('index__setinfo__label_genderFemale');?></div>
+	    <div class="c"><?php LO('index__setinfo__label_Description');?><br /><textarea rows="2" name="description"><?php echo F('escape', $uInfo['description'], ENT_QUOTES); ?></textarea><br /><input type="submit" value="<?php LO('index__setinfo__btnSave');?>" /></div>
     </form>
 	<?php
 	TPL::plugin('wap/include/search', '', false);

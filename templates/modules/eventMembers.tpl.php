@@ -1,5 +1,5 @@
 								<div class="user-list user-list-mode">
-									<p class="result">这个活动参与者<span>(共<?php echo $event_info['join_num']*1;?>人)</span></p>
+									<p class="result"><?php LO('modules__eventMembers__eventJoinMemberNum', $event_info['join_num']*1);?></p>
                                     <ul>
 									<?php if (is_array($members)) {foreach($members as $row) {?>
 										<?php
@@ -13,17 +13,18 @@
                                                 <div class="content-r">
 												<?php if ($mid != USER::uid()) {?>
 												<?php if (!empty($listFans) && in_array($mid, $listFans)) {?>
-												<span class="followed-btn">已关注</span>
+												<span class="followed-btn"><?php LO('modules__eventMembers__eventMemberFollowed');?></span>
 												<?php } else {?>
-                                                    <a href="#" class="addfollow-btn" rel="e:fl,t:1">加关注</a>
+												<a href="#" class="addfollow-btn" rel="e:fl,t:1"><?php LO('modules__eventMembers__eventMemberToFollow');?></a>
 												<?php }}?>
                                                 </div>
                                                 <div class="content-m">
                                                     <a href="<?php echo URL('ta', 'id=' .$mid)?>" class="u-name"><?php echo htmlspecialchars($users_info[$mid]['screen_name']);?></a><span class="loc"><?php echo $users_info[$mid]['location'];?></span>
-													<?php if (USER::uid() == $event_info['sina_uid'] || USER::aid()) {?>
-														<span class="phone">联系方式：<?php echo htmlspecialchars($row['contact']);?></span>
-													<?php }?>
-                                                    <div class="u-info"><a href="#" class="black"><?php echo htmlspecialchars($users_info[$mid]['description']);?></a></div>
+													<?php if($users_info[$mid]['description']) {?><div class="u-info"><a href="#" class="black"><?php echo htmlspecialchars($users_info[$mid]['description']);?></a></div><?php } ?>
+													<?php if (USER::uid()==$event_info['sina_uid']||USER::get('isAdminAccount') ) {?>
+														<?php if ($row['contact']):?><p class="phone"><span><?php LO('modules__eventMembers__eventPhone');?></span><?php echo htmlspecialchars($row['contact']);?></p><?php endif; ?>
+														<?php if ($row['notes']):?><p><span><?php LO('modules__eventMembers__eventNotes');?></span><?php echo htmlspecialchars($row['notes']);?></p><?php endif; ?>
+                                                    <?php } ?>
                                                 </div>
                                             </div>
                                         </li>

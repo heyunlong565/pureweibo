@@ -4,7 +4,7 @@
   文档作用：默认样式，定义微博标准版主题相关样式，包括背景、文本颜色、链接颜色、边框等
 */
 /*主背景色*/
-html { background-color:#8dd7f5;}
+html { background-color:#96ddf7;}
 
 /*主文字色*/
 body,
@@ -28,10 +28,10 @@ body,
 #favs .favs-current,
 #systemnotice .systemnotice-current,
 #messages .messages-current,
-.nav-block .cur,
-.nav-block .cur:hover,
 .nav .defined-link a:hover,
 .nav .user-link a:hover,
+.nav-block .cur,
+.nav-block .cur:hover,
 .tab-s4 a:hover,
 .tab-s4 .current,
 .tab-s4 .current:visited { background:#44b1da; }
@@ -90,7 +90,7 @@ a,
 #container { background:url(bgimg/bg_content.png) repeat-y right; }
 
 #footer .ft-bg,
-.gotop .gotop-bg { background:#fff;opacity:.4; filter:alpha(opacity=40); }
+.gotop .gotop-bg { background:#fff;opacity:.7; filter:alpha(opacity=70); }
 
 /*微博发布框*/
 .post-box .post-title { background-position:0 0; }
@@ -124,13 +124,9 @@ a,
 .menu .sub-arrow{ background:url(bgimg/menu_bg.png) left -176px; *background-position:left -171px; }
 
 /*三栏站点导航*/
-.nav-block h3,
-.nav-block a:link,
-.nav-block a:visited { color:#444; }
-.nav-block h3 a:hover,
-.nav-block ul li a:hover { background-color:#c8e9f9; }
-.nav-block .cur { color:#fff !important;font-weight:700; }
-.nav-block .cur:hover { text-decoration:none; }
+/*.nav-block .cur,
+.nav-block .cur:hover { background-color:#8dd7f5; }*/
+
 /*微博广场*/
 	/*导入图片*/
 	.hot-topic{ background:#fff url(bgimg/hot_topic_bg.jpg) center top no-repeat; }

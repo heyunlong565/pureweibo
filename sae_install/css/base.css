@@ -10,7 +10,7 @@ h1,h2,h3,h4,h5,h6 { font-size:100%}
 a { text-decoration:none;}
 a:link, a:visited {color:#0082cb;}
 .clear { display:block; overflow:hidden; _zoom:1;}
-
+.hidden { display:none!important;}
 .mt20 {margin-top:20px;}
 .mr50 {margin-right:50px;}
 .lh44 {line-height:44px;}
@@ -21,12 +21,12 @@ a:link, a:visited {color:#0082cb;}
 
 
 /*layout*/
-#wrap, #header, #main, #footer {margin-left:auto;margin-right:auto;}
+#wrap, #header, #main, #footer { margin:0 auto;}
 #wrap { width:800px;overflow:hidden; }
-#header {height:65px;line-height:65px;padding:0 15px;}
+#header {height:65px;line-height:65px;padding:18px 15px 0;}
 #header span {color:#c9e4fb;float:right;_margin-top:30px;}
 #header span a:link, #header span a:visited {color:#0082cb;}
-#header .logo {background:url(bgimg/xweibo_logo.png) no-repeat;height:39px;margin-top:28px;text-indent:-9999px;width:189px;outline:none;}
+#header .logo {background:url(bgimg/xweibo_logo.png) no-repeat;height:39px;text-indent:-9999px;width:189px;outline:none;}
 #main {overflow:hidden;}
 
 /*内容框*/
@@ -120,14 +120,20 @@ a:link, a:visited {color:#0082cb;}
 .form-row-disable label span {color:#aca899;margin-right:5px;}
 
 /*个人资料校验输入*/
-.check-tips-box {height:23px;float:left;display:none;margin-left:5px;width:108px;}/*display默认是inline-block*/
+.check-tips-box {height:23px;float:left;margin-left:5px;width:108px;}/*display默认是inline-block*/
 .check-tips-box p {font-size:12px;padding:3px 0 0 0;line-height:18px;}
 .tips-wrong {background-color:#ffdbdb;border:1px solid #f00;}
 .tips-warn {background-color:#fffad2;border:1px solid #e8b732;right:50px;top:130px;}
-.tips-correct {display:none;padding-left:5px;}
+.tips-correct {padding-left:5px;}
 
 .hidden {display:none !important;}
 
 /*滚动y盒子*/
 .box-scroll-y {background:#fbfbf9;border:1px solid #eeede5;height:240px;max-height:240px;overflow-x:hidden;margin:20px 10px;overflow-y:auto;padding:10px;}
 .box-scroll-y p {color:#707070;line-height:1.6;}
+
+
+#db-remove .form-row { margin:20px 0;}
+#db-remove .form-row label { margin-right:12px; font-size:12px; color:#333;}
+#db-remove .form-row input, 
+#db-remove .form-row-disable input {border:1px solid #c4c7bd;font-family:arial,"宋体";float:left;height:18px;line-height:18px;padding:3px;width:217px; background:#fcfcfc; border:1px solid; border-color:#adadad #dbdbdb #e0e0e0  #ccc;}

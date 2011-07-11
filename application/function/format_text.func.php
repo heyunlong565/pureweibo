@@ -35,8 +35,8 @@ function format_text($text, $type = 'feed', $uid = 0, $show_em = true){
 					}
 					$newText.=' <a title="'.$v.'" href="'.$v.'" target="_blank">'.$v.'</a> ';
 				}elseif(preg_match("#<a\s+href=[\"']([^\"']+)[\"'][^>]*>(.+?)</a>#sim",$v,$ma)){
-					if (preg_match("#http://t.sina.com.cn/k/([^/]+)\$#sim",$ma[1],$mlink)){
-						$newText.=' <a href="'.URL('search', array('k' => $mlink[1])).'">'.htmlspecialchars($ma[2]).'</a> ';
+					if (preg_match("#http://(t.sina.com.cn|weibo.com)/k/([^/]+)\$#sim",$ma[1],$mlink)){
+						$newText.=' <a href="'.URL('search', array('k' => $mlink[2])).'">'.htmlspecialchars($ma[2]).'</a> ';
 					}elseif(preg_match("#/pub/tags/([^/]+)\$#sim",$ma[1],$tag)){
 						/// 标签链接处理
 						$newText.=' <a href="'.URL('search.user',array('k'=>urldecode($tag[1]),'ut'=>'tags')).'">'.htmlspecialchars($ma[2]).'</a> ';
@@ -60,12 +60,16 @@ function format_text($text, $type = 'feed', $uid = 0, $show_em = true){
 		static $search_em = null;
 		static $replace_em = null;
 		if(null === $search_em){
+			$emoticons_cn = DS('xweibo/xwb.getRepFaces', 'g0/86400');
+			$emoticons_tw = DS('xweibo/xwb.getRepFaces', 'g0/86400', 'zh_tw');
+			$emoticons['search'] = array_merge($emoticons_cn['search'], $emoticons_tw['search']);
+			$emoticons['replace'] = array_merge($emoticons_cn['replace'], $emoticons_tw['replace']);
+
+			$search_em = isset($emoticons['search']) & is_array($emoticons['search']) ? $emoticons['search'] : array() ;
+			$replace_em = isset($emoticons['replace']) & is_array($emoticons['replace']) ? $emoticons['replace'] : array() ;
 			if (empty($search_em) || empty($replace_em)){
 				DD('xweibo/xwb.getRepFaces');
 			}
-			$emoticons = DS('xweibo/xwb.getRepFaces', 86400);
-			$search_em = isset($emoticons['search']) & is_array($emoticons['search']) ? $emoticons['search'] : array() ;
-			$replace_em = isset($emoticons['replace']) & is_array($emoticons['replace']) ? $emoticons['replace'] : array() ;
 		}
 		
 		if (!empty($search_em)) {

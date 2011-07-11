@@ -21,19 +21,17 @@
 		<?php
 		else:
 		?>
-		感谢您的举报，我们会尽快处理
+		<?php LO('show__reportSpamResult__label_commonTips');?>
 		<?php
 		endif;
 		?>
-		，页面返回中...
+		<?php LO('show__reportSpamResult__label_backTips');?>
 		
 		
 	</div>
 	<br/>
 		<div class='c'>
-			
-			如果您在微博中发现有色情、暴力或者其它违规的内容,请提交上述信息,我们将尽快处理.您的隐私会得到严格的保护.每周还将有机会获得我们送出的精美礼品.<br />
-			举报电话:4006900000 听到提示音后按2键(按当地市话标准计费)
+			<?php LO('show__reportSpamResult__label_tips');?>
 		</div>
 	</div>
 	<?php

@@ -34,14 +34,14 @@
 <body class="main-body">
 	<div class="path"><p>当前位置：用户管理<span>&gt;</span>用户组管理</p></div>
     <div class="main-cont">
-        <h3 class="title"><a class="general-btn" href="javascript:add('list');"><span>添加用户组</span></a>用户组列表</h3>
+        <h3 class="title"><a class="btn-general" href="javascript:add('list');"><span>添加用户组</span></a>用户组列表</h3>
 		<div class="set-area">
             <table class="table" cellpadding="0" cellspacing="0" width="100%" border="0">
                 <colgroup>
-                    <col class="h-w70" />
+                    <col class="w70" />
                     <col />
-                    <col class="h-w100" />
-                    <col class="h-w150" />
+                    <col class="w100" />
+                    <col class="w150" />
                 </colgroup>
                 <thead class="tb-tit-bg">
                 <tr>
@@ -75,16 +75,16 @@
     </div>
 <script type="text/javascript">
 var HtmlMode=['<form action="<?php echo URL('mgr/user_recommend.addReSort');?>" method="post"  name="changes-newlink" id="form1">',
-				'	<div class="pop-form">',
+				'	<div class="form-box">',
 				'		<div class="form-row">',
-            	'			<label for="name">用户组名称</label>',
+            	'			<label for="name" class="form-field">用户组名称</label>',
             	'			<div class="form-cont">',
-            	'				<input id="name" name="name" class="input-txt" type="text" warntip="#nameTip" vrel="_f|ne|sz=max:16,m:多于8个汉字,ww" value=""/><span class="tips-error hidden" id="nameTip"></span>',
+            	'				<input id="name" name="name" class="ipt-txt" type="text" warntip="#nameTip" vrel="_f|ne|sz=max:16,m:多于8个汉字,ww" value=""/><span class="tips-error hidden" id="nameTip"></span>',
             	'			</div>',
             	'		</div>',
                 '    	<div class="btn-area">',
-                '    		<a class="general-btn  btn-s2" id="pop_submit" href="#"><span>确定</span></a>',
-                '    		<a class="general-btn" id="pop_cancel" href="#"><span>取消</span></a>',
+                '    		<a class="btn-general  highlight" id="pop_submit" href="#"><span>确定</span></a>',
+                '    		<a class="btn-general" id="pop_cancel" href="#"><span>取消</span></a>',
                 '    	</div>',
             	'	</div>',
                 '</form>'].join('');

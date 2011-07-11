@@ -22,14 +22,22 @@ function show_ad($flag, $css_class='') {
 							V('c:ad_' . $rs[$i]['page'] . '_' . $rs[$i]['flag']. '_hide', false)) {
 						$display = false;
 					}
-					$close_btn = '<span class="close-xad"><a href="#" id="xwb_ad_cls">关闭</a></span>';
-					//$close_btn = '<a href="#" class="icon-close-btn icon-bg" id="xwb_ad_cls">关闭窗口</a>';
+					$close_btn = '<span class="close-xad"><a href="#" id="xwb_ad_cls">'.LO('function__showAd__close').'</a></span>';
+					//$close_btn = '<a href="#" class="ico-close-btn" id="xwb_ad_cls">关闭窗口</a>';
 				}
+
+				if ($rs[$i]['flag'] == 'sidebar' && !empty($data)) {
+					$data = '<div class="mod-aside aside-xad">' .$data. '</div>';
+				}
+
 				break;
 			}
 		}
 	}
-	return !empty($data) && $display ? '<div id="ad_' . $flag . '" class="' . $css_class . '">' . $close_btn  .  $data . '</div>' : '';
+	if (!empty($css_class)) {
+		$css_class = ' class="' . $css_class. '"';
+	}
+	return !empty($data) && $display ? '<div id="ad_' . $flag . '" ' . $css_class . '>' . $close_btn  .  $data . '</div>' : '';
 }
 
 ?>

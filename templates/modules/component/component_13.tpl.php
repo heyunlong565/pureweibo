@@ -2,7 +2,7 @@
 	/**
 	 * 专题banner模块
 	 * 需要参数参见component_13_pls
-	 * @version $Id: component_13.tpl.php 10890 2011-02-28 11:06:34Z yaoying $
+	 * @version $Id: component_13.tpl.php 16922 2011-06-08 09:03:14Z jianzhou $
 	 */
 if(!defined('IN_APPLICATION')){
 	exit('ACCESS DENIED!');

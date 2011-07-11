@@ -39,15 +39,32 @@ class weibo_pls {
 		/// 调用获取当前用户所关注用户的最新微博信息api
 		$list = DR('xweibo/xwb.getUserTimeline', '', $userinfo['id'], null, $userinfo['screen_name'], null, null, $count, $page, $filter_type, $oauth);
 		$list = $list['rst'];
+
+		/// 如果是先审核后发，获取待审核微博
+		if ($userinfo['id'] == USER::uid()) {
+			//$config = json_decode( V('-:sysConfig/xwb_strategy'), TRUE);
+			//if (isset($config['strategy']) && $config['strategy']) {
+				$v_list = DR('weiboVerify.getWeiboVerifyFeed', false, $userinfo['id']);
+				if (!empty($v_list['rst'])) {
+					$v_list = $v_list['rst'];
+					$list = array_merge($list, $v_list);
+					$compare = create_function('$a, $b', 'return strcasecmp(strtotime($b["created_at"]), strtotime($a["created_at"]));');
+					/// 根据时间排序
+					usort($list, $compare);
+				}
+			//}
+		}
+
+
 		$param = array('list' => $list,
 					'limit'=>$limit, 
 					'uid' => $userinfo['id'], 
 					'header'=>0,
 					'author'=>0,
 					'show_unread_tip' => false,
-					'empty_msg'=> F('escape', $userinfo['screen_name']) . '还没有开始发微博，请等待。',
-					'not_found_msg' => '找不到符合条件的微博，返回查看<a href="' . URL('index') . '">全部微博</a>',
-					'list_title'=>$userinfo['id'] == USER::uid()?'我的微博':F('escape', $userinfo['screen_name']) . '的微博',
+					'empty_msg'=> L('pls__userTimeline__profile__emptyWeiboTip', F('escape', $userinfo['screen_name'])),
+					'not_found_msg' => L('pls__userTimeline__profile__notFoundTip', URL('index')),
+					'list_title'=>$userinfo['id'] == USER::uid()? L('pls__myUserTimeline__profile__listTitle') : L('pls__userTimeline__profile__listTitle', F('escape', $userinfo['screen_name'])),
 					'filter_type'=>$filter_type);
 		TPL::module('weibolist', $param);
 		return array('cls'=>'wblist', 'list' =>F('format_weibo',$list));
@@ -58,7 +75,7 @@ class weibo_pls {
 		$page = max(V('g:page'), 1);
 
 		/// 设置每页显示微博数
-		$limit = WB_API_LIMIT;
+		$limit = V('-:userConfig/user_page_wb', WB_API_LIMIT);;
 		$count = $limit;
 		$filter_type = V('g:filter_type');
 

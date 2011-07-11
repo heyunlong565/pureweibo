@@ -17,7 +17,7 @@
     	<tbody>
         	<tr>
             	<td>
-            	管理员：<?php echo F('escape', $notice['title'], ENT_QUOTES); ?><br /><?php echo F('escape', $notice['content'], ENT_QUOTES); ?>&nbsp;<span class="g"><?php echo date('Y-m-d H:i:s', $notice['add_time']); ?></span>
+            	<?php LO('index__notice__label_admin');?><?php echo F('escape', $notice['title'], ENT_QUOTES); ?><br /><?php echo F('escape', $notice['content'], ENT_QUOTES); ?>&nbsp;<span class="g"><?php echo date('Y-m-d H:i:s', $notice['add_time']); ?></span>
             	</td>
             </tr>
         </tbody>
@@ -26,9 +26,9 @@
 	<?php endforeach; ?>
 <?php else: ?>
 	<?php if (V('g:page', 1) > 1):?>
-	<p>已到最后一页</p>
+	<p><?php LO('index__notice__lastPage');?></p>
 	<?php else: ?>
-	<p>您还没有收到任何通知</p>
+	<p><?php LO('index__notice__notAnyNotice');?></p>
 	<?php endif; ?>
 	<div class="s"></div>
 <?php endif; ?>

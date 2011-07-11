@@ -5,6 +5,24 @@
 <title>在线直播列表 - 组件扩展</title>
 <link href="<?php echo W_BASE_URL;?>css/admin/admin.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="<?php echo W_BASE_URL;?>js/jquery.min.js"></script>
+<script type="text/javascript">
+$(function(){
+	$('#dataList').click(function(e){
+
+		var $target = $(e.target);
+		if ($target.hasClass('icon-approve'))
+		{
+			if ($target.data('lock'))
+			{
+				e.preventDefault();
+				return false;
+			}
+
+			$target.data('lock', 1);
+		}
+	});
+});
+</script>
 </head>
 <body class="main-body">
 	<div class="path"><p>当前位置：扩展工具<span>&gt;</span><a href="<?php echo URL('mgr/wb_live');?>">在线直播列表</a><span>&gt;</span>在线直播审批</p></div>
@@ -14,12 +32,12 @@
         	<p class="approve-tips">
         		<span class="check"><input id="wbState" onchange="setWbState();" type="checkbox" <?php if ('P'==$live['wb_state']){echo 'checked="checked"'; } ?>  />审批后才能发布</span>
         		还有<span class="num"><?php echo $totalCnt;?></span>条微博没有审批
-        		<a href="javascript:void(0);" onclick="location.reload();" class="general-btn"><span>刷新</span></a></p>
-        	<table width="100%" border="0" cellpadding="0" cellspacing="0" class="table">
+        		<a href="javascript:void(0);" onclick="location.reload();" class="btn-general"><span>刷新</span></a></p>
+        	<table width="100%" border="0" cellpadding="0" cellspacing="0" class="table" id="dataList">
             	<colgroup>
-					<col class="h-w70"/>
+					<col class="w70"/>
                     <col/>
-    				<col class="h-w170" />
+    				<col class="w170" />
     			</colgroup>
                 <thead class="tb-tit-bg">
   					<tr>
@@ -34,8 +52,8 @@
                     <tr>
     					<td><?php echo ++$cnt; ?></td>
     					<td><?php echo $aRecord['text'].$aRecord['pic']; ?></td>
-							<td><a href="<?php echo URL('mgr/wb_live.approveWb', array('id'=>$id, 'wb_id'=>$key) )?>" class="icon-approve">审批</a>
-    						<a href="<?php echo URL('mgr/wb_live.delWb', array('id'=>$id, 'wb_id'=>$key) )?>" class="icon-del">删除</a>
+							<td><a href="<?php echo URL('mgr/wb_live.approveWb', array('id'=> $id, 'wb_id'=>$key, 'v' => isset($aRecord['v']) ? $aRecord['v'] : '', 'vid' => isset($aRecord['v']) ? $aRecord['id'] : '') )?>" class="icon-approve">审批</a>
+    						<a href="<?php echo URL('mgr/wb_live.delWb', array('id'=> $id, 'wb_id'=>$key, 'v' => isset($aRecord['v']) ? $aRecord['v'] : '', 'vid' => isset($aRecord['v']) ? $aRecord['id'] : '') )?>" class="icon-del">删除</a>
     					</td>
   					</tr>
   					<?php } ?>

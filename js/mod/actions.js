@@ -15,7 +15,9 @@ var FALSE = false,
     R = X.request,
     Box = X.ui.MsgBox,
 	getCfg = X.getCfg,
-	getWb = X.getWb;
+	getWb = X.getWb,
+	doc = document,
+    getText = X.lang.getText;
 
 X.use('action')
 /**
@@ -101,6 +103,10 @@ X.use('action')
 .reg('sd', function( e ){
     var box = X.use('postBox');
     var text = e.get('m');
+	var postTitle = e.get('t');
+	if(postTitle&& postTitle == 'share'){
+		box.setPostTitle(getText('分享给大家'));
+	}
     box.display(TRUE)
        .reset()
        .selectionHolder.setText(text||'');
@@ -115,13 +121,23 @@ X.use('action')
  * @param {String} w 微博ID
  */
 .reg('fw', function( e ){
-    var wbId = e.get('w');
-    // 打开转发框
-    var fb = Xwb.use('forwardBox');
-    fb.display(true)
-      .setContent(wbId, getWb(wbId), X.getUid())
-      .selectionHolder
-      .focusStart();
+    var wbId = e.get('w')
+    
+        //是否正在審核
+        v = e.get('v');
+    
+    if (v) {
+		Xwb.use('verifyBox',{
+			appendTo : doc.body
+		}).setAnchor(e.src).display(true);
+    } else {
+        // 打开转发框
+        var fb = Xwb.use('forwardBox');
+        fb.display(true)
+          .setContent(wbId, getWb(wbId), X.getUid())
+          .selectionHolder
+          .focusStart();
+    }
 })
 
 /**
@@ -149,15 +165,15 @@ X.use('action')
 			var $src = $(e.src);
 			switch (parseInt(type)) {
     			case 1: //今日话题、他的微博
-    				$src.replaceWith('<span class="followed-btn">已关注</span>');
+    				$src.replaceWith('<span class="followed-btn">' + getText('已关注') + '</span>');
     			break;
     
     			case 2: //挂件栏
-    				$src.replaceWith('<em>已关注</em>');
+    				$src.replaceWith('<em>' + getText('已关注') + '</em>');
     			break;
                 // ta
                 case 3:
-                    $src.replaceWith('<div class="operated-box"><span class="followed-btn">已关注</span><em>|</em><a href="#" rel="e:ufl,t:3" class="cancel">取消</a></div>');
+                    $src.replaceWith('<div class="operated-box"><span class="followed-btn">' + getText('已关注') + '</span><em>|</em><a href="#" rel="e:ufl,t:3" class="cancel">'+ getText('取消') + '</a></div>');
                 break;
     			default:
     				location.reload();
@@ -165,7 +181,7 @@ X.use('action')
         }else {
             if(ed.getCode() == '1020806'){
                 //如果该用户一天超过500次关注行为，弹窗提示
-                Box.confirm('', '你今天已经关注了足够多的人，先去看看他们在说些什么吧？', function(btn){
+                Box.confirm('', getText('你今天已经关注了足够多的人，先去看看他们在说些什么吧？'), function(btn){
                     if(btn == 'ok')
                         location.href = Req.mkUrl('ta', '', 'id='+uid);
                 });
@@ -187,7 +203,7 @@ X.use('action')
  * </ul>
  */
 .reg('ufl', function(e) {
-	Box.anchorConfirm(e.src,'确定要取消关注？', function(btnId){
+	Box.anchorConfirm(e.src, getText('确定要取消关注')+'？', function(btnId){
         if(btnId == 'ok'){
             e.lock(1);
 			var uid = e.get('u');
@@ -197,7 +213,7 @@ X.use('action')
 				if (re.isOk()){
 				    switch(act){
 				        case 1:
-				            $(e.src).replaceWith('<a rel="e:fl,t:2" href="#">关注他</a>');
+				            $(e.src).replaceWith('<a rel="e:fl,t:2" href="#">' + getText('关注他') + '</a>');
 				        break;
 				        case 3:
 				            $(e.src).parent().replaceWith('<a class="skin-bg addfollow-btn" rel="e:fl,t:3" href="#">加关注</a>');
@@ -297,17 +313,26 @@ X.use('action')
  * @param {String} w 微博ID
  */
 .reg('fr', function( e ){
-    var wbId = e.get('w');
-    e.lock(1);
-    R.fav(wbId, function( r ){
-        if( r.isOk() ){
-            Box.anchorTipOk(e.src, '收藏成功！');
-            $(e.src).replaceWith('<span>已收藏</span>');
-        }else {
-            Box.tipWarn(r.getMsg());
-        }
-        e.lock(0);
-    });
+    var wbId = e.get('w'),
+    
+        v = e.get('v');
+    
+    if (v) {
+		Xwb.use('verifyBox',{
+			appendTo : doc.body
+		}).setAnchor(e.src).display(true);
+    } else {
+        e.lock(1);
+        R.fav(wbId, function( r ){
+            if( r.isOk() ){
+                Box.anchorTipOk(e.src, '收藏成功！');
+                $(e.src).replaceWith('<span>已收藏</span>');
+            }else {
+                Box.tipWarn(r.getMsg());
+            }
+            e.lock(0);
+        });
+    }
 })
 
 /**
@@ -348,26 +373,33 @@ X.use('action')
 .reg('cm', function( e ){
      var wbId = e.get('w'),
          itemEl = $( e.getEl('w') ),
-         cmt = itemEl.data('xwb_cmt');
+         cmt = itemEl.data('xwb_cmt'),
+         v = e.get('v');
      
-     if( !cmt ){
-	   var wb = getWb(wbId);
+     if (v) {
+		Xwb.use('verifyBox',{
+			appendTo : doc.body
+		}).setAnchor(e.src).display(true);
+     } else {
+         if( !cmt ){
+	       var wb = getWb(wbId);
 
-       cmt =  X.use('CmtArea', {
-                wbId:wbId, 
-                wbUid    : wb && wb.u.id,
-                appendTo : itemEl.find('.feed-content'), 
-                trigEl : e.src
-              });
-       itemEl.data('xwb_cmt', cmt);
+           cmt =  X.use('CmtArea', {
+                    wbId:wbId, 
+                    wbUid    : wb && wb.u.id,
+                    appendTo : itemEl.find('.feed-content'), 
+                    trigEl : e.src
+                  });
+           itemEl.data('xwb_cmt', cmt);
+         }
+         
+         if(! cmt.display() ){
+            cmt.display(TRUE);
+            cmt.load(function(){
+                cmt.cmtBox.jqInputor.focus();
+            });
+         }else cmt.display(FALSE);
      }
-     
-     if(! cmt.display() ){
-        cmt.display(TRUE);
-        cmt.load(function(){
-            cmt.cmtBox.jqInputor.focus();
-        });
-     }else cmt.display(FALSE);
 })
 
 // trun left 向左转
@@ -376,8 +408,9 @@ X.use('action')
 	var wbEle = $wb.data('wbEle');
 
 	if (!wbEle) {
-		var wid = e.get('w');
-		wbEle = X.use('WbElement', {$wb: $wb, wbData: getWb(wid)});
+		var wid = e.get('w'),
+			st = e.get('v');
+		wbEle = X.use('WbElement', {$wb: $wb,psrc: e.get('p'), psrc: e.get('p'), wid: wid, state: st, wbData: getWb(wid)});
 		
 		$wb.data('wbEle', wbEle);
 	}
@@ -391,8 +424,9 @@ X.use('action')
 	var wbEle = $wb.data('wbEle');
 
 	if (!wbEle) {
-		var wid = e.get('w');
-		wbEle = X.use('WbElement', {$wb: $wb, wbData: getWb(wid)});
+		var wid = e.get('w'),
+			st = e.get('v');;
+		wbEle = X.use('WbElement', {$wb: $wb,psrc: e.get('p'), wid: wid, state: st, wbData: getWb(wid)});
 		
 		$wb.data('wbEle', wbEle);
 	}
@@ -406,12 +440,15 @@ X.use('action')
 	var wbEle = $wb.data('wbEle');
 
 	if (!wbEle) {
-		var wid = e.get('w');
-		wbEle = X.use('WbElement', {$wb: $wb, wbData: getWb(wid)});
+		var wid = e.get('w'),
+			st = e.get('v');;
+		wbEle = X.use('WbElement', {$wb: $wb,psrc: e.get('p'), wid: wid, state: st, wbData: getWb(wid)});
 		
 		$wb.data('wbEle', wbEle);
 	}
-
+	if($(document).scrollTop() > $wb.find('div[name="img"]').offset().top ){
+		$(document).scrollTop($wb.offset().top-21);
+	}
 	wbEle.zoomOut();
 }, {na:TRUE})
 
@@ -422,8 +459,9 @@ X.use('action')
 
 	if (!wbEle)
 	{
-		var wid = e.get('w');
-		wbEle = X.use('WbElement', {$wb: $wb, wbData: getWb(wid)});
+		var wid = e.get('w'),
+			st = e.get('v');;
+		wbEle = X.use('WbElement', {$wb: $wb,psrc: e.get('p'), wid: wid, state: st, wbData: getWb(wid)});
 		
 		$wb.data('wbEle', wbEle);
 	}
@@ -439,8 +477,9 @@ X.use('action')
 
 	if (!wbEle)
 	{
-		var wid = e.get('w');
-		wbEle = X.use('WbElement', {$wb: $wb, wbData: getWb(wid)});
+		var wid = e.get('w'),
+			st = e.get('v');;
+		wbEle = X.use('WbElement', {$wb: $wb,psrc: e.get('p'), wid: wid, state: st, wbData: getWb(wid)});
 		
 		$wb.data('wbEle', wbEle);
 	}
@@ -456,8 +495,9 @@ X.use('action')
 
 	if (!wbEle)
 	{
-		var wid = e.get('w');
-		wbEle = X.use('WbElement', {$wb: $wb, wbData: getWb(wid)});
+		var wid = e.get('w'),
+			st = e.get('v');;
+		wbEle = X.use('WbElement', {$wb: $wb,psrc: e.get('p'), wid: wid, state: st, wbData: getWb(wid)});
 		
 		$wb.data('wbEle', wbEle);
 	}
@@ -471,11 +511,13 @@ X.use('action')
  * @param {String} w 微博ID
  */
 .reg('dl', function( e ){
-    var wbId = e.get('w');
-    Box.anchorConfirm(e.src,'确定删除该微博吗？', function(btnId){
+    var wbId = e.get('w'),
+        v = e.get('v');
+        
+    Box.anchorConfirm(e.src, getText('确定删除该微博吗？'), function(btnId){
         if(btnId === 'ok'){
             e.lock(1);
-            R.del(wbId, function(re){
+            R.del(wbId, v, function(re){
                 var el = $(e.getEl('w'));
                 if( re.isOk() ){
     				el.slideUp('normal', function(){
@@ -492,7 +534,7 @@ X.use('action')
 .reg('clsevt', function(e){
     var id = e.get('id');
     if (id) {
-        Box.anchorConfirm(e.src, '确定要关闭此活动？' , function(bt) {
+        Box.anchorConfirm(e.src, getText('确定要关闭此活动？') , function(bt) {
             if (bt !== 'ok') return;
             
             e.lock(1);
@@ -510,7 +552,7 @@ X.use('action')
 .reg('delevt', function(e){
     var id = e.get('id');
     if (id) {
-        Box.anchorConfirm(e.src, '确定要删除此活动？' , function(bt) {
+        Box.anchorConfirm(e.src, getText('确定要删除此活动？' ), function(bt) {
             if (bt !== 'ok') return;
             
             e.lock(1);
@@ -583,7 +625,7 @@ X.use('action')
  * @param {String} m 私信ID
  */
 .reg('dm', function(e){
-	 Box.anchorConfirm(e.src,'确定要删除该私信？', function(btnId){
+	 Box.anchorConfirm(e.src, getText('确定要删除该私信？'), function(btnId){
         if(btnId == 'ok'){
             e.lock(1);
             var mid    = e.get('m');
@@ -623,7 +665,7 @@ X.use('action')
 
 	if (m)
 	{
-		Box.confirm('提示', m, function(bt) {
+		Box.confirm( getText('提示') , m, function(bt) {
 			bt === 'ok' && removeBl();
 		});
 	} else {
@@ -638,7 +680,7 @@ X.use('action')
  */
 .reg('dfan', function(e){
     // 有必要时可改为anchorBox提示
-    Box.confirm('提示','移除之后将取消'+name+'对你的关注?', function(bid){
+    Box.confirm( getText('提示'), getText('移除之后将取消{0}对你的关注?', name) , function(bid){
         if(bid=='ok'){
             var uid = e.get('u');
             var itemElem = e.getEl('u');
@@ -663,10 +705,10 @@ X.use('action')
 	e.lock(1);
 	R.postReq(R.apiUrl('action','addSubject'),{text:e.get('subject')},function(r){
 		if(r.isOk()){
-			self.parent().replaceWith('<span>已关注(<a href="javascript:;" rel="e:delSubject">取消关注</a>)</span>');
+			self.parent().replaceWith('<span>' + getText('已关注') + '(<a href="javascript:;" rel="e:delSubject">' + getText('取消关注') + '</a>)</span>');
 			X.fire('subrefresh',{'subject':e.get('subject'),type:'add'});
 		} else {
-			Box.alert('提示',r.getError());
+			Box.alert( getText('提示') , r.getError());
 		}
 		e.lock(0);
 	});
@@ -677,10 +719,10 @@ X.use('action')
 	e.lock(1);
 	R.postReq(R.apiUrl('action','deleteSubject'),{text:e.get('subject')},function(r){
 		if(r.isOk()){
-			self.parent().replaceWith('<span class="topic-follow"><a href="javascript:;" rel="e:addSubject">关注该话题</a></span>');
+			self.parent().replaceWith('<span class="topic-follow"><a href="javascript:;" rel="e:addSubject">' + getText('关注该话题') + '</a></span>');
 			X.fire('subrefresh',{'subject':e.get('subject'),type:'del'});
 		} else {
-			Box.alert('提示',r.getError());
+			Box.alert( getText('提示') ,r.getError());
 		}
 		e.lock(0);
 	});

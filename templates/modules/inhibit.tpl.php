@@ -17,8 +17,8 @@
                     <div class="inhibit">
                             <div class="inhibit-icon"></div>
                             <div class="inhibit-txt">
-                                <p><strong>登录失败!</strong></p>
-                                <p>原因：您已经被禁止访问此网站</p>
+							<p><strong><?php LO('modules__inhibit__loginError');?></strong></p>
+								<p><?php LO('modules__inhibit__reason');?></p>
                             </div>
                     </div>
                     

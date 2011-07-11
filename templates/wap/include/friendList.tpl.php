@@ -18,9 +18,9 @@ foreach($list as $fr){
         $fr['gender']=$userinfo['rst']['gender'];
     }
     else{
-        $fr['followers_count']='无法获取';
-        $fr['following']='无法获取';
-        $fr['gender']='无法获取';
+        $fr['followers_count']=L('include__friendlist__error');
+        $fr['following']=L('include__friendlist__error');
+        $fr['gender']=L('include__friendlist__error');
         
     }
     if(USER::isUserLogin()) {

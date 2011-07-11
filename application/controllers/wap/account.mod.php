@@ -73,6 +73,7 @@ class account_mod extends action
     	}
     	
     	// 1 使用新浪帐号登录，2 使用附属站帐号登录 3 可同时使用两种帐号登录
+    	//暂时屏蔽附属站帐号登录功能
 		$login_way = V('-:sysConfig/login_way', 1)*1;
 		$siteInfo = $this->accAdapter->getInfo();
 		TPL :: assign('site_name', $siteInfo['site_name']);
@@ -105,7 +106,7 @@ class account_mod extends action
 			TPL :: assign('site_name', V('-:sysConfig/site_name'));
 			$this->_display('account_bind');
     	} else {
-			$this->_showErr('您尚未开通' . htmlspecialchars(V('-:sysConfig/site_name'), ENT_QUOTES) . '，绑定新浪微博账号可立即开通。现在马上跳转至新浪微博绑定页面。', URL('account.showLogin', 'lt=2'));
+			$this->_showErr(L('controller__account__bind__showErr'), URL('account.showLogin', 'lt=2'));
     	}
     }
     
@@ -151,7 +152,7 @@ class account_mod extends action
     		$loginCallBack = !empty($back) ? '&loginCallBack=' . urlencode($back) : '';
     		$oauthCbUrl = W_BASE_HTTP . URL('account.oauthCallback', $callbackOpt) . $loginCallBack;
 			$oauthUrl = DS('xweibo/xwb.getTokenAuthorizeURL', '', $oauthCbUrl);
-			$oauthUrl .= '&xwb_&display=wap2.0';
+			$oauthUrl .= '&xwb_&display=wap2.0&forcelogin=true';
 			APP::redirect($oauthUrl, 3);
     	}
     }
@@ -172,7 +173,7 @@ class account_mod extends action
 	  */
 	function allowedLogin(){
 		if(F('user_action_check',array(2,3))){
-			$this->_showErr('对不起，您已经被禁止登录了',URL('account.logout'));
+			$this->_showErr(L('controller__account__allowedLogin__showErr'),URL('account.logout'));
 			exit();
 		}		
 	}
@@ -190,7 +191,7 @@ class account_mod extends action
 
         $errBackURL = URL('account.showLogin', array('backURL' => $backURL, 'lt' => $loginType));
         if (empty($account) || empty($password)) {
-			$this->_showErr('请输入账号和密码', $errBackURL);
+			$this->_showErr(L('controller__account__doLogin__inputAccountPasswd'), $errBackURL);
         }
         
         if ($loginType === 1) {
@@ -202,7 +203,7 @@ class account_mod extends action
 			}
 			
 			if (empty($site_uid) || !is_numeric($site_uid)) {
-				$this->_showErr('账号或密码错误，请重新输入', $errBackURL);
+				$this->_showErr(L('controller__account__doLogin__accountOrpasswdIsWrong'), $errBackURL);
 			} else {
 				USER::set('site_uid', $site_uid);
 				$user = $this->_getBindInfo($site_uid, 'uid');
@@ -223,11 +224,11 @@ class account_mod extends action
         } else {
 			$authRst = DR('xweibo/xwb.getXauthAccessToken', '', $account, $password);
 			if (!empty($authRst['errno'])) {
-				$this->_showErr('账号或密码错误，请重新输入', $errBackURL);
+				$this->_showErr(L('controller__account__doLogin__accountOrpasswdIsWrong'), $errBackURL);
 			}
 			
 			$authRst = $authRst['rst'];
-            $need_bind = (int)USER::get('site_uid') > 0 ? true : false;
+            $need_bind = USER::get('site_uid') > 0 ? true : false;
             $uInfo = $this->_setSinaLoginSession($authRst, null, $need_bind);
         }
         
@@ -261,7 +262,7 @@ class account_mod extends action
     	if (!empty($user) && is_array($user)  ) {
     		if (!empty($user['access_token']) && !empty($user['token_secret']) && !empty($user['uid']) ) {
     			$this->_resetClientSess();
-    			$this->_showErr('您的<em>' . F('escape', $uInfo['screen_name']) . '</em>新浪微博帐号已绑定过了，换个帐号试试吧', URL('account.showLogin'));  //重复绑定
+    			$this->_showErr(L('controller__account__bindAccount__bindedTip', F('escape', $uInfo['screen_name'])), URL('account.showLogin'));  //重复绑定
 			}
 			USER::set('site_uid', $user['uid']);
 		} else {
@@ -275,7 +276,7 @@ class account_mod extends action
 		
 		$inData['sina_uid']		= $uInfo['id'];
 		$inData['nickname']		= $uInfo['screen_name'];
-		$inData['uid']			= (int)USER::get('site_uid');
+		$inData['uid']			= USER::get('site_uid');
 		$inData['access_token']	= $token['oauth_token'];
 		$inData['token_secret']	= $token['oauth_token_secret'];
 		
@@ -340,7 +341,7 @@ class account_mod extends action
         
         if ($isLoginForbidden){
             $this->_resetClientSess();
-            $this->_showErr('很抱歉，您不能登录此站点', URL('pub'));
+            $this->_showErr(L('controller__account__chkIsForbidden__youNotAllowToLogin'), URL('pub'));
         }
     }
     

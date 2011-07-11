@@ -106,7 +106,7 @@ class upgrade {
 				KEY `index_using` (`using`,`page`,`flag`)
 				) ENGINE=MYISAM DEFAULT CHARSET=utf8 COMMENT='广告'";
 		$ret = mysql_query($sql, $this->link);
-		$sql = "INSERT INTO `$adTable` VALUES ('1','<a href=\"http://x.weibo.com\" target=\"_blank\"><img src=\"var/upload/footer_ad.png\"></a>','1','1293697787','底部通栏广告','全站','global','global_bottom',NULL,'0','0'),('2','','',NULL,'对联广告(左)','全站','global','global_left',null,'0','0'),('3','','',NULL,'对联广告(右)','全站','global','global_right',null,'0','0'),('4','','',NULL,'侧栏广告','微博广场','pub','sidebar',NULL,'0','0'),('5','','',NULL,'今日话题广告','微博广场','pub','today_topic',NULL,'0','0'),('6','','',NULL,'发布框下广告','我的首页','index','publish',NULL,'0','0'),('7','','',NULL,'侧栏广告','我的首页','index','sidebar',NULL,'0','0'),('8','','',NULL,'侧栏广告','他的首页','ta','sidebar',NULL,'0','0');";
+		$sql = "INSERT INTO `$adTable` VALUES ('1','<a href=\"http://x.weibo.com\" target=\"_blank\"><img src=\"img/ad/footer_ad.png\"></a>','1','1293697787','底部通栏广告','全站','global','global_bottom',NULL,'0','0'),('2','','',NULL,'对联广告(左)','全站','global','global_left',null,'0','0'),('3','','',NULL,'对联广告(右)','全站','global','global_right',null,'0','0'),('4','','',NULL,'侧栏广告','微博广场','pub','sidebar',NULL,'0','0'),('5','','',NULL,'今日话题广告','微博广场','pub','today_topic',NULL,'0','0'),('6','','',NULL,'发布框下广告','我的首页','index','publish',NULL,'0','0'),('7','','',NULL,'侧栏广告','我的首页','index','sidebar',NULL,'0','0'),('8','','',NULL,'侧栏广告','他的首页','ta','sidebar',NULL,'0','0');";
 		$ret = mysql_query($sql, $this->link);
 
 		///添加content_unit表
@@ -166,5 +166,42 @@ class upgrade {
 		return true;
 	}
 
+	/**
+	 *
+	 * 升级到2.1
+	 *
+	 */
+	function action_db21($db_prefix)
+	{
+		// 清空广告表
+		$table_ad = $db_prefix . 'ad';
+		$sql = 'TRUNCATE ' . $table_ad;
+		$rs = mysql_query($sql, $this->link);
+
+		///更新表结构
+		upgrade_tables($db_prefix, $this->link);
+
+		$sql = 'UPDATE ' . $db_prefix . 'admin SET group_id=2';
+		mysql_query($sql, $this->link);
+
+		$sysConfigTable = $db_prefix.'sys_config';
+		// 如果是2.0默认的认证图标，则替换
+		$sql = 'UPDATE '. $sysConfigTable . ' SET `value`="img/logo/big_auth_icon.png" WHERE `key`="authen_big_icon" AND `value`="var/data/logo/big_auth_icon.png"' ;
+		mysql_query($sql, $this->link);
+		$sql = 'UPDATE '. $sysConfigTable . ' SET `value`="img/logo/small_auth_icon.png" WHERE `key`="authen_small_icon" AND `value`="var/data/logo/small_auth_icon.png"' ;
+		mysql_query($sql, $this->link);
+		///sys_config 添加wb_lang_type,xwb_strategy字段值
+		$lang_type = getLangType();
+		$sql = "INSERT INTO `$sysConfigTable` VALUES ('wb_lang_type','".$lang_type."',1),('xwb_strategy','',1),('sysLoginModel','0',1)";
+		$ret = mysql_query($sql, $this->link);
+
+		///更新sys_config wb_version版本号的值
+		$sql = "UPDATE `$sysConfigTable` set `value` = '2.1' where `key` = 'wb_version'";
+		$ret = mysql_query($sql, $this->link);
+
+		mysql_close($this->link);
+
+		return true;
+	}
 }
 ?>

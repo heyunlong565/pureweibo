@@ -14,9 +14,9 @@
 <div class="user-list-search">
 	<div class="tab-box">
 		<div class="tab-s2">
-			<a href="<?php echo URL('search.user', array('k' => V('r:k', ''), 'base_app' => V('r:us_base_app', '0'))); ?>" class="show-all">查看全部</a>
-			<span <?php echo V('r:us_base_app', '0') == 0 ? 'class="current"' : ''; ?>><span><a href="<?php echo URL('search', array('k' => V('r:k', ''), 'us_base_app' => 0, 'wb_base_app' => V('r:wb_base_app', '0'))); ?>">来自新浪</a></span></span>
-			<span <?php echo V('r:us_base_app', '0') == 1 ? 'class="current"' : ''; ?>><span><a href="<?php echo URL('search', array('k' => V('r:k', ''), 'us_base_app' => 1, 'wb_base_app' => V('r:wb_base_app', '0'))); ?>">本站</a></span></span>
+		<a href="<?php echo URL('search.user', array('k' => V('r:k', ''), 'base_app' => V('r:us_base_app', '0'))); ?>" class="show-all"><?php LO('modules__modSearchUserPre__seeAll');?></a>
+			<span <?php echo V('r:us_base_app', '0') == 0 ? 'class="current"' : ''; ?>><span><a href="<?php echo URL('search', array('k' => V('r:k', ''), 'us_base_app' => 0, 'wb_base_app' => V('r:wb_base_app', '0'))); ?>"><?php LO('modules__modSearchUserPre__sourceSina');?></a></span></span>
+			<span <?php echo V('r:us_base_app', '0') == 1 ? 'class="current"' : ''; ?>><span><a href="<?php echo URL('search', array('k' => V('r:k', ''), 'us_base_app' => 1, 'wb_base_app' => V('r:wb_base_app', '0'))); ?>"><?php LO('modules__modSearchUserPre__local');?></a></span></span>
 		</div>
 	</div>
     
@@ -40,18 +40,18 @@
 	
 		<div class="user-item" rel="u:<?php echo $row['id'];?>">
 			<div class="user-pic">
-				<a href="<?php echo URL('ta', 'id=' . $row['id'] . '&name='. urlencode($row['screen_name']));?>"><img src="<?php echo $row['profile_image_url']?>" alt="<?php echo htmlspecialchars($row['screen_name']);?>的头像" /></a>
+				<a href="<?php echo URL('ta', 'id=' . $row['id'] . '&name='. urlencode($row['screen_name']));?>"><img src="<?php echo $row['profile_image_url']?>" alt="<?php LO('modules__modSearchUserPre__profileImageUrl', F('escape', $row['screen_name']));?>" /></a>
 			</div>
             <?php if ($row['id'] != $uid) {?>
 			<?php if ($row['following']) {?>
-			<span class="followed-btn">已关注</span>
+			<span class="followed-btn"><?php LO('common__template__toFollow');?></span>
 			<?php } else {?>
-			<a class="addfollow-btn"  rel="e:fl,t:1" href="#">加关注</a></li>
+			<a class="addfollow-btn"  rel="e:fl,t:1" href="#"><?php LO('common__template__followed');?></a>
 			<?php }?>
 			<?php }?>
 			<div class="user-info">
 				<a class="u-name" href="<?php echo URL('ta', 'id=' . $row['id'] . '&name=' . urlencode($row['screen_name']));?>"><?php echo htmlspecialchars($row['screen_name']); echo F('verified', $row); ?></a>
-				<span class="icon-bg <?php echo $row['gender'] == 'm' ? 'icon-male' : 'icon-female'; ?>"><?php echo htmlspecialchars($row['location']);?></span>
+				<span class="<?php echo $row['gender'] == 'm' ? 'ico-male' : 'ico-female'; ?>"><?php echo htmlspecialchars($row['location']);?></span>
 				<p><?php echo htmlspecialchars(mb_strwidth($row['description'], 'UTF-8') > 30 ? mb_substr($row['description'], 0, 13, 'UTF-8') . '...' : $row['description']); ?></p>
 			</div>
 			
@@ -67,8 +67,8 @@
 	} else {
 	?>
 	<div class="search-result">
-        <div class="icon-alert all-bg"></div>
-        <p><strong>找不到符合条件的用户，请输入其他关键字再试</strong></p>
+        <div class="icon-alert"></div>
+		<p><strong><?php LO('modules__modSearchUserPre__emptyTip');?></strong></p>
     </div>
 	<?php
 	}

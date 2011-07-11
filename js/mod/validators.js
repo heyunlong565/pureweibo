@@ -4,6 +4,7 @@
  * 常用表单验证器集合
  */
 
+var getText = X.lang.getText;
 
 Xwb.ax.ValidationMgr.prototype
 
@@ -60,7 +61,7 @@ Xwb.ax.ValidationMgr.prototype
     }
 
     if(em && !data.m)
-        data.m = '该项不能为空';
+        data.m = getText('该项不能为空');
 
     if (elem.tagName === 'INPUT' && ( elem.type === 'radio' || elem.type === 'checkbox' )) 
         em = !elem.checked;
@@ -145,7 +146,7 @@ Xwb.ax.ValidationMgr.prototype
 .reg('dt', function(elem, v, data, next){
     if(v){
         if(!data.m)
-            data.m = '不是有效的日期格式';
+            data.m = getText('不是有效的日期格式');
         var d = Date.parse(v);
         // 可以在这扩展max,min等
         this.report(!isNaN(d), data);
@@ -164,7 +165,7 @@ Xwb.ax.ValidationMgr.prototype
     if(v){
     	var result = /\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/.test(v);
         if(!data.m && data.m !== 0)
-            data.m = '请输入正确的邮箱格式';
+            data.m = getText('请输入正确的邮箱格式');
     	this.report(result, data);
     }else this.report(true, data);
 	next();
@@ -181,7 +182,7 @@ Xwb.ax.ValidationMgr.prototype
     if(v !== ''){
     	var result = v && /^\d+$/.test(v);
         if(!data.m && data.m !== 0)
-            data.m = '该项为数字格式';
+            data.m = getText('该项为数字格式');
     	this.report(result, data);
     }else this.report(true, data);
 	next();
@@ -225,7 +226,7 @@ Xwb.ax.ValidationMgr.prototype
 .reg('sinan', function(elem, v, data, next){
     if(v){
         if(!data.m)
-            data.m = '支持中英文、数字、"_"或减号';
+            data.m = getText('支持中英文、数字、"_"或减号');
         this.report(/^[a-zA-Z0-9\u4e00-\u9fa5_-]+$/.test(v), data);
     }else this.report(true, data);
     next();

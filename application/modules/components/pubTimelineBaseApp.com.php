@@ -2,7 +2,7 @@
 /**
 * 当前站点最新发布的微博列表
 *
-* @version $Id: pubTimelineBaseApp.com.php 14807 2011-04-28 05:37:46Z guanghui1 $
+* @version $Id: pubTimelineBaseApp.com.php 17362 2011-06-20 00:59:48Z heli $
 * @package xweibo
 * @copyright (C) 2009 - 2010 sina.com.cn
 * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL
@@ -31,11 +31,18 @@ class pubTimelineBaseApp extends PageModule{
 			$wb_ids[] = $wb['id'];
 		}
 		//$list = DR('xweibo/xwb.getPublicTimeline', '', 1);
-		if (USER::isUserLogin()) {
-			$list = DR('xweibo/xwb.getStatusesBatchShow', '', implode(',', $wb_ids));
+		if ($wb_ids) {
+			if (USER::isUserLogin()) {
+				$list = DR('xweibo/xwb.getStatusesBatchShow', '', implode(',', $wb_ids));
+			} else {
+				$list = DR('xweibo/xwb.getStatusesBatchShow', '', implode(',', $wb_ids), true, false);
+			}
 		} else {
-			$list = DR('xweibo/xwb.getStatusesBatchShow', '', implode(',', $wb_ids), true, false);
+			$list['rst'] = array();
+			$list['errno'] = '';
+			$list['err'] = '';
 		}
+
 		
 		return RST($list['rst'], $list['errno'], $list['err']);
 	}

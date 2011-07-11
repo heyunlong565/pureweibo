@@ -69,26 +69,34 @@ function report($type = 'idx', $way = 'src', $tauid = null)
 			break;
 
 		case 'site_login':
-			$params['log_type'] = 2;
+			//$params['log_type'] = 2;
 			$params['xt'] = 'login';
 			$params['akey'] = WB_AKEY;
 			$params['uid'] = USER::uid();
 			$params['ip'] = F('get_client_ip');
+			$params['is_bind'] = USER::get('site_uid') ? 1 : 0;
 			break;
 
 		case 'sina_login':
-			$params['log_type'] = 1;
+			//$params['log_type'] = 1;
 			$params['xt'] = 'login';
 			$params['akey'] = WB_AKEY;
 			$params['uid'] = USER::uid();
 			$params['ip'] = F('get_client_ip');
+			$params['is_bind'] = USER::get('site_uid') ? 1 : 0;
 			break;
 		case 'logout':
+			$params['xt'] = $type;
+			$params['akey'] = WB_AKEY;
+			$params['uid'] = USER::uid();
+			$params['ip'] = F('get_client_ip');
+			break;
 		case 'logon':
 			$params['xt'] = $type;
 			$params['akey'] = WB_AKEY;
 			$params['uid'] = USER::uid();
 			$params['ip'] = F('get_client_ip');
+			$params['is_bind'] = USER::get('site_uid') ? 1 : 0;
 			break;
 		case 'skin':
 			$params['xt'] = $type;

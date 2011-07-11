@@ -1,4 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -20,6 +20,17 @@
 	<div class="path"><p>当前位置：界面管理<span>&gt;</span><a href="<?php echo URL('mgr/page_manager') ?>">页面设置</a><span>&gt;</span><?php echo $page['page_name'];?>设置</p></div>
 	<div class="main-cont">
 		<h3 class="title"><?php echo $page['page_name'];?>设置</h3>
+<?php
+	// 如果没有设置代理帐号	
+	if (!DS('accountProxy.issetProxy')) {
+		// 设置代理帐号的URL
+		$url = URL('mgr/proxy_account.accountList');
+		// 如果不是站长
+		if (USER::uid() == SYSTEM_SINA_UID) {
+			echo '<p class="suggest-tips">请先<a href="' . $url. '">设置代理帐号</a>，否则可能会引起权限受限。</p>';
+		}
+	}
+	?>
 		<div class="drag-area clear">
 			<div class="caption-box"><span>logo位置</span></div>
 			<div class="drag-area-left" id="left">
@@ -29,11 +40,11 @@
 					<h4>
 						<span>
 						<?php if (16 != $m['component_id'] ) { // 微博发布框不用设置 ?>
-						<a href="javascript:openPop('<?php echo URL('mgr/page_manager.editComponentView', array('page_id'=>$page_id, 'id'=>$m['id'])).'\' ,\''.$m['title'].'设置\','.$m['component_id'] ;?>);" >设置</a>
+						<a href="#" onclick="openPop('<?php echo URL('mgr/page_manager.editComponentView', array('page_id'=>$page_id, 'id'=>$m['id'])).'\' ,\''.$m['title'].'设置\','.$m['component_id'] ;?>);return false;" >设置</a>
 						<?php } ?>
 						
 						<?php if(empty($m['isNative'])) { ?>
-							<a href="javascript:delConfirm('<?php echo URL('mgr/page_manager.delComponent', array('page_id'=>$page_id, 'pmId'=>$m['id']));?>');" title="删除">删除</a>
+							<a href="#" onclick="delConfirm('<?php echo URL('mgr/page_manager.delComponent', array('page_id'=>$page_id, 'pmId'=>$m['id']));?>');return false;" title="删除">删除</a>
 						<?php } ?>
 						</span>
 
@@ -49,7 +60,7 @@
 					您添加的页面还没有内容,您可以添加一些模块
 				</p>
 			<?php }?>
-			<a class="general-btn" href="javascript:newPop('<?php echo URL('mgr/page_manager.componentCategory', array('page_id'=>$page_id, 'componentType'=>1));?>','添加新组件','692');"><span>添加主体模块</span></a>
+			<a class="btn-general" href="#" onclick="newPop('<?php echo URL('mgr/page_manager.componentCategory', array('page_id'=>$page_id, 'componentType'=>1));?>','添加新组件','692');return false;"><span>添加主体模块</span></a>
 			<?php } else {?>
 				<p class="no-data">
 					该页面没有可以添加模块
@@ -63,9 +74,9 @@
 					<div class="drag-box"  data="<?php echo $m['id']; ?>">
 						<h4>
 						<span>
-						<a href="javascript:openPop('<?php echo URL('mgr/page_manager.editComponentView', array('page_id'=>$page_id, 'id'=>$m['id'])).'\',\''.$m['title'].'设置\','.$m['component_id'] ;?>);" >设置</a>
+						<a href="#" onclick="openPop('<?php echo URL('mgr/page_manager.editComponentView', array('page_id'=>$page_id, 'id'=>$m['id'])).'\',\''.$m['title'].'设置\','.$m['component_id'] ;?>);return false;" >设置</a>
 						<?php if(empty($m['isNative'])) { ?>
-							<a href="javascript:delConfirm('<?php echo URL('mgr/page_manager.delComponent', array('page_id'=>$page_id, 'pmId'=>$m['id']));?>');" title="删除">删除</a>
+							<a href="#" onclick= "delConfirm('<?php echo URL('mgr/page_manager.delComponent', array('page_id'=>$page_id, 'pmId'=>$m['id']));?>');return false;" title="删除">删除</a>
 						<?php } ?>
 						</span>
 						<?php echo F('escape', $m['name']);?>
@@ -76,12 +87,12 @@
 					您添加的页面还没有内容,您可以添加一些模块
 				</p>
 				<?php }?>
-				<a class="general-btn" href="javascript:newPop('<?php echo URL('mgr/page_manager.componentCategory', array('page_id'=>$page_id, 'componentType'=>2));?>','添加新组件','692');"><span>添加右侧模块</span></a>
+				<a class="btn-general" href="#" onclick = "newPop('<?php echo URL('mgr/page_manager.componentCategory', array('page_id'=>$page_id, 'componentType'=>2));?>','添加新组件','692');return false;"><span>添加右侧模块</span></a>
 			</div>
 		</div>
 		<p>
-			<a class="general-btn btn-s2" target="_blank" href="<?php echo URL("{$page['url']}", array('page_id'=>$page_id), 'index.php');?>"><span>预览</span></a>
-			<a class="general-btn" href="javascript:;" id="saveSort"><span>保存</span></a>
+			<a class="btn-general highlight" target="_blank" href="<?php echo URL("{$page['url']}", array('page_id'=>$page_id), 'index.php');?>"><span>预览</span></a>
+			<a class="btn-general" href="javascript:;" id="saveSort"><span>保存排序</span></a>
 		</p>
 	</div>
 </body>

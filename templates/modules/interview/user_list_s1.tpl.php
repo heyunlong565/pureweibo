@@ -1,6 +1,6 @@
 <?php if ( is_array($masterList) ) { ?>
-<div class="user-list-s1">
-	<div class="hd"><h3>微博主持人</h3></div>
+<div class="mod-aside user-list-s1">
+	<div class="hd"><h3><?php LO('modules_interview_user_list_s1_title');?></h3></div>
 	<div class="bd">
 		<ul>
 			<?php 
@@ -15,11 +15,11 @@
 	         	<?php if ( $aMaster['id'] == USER::uid() ) { ?>
 	         		<span>&nbsp;</span>
 				<?php } else if ( isset($friendList[$aMaster['id']]) ) { ?>
-	         		<span class="followed-btn">已关注</span>
+	         		<span class="followed-btn"><?php LO('modules_interview_user_list_s1_followed');?></span>
 	         	<?php } else { ?>
-	         		<a href="#" class="addfollow-btn" rel="e:fl,t:1" >加关注</a>
+	         		<a href="#" class="addfollow-btn" rel="e:fl,t:1" ><?php LO('modules_interview_user_list_s1_follow');?></a>
 	         	<?php } ?>
-	         		<p class="txt">官方主持人</p>
+	         		<p class="txt"><?php LO('modules_interview_user_list_s1_master');?></p>
 	         	</div>
             </li>
       		<?php } ?>

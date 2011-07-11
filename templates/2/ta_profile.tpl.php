@@ -23,9 +23,9 @@
                                 <!-- 用户头部介绍 开始-->
 								<?php Xpipe::pagelet('user.userHead', $userinfo ); ?>
                                 <!-- 用户头部介绍 结束-->
-								<?php if (isset($userinfo['is_localsite_user']) && $userinfo['is_localsite_user'] == 0) {Xpipe::pagelet('user.privacyNotice', $userinfo );} ?>
+                                <?php if ($userinfo['needPrivacy']) {Xpipe::pagelet('user.privacyNotice', $userinfo );} ?>
 								<?php Xpipe::pagelet('weibo.userTimelineList', $userinfo ); ?>
-								<?php if (isset($userinfo['is_localsite_user']) && $userinfo['is_localsite_user'] == 0) {Xpipe::pagelet('user.privacyNotice', $userinfo );} ?>
+								<?php if ($userinfo['needPrivacy']) {Xpipe::pagelet('user.privacyNotice', $userinfo );} ?>
                             </div>
 						</div>
 						<div class="aside">
@@ -47,6 +47,7 @@
 							<!-- 关注的话题 -->
 							<?php Xpipe::pagelet('common.subjectFollowed',$userinfo['id']); ?>
 							<!-- 关注的话题 -->							
+						<?php echo F('show_ad', 'sidebar', '');?>
 						</div>
 					</div>
 				</div>

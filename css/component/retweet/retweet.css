@@ -64,40 +64,31 @@ a:hover { text-decoration:underline; }
 .retweet .go-weibo-btn a:hover { background-position:-144px -90px; }
 
 /*转发按钮*/
-.share { float:left; position:relative; cursor:pointer; background:url(bgimg/relay_btn.png) no-repeat; }
-.share span { display:block; float:left; background:url(bgimg/relay_btn.png) no-repeat; }
-.share-a, .share-b { height:32px; padding-left:132px; background-position:0 -58px; }
-.share-a span, .share-b span { height:32px; line-height:32px; padding:0 5px; background-position:right -96px; }
-.share-b em, .share-d em, .share-f em, .share-h span, .share-j span, .share-l span { display:none; }
-.share-g span, .share-i span, .share-k span { position:absolute; }
-.share-g em, .share-i em, .share-k em { display:block; float:left; padding:0 5px; background:url(bgimg/relay_btn.png) no-repeat; }
-.share-c, .share-d { height:24px; padding-left:95px; background-position:0 0; }
-.share-c span, .share-d span { height:24px; line-height:24px; padding:0 5px; background-position: right -29px; }
-.share-e, .share-f { height:16px; padding-left:80px; background-position:0 -132px; }
-.share-e span, .share-f span { height:16px; line-height:16px; padding:0 5px; background-position: right -154px; }
-.share-g, .share-h { width:32px; height:32px; background-position:0 -176px; }
-.share-g span { left:35px; top:5px; height:24px; padding-left:10px; background-position:0 -217px; }
-.share-g em { height:24px; line-height:24px; background-position:right -246px; }
-.share-i, .share-j { width:24px; height:24px; background-position:-38px -176px; }
-.share-i span { left:27px; top:0; height:24px; padding-left:10px; background-position:0 -217px; }
-.share-i em { height:24px; line-height:24px; background-position: right -246px; }
-.share-k, .share-l { width:16px; height:16px; background-position: -68px -176px; }
-.share-k span { left:18px; top:0; height:16px; padding-left:7px; background-position:0 -281px; }
-.share-k em { height:16px; line-height:16px; background-position: right -304px; }
+.share { float:left; position:relative; cursor:pointer;}
+.share-b{ width:140px;height:32px; background:url(bgimg/btn_share_l1.png) no-repeat;}
+.share-d{ width:105px;height:24px; background:url(bgimg/btn_share_m1.png) no-repeat;}
+.share-f{ width:85px;height:16px; background:url(bgimg/btn_share_s1.png) no-repeat;}
+.share-h{ width:32px;height:32px; background:url(bgimg/btn_share_l2.png) no-repeat;}
+.share-j{ width:24px;height:24px; background:url(bgimg/btn_share_m2.png) no-repeat;}
+.share-l{ width:16px;height:16px; background:url(bgimg/btn_share_s2.png) no-repeat;}
 
-.general-btn,
-.general-btn span { background:url( bgimg/btn_bg.png ) no-repeat; }
+.btn-s1,
+.btn-s1 span { background:url( bgimg/btn_bg.png ) no-repeat; }
 /*通用12号字体按钮*/
-	.general-btn{ display:inline-block; height:23px; line-height:23px; background-position:left -56px;}
-	.general-btn span{ float:left;_display:inline;margin-left:4px;padding:0 18px 0 14px;height:23px;background-position:right -84px; color:#333; cursor:pointer;}
-	.general-btn:hover { background-position:left -112px;text-decoration:none; }
-	.general-btn:hover span{ background-position:right -140px; }
-	.general-btn.highlight{ background-position:left 0; }
-	.general-btn.highlight span{ background-position:right -28px; }
-	.general-btn-disabled{ background-position:left -168px; cursor:default; }
-	.general-btn-disabled span{ background-position:right -196px; color:#999; cursor:default; }
-	.general-btn-disabled:hover { background-position:left -168px; cursor:default; }
-	.general-btn-disabled:hover span{ background-position:right -196px; color:#999; cursor:default; }
+	.btn-s1{ display:inline-block; outline:none; }
+	.btn-s1 span{ float:left;margin-left:5px;cursor:pointer;_display:inline; }
+	.btn-s1,
+	.btn-s1 span { height:25px;line-height:25px;color:#333; }
+	.btn-s1 { background-position:left -56px; }
+	.btn-s1 span { padding:0 18px 0 14px;background-position:right -84px; }
+	.btn-s1:hover { background-position:left -112px;text-decoration:none; }
+	.btn-s1:hover span { background-position:right -140px; }
+	.btn-s1-light { background-position:left 0; }
+	.btn-s1-light span { background-position:right -28px; }
+	.btn-s1-disabled,
+	.btn-s1-disabled:hover{ height:25px;background-position:left -168px;cursor:default; }
+	.btn-s1-disabled span,
+	.btn-s1-disabled:hover span{ height:25px;line-height:25px;background-position:right -196px;cursor:default;color:#aaa; }
 
 /*浮层*/
 	/*窗口公共部分*/

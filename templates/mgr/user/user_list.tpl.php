@@ -47,26 +47,24 @@ $(function(){
     	<h3 class="title">用户列表</h3>
 		<div class="set-area">
         	<p class="tips-desc">请输入昵称搜索用户，然后选择相应的添加操作</p>
-        	<div class="operate-cont">
+        	<div class="search-area">
             	<form action="<?php echo URL('mgr/users.search');?>" id="searchUser" method="post">
-                <div class="form-s2">
                 	<div class="item">
                     	<label><strong>搜索包含以下昵称的用户</strong></label>
-                        <input name="keyword" class="ipt-txt form-el-w200" type="text" vrel="sz=max:20,m:请限制在10个中文或20个英文以下。|ne" warntip="#nameTip" />
-                        <a href="javascript:;" id="submitBtn" class="general-btn"><span>搜索</span></a>
+                        <input name="keyword" class="ipt-txt w200" type="text" vrel="sz=max:20,m:请限制在10个中文或20个英文以下。|ne" warntip="#nameTip" />
+                        <a href="javascript:;" id="submitBtn" class="btn-general"><span>搜索</span></a>
                         <span class="tips-error hidden" id="nameTip"></span>
                     </div>
-                </div>
                 </form>
 			</div>
             <p class="tips-desc"><?php if($nickname):?>您的搜索结果如下：<?php else:?>已成功开通了本站微博的用户总计<span><?php echo $count;?></span>个，列表如下：<?php endif;?></p>
             <table class="table" cellpadding="0" cellspacing="0" width="100%" border="0">
                 <colgroup>
-                    <col class="h-w70" />
+                    <col class="w70" />
                     <col />
-                    <col class="h-w150" />
-                    <col class="h-w80" />
-                    <col class="h-w80" />
+                    <col class="w150" />
+                    <col class="w80" />
+                    <col class="w80" />
                 </colgroup>
                 <thead class="tb-tit-bg">
                     <tr>

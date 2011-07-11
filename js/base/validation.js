@@ -551,7 +551,14 @@ X.ax.ValidationMgr.prototype = {
             chain.validate(callback);
         }else { callback && callback(); }
     },
-
+	/**
+	 *异步提交的时候锁定验证器 该方法应该放到Next函数后面执行
+	 * @param {Boolean} stat 状态值
+	 */
+	lock : function(bool){
+		 this.isGlobalVal  = ( bool ? true : false );
+	},
+	
     _finalChain : function(){
         this.onfinal();
         this.isGlobalVal = false;
@@ -665,6 +672,7 @@ X.ax.ValidationMgr.prototype = {
     focusCss : 'style-focus', //获得焦点时的样式
     disableCss : 'style-disabled', //禁用的样式
     errCss : 'style-wrong', // 出错的样式
+	haveSpace :true , //验证通过是否占位
     
     
     okTip   : 'oktip',
@@ -701,7 +709,7 @@ X.ax.ValidationMgr.prototype = {
         if(needed){
              var msgs = chain.getErrors();
              if(this.warnType === 1){
-                     if(msgs.length == 1){
+                     if(msgs.length != 0){
                          msgs = msgs[0];
                      }
              }else {
@@ -768,9 +776,13 @@ X.ax.ValidationMgr.prototype = {
         // 出错了，就隐藏oktip
         var okTip = $(elem).attr(this.okTip);
         // 用visiblity是CSS要求占位
-        if (okTip){
-        	$(okTip).css('visibility', 'hidden');
-        }
+		if(okTip){
+			if(this.haveSpace) {
+				$(okTip).css('visibility', 'hidden');
+			} else {
+				$(okTip).cssDisplay(false);
+			}
+		}
     },
     /**
      * 显示元素验证通过后提示，可重写自定义成功提示
@@ -782,8 +794,13 @@ X.ax.ValidationMgr.prototype = {
         if(tipId)
             $(tipId).cssDisplay(false);
     	var okTip = $(elem).attr(this.okTip);
-    	if (okTip)
-    		$(okTip).css('visibility', '');
+		if(okTip){
+			if(this.haveSpace) {
+				$(okTip).css('visibility', '');
+			} else {
+				$(okTip).cssDisplay(true);
+			}
+		}
     }
 };
 

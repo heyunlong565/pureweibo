@@ -13,10 +13,10 @@
 	<link href="<?php echo W_BASE_URL ?>css/default/skin_set.css" rel="stylesheet" type="text/css" />
 <script type='text/javascript'>
 	var ModeHtml=[' <form id="skin_form" action="<?php echo URL('mgr/skin.editSkin');?>" method="post"  name="add-newlink">',
-					'	<div class="pop-form">',
-	            	'		<div class="form-txt"><label>皮肤名称：</label><span id="skin_name"></span></div>',
+					'	<div class="form-box">',
+	            	'		<div class="form-row"><label class="form-field">皮肤名称：</label><span id="skin_name"></span></div>',
 	            	'		<div class="form-row">',
-	            	'			<label for="skin-slect-default">所属类别：</label>',
+	            	'			<label for="skin-slect-default" class="form-field">所属类别：</label>',
 	                '   		<select name="style_id" id="select_id" class="skin-slect-default">',
 					'				<?php foreach($sort as $value):?>',
 					'					<option value="<?php echo $value['style_id'];?>" ><?php echo $value['style_name'];?></option>',
@@ -25,8 +25,8 @@
 	                ' 		</div>',
 	                '    	<div class="btn-area">',
 					'			<input type="hidden" name="id" id="skin_id" value="" />',
-                	'       	<a class="general-btn btn-s2" href="#" id="submitBtn"><span>确定</span></a>',
-                	'       	<a class="general-btn" href="#" id="pop_cancel"><span>取消</span></a>',
+                	'       	<a class="btn-general highlight" href="#" id="submitBtn"><span>确定</span></a>',
+                	'       	<a class="btn-general" href="#" id="pop_cancel"><span>取消</span></a>',
 	                '   	 </div>',
 	            	'	</div>',
                 '</form>'].join('');
@@ -115,32 +115,30 @@ $(function(){
 				<a href="#"><span>自定义皮肤</span></a>
 
 			</h5>
-			<div class="con" id='skin-tabs'>
+			<div class="tab-con-s1" id='skin-tabs'>
 				<!-- tab内容 -->
 				<div class='tab'>
 					<div  class="main-cont">
         <div class="set-area">
-        	<div class="operate-cont">
+        	<div class="search-area">
                 <form  action="<?php echo URL('mgr/skin.setSkinDefault');?>" id='default_form' method="post">
-                <div class="form-s2">
                 	<div class="item">
                     	<label><strong>设置默认皮肤</strong></label>
-                        <select name="skin_default_id"  class="select form-el-w150">
+                        <select name="skin_default_id"  class="select w150">
 						   <?php foreach($list as $value):?>
                                <?php if($value['state'] < 1):?>
                                    <option value="<?php echo $value['skin_id'];?>" <?php if($sysconfig['skin_default'] == $value['skin_id']){echo 'selected=selected';}?>><?php echo $value['name'];?></option>
                                <?php endif;?>
                            <?php endforeach;?>
                        </select>
-                        <a class="general-btn" href="#" id='submit'><span>确定</span></a>
+                        <a class="btn-general" href="#" id='submit'><span>确定</span></a>
                         <span class="desc">(注：未启用以及不兼容的皮肤都不能设为默认皮肤)</span>
                     </div>
-                </div>
                 </form>
             </div>
         </div>
         
-        <h3 class="title"><a class="general-btn" href='<?php echo URL('mgr/skin.getAllSkinSort');?>'><span>类别管理</span></a>所有可用的皮肤</h3>
+        <h3 class="title"><a class="btn-general" href='<?php echo URL('mgr/skin.getAllSkinSort');?>'><span>类别管理</span></a>所有可用的皮肤</h3>
 		<div class="set-area">
 			<div class="skinlist-menu">
 				<ul id="skin-menu1" class="skin-menu1">
@@ -154,14 +152,14 @@ $(function(){
                 <div>
                 	<table class="table skin-t" width="100%" cellpadding="0" cellspacing="0" border="0">
                     	<colgroup>
-							<col class="h-w50" />
-    						<col class="h-w80" />
-    						<col class="h-w70" />
+							<col class="w50" />
+    						<col class="w80" />
+    						<col class="w70" />
     						<col />
-    						<col class="h-w80" />
-                            <col class="h-w70" />
-                            <col class="h-w110"/>
-                            <col class="h-w120" />
+    						<col class="w80" />
+                            <col class="w70" />
+                            <col class="w110"/>
+                            <col class="w120" />
     					</colgroup>
 						<thead class="tb-tit-bg">
 							<tr>
@@ -220,14 +218,14 @@ $(function(){
                 <div class="hidden">
                 	<table class="table skin-t" cellpadding="0" cellspacing="0" width="100%" border="0">
                     	<colgroup>
-							<col class="h-w50" />
-    						<col class="h-w80" />
-    						<col class="h-w70" />
+							<col class="w50" />
+    						<col class="w80" />
+    						<col class="w70" />
     						<col />
-    						<col class="h-w80" />
-                            <col class="h-w70" />
-                            <col class="h-w110" />
-                            <col class="h-w120" />
+    						<col class="w80" />
+                            <col class="w70" />
+                            <col class="w110" />
+                            <col class="w120" />
     					</colgroup>
 						<thead class="tb-tit-bg">
 							<tr>
@@ -265,7 +263,8 @@ $(function(){
 									<td>
 									
 										<?php if(!$value['state']):?>
-											<a  class="icon-edit"  title="编辑" href="javascript:edit('<?php echo $value['skin_id'];?>','<?php echo $value['style_id'];?>','<?php echo $value['name'];?>')" >编辑</a><a class="icon-forbid" href="<?php echo URL('mgr/skin.setSkinState', 'state=1&id=' . $value['skin_id']);?>" class="using">禁用</a>
+											<a  class="icon-edit"  title="编辑" href="javascript:edit('<?php echo $value['skin_id'];?>','<?php echo $value['style_id'];?>','<?php echo $value['name'];?>')" >编辑</a>
+                                            <a class="icon-forbid" href="<?php echo URL('mgr/skin.setSkinState', 'state=1&id=' . $value['skin_id']);?>" class="using">禁用</a>
 										<?php endif;?>
 										<?php if($value['state'] == 1):?>
 											<a  class="icon-edit"  title="编辑" href="javascript:edit('<?php echo $value['skin_id'];?>','<?php echo $value['style_id'];?>','<?php echo $value['name'];?>')" >编辑</a>
@@ -292,40 +291,6 @@ $(function(){
             
     	</div>
     </div>
-<div class="pop-float win-tips-add fixed-pop" id="edit" style="display:none">
-	<div class="pop-t">
-		<div></div>
-	</div>
-	<div class="pop-m">
-		<div class="pop-inner">
-        	<h4><a class="clos" href="javascript:closeBox();"></a>修改皮肤所属的类别</h4>
-            <div class="add-float-content">
-            	<form action="<?php echo URL('mgr/skin.editSkin');?>" method="post"  name="add-newlink">
-                	<div class="pop-form">
-                    	<div class="form-txt"><label>皮肤名称：</label><span id="skin_name"></span></div>
-                        <div class="form-row">
-                            <label for="select_id">所属类别：</label>
-                            <select name="style_id" id="select_id" class="skin-slect-default">
-                                <?php foreach($sort as $value):?>
-                                    <option value="<?php echo $value['style_id'];?>" ><?php echo $value['style_name'];?></option>
-                                <?php endforeach;?>
-                            </select>                		
-                        </div>
-                        <div class="btn-area">
-                            <input type="hidden" name="id" id="skin_id" value="" />
-                            <a href="#" class="general-btn btn-s2"><span>确定</span></a>
-                            <a href="#" class="general-btn"  onclick="closeBox();"><span>取消</span></a>
-                        </div>
-                    </div>
-                </form>
-            </div>
-    	</div>
-		<div class="pop-inner-bg"></div>
-	</div>
-	<div class="pop-b">
-		<div></div>
-	</div>
-</div>
 <div id="edit_class"></div>
 				</div>
 				
@@ -372,12 +337,12 @@ $(function(){
                 <div class="skin-custom">
                     <div class="skin-setbg">
                         <div class="upload-pic">
-							<img rel='<?php if(isset($customSkin['bg'])) echo 'u:1'?>' src="<?php if(isset($customSkin['bg'])) echo $customSkin['bg']; else echo W_BASE_URL.'img/upload_pic.png'?>" alt="" id="previewImg"/>
+							<img rel='<?php if(isset($customSkin['bg'])) echo 'u:1'?>' src="<?php if(isset($customSkin['bg'])) echo $customSkin['bg']; else echo W_BASE_URL.'img/'.WB_LANG_TYPE_CSS.'/upload_pic.png'?>" alt="" id="previewImg"/>
 							<a href="#" class="icon-close-btn <?php if(!isset($customSkin['bg'])) echo 'hidden';?>"></a>
 						</div>
                         <div class="oper-area">
                         	<div class="frm-row">
-                                <form id="xwb_back_form" target="" action="<?php echo URL('setting.skinBGUpload');?>" enctype="multipart/form-data" method="post" >
+                                <form id="xwb_back_form" target="" action="<?php echo URL('mgr/setting.skinBGUpload');?>" enctype="multipart/form-data" method="post" >
                                     <input type="file" value="浏览" id="xwb_back_file" name="skinbg"/>
                                 </form>
                             </div>
@@ -510,8 +475,8 @@ $(function(){
             </div>
         </div>
         <p class="btn-area skin-btn-area">
-            <a href="" class="general-btn btn-s2" rel="e:prv"><span>预览</span></a>
-            <a href="#" class="general-btn" rel="e:save"><span>保存</span></a>
+            <a href="" class="btn-general highlight" rel="e:prv"><span>预览</span></a>
+            <a href="#" class="btn-general" rel="e:save"><span>保存</span></a>
         </p>
     </div>
 				</div>

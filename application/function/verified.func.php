@@ -57,9 +57,11 @@ function getSinaVerified($user, $type = 'feed')
 		$verified_html = '<img src="' . W_BASE_URL . 'css/wap/bgimg/icon_v.png" alt="V" />';
 	} else {
 		if ('feed' == $type) {
-			$verified_html = '<img src="'.F('fix_url',  AUTH_SMALL_ICON_DEFAULT_NAME).'" alt="新浪认证" title="新浪认证" />';
+			$verified_html = L('function__verified__sinaVerifyTip1', F('fix_url',  AUTH_SMALL_ICON_DEFAULT_NAME));
+			//$verified_html = '<img src="'.F('fix_url',  AUTH_SMALL_ICON_DEFAULT_NAME).'" alt="'.LO('function__verified__sinaVerify').'" title="'.LO('function__verified__sinaVerify').'" />';
 		} else {
-			$verified_html = '<div class="vip-card"><img src="'.F('fix_url', AUTH_BIG_ICON_DEFAULT_NAME).'" alt="新浪认证" title="新浪认证" /></div>';
+			$verified_html = L('function__verified__sinaVerifyTip2', F('fix_url', AUTH_BIG_ICON_DEFAULT_NAME));
+			//$verified_html = '<div class="vip-card"><img src="'.F('fix_url', AUTH_BIG_ICON_DEFAULT_NAME).'" alt="'.LO('function__verified__sinaVerify').'" title="'.LO('function__verified__sinaVerify').'" /></div>';
 		}
 	}
 	
@@ -79,17 +81,17 @@ function getSinaVerified($user, $type = 'feed')
 function getSiteVerified($user, $type = 'feed')
 {
 	if (defined('ENTRY_SCRIPT_NAME') && ENTRY_SCRIPT_NAME == 'wap') {
-		$authen_small_icon = V('-:sysConfig/authen_small_icon') ? V('-:sysConfig/authen_small_icon') : 'var/data/logo/small_auth_icon.png';
+		$authen_small_icon = V('-:sysConfig/authen_small_icon') ? V('-:sysConfig/authen_small_icon') : 'img/logo/small_auth_icon.png';
 		$verified_html = '<img src="'.F('fix_url', $authen_small_icon).'" alt="V" />';
 	} else {
 		$reason = isset($user['site_v_reason']) && !empty($user['site_v_reason']) ? F('escape', $user['site_v_reason']) : '';
-		$title = V('-:sysConfig/authen_small_icon_title') ? F('escape', V('-:sysConfig/authen_small_icon_title')) : F('escape', V('-:sysConfig/site_name')) . '认证';
+		$title = V('-:sysConfig/authen_small_icon_title') ? F('escape', V('-:sysConfig/authen_small_icon_title')) : F('escape', V('-:sysConfig/site_name')) . L('function__verified__verifyTitle');
 	
 		if ('feed' == $type) {
-			$authen_small_icon = V('-:sysConfig/authen_small_icon') ? V('-:sysConfig/authen_small_icon') : 'var/data/logo/small_auth_icon.png';
+			$authen_small_icon = V('-:sysConfig/authen_small_icon') ? V('-:sysConfig/authen_small_icon') : 'img/logo/small_auth_icon.png';
 			$verified_html = '<img src="'.F('fix_url', $authen_small_icon).'" alt="'.$title.'" title="'.$title.'" />';
 		} else {
-			$authen_big_icon = V('-:sysConfig/authen_big_icon') ? V('-:sysConfig/authen_big_icon') : 'var/data/logo/big_auth_icon.png';
+			$authen_big_icon = V('-:sysConfig/authen_big_icon') ? V('-:sysConfig/authen_big_icon') : 'img/logo/big_auth_icon.png';
 			$verified_html = ($reason ? '<div class="explain"><div class="bd"><div class="bg"></div><div class="cont">' : '') . '<div class="vip-card"><img src="'.F('fix_url', $authen_big_icon).'" alt="'.$title.'" title="'.$title.'" /></div>'  . ($reason ? '<p>' . $reason . '</p></div></div></div>' : '');
 		}
 	}

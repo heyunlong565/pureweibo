@@ -44,7 +44,7 @@ class celeb_mod extends action {
 		if (!is_numeric($id)) {
 			APP::tips(array(
 				'tpl' => 'e404',
-				'msg' => '抱歉你所访问的数据不存在'
+				'msg' => L('controller__celeb__starSortList__emptyTip')
 			));
 		}
 		$num = DS('Celeb.getUserNum', 'g1/0', $id);

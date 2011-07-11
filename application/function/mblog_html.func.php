@@ -47,7 +47,7 @@ function mblog_html($result, $counts = null, $type = 'repost', $add = false)
 			$v_style = '';
 		}
 		$html .= '<a '.$v_style.' href="'.URL('ta',array('id' => $result['user']['id'])).'" title="'.htmlspecialchars($result['user']['screen_name']).'">';
-		$html .= '我</a>：'.APP::F('format_text', $result['text']).'</p>';
+		$html .= L('function__mblogHtml__weibo', APP::F('format_text', $result['text']));
 		if (isset($result['thumbnail_pic'])) {
 			$html .= '<div class="preview-img">';
 			$html .= '<div class="feed-img"><img class="zoom-move" src="'.$result['thumbnail_pic'].'" rel=4 alt="" /></div>';
@@ -64,12 +64,12 @@ function mblog_html($result, $counts = null, $type = 'repost', $add = false)
 			} else {
 				$rt_v_style = '';
 			}
-			$html .= '<p><a '.$rt_v_style.' href="'.URL('ta',array('id' => $result['retweeted_status']['user']['id'])).'">@'.htmlspecialchars($result['retweeted_status']['user']['screen_name']).'</a>：'.APP::F('format_text', $result['retweeted_status']['text']).'<span><a href="'.URL('show',array('id' => $result['retweeted_status']['id'])).'">原文转发';
+			$html .= '<p><a '.$rt_v_style.' href="'.URL('ta',array('id' => $result['retweeted_status']['user']['id'])).'">@'.htmlspecialchars($result['retweeted_status']['user']['screen_name']).'</a>：'.APP::F('format_text', $result['retweeted_status']['text']).'<span><a href="'.URL('show',array('id' => $result['retweeted_status']['id'])).'">'.LO('function__mblogHtml__orRepost');
 			if ($rts > 0) {
 				$html .= '('.$rts.')';
 			}
 			$html .= '</a>|';
-			$html .= '<a href="'.URL('show',array('id' => $result['retweeted_status']['id'])).'">原文评论';
+			$html .= '<a href="'.URL('show',array('id' => $result['retweeted_status']['id'])).'">'. LO('function__mblogHtml__orComment');
 			if ($comments > 0) {
 				$html .= '('.$comments.')';
 			}
@@ -87,11 +87,11 @@ function mblog_html($result, $counts = null, $type = 'repost', $add = false)
 		//end 转发部分html结构
 
 		$html .= '<div class="feed-info"><p>';
-		$html .= '<a href="#" rel="e:dl">删除</a>';
-		$html .= '<a href="#" rel="e:fw">转发</a>|';
-		$html .= '<a href="#" rel="e:fr">收藏</a>|';
-		$html .= '<a href="#" rel="e:cm">评论</a></p>';
-		$html .= '<span><a href="'.URL('show',array('id' => $result['id'])).'">'.APP::F('format_time', $result['created_at']).'</a> 来自 '.$result['source'].'</span>';
+		$html .= '<a href="#" rel="e:dl">'.LO('function__mblogHtml__delete').'</a>';
+		$html .= '<a href="#" rel="e:fw">'.LO('function__mblogHtml__repost').'</a>|';
+		$html .= '<a href="#" rel="e:fr">'.LO('function__mblogHtml__favs').'</a>|';
+		$html .= '<a href="#" rel="e:cm">'.LO('function__mblogHtml__comment').'</a></p>';
+		$html .= '<span><a href="'.URL('show',array('id' => $result['id'])).'">'.APP::F('format_time', $result['created_at']).'</a> '.LO('function__mblogHtml__source', $result['source']).'</span>';
 		$html .='</div></div></li>';
 		return $html;
 }

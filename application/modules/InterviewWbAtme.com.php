@@ -65,7 +65,7 @@ class InterviewWbAtme
 	 * @param int $interviewId, 访谈ID
 	 * @param bigint $uid 嘉宾UID
 	 */
-	function getUserAskList($interviewId, $uid, $offset=0, $limit=40)
+	function getUserAskList($interviewId, $uid, $offset=0, $limit=40, $params=array())
 	{
 		$interviewId = $this->db->escape($interviewId);
 		$uid 		 = $this->db->escape($uid);
@@ -75,7 +75,8 @@ class InterviewWbAtme
 		{
 			$wbTable = $this->db->getTable(T_INTERVIEW_WB);
 			$askSql	 = " Select ask_id From $wbTable Where interview_id=$interviewId And state='A' ";
-			$sql     = "Select * From {$this->table} Where interview_id=$interviewId And at_uid=$uid And answer_wb=0 And ask_id In ( $askSql ) Order by ask_id Desc Limit $offset, $limit ";
+			$sinceId = isset($params['since_id']) ? " And ask_id>{$params['since_id']} " : '';
+			$sql     = "Select * From {$this->table} Where interview_id=$interviewId And at_uid=$uid $sinceId And answer_wb=0 And ask_id In ( $askSql ) Order by ask_id Desc Limit $offset, $limit ";
 			$result  = $this->db->query($sql);
 		}
 		
@@ -88,14 +89,15 @@ class InterviewWbAtme
 	 * @param int $interviewId, 在线访谈ID
 	 * @param bigint $uid 嘉宾UID
 	 */
-	function getUserAskCount( $interviewId, $uid )
+	function getUserAskCount( $interviewId, $uid, $params=array())
 	{
 		$interviewId = $this->db->escape($interviewId);
 		$uid 		 = $this->db->escape($uid);
 		
 		if ( $interviewId && $uid )
 		{
-			$sql   = "Select count(*) From {$this->table} Where interview_id=$interviewId And at_uid=$uid And answer_wb=0 ";
+			$sinceId 	= isset($params['since_id']) ? " And ask_id>{$params['since_id']} " : '';
+			$sql   		= "Select count(*) From {$this->table} Where interview_id=$interviewId $sinceId And at_uid=$uid And answer_wb=0 ";
 			return $this->db->getOne($sql);
 		}
 		return 0;
@@ -127,16 +129,17 @@ class InterviewWbAtme
 	 * @param bigint $atUid
 	 * @param bigint $answerId
 	 */
-	function updateAnswer($interviewId, $askId, $atUid, $answerId)
+	function updateAnswer($interviewId, $askId, $atUid, $answerId, $weibo='')
 	{
 		$interviewId = $this->db->escape($interviewId);
 		$askId 		 = $this->db->escape($askId);
 		$atUid 		 = $this->db->escape($atUid);
 		$answerId 	 = $this->db->escape($answerId);
+		$weibo 	 	 = $this->db->escape($weibo);
 		
 		if ($interviewId && $askId && $atUid && $answerId )
 		{
-			$sql = "Update {$this->table} Set answer_wb=$answerId Where interview_id=$interviewId And at_uid=$atUid And ask_id=$askId ";
+			$sql = "Update {$this->table} Set answer_wb=$answerId, weibo='$weibo' Where interview_id=$interviewId And at_uid=$atUid And ask_id=$askId ";
 			return $this->db->execute($sql);
 		}
 		return FALSE;
@@ -162,6 +165,33 @@ class InterviewWbAtme
 			return $this->db->execute($sql);
 		}
 		return FALSE;
+	}
+	
+	
+	
+	/**
+	 * 根据id获取微博内容
+	 * @param $ids
+	 */
+	function getWeiboByIds($ids)
+	{
+		$ids 	= is_array($ids) ? implode(',', $ids) : $ids;
+		$sql 	= "Select weibo From $this->table Where answer_wb In ($ids)";
+		$result = $this->db->query($sql);
+		$weibo	= array();
+		
+		if ( is_array($result) )
+		{
+			foreach ($result as $aWeibo)
+			{
+				// weibo
+				$tmp = json_decode($aWeibo['weibo'], true);	
+				if ( !empty($tmp) ) {
+					$weibo[] = $tmp;
+				}
+			}
+		}
+		return $weibo;
 	}
 }
 	

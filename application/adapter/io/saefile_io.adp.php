@@ -13,6 +13,8 @@ class saefile_io
 {
 	var $err = "";
 	var $storage;
+	var $logType = 'io';
+	
 	function saefile_io() {
 		$this->storage = new SaeStorage();
 	}
@@ -21,15 +23,34 @@ class saefile_io
 		
 	}
 	
-	function write($file, $data, $append = false){
+	
+	function write($file, $data, $append = false)
+	{
+		$log_func_start_time = microtime(TRUE);
 		$len = $this->storage->write(SAE_DOMAIN,md5($file),$data);
+		
+		LogMgr::warningLog($log_func_start_time, $this->logType, "[write]file=$file&result=$len", LOG_LEVEL_WARNING);
+		LOGSTR($this->logType, "[write]file=$file&result=$len", LOG_LEVEL_INFO, array(), $log_func_start_time);
 		return $len;
 	}
 	
-	function read($file) {
-		return $this->storage->read(SAE_DOMAIN,md5($file));
+	
+	function read($file) 
+	{
+		$log_func_start_time = microtime(TRUE);
+		$result = $this->storage->read(SAE_DOMAIN,md5($file));
+		
+		LogMgr::warningLog($log_func_start_time, $this->logType, "[read]file=$file", LOG_LEVEL_WARNING);
+		LOGSTR($this->logType, "[read]Input:file=$file", LOG_LEVEL_INFO, array(), $log_func_start_time);
+		return $result;
 	}
-	function ls($dir,$r=false,$info=false) {
+	
+	
+	function ls($dir,$r=false,$info=false) 
+	{
+		LOGSTR($this->logType, "[ls]Input: dir=$dir&recursion=$r&info=$info", LOG_LEVEL_INFO);
+		$log_func_start_time = microtime(TRUE);
+		
 		if (empty($dir)) $dir = '.';
 		if(!file_exists($dir) || !is_dir($dir)){return false;}
 		$fs = array();
@@ -47,9 +68,15 @@ class saefile_io
 				}
 			}
 		}
+		
+		LogMgr::warningLog($log_func_start_time, $this->logType, "[ls]dir=$dir&recursion=$r&info=$info", LOG_LEVEL_WARNING);
+		LOGSTR($this->logType, "[ls]Output", LOG_LEVEL_INFO, $fs, $log_func_start_time);
 		return $fs;
 	}
-	function info($path=".",$key=false) {
+	
+	
+	function info($path=".",$key=false) 
+	{
 		$path = realpath($path);
 		if (!$path) false;
 		$result = array(
@@ -64,6 +91,8 @@ class saefile_io
 			"write"		=> is_writable($path)
 			);
 		clearstatcache();
+		
+		LOGSTR($this->logType, "[info]Input:path=$path&key=$key", LOG_LEVEL_INFO, array('Output'=>$key?$result[$key]:$result));
 		return $key ? $result[$key] : $result;
 	}
 }

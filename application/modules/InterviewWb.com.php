@@ -125,6 +125,10 @@ class InterviewWb
 			return ' And answer_wb != ask_id '; 
 		}
 		
+		if ( 'reply'==$type ){
+			return ' And answer_wb<>0 And answer_wb!=ask_id ';
+		}
+		
 		return '';
 	}
 	
@@ -177,16 +181,17 @@ class InterviewWb
 	 * @param bigint $uid
 	 * @param bigint $answerId
 	 */
-	function updateAnswer($interviewId, $askId, $uid, $answerId)
+	function updateAnswer($interviewId, $askId, $uid, $answerId, $answerWb='')
 	{
 		$interviewId = $this->db->escape($interviewId);
 		$askId 		 = $this->db->escape($askId);
 		$uid 		 = $this->db->escape($uid);
 		$answerId 	 = $this->db->escape($answerId);
+		$answerWb 	 = $this->db->escape($answerWb);
 		
 		if ($interviewId && $askId && $uid && $answerId )
 		{
-			$sql = "Update {$this->table} Set answer_wb=$answerId, answer_uid=$uid, state='A' Where interview_id=$interviewId And ask_id=$askId And answer_wb=0";
+			$sql = "Update {$this->table} Set answer_wb=$answerId, answer_uid=$uid, answer_weibo='$answerWb', state='A' Where interview_id=$interviewId And ask_id=$askId And answer_wb=0";
 			return $this->db->execute($sql);
 		}
 		return FALSE;
@@ -229,5 +234,82 @@ class InterviewWb
 		}
 	}
 	
+	
+	/**
+	 * 根据id获取微博内容
+	 * @param $ids
+	 */
+	function getWeiboByIds($ids)
+	{
+		$ids 	= is_array($ids) ? implode(',', $ids) : $ids;
+		$sql 	= "Select weibo, answer_weibo From $this->table Where ask_id In ($ids) Or answer_wb In ($ids)";
+		$result = $this->db->query($sql);
+		$weibo	= array();
+		
+		if ( is_array($result) )
+		{
+			foreach ($result as $aWeibo)
+			{
+				// weibo
+				$tmp = json_decode($aWeibo['weibo'], true);	
+				if ( !empty($tmp) ) {
+					$weibo[] = $tmp;
+				}
+				
+				// answered Weibo
+				$tmp = json_decode($aWeibo['answer_weibo'], true);	
+				if ( !empty($tmp) ) {
+					$weibo[] = $tmp;
+				}
+			}
+		}
+		return $weibo;
+	}
+	
+	
+	
+	/**
+	 * 获取嘉宾已回答的微博
+	 * @param $interviewId
+	 * @param $uid
+	 */
+	function getGuestAnswered($interviewId, $uid, $offset=0, $limit=10)
+	{
+		if ( $interviewId && $uid )
+		{
+			$sql = $this->_buildGestAnswerdSql($interviewId, $uid);
+			return $this->db->query("Select * From ($sql) As tmp Order By answer_wb Desc Limit $offset, $limit");
+		}
+		return array();
+	}
+	
+	
+	function _buildGestAnswerdSql($interviewId, $uid)
+	{
+		$interviewId 	= $this->db->escape($interviewId);
+		$uid 			= $this->db->escape($uid);
+		
+		$atMe		= $this->db->getTable( T_INTERVIEW_WB_ATME );
+		$wbTable 	= " Select ask_id, answer_wb From $this->table Where interview_id=$interviewId And state='A' And answer_wb <>0 And (answer_uid=$uid Or ask_uid=$uid) ";
+		$atmeTable 	= " Select ask_id, answer_wb From $atMe Where interview_id=$interviewId And at_uid=$uid And answer_wb <>0 ";
+		
+		return "$wbTable Union $atmeTable";
+	}
+	
+	
+	/**
+	 * 获取嘉宾已回答微博总数
+	 * @param $interviewId
+	 * @param $uid
+	 */
+	function getGuestAnsweredCnt($interviewId, $uid)
+	{
+		if ( $interviewId && $uid )
+		{
+			$sql = $this->_buildGestAnswerdSql($interviewId, $uid);
+			return $this->db->getOne("Select count(*) From ($sql) As tmp");
+		}
+		return 0;
+	}
 }
 	

@@ -22,11 +22,13 @@ class output_mod
 	 */
 	function default_action()
 	{
-		$this->_isShutdownOutput(V('g:type', 1));
-		$isLogin		= USER::isUserLogin();
-		$page_key 		= "weiboshow#isLogin=$isLogin#" . md5(serialize(V('g')));
-		$pageContent 	= CACHE::get($page_key);
-		if($pageContent) 
+		/// 内容单元类型
+		$type = V('g:type', 1);
+		$this->_isShutdownOutput($type);
+		
+		// 取缓存
+		$page_key = $this->_getCacheKey($type);
+		if(ENABLE_CACHE && $page_key && ($pageContent=CACHE::get($page_key)) ) 
 		{
 		    echo $pageContent;
 		    exit;
@@ -49,16 +51,15 @@ class output_mod
 		}
 		/// 自定义颜色
 		$colors = V('g:colors', false);
-		/// 内容单元类型
-		$type = V('g:type', 1);
 		/// 内容单元名称
 		$unit_name = V('g:unit_name', null);
 
 		$target = V('g:target');
 		if (empty($target)) {
-			die('empty');
+			die('');
 		}
 
+		
 		TPL::assign('width', $width);
 		TPL::assign('height', $height);
 		TPL::assign('show_logo', $show_logo);
@@ -66,21 +67,27 @@ class output_mod
 		TPL::assign('show_border', $show_border);
 		TPL::assign('skin', $skin);
 
+		
 		$errno 		 = false;
 		$pageContent = FALSE;
-		switch (intval($type)) {
+		$cacheTime	 = V('-:tpl/cache_time/output_nologin');
+		switch (intval($type)) 
+		{
+			/// 微博秀
 			case 1:
-				$unit_name = $unit_name ? urldecode($unit_name) : '微博秀';	
+				$unit_name = $unit_name ? urldecode($unit_name) : L('controller__outPut__weiboShow');	
 
 				/// 调用微博个人资料接口
-				$target = urldecode($target);
-				$userinfo = DR('xweibo/xwb.getUserShow', '', null, null, $target, false);
+				$target   = urldecode($target);
+				$dataTime = ENABLE_CACHE && USER::isUserLogin() ? 'g0/'.V('-:tpl/cache_time/output_type1_login') : FALSE;
+				$userinfo = DR('xweibo/xwb.getUserShow', $dataTime, null, null, $target, false);
 				if ($userinfo['errno']) {
 					$errno = $userinfo['errno']; 
 				}
+				
 				if (empty($errno)) {
 					$userinfo = $userinfo['rst'];
-					$list = DR('xweibo/xwb.getUserTimeline', '', null, null, $userinfo['screen_name'], null, null, null, null, null, false);
+					$list = DR('xweibo/xwb.getUserTimeline', $dataTime, null, null, $userinfo['screen_name'], null, null, null, null, null, false);
 					$list = $list['rst'];
 				} else {
 					$list = null;
@@ -89,26 +96,31 @@ class output_mod
 				TPL::assign('fids', $this->_getFids());
 				TPL::assign('errno', $errno);
 				TPL::assign('unit_name', $unit_name);
-				
 				TPL::assign('userinfo', $userinfo);
 				TPL::assign('list', $list);
 				$pageContent = TPL::fetch('unit/t_show', array(), 0, 'modules');
-				break;
+			break;
+
+			
+			/// 推荐关注
 			case 2:
-				$unit_name = $unit_name ? urldecode($unit_name) : '推荐关注用户';	
-				$rst = $this->_getUserGroup(intval($target));
+				$unit_name 	= $unit_name ? urldecode($unit_name) : L('controller__outPut__recFollower');
+				$dataTime 	= ENABLE_CACHE && USER::isUserLogin() ? 'g0/'.V('-:tpl/cache_time/output_type2_login') : FALSE;	
+				$rst 		= $this->_getUserGroup(intval($target), $dataTime);
 
 				TPL::assign('unit_name', $unit_name);
-				TPL :: assign('userlist', $rst);
-				
+				TPL::assign('userlist', $rst);
 				TPL::assign('fids', $this->_getFids());
 				$pageContent = TPL::fetch('unit/t_follow', array(), 0, 'modules');
-				break;
+			break;
+				
+			
+			/// 互动话题
 			case 3:
-				$show_publish = (int)V('g:show_publish', 0);
-				$auto_scroll = (int)V('g:auto_scroll', 0);
-				$unit_name = $unit_name ? urldecode($unit_name) : '关注话题';	
-				$list = DR('xweibo/xwb.searchStatuse', null, array('q' => $target, 'rpp' => 20, 'page' => 1), false);
+				$show_publish 	= (int)V('g:show_publish', 0);
+				$auto_scroll 	= (int)V('g:auto_scroll', 0);
+				$unit_name 		= $unit_name ? urldecode($unit_name) : L('controller__outPut__followTopic');	
+				$list	 		= DR('xweibo/xwb.searchStatuse', null, array('q'=>$target, 'count'=>20, 'page'=>1), false);
 				if ($list['errno']) {
 					$errno = $list['errno'];
 				}
@@ -120,19 +132,21 @@ class output_mod
 				TPL::assign('auto_scroll', $auto_scroll);
 				TPL::assign('topic', $target);
 				TPL::assign('list', $list);
+				$cacheTime = V('-:tpl/cache_time/output_type3_login');
 				$pageContent = TPL::fetch('unit/t_topic', array(), 0, 'modules');
-				break;
+			break;
+				
+			
+			/// 一键关注 
 			case 4:
-				/**
-				  *  一键关注 
-				  */
-				$unit_name = $unit_name ? urldecode($unit_name) : '一键关注';	
-				$rst = $this->_getUserGroup(intval($target));
-				$ids=array();
-				foreach($rst as $row){
-					$ids[]=$row['uid'];
-					
+				$unit_name 	= $unit_name ? urldecode($unit_name) : L('controller__outPut__keyFollow');	
+				$rst 		= $this->_getUserGroup(intval($target));
+				$ids		= array();
+				foreach($rst as $row)
+				{
+					$ids[] = $row['uid'];
 				}
+				
 				//如果未登录，使用内置的token访问
 				if (!USER::uid()) {
 					DS('xweibo/xwb.setToken', '', 2);
@@ -160,20 +174,22 @@ class output_mod
 				}
 				TPL::assign('fids',$fids);
 				$pageContent = TPL::fetch('unit/t_oneclick_follow', array(), 0, 'modules');
-				break;
+			break;
+			
+			
+			/// 群组微博
 			case 5:
-				$unit_name = $unit_name ? urldecode($unit_name) : '群组微博';
-				$title = urldecode(trim(V('g:title', '')));
-				
-				$user_id = array();
-				$user_rst = $this->_getUserGroup(intval($target));
+				$unit_name 	= $unit_name ? urldecode($unit_name) : L('controller__outPut__qunWeibo');
+				$title 		= urldecode(trim(V('g:title', '')));
+				$user_id 	= array();
+				$user_rst 	= $this->_getUserGroup(intval($target));
 				foreach ($user_rst as $user) {
 					$user_id[] = $user['uid'];
 				}
 				
-				$wb_rst = array();
-				$chunk_uid = array_chunk($user_id, 20);
-				$chunk_count = count($chunk_uid);
+				$wb_rst 		= array();
+				$chunk_uid 		= array_chunk($user_id, 20);
+				$chunk_count 	= count($chunk_uid);
 				foreach ($chunk_uid as $k => $uid) {
 					$rs = DR('xweibo/xwb.getBatchTimeline', '', array('user_id' => implode(',', $uid)), false);
 					if ($rs['errno']) {
@@ -187,6 +203,7 @@ class output_mod
 					}
 				}
 				
+				
 				//微博按时间排序
 				if ($wb_rst && $chunk_count > 0) {
 					$compare = create_function('$a, $b', 'return strcasecmp(strtotime($b["created_at"]), strtotime($a["created_at"]));');
@@ -199,22 +216,38 @@ class output_mod
 				TPL::assign('title', $title);
 				TPL::assign('user_list', $user_rst);
 				TPL::assign('weibo_list', $wb_rst);
-				TPL::assign('fids', $this->_getFids());
 				$pageContent = TPL::fetch('unit/t_weibo', array(), 0, 'modules');
-				break;
+			break;
 		}
 		
-		if ($pageContent)
-		{
-			CACHE::set($page_key, $pageContent, WEIBO_SHOW_PAGE_TIME);
+		
+		// 设置缓存
+		if (ENABLE_CACHE && $page_key && $pageContent) {
+			CACHE::set($page_key, $pageContent, $cacheTime);
 		}
 		
 		echo $pageContent;
 		exit;
 	}
 	
-	//可动态关闭不同的内容输出，主要用于定制项目的故障恢复
-	function _isShutdownOutput($type){
+	
+	function _getCacheKey($type)
+	{
+		$isLogin = USER::isUserLogin();
+		if ( !$isLogin || in_array($type, array(3, 4, 5)) ) 
+		{
+			return "weiboshow#isLogin=$isLogin#".md5( serialize(V('g')) );
+		}
+		
+		return false;
+	}
+	
+	
+	/**
+	 * 可动态关闭不同的内容输出，主要用于定制项目的故障恢复
+	 */
+	function _isShutdownOutput($type)
+	{
 		$cfg = WEIBO_SHOW_CACHE_SWITCH;
 		if ($cfg === true) {return null;}
 		
@@ -224,53 +257,38 @@ class output_mod
 		}
 		return null;
 	}
-	function _getUserGroup($group_id)
+	
+	
+	function _getUserGroup($group_id, $cacheTime=FALSE)
 	{
-		$aGroup	= DR('mgr/userRecommendCom.getById', '', $group_id);
-		$officalType = (isset($aGroup['rst'][0]['type']) && 4 == $aGroup['rst'][0]['type'] );
 		$rst = array();
-		/*if($group_id == 4 || $officalType) 
+		if( $group_id ) 
 		{
-			//获取官方微薄数据
-			$listId = DR('PageModule.getListIdByGroupId', '', $group_id);
-			$rss 	= DR('components/officialWB.getUsers', '', $listId);
-			if(isset($rss['rst']['users'])) {
-				foreach($rss['rst']['users'] as $value) {
-					if(isset($value['id'])) {
-						$value['http_url'] = W_BASE_HTTP . URL('ta', 'id='.$value['id'], 'index.php');
-						$rst[] = $value;
-					}
-				}
-			}
-		} else*/
-		if($group_id) {
 			//获取其他数据
-			$rs = DR('mgr/userRecommendCom.getById', '', $group_id);
-			$rss = DR('mgr/userRecommendCom.getUserById', '', $group_id);
-			if($rss['rst']) {
-				foreach($rss['rst'] as $value) {
-					$value['http_url'] = W_BASE_HTTP . URL('ta', 'id='.$value['uid'], 'index.php');
+			$rs  = DR('mgr/userRecommendCom.getById', $cacheTime, $group_id);
+			$rss = DR('mgr/userRecommendCom.getUserById', $cacheTime, $group_id);
+			if($rss['rst']) 
+			{
+				foreach($rss['rst'] as $value) 
+				{
+					$value['http_url'] = W_BASE_HTTP.URL('ta', 'id='.$value['uid'], 'index.php');
 					$rst[] = $value;
 				}
 			}
-		} else {
-			$rs = DR('mgr/userRecommendCom.getById');
+		} 
+		else 
+		{
+			$rs  = DR('mgr/userRecommendCom.getById');
 			$rst = $rs['rst'];
 		}
 		
 		return $rst;
 	}
 	
+	
 	function _getFids()
 	{
-		if(USER::isUserLogin()) {
-			$fids = DR('xweibo/xwb.getFriendIds', '', USER::uid(), null, null, -1, 5000);
-			$fids = empty($fids['errno']) ? $fids['rst']['ids'] : array();
-		} else {
-			$fids = array();
-		}
-		
-		return $fids;
+		return USER::isUserLogin() ? F('get_user_friend_ids') : array();
 	}
 }
 ?>

@@ -28,6 +28,14 @@ function format_weibo($list, $filte=true) {
 		if ($filte && (isset($wb['filter_state']) && !empty($wb['filter_state'])) || (isset($wb['user']['filter_state']) && !empty($wb['user']['filter_state']))) {
 			continue;	
 		}
+		/// 未通过审核微博
+		if (isset($wb['xwb_weibo_verify']) && $wb['xwb_weibo_verify']) {
+			if (isset($wb['retweeted_status']) && $wb['retweeted_status']) {
+				$wb = $wb['retweeted_status'];
+			} else {
+				continue;
+			}
+		}
 		$data[(string)$wb['id']] = fw_getItem($wb);
 	}
 
@@ -43,7 +51,7 @@ function fw_getItem($wb) {
 	extract($wb, EXTR_SKIP);
 	$json_element = array(
 		'cr' => $created_at, //create time
-		'f' => isset($favorited) ? 1: 0, //is favorited
+		//'f' => isset($favorited) ? 1: 0, //is favorited
 		's' => $source, //来源
 		'tx' => $text //文本内容
 	);
@@ -67,11 +75,11 @@ function fw_getItem($wb) {
 		//转发消息JSON部分
 		$json_element['rt'] = array(
 			'cr' => $rt['created_at'],
-			'f' => $rt['favorited'],
+			//'f' => $rt['favorited'],
 			'id' => (string)$rt['id'],
 			's' => $rt['source'],
 			'tx' => $rt['text'],
-			'fl' => $rtUser['following'] ? 1: 0,
+			//'fl' => $rtUser['following'] ? 1: 0,
 			'sn' => $rtUser['screen_name'],
 			'u' => array(
 				'id' => (string)$rtUser['id'],

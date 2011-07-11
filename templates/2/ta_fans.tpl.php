@@ -22,7 +22,7 @@
                             <div class="main-bd">
 								<?php Xpipe::pagelet('user.userHead', $userinfo ); ?>
                                 <div class="title-box">
-                                    <h3><?php echo F('escape',$userinfo['screen_name']);?>的粉丝（<?php echo $userinfo['followers_count'];?>）</h3>
+									<h3><?php echo F('escape',$userinfo['screen_name']);?><?php LO('ta__fans_taFans');?>（<?php echo $userinfo['followers_count'];?>）</h3>
                                 </div>
 								<?php Xpipe::pagelet('user.fansList', $userinfo ); ?>
                             </div>
@@ -35,6 +35,7 @@
 								<?php Xpipe::pagelet('common.userTag', $userinfo);?>
 								<!-- end 标签 -->
 								<?php Xpipe::pagelet('common.magicFriends', $userinfo ); ?>
+						<?php echo F('show_ad', 'sidebar', '');?>
 						</div>
 					</div>
 				</div>

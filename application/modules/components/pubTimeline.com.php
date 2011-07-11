@@ -27,9 +27,9 @@ class pubTimeline extends PageModule{
 		$source 	= isset($param['source'])	? $param['source']	 : (isset($cfg['source']) ? $cfg['source']: '0');
 
 		if (USER::isUserLogin() /* && $source*/) {
-			$list = DR('xweibo/xwb.getPublicTimeline', '', $source, true, 100);
+			$list = DR('xweibo/xwb.getPublicTimeline', '', $source, true, $show_num*2);
 		} else {
-			$list = DR('xweibo/xwb.getPublicTimeline', '', $source, false, 100);
+			$list = DR('xweibo/xwb.getPublicTimeline', '', $source, false, $show_num*2);
 		}
 		
 		if(!is_array($list['rst'])){

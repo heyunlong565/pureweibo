@@ -30,7 +30,7 @@ class itemGroups {
 	 *
 	 */
 	function hasItem($group_id, $item_id) {
-		$sql = 'select * from ' . $this->db->getTable() . ' where group_id=' . (int)$group_id . ' and item_id=' . (int)$item_id;
+		$sql = 'select * from ' . $this->db->getTable() . ' where group_id=' . (int)$group_id . ' and item_id=' . $item_id;
 
 		return $this->db->getRow($sql);
 	}
@@ -46,10 +46,10 @@ class itemGroups {
 
 	function saveItem($item, $id) {
 		$data = array(
-			'group_id' => (int)$item->group_id,
-			'item_id' => (int)$item->item_id,
+			'group_id' 	=> (int)$item->group_id,
+			'item_id' 	=> $item->item_id,
 			'item_name' => $item->item_name,
-			'sort_num' => isset($item->sort_num) ? (int)$item->sort_num: 0
+			'sort_num' 	=> isset($item->sort_num) ? (int)$item->sort_num: 0
 		);
 
 		return $this->db->save($data, $id, T_ITEM_GROUPS);

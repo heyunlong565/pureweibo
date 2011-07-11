@@ -86,5 +86,91 @@ class CommentCopy
 		return TRUE;
 	}
 	
+	
+	
+	/**
+	 * 获取所有列表
+	 * @param array $params, 查询参数
+	 * @param int $offset
+	 * @param int $limit
+	 */
+	function getList($params=array(), $offset=0, $limit=10)
+	{
+		// Escape Var
+		$offset	 = $this->db->escape($offset);
+		$limit	 = $this->db->escape($limit);
+
+		$where = $this->_buildWhere($params);
+		$sql   = "Select * From {$this->table} $where Order By cid Desc Limit $offset, $limit ";
+		return $this->db->query($sql);
+	}
+	
+	
+	
+	/**
+	 * 获取总数
+	 * @param array $params 其它参数
+	 */
+	function getCount($params=array())
+	{
+		$where = $this->_buildWhere($params);
+		$sql   = "Select count(*) From {$this->table} $where ";
+		return $this->db->getOne($sql);
+	}
+	
+	
+	
+	/**
+	 * 构建where 语句
+	 * @param array $params
+	 */
+	function _buildWhere($params)
+	{
+		$where = ' Where disabled=0 ';
+		
+		// Start Time
+		if ( isset($params['startTime']) && ($startTime=$this->db->escape($params['startTime'])) )
+		{
+			$where .= " And dateline>='$startTime' ";
+		}
+		
+		// End Time
+		if ( isset($params['endTime']) && ($endTime=$this->db->escape($params['endTime'])) )
+		{
+			$where .= " And dateline<='$endTime' ";
+		}
+		
+		// Keyword
+		if ( isset($params['keyword']) && ($keyword=$this->db->escape($params['keyword'])) )
+		{
+			$where .= " And content Like '%$keyword%' ";
+		}
+		
+		// ids
+		if ( isset($params['ids']) && ($ids=$this->db->escape($params['ids'])))
+		{
+			$where .= " And cid In ($ids)";
+		}
+		
+		return $where;
+	}
+	
+	
+	/**
+	 * 屏蔽评论，设置标识为1
+	 * @param $ids
+	 * @param $state
+	 */
+	function disabled($ids, $state) 
+	{
+		$ids = (array)$ids;
+		if ($state != 1) 
+		{
+			$state = 0;
+		}
+		
+		$sql = 'UPDATE ' . $this->table . ' SET `disabled`='.$state . ' WHERE cid IN('. implode(',', $ids). ')';
+		return $this->db->execute($sql);
+	}
 }
 	

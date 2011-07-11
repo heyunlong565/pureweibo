@@ -239,8 +239,8 @@ class user_verify_mod extends action {
 				$this->_error('参数错误', array('webAuthenWay'));
 			}
 			
-			$big = $big_file ? $big_file : 'var/data/logo/big_auth_icon.png';//AUTH_BIG_ICON_DEFAULT_NAME;
-			$small = $small_file ? $small_file : 'var/data/logo/small_auth_icon.png';//AUTH_SMALL_ICON_DEFAULT_NAME;
+			$big = $big_file ? $big_file : 'img/logo/big_auth_icon.png';//AUTH_BIG_ICON_DEFAULT_NAME;
+			$small = $small_file ? $small_file : 'img/logo/small_auth_icon.png';//AUTH_SMALL_ICON_DEFAULT_NAME;
 			
 			if ($authen_type == 2 || $authen_type == 3) {
 				if ($big_file) {

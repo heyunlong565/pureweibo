@@ -1,7 +1,7 @@
 <?php
 /*
 名人组块（目前用于名人堂）
-$Id: user_recommend_block.tpl.php 15714 2011-05-11 05:40:05Z qiping $
+$Id: user_recommend_block.tpl.php 16654 2011-05-31 09:44:16Z linyi1 $
 必须：
     $id（名人组id） 
     $name（名人组名称）
@@ -23,7 +23,7 @@ $block_id = isset($block_id) ? $block_id : $id;
         <div class="hd">
         	<a name="<?php echo $block_id; ?>"></a>
         	<?php if($show_more_link): ?>
-            <span><a href="<?php echo URL('celeb.starChildSortList', 'id='. $id);?>">更多&gt;&gt;</a></span>
+            <span><a href="<?php echo URL('celeb.starChildSortList', 'id='. $id);?>"><?php LO('modules_user_recommend_block_more');?>&gt;&gt;</a></span>
             <?php endif; ?>
             <?php if (isset($parent_name)): ?>
                 <h3><?php echo strip_tags($parent_name);?><em class="gt">&gt;</em><a href="<?php echo URL('celeb.starChildSortList', 'id='. $id);?>"><?php echo strip_tags($name);?></a></h3>
@@ -54,7 +54,7 @@ $block_id = isset($block_id) ? $block_id : $id;
            </ul>
         </div>
         
-        <div class="oper-area"><label for="selectAll_<?php echo $block_id;?>"><input type="checkbox" id="selectAll_<?php echo $block_id;?>" rel="e:sa" />全选</label><a href="#" rel="e:submit">关注已选</a></div>
+        <div class="oper-area"><label for="selectAll_<?php echo $block_id;?>"><input type="checkbox" id="selectAll_<?php echo $block_id;?>" rel="e:sa" /><?php LO('modules_user_recommend_block_selectAll');?></label><a href="#" rel="e:submit" class="btn-s2"><span><?php LO('modules_user_recommend_block_followMore');?></span></a></div>
     </div>
     <div class="b"><div></div></div>
 </div>

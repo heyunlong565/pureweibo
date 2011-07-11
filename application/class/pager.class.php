@@ -14,11 +14,12 @@ class pager
 	//分页参数
 	var $pageParam = array();
 	//分页格式
-	var $formatStr = "[prev]上一页[/prev] [nav] [next]下一页[/next] 总记录数 [recordCount]";
+	var $formatStr;
 	var $varExtends = array();// 添加额外的url变量
 	//构造函数
 	function pager($pageParam=null)
 	{
+		$this->formatStr = L('pageClass__title__pageStyle');
 		if($pageParam)
 			$this->setParam($pageParam);
 		if(!isset($pageParam['linkNumber']))
@@ -246,7 +247,9 @@ class pager
 		return preg_replace( $reg, $rpt, $preFormat );
 	}
 
-	function nav($var=array(),$pname='page', $preText='上一页', $nextText='下一页'){
+	function nav($var=array(),$pname='page', $preText=false, $nextText=false){
+		$preText = $preText ? $preText : L('pageClass__title__prePage');
+		$nextText = $nextText ? $nextText : L('pageClass__title__nextPage');
 		//根据当前URL生成新的URL链接
 		$curPage = isset($_GET[$pname]) ? $_GET[$pname]*1 : 1;
 		$curPage = max(1,$curPage);
@@ -272,14 +275,16 @@ class pager
 
 		$navHtml = '';
 		if ($curPage>1) {
-			$navHtml = sprintf('<a href="%s" class="general-btn"><span>'.$preText.'</span></a>', $url.($curPage-1) );
+			$navHtml = sprintf('<a href="%s" class="btn-s1"><span>'.$preText.'</span></a>', $url.($curPage-1) );
 		}
-		$navHtml .= sprintf('  <a href="%s" class="general-btn"><span>'.$nextText.'</span></a>', $url.($curPage+1) );
+		$navHtml .= sprintf('  <a href="%s" class="btn-s1"><span>'.$nextText.'</span></a>', $url.($curPage+1) );
 		return $navHtml;
 	}
 
-	function pagehtml($var=array(), $recordCount, $limit = WB_API_LIMIT, $preField = 'start_pos', $nextField = 'end_pos', $pname = 'page', $preText='上一页', $nextText='下一页')
+	function pagehtml($var=array(), $recordCount, $limit = WB_API_LIMIT, $preField = 'start_pos', $nextField = 'end_pos', $pname = 'page', $preText=false, $nextText=false)
 	{
+		$preText = $preText ? $preText : L('pageClass__title__prePage');
+		$nextText = $nextText ? $nextText : L('pageClass__title__nextPage');
 		$curPage = isset($_GET[$pname]) ? $_GET[$pname]*1 : 1;
 		$curPage = max(1,$curPage);
 		$vGet = V('g',array());
@@ -318,21 +323,21 @@ class pager
 		$navHtml = '';
 		if ($return_index) {
 			if ($curPage >= 3) {
-					$navHtml = sprintf('<a href="'.URL('index').'" class="general-btn"><span>首页</span></a>');
+					$navHtml = sprintf('<a href="'.URL('index').'" class="btn-s1"><span>'.L('pageClass__title__indexPage').'</span></a>');
 			}
 		}
 		if ($curPage > 1) {
 			if ($preValue) {
-				$navHtml .= sprintf('<a href="%s" class="general-btn"><span>'.$preText.'</span></a>', URL(APP::getRequestRoute(), $q_str.($curPage-1).'&'.$preField.'='.$preValue));
+				$navHtml .= sprintf('<a href="%s" class="btn-s1"><span>'.$preText.'</span></a>', URL(APP::getRequestRoute(), $q_str.($curPage-1).'&'.$preField.'='.$preValue));
 			} else {
-				$navHtml .= sprintf('<a href="%s" class="general-btn"><span>'.$preText.'</span></a>', URL(APP::getRequestRoute(), $q_str.($curPage-1)));
+				$navHtml .= sprintf('<a href="%s" class="btn-s1"><span>'.$preText.'</span></a>', URL(APP::getRequestRoute(), $q_str.($curPage-1)));
 			}
 		}
 		if ($recordCount > $limit) {
 			if ($nextValue) {
-				$navHtml .= sprintf('  <a href="%s" class="general-btn"><span>'.$nextText.'</span></a>', URL(APP::getRequestRoute(), $q_str.($curPage+1).'&'.$nextField.'='.$nextValue));
+				$navHtml .= sprintf('  <a href="%s" class="btn-s1"><span>'.$nextText.'</span></a>', URL(APP::getRequestRoute(), $q_str.($curPage+1).'&'.$nextField.'='.$nextValue));
 			} else {
-				$navHtml .= sprintf('  <a href="%s" class="general-btn"><span>'.$nextText.'</span></a>', URL(APP::getRequestRoute(), $q_str.($curPage+1)));
+				$navHtml .= sprintf('  <a href="%s" class="btn-s1"><span>'.$nextText.'</span></a>', URL(APP::getRequestRoute(), $q_str.($curPage+1)));
 			}
 		}
 		return $navHtml;

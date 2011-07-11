@@ -21,27 +21,27 @@
 						<!-- 搜索 结束 -->
 						<div class="tab-box">
 							<div class="tab-s2">
-								<span <?php echo V('r:base_app', '0') == 0 ? 'class="current"' : ''; ?>><span><a href="<?php echo URL('search.weibo', array('k' => V('r:k', ''), 'base_app' => 0)); ?>">来自新浪</a></span></span>
-										<span <?php echo V('r:base_app', '0') == 1 ? 'class="current"' : ''; ?>><span><a href="<?php echo URL('search.weibo', array('k' => V('r:k', ''), 'base_app' => 1)); ?>">本站</a></span></span>
+								<span <?php echo V('r:base_app', '0') == 0 ? 'class="current"' : ''; ?>><span><a href="<?php echo URL('search.weibo', array('k' => V('r:k', ''), 'base_app' => 0)); ?>"><?php LO('search__weibo__fromSina');?></a></span></span>
+								<span <?php echo V('r:base_app', '0') == 1 ? 'class="current"' : ''; ?>><span><a href="<?php echo URL('search.weibo', array('k' => V('r:k', ''), 'base_app' => 1)); ?>"><?php LO('search__weibo__local');?></a></span></span>
 							</div>
 						</div>
 						<div class="title-info">
 									<p class="sort">
-                            <a href="<?php echo URL('search.weibo','k=' . urlencode(V('r:k','')).'&base_app=' . V('r:base_app','') . '&filter_pic=0');?>" <?php if(!V('r:filter_pic')) {?>class="current"<?php }?>>全部</a> |
-                            <a href="<?php echo URL('search.weibo','k=' . urlencode(V('r:k','')).'&base_app=' . V('r:base_app','') . '&filter_pic=2');?>" <?php if(V('r:filter_pic') == 2) {?>class="current"<?php }?>>文字</a> |
-                            <a href="<?php echo URL('search.weibo','k=' . urlencode(V('r:k','')).'&base_app=' . V('r:base_app','') . '&filter_pic=1');?>" <?php if(V('r:filter_pic') == 1) {?>class="current"<?php }?>>图片</a>
+							<a href="<?php echo URL('search.weibo','k=' . urlencode(V('r:k','')).'&base_app=' . V('r:base_app','') . '&filter_pic=0');?>" <?php if(!V('r:filter_pic')) {?>class="current"<?php }?>><?php LO('search__weibo__seeAll');?></a> |
+							<a href="<?php echo URL('search.weibo','k=' . urlencode(V('r:k','')).'&base_app=' . V('r:base_app','') . '&filter_pic=2');?>" <?php if(V('r:filter_pic') == 2) {?>class="current"<?php }?>><?php LO('search__weibo__text');?></a> |
+							<a href="<?php echo URL('search.weibo','k=' . urlencode(V('r:k','')).'&base_app=' . V('r:base_app','') . '&filter_pic=1');?>" <?php if(V('r:filter_pic') == 1) {?>class="current"<?php }?>><?php LO('search__weibo__pic');?></a>
 
 							<!--
-							| <a href="<?php echo URL('search.weibo','k=' . urlencode(V('r:k','')).'&base_app=' . V('r:base_app','') . '&filter_pic=1');?>">视频</a>
+							| <a href="<?php //echo URL('search.weibo','k=' . urlencode(V('r:k','')).'&base_app=' . V('r:base_app','') . '&filter_pic=1');?>"><?php //LO('search__weibo__video');?></a>
 							-->
                         </p>
-									<p>找到的微博如下</p>
+									<p><?php LO('search__weibo__title');?></p>
                                 </div>
 						<!-- 微博列表 开始-->
 						<?php if (!isset($list) || empty($list)) {?>
                     <div class="search-result">
-                        <div class="icon-alert all-bg"></div>
-                        <p><strong>找不到符合条件的微博，请输入其他关键字再试</strong></p>
+                        <div class="icon-alert"></div>
+						<p><strong><?php LO('search__weibo__emptySearch');?></strong></p>
                     </div>
                     <?php } else {?>
                     <!-- 微博列表 开始-->
@@ -58,6 +58,7 @@
 					<!-- 关注的话题 -->
 							<?php Xpipe::pagelet('common.subjectFollowed',USER::uid()); ?>
 					<!-- 关注的话题 -->	
+						<?php echo F('show_ad', 'sidebar', '');?>
 				</div>
 			</div>
 			<!-- 底部 开始-->

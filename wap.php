@@ -20,7 +20,7 @@ define('R_FORCE_MODE', 0);
 require_once 'application/init.php';
 
 ///检查是否安装
-if (XWB_SERVER_ENV_TYPE!=='sae' && !WB_AKEY ) {
+if (XWB_SERVER_ENV_TYPE!=='sae' && (!WB_AKEY)) {
 	header("Location: install/index.php");
 	exit;
 }

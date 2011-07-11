@@ -1,5 +1,4 @@
 <?php
-include_once P_CLASS.'/purify.inc.php';
 //如果未登录，使用内置的token访问
 if (!USER::uid()) {
 	DS('xweibo/xwb.setToken', '', 2);
@@ -26,7 +25,6 @@ if (empty($batch_counts['errno'])) {
 }
 
 foreach ($list as $wb) {	/// 过滤掉过敏的原创微博
-	if (array_key_exists('id', $wb)) {
 	if ((isset($wb['filter_state']) && !empty($wb['filter_state'])) || (isset($wb['user']['filter_state']) && !empty($wb['user']['filter_state']))) {
 		continue;
 }
@@ -41,6 +39,5 @@ if (isset($wb['retweeted_status'])) {
 echo '<div class="f-list">';
 	TPL::plugin('wap/include/feed', $wb, false);
 echo '</div>';
-}
 }
 ?>

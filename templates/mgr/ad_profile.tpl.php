@@ -9,22 +9,22 @@
 <script>
 	$(function(){
 		var html=['<form id="form1" name="form1" method="post">',
-							'<div class="pop-form">',
+							'<div class="form-box">',
 								'<div class="form-row">',
-									'<label for="text">信息内容</label>',
+									'<label for="text" class="form-field">信息内容</label>',
 									'<div class="form-cont">',
-										'<input type="text" value="" class="input-txt" id="text" name="input_text" vrel="_f|ne|sz=max:40,m:不能超过20个字,ww" warntip="#textErr"><span id="textErr" class="tips-error hidden"></span>',
+										'<input type="text" value="" class="ipt-txt" id="text" name="input_text" vrel="_f|ne|sz=max:40,m:不能超过20个字,ww" warntip="#textErr"><span id="textErr" class="tips-error hidden"></span>',
 									'</div>',
 								'</div>',
 								'<div class="form-row">',
-									'<label for="link">链接</label>',
+									'<label for="link" class="form-field">链接</label>',
 									'<div class="form-cont">',
-									'<input type="text" value="" class="input-txt" id="link" name="input_link" vrel="_f|ne|sz=max:255,m:不能超过255字符" warntip="#linkErr"><span id="linkErr" class="tips-error hidden"></span>',
+									'<input type="text" value="" class="ipt-txt" id="link" name="input_link" vrel="_f|ne|sz=max:255,m:不能超过255字符" warntip="#linkErr"><span id="linkErr" class="tips-error hidden"></span>',
 									'</div>',
 								'</div>',
 								'<div class="btn-area">',
-									'<a class="general-btn  btn-s2" id="input_ok" href="#"><span>确定</span></a>',
-									'<a class="general-btn" id="input_cancle" href="#"><span>取消</span></a>',
+									'<a class="btn-general  highlight" id="input_ok" href="#"><span>确定</span></a>',
+									'<a class="btn-general" id="input_cancle" href="#"><span>取消</span></a>',
 								'</div>',
 							'</div>',
 						'</form>'].join('');
@@ -53,7 +53,7 @@
 		   },
 		   modeHtml:html,
 		   dlgcfg:{
-			    cs:'add-link win-fixed',
+			    cs:'win-link win-fixed',
 				title:'推广信息',
 				onViewReady:function(view){
 					var self=this;
@@ -196,13 +196,13 @@ $(function() {
 <body class="main-body">
 	<div class="path"><p>当前位置：内容管理<span>&gt;</span>个人资料推广</p></div>
     <div class="main-cont" id="mainContent">
-        <h3 class="title"><a class="general-btn" rel="add" href="javascript:;"><span rel="add">添加推广信息</span></a>推广信息列表</h3>
+        <h3 class="title"><a class="btn-general" rel="add" href="javascript:;"><span rel="add">添加推广信息</span></a>推广信息列表</h3>
         <div class="set-area">
             <table class="table" border="0" cellpadding="0" cellspacing="0" width="100%">
                 <colgroup>
-                    <col class="h-w180" />
+                    <col class="w180" />
                     <col />
-                    <col class="h-w140"/>
+                    <col class="w140"/>
                 </colgroup>
                 <thead class="tb-tit-bg">
                     <tr>
@@ -236,7 +236,7 @@ if (empty($list)) {
             </table>
             <!--
             <div class="btn-area">
-            	<a class="general-btn" href="<?php echo URL('mgr/plugins');?>"><span>返回组件列表</span></a>
+            	<a class="btn-general" href="<?php echo URL('mgr/plugins');?>"><span>返回组件列表</span></a>
             </div>
             -->
         </div>

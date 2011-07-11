@@ -49,15 +49,18 @@ class interview_mod
 	{
 		$cofig		= V('-:sysConfig/microInterview_setting');
 		$cofig		= json_decode($cofig, TRUE);
-		
 		$master		= isset($cofig['master']) ? $cofig['master'] : array();
+		
+		if ( !USER::isUserLogin() ){ DS('xweibo/xwb.setToken', '', 2); }
 		$userlist 	= F('get_user_show', implode(',', $master), '1800');
 		if ( empty($userlist['errno']) ) {
 			$userlist = $userlist['rst'];
 		}
 		
+		$banner_img = isset($cofig['banner_img']) ? $cofig['banner_img'] : (WB_LANG_TYPE_CSS ? W_BASE_URL.'img/'.WB_LANG_TYPE_CSS.'/talk_bg.jpg' : W_BASE_URL.'img/talk_bg.jpg');
 		TPL::assign('userlist', $userlist);
 		TPL::assign('config', $cofig);
+		TPL::assign('banner_img', $banner_img);
 		TPL::assign('friendList', $this->_getUserFriends() );
 		TPL::display('interview/index');
 	}
@@ -80,6 +83,7 @@ class interview_mod
 		$cofig		= json_decode($cofig, TRUE);
 		
 		$master		= isset($cofig['master']) ? $cofig['master'] : array();
+		if ( !USER::isUserLogin() ){ DS('xweibo/xwb.setToken', '', 2); }
 		$userlist 	= F('get_user_show', implode(',', $master), '1800');
 		if ( empty($userlist['errno']) ) {
 			$userlist = $userlist['rst'];
@@ -103,6 +107,10 @@ class interview_mod
 	 */
 	function _getUserFriends()
 	{
+		if ( !USER::isUserLogin() ) {
+			return array();
+		}
+		
 		$rsp 		= DR('xweibo/xwb.getFriendIds', 'g2/300', null, USER::uid(), null, null, null, 2000);
 		$friendList = array();
 		
@@ -127,7 +135,7 @@ class interview_mod
 		$interview = DR('MicroInterview.getById', FALSE, $id);
 		if ( empty($interview) )
 		{
-			APP::tips( array('tpl'=>'e404', 'msg'=>'抱歉你所访问的节目不存在') );
+			APP::tips( array('tpl'=>'e404', 'msg'=> L('controller__common__interviewNotExist')) );
 		}
 		
 		$interviewList = DR('MicroInterview.getList', FALSE, 0, 10);
@@ -150,6 +158,8 @@ class interview_mod
 				$params					= array('state'=>'A', 'type'=>'answer');
 				$listTmp				= DR('InterviewWb.getList', FALSE, $interviewId, $params, $offset, 20, 'answer_wb DESC');
 				$wbList['answerCnt'] 	= DR('InterviewWb.getCount', FALSE, $interviewId, $params);
+				$params['type']			= 'reply';
+				$wbList['replyCnt']		= DR('InterviewWb.getCount', FALSE, $interviewId, $params);
 				$wbList['answerList']	= $this->_buildWbList($listTmp, $interviewId);
 				
 				TPL::assign('wbList', $wbList);
@@ -179,16 +189,23 @@ class interview_mod
 						$listTmp			= DR('InterviewWb.getList', FALSE, $interviewId, $params, $offset, $limit);
 						$wbList['myCnt'] 	= DR('InterviewWb.getCount', FALSE, $interviewId, $params);
 						$wbList['myList']	= $this->_buildWbList($listTmp);
-						$wbList['allList']	= TRUE;
+					} 
+					else if ($type=='myAnswered')	// 我回答过的问题
+					{
+						$listTmp			= DR('InterviewWb.getGuestAnswered', FALSE, $interviewId, $curUid, $offset, $limit);
+						$wbList['myCnt'] 	= DR('InterviewWb.getGuestAnsweredCnt', FALSE, $interviewId, $curUid);
+						$wbList['myList']	= $this->_buildWbList($listTmp, $interviewId);
 					}
 					else 	// 我的问题列表
 					{
 						$listTmp			= DR('InterviewWbAtme.getUserAskList', FALSE, $interviewId, USER::uid(), $offset, $limit);
 						$wbList['myCnt'] 	= DR('InterviewWbAtme.getUserAskCount', FALSE, $interviewId, USER::uid());
 						$wbList['myList']	= $this->_buildWbList($listTmp);
+						$type				= 'guest';
 					}
 					
 					TPL::assign('wbList', $wbList);
+					TPL::assign('type', $type);
 					TPL::assign('limit', $limit);
 					TPL::assign('list', array_values($this->_list) );
 					TPL::display('interview/guest_going', array(), 0, 'modules');
@@ -203,7 +220,10 @@ class interview_mod
 					$params					= array('state'=>'A', 'type'=>'answer');
 					$listTmp				= DR('InterviewWb.getList', FALSE, $interviewId, $params, $offset, $limit, 'answer_wb DESC');
 					$wbList['answerCnt'] 	= DR('InterviewWb.getCount', FALSE, $interviewId, $params);
+					$params['type']			= 'reply';
+					$wbList['replyCnt']		= DR('InterviewWb.getCount', FALSE, $interviewId, $params);
 					$wbList['answerList']	= $this->_buildWbList($listTmp, $interviewId);
+					
 					
 					// 提问总数
 					$params					= array('state'=>'A', 'type'=>'allAsk');
@@ -247,6 +267,8 @@ class interview_mod
 						$params					= array('state'=>'A', 'type'=>'answer');
 						$listTmp				= DR('InterviewWb.getList', FALSE, $interviewId, $params, 0, 10, 'answer_wb DESC');
 						$wbList['answerCnt'] 	= DR('InterviewWb.getCount', FALSE, $interviewId, $params);
+						$params['type']			= 'reply';
+						$wbList['replyCnt'] 	= DR('InterviewWb.getCount', FALSE, $interviewId, $params);
 						$wbList['answerList']	= $this->_buildWbList($listTmp, $interviewId);
 						
 						TPL::assign('wbList', $wbList);
@@ -324,7 +346,7 @@ class interview_mod
 	 * @param array $answerList
 	 * @param bigint $interviewId, 为FALSE时，不需要回答
 	 */
-	function _getWbInfo(&$wbList, $answerList, $interviewId, $comWbList)
+	function _getApiWbInfo(&$wbList, $answerList, $interviewId, $comWbList)
 	{
 		$idList = array_merge( array_keys($wbList), array_keys($answerList) );
 		
@@ -398,6 +420,59 @@ class interview_mod
 	
 	
 	/**
+	 * 获取微博信息
+	 * @param array $wbList
+	 * @param array $answerList
+	 * @param bigint $interviewId, 为FALSE时，不需要回答
+	 */
+	function _getWbInfo(&$wbList, $answerList, $interviewId, $comWbList)
+	{
+		$idList   	= array_merge( array_keys($wbList), array_keys($answerList) );
+		$wbListTmp 	= DR('InterviewWb.getWeiboByIds', FALSE, $idList);
+		$atmeList 	= DR('InterviewWbAtme.getWeiboByIds', FALSE, $idList);
+		$weiboList	= array_merge($wbListTmp, $atmeList);
+		
+		foreach ( $weiboList as $aWb)
+		{
+			$idTmp = $aWb['id'];
+			if ( empty($idTmp) ) {
+				continue;
+			}
+			
+			// 保存原微博列表
+			$this->_list[$idTmp] = $aWb;
+			
+			// 点评微博
+			if ( isset($comWbList[$idTmp]) )
+			{
+				$wbList[$idTmp]['comWb'] = $aWb;
+				continue;
+			}
+			
+			/// 提问微博
+			if ( isset($wbList[$idTmp]) )
+			{
+				$wbList[$idTmp]['askWb'] = $aWb;
+			}
+			
+			/// 回答微博
+			if ( isset($answerList[$idTmp]) )
+			{
+				$wbIdTmp = $answerList[$idTmp];
+				if ( isset($wbList[$wbIdTmp]) ) 
+				{
+					$wbList[$wbIdTmp]['answerWb'][$idTmp] = $aWb;
+				}
+			}
+		}
+		
+		krsort($this->_list);
+		return $wbList;
+	}
+	
+	
+	
+	/**
 	 * 获取最新微博信息
 	 */
 	function unread() 
@@ -410,119 +485,152 @@ class interview_mod
 		
 		if ( empty($interview) || (empty($sinceId) && empty($maxId)) )
 		{
-			APP::ajaxRst('false', '11111', '访谈不存在或参数不正确');
+			APP::ajaxRst('false', '11111', L('controller__interview__paramsNotExist'));
 		}
 		
 		$currentUid 	= USER::uid();
 		$wbList['html']	= array();
 		$json			= array();
 		
-		if ( 'answer'==V('p:type') )	// 问答微博
+		switch ( V('p:type') )
 		{
-			// Build Params
-			$params	= array('state'=>'A', 'type'=>'answer');
-			if ( $sinceId ) 
-			{
-				$params['since_id'] = $sinceId;
-			}
-			
-			if ( $maxId )
-			{
-				$params['max_id'] = $maxId;
-			}
-			
-			
-			$listTmp				= DR('InterviewWb.getList', FALSE, $interviewId, $params, 0, 2, 'answer_wb DESC');
-			$wbList['newCnt'] 		= DR('InterviewWb.getCount', FALSE, $interviewId, $params);
-			$wbList['replyCnt'] 	= DR('InterviewWb.getCount', FALSE, $interviewId, array('state'=>'A', 'type'=>'answer'));
-			$wbList['totalCnt'] 	= DR('InterviewWb.getCount', FALSE, $interviewId, array('state'=>'A', 'type'=>'allAsk'));
-			$wbList['answerList']	= $this->_buildWbList($listTmp, $interviewId);
-			$json['reply']			= $wbList['replyCnt'];
-			
-			// Build Wb Html
-			if ( is_array($wbList['answerList']) )
-			{
-				foreach ($wbList['answerList'] as $wbId=>$aWbTmp)
+			// 问答微博
+			case 'answer':
+				// Build Params
+				$params	= array('state'=>'A', 'type'=>'answer');
+				if ( $sinceId ) 
 				{
-					// 评论微博
-					if ( isset($aWbTmp['comWb']) )
+					$params['since_id'] = $sinceId;
+				}
+				
+				if ( $maxId )
+				{
+					$params['max_id'] = $maxId;
+				}
+				
+				
+				$listTmp				= DR('InterviewWb.getList', FALSE, $interviewId, $params, 0, 2, 'answer_wb DESC');
+				$wbList['newCnt'] 		= DR('InterviewWb.getCount', FALSE, $interviewId, $params);
+				$wbList['replyCnt'] 	= DR('InterviewWb.getCount', FALSE, $interviewId, array('state'=>'A', 'type'=>'reply'));
+				$wbList['totalCnt'] 	= DR('InterviewWb.getCount', FALSE, $interviewId, array('state'=>'A', 'type'=>'allAsk'));
+				$wbList['answerList']	= $this->_buildWbList($listTmp, $interviewId);
+				$json['reply']			= $wbList['replyCnt'];
+				
+				// Build Wb Html
+				if ( is_array($wbList['answerList']) )
+				{
+					foreach ($wbList['answerList'] as $wbId=>$aWbTmp)
 					{
-						$wb			= $aWbTmp['comWb'];
-						$wb['uid'] 	= $currentUid;
-							
-						$wbList['html'][$wbId]  = '<div class="emcee-com"><div class="talk-content" rel="w:'. $wb['id'].'">';
-                       	$wbList['html'][$wbId] .= TPL::module('feed', $wb, FALSE);
-						$wbList['html'][$wbId] .= '<div class="emcee-icon"></div></div></div>';
-						continue;
+						// 评论微博
+						if ( isset($aWbTmp['comWb']) )
+						{
+							$wb			= $aWbTmp['comWb'];
+							$wb['uid'] 	= 'false';
+								
+							$wbList['html'][$wbId]  = '<div class="emcee-com"><div class="talk-content" rel="w:'. $wb['id'].'">';
+	                       	$wbList['html'][$wbId] .= TPL::module('feed', $wb, FALSE);
+							$wbList['html'][$wbId] .= '<div class="emcee-icon"></div></div></div>';
+							continue;
+						}
+								
+								
+						// 问答微博开始
+						$wbList['html'][$wbId] = '<div class="inte-list">';
+								
+						// 问微博
+						if ( isset($aWbTmp['askWb']) )
+						{
+							$wb			= $aWbTmp['askWb'];
+							$wb['uid'] 	= 'false';
+								
+							$wbList['html'][$wbId] .= '<div class="talk-content fans-ask" rel="w:'. $wb['id'].'">';
+	                       	$wbList['html'][$wbId] .= TPL::module('feed', $wb, FALSE);
+							$wbList['html'][$wbId] .= '<div class="ask-icon"></div></div>';
+						}
+								
+						// 答微博
+						if ( isset($aWbTmp['answerWb']) && is_array($aWbTmp['answerWb']) )
+						{
+							foreach ($aWbTmp['answerWb'] as $wb)
+							{
+								$wb['uid'] 	= 'false';
+										
+								$wbList['html'][$wbId] .= '<div class="talk-content guest-reply" rel="w:'. $wb['id'].'">';
+	                           	$wbList['html'][$wbId] .= TPL::module('interview/feed_answer', $wb, FALSE);
+								$wbList['html'][$wbId] .= '<div class="reply-icon"></div></div>';
+							}
+						}
+						
+						$wbList['html'][$wbId] .= '</div>';
 					}
-							
-							
-					// 问答微博开始
-					$wbList['html'][$wbId] = '<div class="inte-list">';
-							
-					// 问微博
-					if ( isset($aWbTmp['askWb']) )
+				}
+			break;
+			
+			
+			// 嘉宾"我的问题"
+			case 'guest':
+				// Build Params
+				$params	= array();
+				if ( $sinceId ) {
+					$params['since_id'] = $sinceId;
+				}
+				
+				$listTmp			= DR('InterviewWbAtme.getUserAskList', FALSE, $interviewId, $currentUid, 0, 10, $params);
+				$wbList['newCnt'] 	= DR('InterviewWbAtme.getUserAskCount', FALSE, $interviewId, $currentUid, $params);
+				$wbList['totalCnt'] = DR('InterviewWbAtme.getUserAskCount', FALSE, $interviewId, $currentUid);
+				$wbList['askList']	= $this->_buildWbList($listTmp);
+				
+				// Build Wb Html
+				if ( is_array($wbList['askList']) )
+				{
+					foreach ($wbList['askList'] as $wbId=>$aWbTmp)
 					{
 						$wb			= $aWbTmp['askWb'];
-						$wb['uid'] 	= $currentUid;
-							
-						$wbList['html'][$wbId] .= '<div class="talk-content fans-ask" rel="w:'. $wb['id'].'">';
-                       	$wbList['html'][$wbId] .= TPL::module('feed', $wb, FALSE);
-						$wbList['html'][$wbId] .= '<div class="ask-icon"></div></div>';
-					}
-							
-					// 答微博
-					if ( isset($aWbTmp['answerWb']) && is_array($aWbTmp['answerWb']) )
-					{
-						foreach ($aWbTmp['answerWb'] as $wb)
-						{
-							$wb['uid'] = $currentUid;
-									
-							$wbList['html'][$wbId] .= '<div class="talk-content guest-reply" rel="w:'. $wb['id'].'">';
-                           	$wbList['html'][$wbId] .= TPL::module('feed', $wb, FALSE);
-							$wbList['html'][$wbId] .= '<div class="reply-icon"></div></div>';
+						$wb['uid'] 	= 'false';
+						
+						if ( isset($interview['guest'][$currentUid]) ) {
+							$wbList['html'][$wbId] 	= '<li rel="w:'.$wb['id'].'">' . TPL::module('interview/feed_withAnswer', $wb, FALSE) . '</li>';
+						} else {
+							$wbList['html'][$wbId] 	= '<li rel="w:'.$wb['id'].'">' . TPL::module('feed', $wb, FALSE) . '</li>';
 						}
 					}
-					
-					$wbList['html'][$wbId] .= '</div>';
 				}
-			}
-		} 
-		else 	// 提问微博列表
-		{
-			// Build Params
-			$params	= array('state'=>'A', 'type'=>'ask');
-			if ( $sinceId ) 
-			{
-				$params['since_id'] = $sinceId;
-			}
-			
-			if ( $maxId )
-			{
-				$params['max_id'] = $maxId;
-			}
+			break;
 			
 			
-			$listTmp			= DR('InterviewWb.getList', FALSE, $interviewId, $params, 0, 2);
-			$wbList['newCnt'] 	= DR('InterviewWb.getCount', FALSE, $interviewId, $params);
-			$wbList['totalCnt'] = DR('InterviewWb.getCount', FALSE, $interviewId, array('state'=>'A', 'type'=>'ask'));
-			$wbList['askList']	= $this->_buildWbList($listTmp);
-			
-			// Build Wb Html
-			if ( is_array($wbList['askList']) )
-			{
-				foreach ($wbList['askList'] as $wbId=>$aWbTmp)
+			// 提问微博列表
+			default:
+				// Build Params
+				$params	= array('state'=>'A', 'type'=>'ask');
+				if ( $sinceId ) {
+					$params['since_id'] = $sinceId;
+				}
+				
+				if ( $maxId ) {
+					$params['max_id'] = $maxId;
+				}
+				
+				$listTmp			= DR('InterviewWb.getList', FALSE, $interviewId, $params, 0, 10);
+				$wbList['newCnt'] 	= DR('InterviewWb.getCount', FALSE, $interviewId, $params);
+				$wbList['totalCnt'] = DR('InterviewWb.getCount', FALSE, $interviewId, array('state'=>'A', 'type'=>'ask'));
+				$wbList['askList']	= $this->_buildWbList($listTmp);
+				
+				// Build Wb Html
+				if ( is_array($wbList['askList']) )
 				{
-					$wb						= $aWbTmp['askWb'];
-					$wb['uid'] 				= $currentUid;
-					
-					if ( isset($interview['guest'][$currentUid]) ) {
-						$wbList['html'][$wbId] 	= '<li rel="w:'.$wb['id'].'">' . TPL::module('interview/feed_withAnswer', $wb, FALSE) . '</li>';
-					} else {
-						$wbList['html'][$wbId] 	= '<li rel="w:'.$wb['id'].'">' . TPL::module('feed', $wb, FALSE) . '</li>';
+					foreach ($wbList['askList'] as $wbId=>$aWbTmp)
+					{
+						$wb			= $aWbTmp['askWb'];
+						$wb['uid'] 	= 'false';
+						
+						if ( isset($interview['guest'][$currentUid]) ) {
+							$wbList['html'][$wbId] 	= '<li rel="w:'.$wb['id'].'">' . TPL::module('interview/feed_withAnswer', $wb, FALSE) . '</li>';
+						} else {
+							$wbList['html'][$wbId] 	= '<li rel="w:'.$wb['id'].'">' . TPL::module('feed', $wb, FALSE) . '</li>';
+						}
 					}
 				}
-			}
+			break;
 		}
 		
 		
@@ -557,4 +665,10 @@ class interview_mod
 		APP::ajaxRst($json, 0);
 	}
 
+	
+	
+	function syncApiWb_action()
+	{
+		
+	}
 }

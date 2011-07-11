@@ -7,7 +7,7 @@ if(!defined('IN_APPLICATION')){
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title><?php echo F('web_page_title', false, "名人堂");?></title>
+<title><?php echo F('web_page_title', false, L('celeb__starChildSortList__fame'));?></title>
 <?php TPL::plugin('include/css_link');?>
 <?php TPL::plugin('include/js_link');?>
 <link href="<?php echo W_BASE_URL ?>css/default/pub.css" rel="stylesheet" type="text/css" />
@@ -30,10 +30,10 @@ if(!defined('IN_APPLICATION')){
                         <div class="main user-recom">
                         	<div class="main-bd">
                                 <div class="recom-top">
-									<img src="<?php echo W_BASE_URL; ?>img/recommend_bg.png" alt="" />
+									<img src="<?php echo W_BASE_URL.'img/'.WB_LANG_TYPE_CSS.'/recommend_bg.png'; ?>" alt="" />
                                 </div>
-                                <div class="column-title">
-                                    <h3>名人堂</h3>
+                                <div class="title-box">
+								<h3><?php LO('celeb__starChildSortList__fame');?></h3>
                                 </div>
                                 <!-- 标签分类 开始 -->
                                 <?php TPL::module('celeb/classify_list', array('sort_list' => $sort_list)); ?>

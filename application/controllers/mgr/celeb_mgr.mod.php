@@ -107,7 +107,7 @@ class celeb_mgr_mod extends action
 	{
 		$c_id1 		= (int)V('g:c_id1', 0);
 		$c_id2 		= (int)V('g:c_id2', 0);
-		$sina_uid 	= (int)V('g:sina_uid', 0);
+		$sina_uid 	= V('g:sina_uid', 0);
 		$info		= array();
 		
 		if ($c_id1 && $c_id2 && $sina_uid) {
@@ -186,7 +186,7 @@ class celeb_mgr_mod extends action
 		} else {
 			$old_c_id1 = (int)V('p:old_c_id1', 0);
 			$old_c_id2 = (int)V('p:old_c_id2', 0);
-			$sina_uid  = (int)V('p:sina_uid', 0);
+			$sina_uid  = V('p:sina_uid', 0);
 			
 			if (empty($old_c_id1) || empty($old_c_id2) || empty($sina_uid)) {
 				$this->_error('参数错误！', URL('mgr/celeb_mgr.starList'));
@@ -228,7 +228,7 @@ class celeb_mgr_mod extends action
 	{
 		$c_id1 		= (int)V('g:c_id1', 0);
 		$c_id2 		= (int)V('g:c_id2', 0);
-		$sina_uid 	= (int)V('g:sina_uid', 0);
+		$sina_uid 	= V('g:sina_uid', 0);
 		
 		if (empty($c_id1) || empty($c_id2) || empty($sina_uid)) {
 			$this->_error('参数错误！', URL('mgr/celeb_mgr.starList'));

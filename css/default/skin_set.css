@@ -12,7 +12,7 @@
 .skin-set .skin-list a:visited { color:#999;}
 .skin-set .skin-list a:hover { padding:1px; border:2px solid #52a3ec; text-decoration:none;}
 .skin-set .skin-list .current{ padding:1px; border:2px solid #52a3ec; }
-.skin-set .skin-list .current span{ background:url(bgimg/icon_bg.png) right -614px no-repeat; color:#000; font-weight:700;}
+.skin-set .skin-list .current span{ background:url(bgimg/ico_bg.png) right -606px no-repeat; color:#000; font-weight:700;}
 .skin-set .skin-list .current span em{ display:inline-block; margin:auto; width:75px; height:16px; word-break:keep-all; overflow:hidden;}
 .skin-set .skin-list span{ display:block; padding:2px 0 1px; text-align:center;}
 .skin-set .btn-area{ position:absolute; right:0; top:3px; line-height:1.5;}
@@ -23,7 +23,7 @@
 .skin-set .skin-setbg { float:left;width:440px;border-right:1px dashed #ddd; }
 .skin-set .skin-setbg .upload-pic { position:relative;float:left;margin-right:20px;_zoom:1; }
 .skin-set .skin-setbg .upload-pic img { width:126px;height:126px;border:1px solid #dadada; }
-.skin-set .skin-setbg .upload-pic .icon-del-pic { position:absolute;right:5px;top:5px; }
+.skin-set .skin-setbg .upload-pic .ico-del-pic { position:absolute;right:5px;top:5px;*right:10px; }
 .skin-set .skin-setbg .oper-area { float:left; }
 .skin-set .skin-setbg .oper-area .frm-row { overflow:hidden;_zoom:1; }
 .skin-setbg .oper-area .frm-row .input-txt { padding:3px;width:182px;height:17px;line-height:17px;border:1px solid #bfbfbf; }

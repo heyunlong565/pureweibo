@@ -13,11 +13,11 @@
     	<form action="<?php echo URL('mgr/setting.updateHeader'); ?>" method="post" id="headForm">
     	<div class="set-area">
         	<div class="form-s1">
-            	<p class="tips"><strong>模式选择：<span class="hight-light">(仅布局为3栏时设置有效)</span></strong></p>
-            	<p class="opeate">
+            	<p class="tips"><strong>模式选择：<span class="stress">(仅布局为3栏时设置有效)</span></strong></p>
+            	<p class="operate">
                     <label for="model1"><input id="model1" class="ipt-radio" name="data[model]" type="radio" value="1" <?php if($model <= 1 || $model > 3) echo 'checked="checked"'; ?> onclick="javascript:showDesc(1,2,3);" />默认页头</label>
                 </p>
-                <p class="opeate">
+                <p class="operate">
                     <label for="model2"><input id="model2" class="ipt-radio" name="data[model]" type="radio" value="2" <?php if($model == 2) echo 'checked="checked"'; ?> onclick="javascript:showDesc(2,1,3);" />输入页头html代码</label>
                 </p>
                 
@@ -35,7 +35,7 @@
                     </ul>
                 </div>
                 <div class="btn-area">
-                	<a href="javascript:$('#headForm').submit();" class="general-btn btn-s2" name="保存设置"><span>保存设置</span></a>
+                	<a href="javascript:$('#headForm').submit();" class="btn-general highlight" name="保存设置"><span>保存设置</span></a>
                 </div>
             </div>
         </div>

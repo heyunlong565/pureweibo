@@ -4,18 +4,32 @@ require_once dirname(__FILE__). '/component_abstract.pls.php';
 /**
  * 同城微博模块
  * @author yaoying
- * @version $Id: component_8.pls.php 11504 2011-03-14 04:02:53Z yaoying $
+ * @version $Id: component_8.pls.php 17065 2011-06-13 04:24:25Z jianzhou $
  *
  */
-class component_8_pls extends component_abstract_pls{
+class component_8_pls extends component_abstract_pls
+{
 	
 	var $_assignData = array();
 	
-	function run($mod){
+	function run($mod)
+	{
 		parent::run($mod);
-		
 		$this->_initAssignData();
 		$this->_assignData['mod'] = $mod;
+		
+		
+		//取缓存
+		$isLogin   = USER::isUserLogin();
+		$cacheKey  = $isLogin ? FALSE : "component8#".md5( serialize($mod).serialize(V('g')) );
+		$wbListKey = "$cacheKey#wbList";
+		if(ENABLE_CACHE && $cacheKey && ($content=CACHE::get($cacheKey)) ) 
+		{
+			$wbList = CACHE::get($wbListKey);
+		    echo $content;
+		    return array('cls'=>'wblist', 'list'=>$wbList, 'currRoute'=>APP::getRequestRoute(), 'page_id'=>$this->_assignData['page_id']);
+		}
+
 		
 		if(!$this->_assignCityData()){
 			return ;
@@ -23,32 +37,37 @@ class component_8_pls extends component_abstract_pls{
 		
 		$this->_assignWeiboList();
 		
-		TPL::module('component/component_' . $mod['component_id'], $this->_assignData);
 		
-		return array(
-			'cls'=>'wblist', 
-			'list' =>F('format_weibo',$this->_assignData['weiboList']),
-			'currRoute' => APP::getRequestRoute(),
-			'page_id' => $this->_assignData['page_id'],
-		);
+		// 设置缓存
+		$wbList  = F('format_weibo', $this->_assignData['weiboList']);
+		$content = TPL::module('component/component_'.$mod['component_id'], $this->_assignData, false);
+		if (ENABLE_CACHE && $cacheKey && $content) 
+		{
+			$cacheTime = V('-:tpl/cache_time/pagelet_component8');
+			CACHE::set($cacheKey, $content, $cacheTime);
+			CACHE::set($wbListKey, $wbList, $cacheTime);
+		}
 		
+		echo $content;
+		return array('cls'=>'wblist', 'list'=>$wbList, 'currRoute'=>APP::getRequestRoute(), 'page_id'=>$this->_assignData['page_id']);
 	}
 	
-	function _initAssignData(){
-		$this->_assignData['province_id'] = (int)V('g:province', '');
-		$this->_assignData['city_id'] = (int)V('g:city', '');
-		
-		$this->_assignData['page_type'] = isset($this->mod['param']['page_type']) && ($this->mod['param']['page_type'] != 0) ? 1 : 0;
-		$this->_assignData['page'] = ($this->_assignData['page_type'] == 1) ? (int)V('g:page', 1) : 1;
-		$this->_assignData['source']	  = isset($this->mod['param']['source']) ? $this->mod['param']['source'] : 0;
-		$this->_assignData['show_num'] = isset($this->mod['param']['show_num']) 	? (int)$this->mod['param']['show_num'] : 0;
-		$this->_assignData['province'] = ''; 
-		$this->_assignData['city'] = '';
-		$this->_assignData['citys'] = $this->_assignData['provinces'] = array();
+	
+	function _initAssignData()
+	{
+		$this->_assignData['province_id'] 	= (int)V('g:province', '');
+		$this->_assignData['city_id'] 		= (int)V('g:city', '');
+		$this->_assignData['page_type'] 	= isset($this->mod['param']['page_type']) && ($this->mod['param']['page_type'] != 0) ? 1 : 0;
+		$this->_assignData['page'] 			= ($this->_assignData['page_type'] == 1) ? (int)V('g:page', 1) : 1;
+		$this->_assignData['source']	  	= isset($this->mod['param']['source']) ? $this->mod['param']['source'] : 0;
+		$this->_assignData['show_num'] 		= isset($this->mod['param']['show_num']) 	? (int)$this->mod['param']['show_num'] : 0;
+		$this->_assignData['province'] 		= ''; 
+		$this->_assignData['city'] 			= '';
+		$this->_assignData['citys'] 		= $this->_assignData['provinces'] = array();
 		
 		$requestRoute = APP::getRequestRoute(true);
-		$this->_assignData['route'] = isset($requestRoute['class']) ? $requestRoute['class'] : 'pub';
-		$this->_assignData['page_id'] = (int)V('g:page_id', 0);;
+		$this->_assignData['route'] 		= isset($requestRoute['class']) ? $requestRoute['class'] : 'pub';
+		$this->_assignData['page_id'] 		= (int)V('g:page_id', 0);;
 	}
 	
 	function _assignCityData(){
@@ -57,7 +76,8 @@ class component_8_pls extends component_abstract_pls{
 		
 		$ret = DR('xweibo/xwb.getProvinces', '86400');
 		if ($ret['errno']) {
-			$this->_error('xweibo/xwb.getProvinces 返回API错误：'. $ret['err']. '('. $ret['errno']. ')');
+			$this->_error(L('pls__component8__getProvinces__apiError', $ret['err'], $ret['errno']));
+			//$this->_error('xweibo/xwb.getProvinces 返回API错误：'. $ret['err']. '('. $ret['errno']. ')');
 			return false;
 		}
 		
@@ -138,7 +158,8 @@ class component_8_pls extends component_abstract_pls{
 			return true;
 		}else{
 			$this->_assignData['weiboList'] = array();
-			$this->_assignData['weiboErrMsg'] = 'components/cityWB.get 返回API错误：'. $ret['err']. '('. $ret['errno']. ')';
+			$this->_assignData['weiboErrMsg'] = L('pls__component8__cityWB__apiError', $ret['err'], $ret['errno']); 
+			//$this->_assignData['weiboErrMsg'] = 'components/cityWB.get 返回API错误：'. $ret['err']. '('. $ret['errno']. ')';
 			//$this->_error('components/cityWB.get 返回API错误：'. $ret['err']. '('. $ret['errno']. ')');
 			return false;
 		}

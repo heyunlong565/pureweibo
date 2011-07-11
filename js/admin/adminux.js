@@ -106,6 +106,8 @@ ui.MgrDlg.prototype={
                 actionMgr:true,
                 closeable:true,
                 mask:true,
+				autoCenter:true,
+				isFixed:true,
                 onactiontrig:function(e){
                 	switch (e.get('e')){
                 	 case 'cal':this.close();break;
@@ -151,7 +153,9 @@ ui.MgrDlg.prototype={
 			 } else {
 			 	if( !this.url && this.valcfg ) this.url = this.valObj.form.action;
 			 }
-			this.afterDisplay  && this.afterDisplay();
+			 this.dlg.jq().css('marginLeft', 0);
+			 this.dlg.center();
+			 this.afterDisplay  && this.afterDisplay();
 		},
 /**
  * 用于动态内容模版的时候重新请求模版内容

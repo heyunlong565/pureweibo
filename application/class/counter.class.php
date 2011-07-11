@@ -20,7 +20,7 @@ class counter {
 	 * @param $id 最后更新的消息ID
 	 */
 	function zero($uid, $type, $id) {
-		if (!in_array($type, array('mentions', 'comments', 'followers', 'dm')) || !(int)$id || !(int)$uid) {
+		if (!in_array($type, array('mentions', 'comments', 'followers', 'dm')) || !$id || !$uid) {
 			return false;
 		}
 		$this->cache = CACHE :: get(CACHE_UNREAD_COUNTER . $uid);

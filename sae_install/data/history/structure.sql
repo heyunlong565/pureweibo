@@ -301,7 +301,7 @@ CREATE TABLE `xwb_profile_ad` (
 -- Dumping data for table `xwb_profile_ad`
 --
 
-INSERT INTO `xwb_profile_ad` VALUES (2,'新浪微博','http://t.sina.com.cn',NULL),(3,'Xweibo','http://x.weibo.com/',NULL),(4,'新浪网','http://www.sina.com.cn/',NULL);
+INSERT INTO `xwb_profile_ad` VALUES (2,'新浪微博','http://weibo.com',NULL),(3,'Xweibo','http://x.weibo.com/',NULL),(4,'新浪网','http://www.sina.com.cn/',NULL);
 
 --
 -- Table structure for table `xwb_skin_groups`
@@ -363,7 +363,7 @@ CREATE TABLE `xwb_sys_config` (
 -- Dumping data for table `xwb_sys_config`
 --
 
-INSERT INTO `xwb_sys_config` VALUES ('rewrite_enable','0',1),('logo','',1),('login_way','1',1),('third_code','',1),('site_record','',1),('address_icon','',1),('head_link','{\"3\":{\"link_name\":\"\\u65b0\\u6d6a\\u5fae\\u535a\",\"link_address\":\"http:\\/\\/t.sina.com.cn\\/\"},\"4\":{\"link_name\":\"Xweibo\",\"link_address\":\"http:\\/\\/x.weibo.com\\/\"}}',1),('foot_link','{\"2\":{\"link_name\":\"\\u610f\\u89c1\\u53cd\\u9988\",\"link_address\":\"http:\\/\\/x.weibo.com\\/bbs\\/\"},\"3\":{\"link_name\":\"\\u5e2e\\u52a9\\u4e2d\\u5fc3\",\"link_address\":\"http:\\/\\/x.weibo.com\\/help.php\"}}',1),('authen_enable','0',1),('authen_big_icon','var/data/logo/big_auth_icon.png',1),('authen_small_icon','var/data/logo/small_auth_icon.png',1),('skin_default','10',1),('ad_header','',1),('guide_auto_follow','1',1),('ad_footer','<a href=\"http://x.weibo.com\" target=\"_blank\"><img src=\"var/upload/footer_ad.png\"></a>',1),('title','Xweibo 1.1.0 ',2),('text','新版Xweibo提供了丰富的运营功能，包括游客访问、换肤机制、用户推荐、话题推荐等等。此外，站长还能在多个区域发布广告，获得收入。',2),('bg_pic','',2),('oper','2',2),('topic','',2),('link','http://x.weibo.com/products.php',2),('btnTitle','了解更多',2),('guide_auto_follow_id','3',1),('authen_small_icon_title','',1);
+INSERT INTO `xwb_sys_config` VALUES ('rewrite_enable','0',1),('logo','',1),('login_way','1',1),('third_code','',1),('site_record','',1),('address_icon','',1),('head_link','{\"3\":{\"link_name\":\"\\u65b0\\u6d6a\\u5fae\\u535a\",\"link_address\":\"http:\\/\\/weibo.com\\/\"},\"4\":{\"link_name\":\"Xweibo\",\"link_address\":\"http:\\/\\/x.weibo.com\\/\"}}',1),('foot_link','{\"2\":{\"link_name\":\"\\u610f\\u89c1\\u53cd\\u9988\",\"link_address\":\"http:\\/\\/x.weibo.com\\/bbs\\/\"},\"3\":{\"link_name\":\"\\u5e2e\\u52a9\\u4e2d\\u5fc3\",\"link_address\":\"http:\\/\\/x.weibo.com\\/help.php\"}}',1),('authen_enable','0',1),('authen_big_icon','img/logo/big_auth_icon.png',1),('authen_small_icon','img/logo/small_auth_icon.png',1),('skin_default','10',1),('ad_header','',1),('guide_auto_follow','1',1),('ad_footer','<a href=\"http://x.weibo.com\" target=\"_blank\"><img src=\"img/ad/footer_ad.png\"></a>',1),('title','Xweibo 1.1.0 ',2),('text','新版Xweibo提供了丰富的运营功能，包括游客访问、换肤机制、用户推荐、话题推荐等等。此外，站长还能在多个区域发布广告，获得收入。',2),('bg_pic','',2),('oper','2',2),('topic','',2),('link','http://x.weibo.com/products.php',2),('btnTitle','了解更多',2),('guide_auto_follow_id','3',1),('authen_small_icon_title','',1);
 
 --
 -- Table structure for table `xwb_user_ban`
@@ -469,7 +469,7 @@ CREATE TABLE `xwb_ad` (
   KEY `index_using` (`using`,`page`,`flag`)
 ) ENGINE=MYISAM DEFAULT CHARSET=utf8 COMMENT='广告';
 
-INSERT INTO `xwb_ad` VALUES ('1','<a href=\"http://x.weibo.com\" target=\"_blank\"><img src=\"var/upload/footer_ad.png\"></a>','1','1293697787','底部通栏广告','全站','global','global_bottom',NULL,'0','0'),('2','','',NULL,'对联广告(左)','全站','global','global_left',null,'0','0'),('3','','',NULL,'对联广告(右)','全站','global','global_right',null,'0','0'),('4','','',NULL,'侧栏广告','微博广场','pub','sidebar',NULL,'0','0'),('5','','',NULL,'今日话题广告','微博广场','pub','today_topic',NULL,'0','0'),('6','','',NULL,'发布框下广告','我的首页','index','publish',NULL,'0','0'),('7','','',NULL,'侧栏广告','我的首页','index','sidebar',NULL,'0','0'),('8','','',NULL,'侧栏广告','他的首页','ta','sidebar',NULL,'0','0');
+INSERT INTO `xwb_ad` VALUES ('1','<a href=\"http://x.weibo.com\" target=\"_blank\"><img src=\"img/ad/footer_ad.png\"></a>','1','1293697787','底部通栏广告','全站','global','global_bottom',NULL,'0','0'),('2','','',NULL,'对联广告(左)','全站','global','global_left',null,'0','0'),('3','','',NULL,'对联广告(右)','全站','global','global_right',null,'0','0'),('4','','',NULL,'侧栏广告','微博广场','pub','sidebar',NULL,'0','0'),('5','','',NULL,'今日话题广告','微博广场','pub','today_topic',NULL,'0','0'),('6','','',NULL,'发布框下广告','我的首页','index','publish',NULL,'0','0'),('7','','',NULL,'侧栏广告','我的首页','index','sidebar',NULL,'0','0'),('8','','',NULL,'侧栏广告','他的首页','ta','sidebar',NULL,'0','0');
 
 --
 -- Table structure for table `xwb_content_unit`

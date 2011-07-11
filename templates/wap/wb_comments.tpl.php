@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
-	<title><?php echo F('web_page_title',isset($wb['user']['screen_name'])?$wb['user']['screen_name']:'他/她');?></title>
+	<title><?php echo F('web_page_title',isset($wb['user']['screen_name'])?$wb['user']['screen_name']:L('show__default__lable_ta'));?></title>
 	<link rel="stylesheet" href="<?php echo W_BASE_URL;?>css/wap/base.css" type="text/css" />
 </head>
 <body <?php F('wap_font_set'); ?>>
@@ -14,9 +14,9 @@
 	<div class="send">
 		<form method="post" action="<?php echo WAP_URL('wbcom.comment'); ?>">
 			<input type="hidden" name="mid" value="<?php echo $wb['id']; ?>" />
-			<span>评论只显示前140字</span><br />
+			<span><?php LO('show__default__lable_commentCharLimit');?></span><br />
 			<textarea id="content" name="content" rows="2"></textarea><br />
-			<input type="submit" value="评论" />&nbsp;<input type="submit" value="评论并转发" name="is_repos" />
+			<input type="submit" value="<?php LO('show__default__lable_comment');?>" />&nbsp;<input type="submit" value="<?php LO('show__default__lable_commentAndRepost');?>" name="is_repos" />
 		</form>
 	</div>
 	<?php if (!empty($list)): ?>
@@ -30,15 +30,15 @@
 						|| (isset($comment['status']['retweeted_status']) && !empty($comment['status']['retweeted_status']['filter_state']))
 						|| (isset($comment['status']['retweeted_status']['user']) && !empty($comment['status']['retweeted_status']['user']['filter_state']))): continue; endif; ?>
 	<div class="f-list">
-		<a href="<?php echo WAP_URL('ta', 'id=' . $comment['user']['id']); ?>"><?php echo F('verified', $comment['user']); ?></a>:<span class="con"><?php echo F('format_text', $comment['text']); ?></span>&nbsp;<a href="<?php echo WAP_URL('wbcom.replyComment', array('mid' => $wb['id'], 'cid' => $comment['id'], 'reply_user' => $comment['user']['screen_name'])); ?>">回复</a>&nbsp;<?php if ($wb['user']['id'] == USER::uid() || $comment['user']['id'] == USER::uid()): ?><a href="<?php echo WAP_URL('wbcom.delCommentAlert', 'cid=' . $comment['id']); ?>">删除</a>&nbsp;<?php endif; ?><span class="g"><?php echo F('format_time', $comment['created_at']); ?></span>
+		<a href="<?php echo WAP_URL('ta', 'id=' . $comment['user']['id']); ?>"><?php echo F('verified', $comment['user']); ?></a>:<span class="con"><?php echo F('format_text', $comment['text']); ?></span>&nbsp;<a href="<?php echo WAP_URL('wbcom.replyComment', array('mid' => $wb['id'], 'cid' => $comment['id'], 'reply_user' => $comment['user']['screen_name'])); ?>"><?php LO('show__default__lable_reply');?></a>&nbsp;<?php if ($wb['user']['id'] == USER::uid() || $comment['user']['id'] == USER::uid()): ?><a href="<?php echo WAP_URL('wbcom.delCommentAlert', 'cid=' . $comment['id']); ?>"><?php LO('show__default__lable_delete');?></a>&nbsp;<?php endif; ?><span class="g"><?php echo F('format_time', $comment['created_at']); ?></span>
 	</div>
 	<?php endforeach; ?>
 	<?php else: ?>
 		<div class="f-list">
 		<?php if (V('g:page', 1) > 1):?>
-		已到最后一页
+		<?php LO('show__default__lable_lastPage');?>
 		<?php else: ?>
-		还没有人发表评论
+		<?php LO('show__default__lable_noFoundData');?>
 		<?php endif; ?>
 		</div>
 	<?php endif; ?>

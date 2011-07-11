@@ -17,7 +17,7 @@
         		<div class="form-s1">
 					<?php if (XWB_SERVER_ENV_TYPE!=='sae'){ ?>
                         <p class="tips">使用短链接可以使本站微博内容中的链接替换成指定域名的链接。</p>
-                        <p class="tips">短链接需要服务器支持Rewrite功能，以下提供的规则只适用于<strong style="color:red;">Apache</strong>服务器，并且xweibo安装在<strong style="color:red;">根目录</strong>，规则如下：</p>
+                        <p class="tips">短链接需要服务器支持Rewrite功能，以下提供的规则只适用于<strong class="stress">Apache</strong>服务器，并且xweibo安装在<strong class="stress">根目录</strong>，规则如下：</p>
                         <ul>
                             <li>1.确保填写的短链接域名可以解析并和服务器绑定</li>
                             <li>2.确认域名的Apache开启了Rewrite功能，并将Apache配置文件中的AllowOverride设置为All</li>
@@ -35,24 +35,18 @@
                     <?php }?>
                 </div>
 				
-				<div class="form-area">
+				<div class="form form-s1">
                 <div class="form-row">
                 	<label for="site-name" class="form-field">短链域名</label>
                     <div class="form-cont">
-                        <input name="data[config]" id="site-name" class="input-txt v-top" type="text" value="<?php echo $config['site_short_link'] ?>" vrel="_f|domain" warntip="#nameTip" />
-						<a href="javascript:$('#shortLinkForm').submit();" class="general-btn btn-s2" name="保存修改"><span>保存修改</span></a>
-						
-                        <span class="tips-error-s1 hidden" id="nameTip">撒旦法</span>
+                        <input name="data[config]" id="site-name" class="input-txt" type="text" value="<?php echo $config['site_short_link'] ?>" vrel="_f|domain" warntip="#nameTip" />
+						<a href="javascript:$('#shortLinkForm').submit();" class="btn-general highlight" name="保存修改"><span>保存修改</span></a>
+                        <span class="tips-error hidden" id="nameTip">撒旦法</span>
                         <p class="form-tips">如:domain.com，如果微博内容中包含网站链接，此链接会自动转换为以此域名开头的短链接，不填写不做转换</p>
                     </div>
                 </div>
+            	<p class="tips">子目录安装或非Apache服务器需要做一些修改，具体修改请参考<a href="http://bbs.x.weibo.com/viewthread.php?tid=2076&page=1&extra=#pid4779" target="_blank">这里</a>。</p>
             </div>
-            <p class="tips">子目录安装或非Apache服务器需要做一些修改，具体修改请参考<a href="http://bbs.x.weibo.com/viewthread.php?tid=2076&page=1&extra=#pid4779" target="_blank">这里</a>。</p>
-            
-            
-                
-                
-            
         </div>
         </form>
     </div>

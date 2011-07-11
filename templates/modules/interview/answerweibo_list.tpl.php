@@ -2,11 +2,11 @@
                         <div class="title-box">
                         <?php if ( isset($isMaster) ) {?>
                         	<div class="feed-refresh hidden">
-                           		<a href="#">有<span></span>条新微博，点击查看</a>
+                           		<a href="#"><?php LO('modules_interview_answerweibo_list_hasNew');?></a>
                            	</div>
-                        	<h3>访谈内容<span>(共有<em class="que-num"><?php echo $wbList['allAskCnt']; ?></em>个问题 <em class="rep-num"> <?php echo $wbList['answerCnt']; ?></em>个回复)</span></h3>
+                        	<h3><?php LO('modules_interview_answerweibo_list_master_count', $wbList['allAskCnt'], $wbList['replyCnt']); ?></h3>
                         <?php } else { ?>
-                        	<h3>访谈内容<span class="close">(已结束，共 <?php echo $wbList['answerCnt']; ?>个回复)</span></h3>
+                        	<h3><?php LO('modules_interview_answerweibo_list_notmaster_count', $wbList['replyCnt']);?></h3>
                         <?php } ?>
                         </div>
                         
@@ -14,8 +14,8 @@
                         	<!-- 问答列表 开始 -->
                             <?php if( $wbList['answerCnt']<=0 ){ ?>
 								<div class="default-tips" id="emptyTip">
-									<div class="icon-tips all-bg"></div>
-									<p>暂时没有微博</p>
+									<div class="icon-tips"></div>
+									<p><?php LO('modules_interview_answerweibo_list_weiboEmpty');?></p>
 								</div>
 								<ul id="xwb_weibo_list_ct"></ul>
 							<?php } else 
@@ -62,7 +62,7 @@
 													$wb['uid'] = $curUid;
 													
 													echo '<div class="talk-content guest-reply" rel="w:'. $wb['id'].'">';
-				                                    TPL::module('feed', $wb);
+				                                    TPL::module('interview/feed_answer', $wb);
 													echo '<div class="reply-icon"></div></div>';
 												}
 											}

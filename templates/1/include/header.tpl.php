@@ -23,7 +23,7 @@ if(!defined('IN_APPLICATION')){
         	<div class="nav-right">
             	<form class="search-box skin-bg" onsubmit="return false" id="xwb_search_form">
                 	<input class="search-btn skin-bg" type="submit" value="" id="xwb_trig"/>
-                    <input class="search-input"  type="text" value="搜微博/找人"  id="xwb_inputor"/>
+                    <input class="search-input"  type="text" value="<?php LO('include__header__searchTip');?>"  id="xwb_inputor"/>
                 </form>
 				<span class="user-link">
 			<?php
@@ -33,34 +33,34 @@ if(!defined('IN_APPLICATION')){
 				if ($uid) {
 			?>
                 <a href="<?php echo URL('index');?>"><?php echo F('escape', USER::get('screen_name'));?></a>
-                <a href="<?php echo URL('setting');?>">设置</a>
-                <a href="<?php echo URL('index','skinset=1');?>">换肤</a>|
+				<a href="<?php echo URL('setting');?>"><?php LO('include__header__set');?></a>
+				<a href="<?php echo URL('index','skinset=1');?>"><?php LO('include__header__skin');?></a>|
 				<?php if ($plugins['in_use']) {?>
-				<a href="#" onclick="Xwb.use('feedback').display(true);return false;">用户反馈</a>|
+				<a href="#" onclick="Xwb.use('feedback').display(true);return false;"><?php LO('include__header__feedback');?></a>|
 				<?php }?>
                 <?php
 				if (USER::get('isAdminAccount')){
-					echo '<a class="manage" href="'.W_BASE_URL_PATH.'admin.php"  target="_blank">管理中心</a>|';
+					LO('include__header__centralAdmin', W_BASE_URL_PATH.'admin.php');
 				}
 				?>
-                <a href="<?php echo URL('account.logout');?>">退出</a>
+				<a href="<?php echo URL('account.logout');?>"><?php LO('include__header__logout');?></a>
                 
 			<?php
 				} else {
 			?>
 				<?php if ($plugins['in_use']) {?>
-				<a href="#" onclick="Xwb.use('feedback').display(true);return false;">用户反馈</a>
+				<a href="#" onclick="Xwb.use('feedback').display(true);return false;"><?php LO('include__header__feedback');?></a>
 				<?php }?>
 				<?php
 				   if (V('-:sysConfig/login_way', 1)!=1 && USER::get('site_uid')){
 				?>
-				<a href="<?php echo URL('account.bind', '');?>" rel="e:lg">绑定SINA微博</a>
-				<a href="<?php echo URL('account.logout');?>">退出</a>
+				<a href="<?php echo URL('account.bind', '');?>" rel="e:lg"><?php LO('include__header__bindSinaWeibo');?></a>
+				<a href="<?php echo URL('account.logout');?>"><?php LO('include__header__logout');?></a>
 				<?php
 				   }else{
 				?>
 				 
-				<a href="<?php echo URL('account.login');?>" rel="e:lg">登录</a>
+				<a href="<?php echo URL('account.login');?>" rel="e:lg"><?php LO('include__header__login');?></a>
 			<?php
 				   }
 				}
@@ -74,10 +74,16 @@ if(!defined('IN_APPLICATION')){
     <!-- <div class="xad"><?php //echo $ad_header;?></div> -->
 
     <div class="inner-header">
-    	<a class="logo" href="<?php echo URL('pub');?>">
+		<h1 class="logo">
+			<a href="<?php echo URL('pub');?>">
 				<img src="<?php echo F('get_logo_src','web');?>" id="logo" alt="" />
-    	</a>
-    	
+			</a>
+		</h1>
+		<?php if (!in_array(APP::getRequestRoute(), array('live','live.details','interview'))) {?>
+		<div class="hd-xad">
+				<?php echo F('show_ad', 'global_header', 'hd-xad-in');?>
+		</div>
+		<?php }?>
         <div class="menu">
         	<ul  class="main-menu">
         	<?php 
@@ -133,7 +139,7 @@ if(!defined('IN_APPLICATION')){
 									$sonUrl 	= isset($pageList[$pid]['url']) ? URL($pageList[$pid]['url'], $uri) : '#';
 								}
 								//$target  	= $row['data']['is_blank'] ? ' target="_blank" ' : '';
-								if($aNav['data']['page_id']==-1&&!strpos($aSonNav['data']['url'],W_BASE_HTTP . W_BASE_URL_PATH)){
+								if($aNav['data']['page_id']==-1&&!strpos($aNav['data']['url'],W_BASE_HTTP . W_BASE_URL_PATH)){
 										$target='_blank';	
 									}
 								else{
@@ -171,30 +177,30 @@ if(!defined('IN_APPLICATION')){
 	<div class="win-t"><div></div></div>
 	<div class="win-con">
 		<div class="win-con-in">
-			<h4 class="win-tit x-bg">用户反馈</h4>
+			<h4 class="win-tit x-bg"><?php LO('include__header__feedback');?></h4>
 			<div class="win-box">
 				<div class="win-box-inner">
 					<form id="fbForm" method="post" action="<?php echo URL('feedback.save');?>">
-						<p>有意见？有想法？那就来吧！</p>
+						<p><?php LO('include__header__ideas');?></p>
 						<div class="feedback-box">
 							<div class="user-info">
 								<img src="<?php echo USER::isUserLogin() ? F('profile_image_url', USER::uid(),'index') : W_BASE_URL. 'css/default/bgimg/icon_guest.png';?>" alt="" />
-								<p><?php echo  USER::isUserLogin() ? USER::get('screen_name'):'匿名';?></p>
+								<p><?php echo  USER::isUserLogin() ? USER::get('screen_name'):L('include__header__anonymous');?></p>
 							</div>
 							<div class="fill-textarea">
-								<textarea class="style-normal" name="content" warntip="#feedbackTip" vrel="ne=m:请输入意见内容"></textarea>
+							<textarea class="style-normal" name="content" warntip="#feedbackTip" vrel="ne=m:<?php LO('include__header__inputContent');?>|sz=max:500,ww,m:<?php LO('include__header__contentLimit');?>"></textarea>
 							</div>
 						</div>
 						<div class="feedback-box">
-							<div class="input-title"><span>联系方式：</span></div>
+							<div class="input-title"><span><?php LO('include__header__contact');?></span></div>
 							<div class="input-area">
-								<div class="input-field"><input type="text" vrel="_ft|ft|mail" warntip="#feedbackTip" class="input-define style-normal" name="mail" value="邮箱地址"/></div>
-								<div class="input-field"><input type="text" warntip="#feedbackTip" class="input-define style-normal" vrel="_ft|ft|int|radio" name="qq" value="QQ" /></div>
-								<p>请留下您的联系方式，方便我们及时反馈信息给您</p>
+								<div class="input-field"><input type="text" vrel="_ft|ft|mail" warntip="#feedbackTip" class="input-define style-normal" name="mail" value="<?php LO('include__header__email');?>"/></div>
+								<div class="input-field"><input type="text" warntip="#feedbackTip" class="input-define style-normal" vrel="_ft|ft|int|radio" name="tel" value="<?php LO('include__header__phone');?>" /></div>
+								<p><?php LO('include__header__inputContact');?></p>
 								<div class="btn-area">
-									<a class="general-btn" href="#" id="trig"><span>提交</span></a>
+									<a class="btn-s1" href="#" id="trig"><span><?php LO('include__header__submit');?></span></a>
 								</div>
-                                <span class="tips-wrong hidden" id="feedbackTip">请输入意见内容</span>
+								<span class="tips-wrong hidden" id="feedbackTip"><?php LO('include__header__inputContent');?></span>
 								<input type="submit" class="hidden" />
 							</div>
 						</div>
@@ -205,6 +211,7 @@ if(!defined('IN_APPLICATION')){
 		<div class="win-con-bg"></div>
 	</div>
 	<div class="win-b"><div></div></div>
-	<a class="icon-close-btn icon-bg" href="#" id="xwb_cls" title="关闭"></a>
+	<a class="ico-close-btn" href="#" id="xwb_cls" title="<?php LO('include__header__close');?>"></a>
 </div>
 <?php }?>
+

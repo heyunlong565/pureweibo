@@ -420,42 +420,14 @@ class sae_http
 //			$this->closeHttp();
 		}
 
-		/****************************/
-//		$log = V('g:log');
-//		if ($log == 1) {
+		//记录调试或错误日志
+//		if ((V('g:log')==1) || ($this->getState()!=200)) {
 //			list($usec, $sec) = explode(" ", microtime());
 //			$end_ex_time = (float)$usec + (float)$sec;
 //
 //			$db = APP::ADP('db');
 //
-//			$db->setTable('api_log');
-//			$db->setAutoFree(true);
-//			$data_log = array();
-//			$data_log['url'] = $this->_serverUrl;
-//			$data_log['base_string'] = $this->base_string;
-//			$data_log['key_string'] = $this->key_string;
-//			$data_log['http_code'] = $this->_curlInit.httpCode();// $this->_codeInfo['http_code'];
-//			//post, 记录post数据
-//			if (strtolower($this->_method) == 'post') {
-//				$data_log['post_data'] = $this->_request_params;
-//			}
-//			$data_log['ret'] = $this->_server_content;
-//			//$data_log['request_time'] = $this->_codeInfo['total_time'];
-//			$data_log['total_time'] = $end_ex_time - $start_ex_time;
-//			$data_log['s_ip'] = $_SERVER['SERVER_ADDR'];
-//			$data_log['log_time'] = date('Y-m-d H:i:s', time());
-//			$db->save($data_log);
-//		}
-		/****************************/
-
-		//记录错误日志
-//		if ($this->getState() != 200) {
-//			list($usec, $sec) = explode(" ", microtime());
-//			$end_ex_time = (float)$usec + (float)$sec;
-//
-//			$db = APP::ADP('db');
-//
-//			$db->setTable('api_log');
+//			$db->setTable(T_LOG_HTTP);
 //			$db->setAutoFree(true);
 //			$data_log = array();
 //			$data_log['url'] = $this->_serverUrl;

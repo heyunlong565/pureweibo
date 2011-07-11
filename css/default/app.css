@@ -22,13 +22,13 @@ a{ text-decoration:none; }
 .going,
 .closed,
 .btn-recommend,
-.btn-refresh,
 .guest-mark,
 .emcee-mark,
 .btn-guest em,
 .ask-icon,
 .reply-icon,
-.emcee-icon { background:url(bgimg/bg_app.png) no-repeat;}
+.emcee-icon,
+.btn-custom-login { background:url(bgimg/bg_app.png) no-repeat;}
 
 .btn-guest,
 .btn-guest span,
@@ -54,10 +54,11 @@ a{ text-decoration:none; }
 #footer .ft-con .footer-defined{ float:right; margin-right:10px;_position:relative;_display:inline; }
 #footer .ft-con .footer-defined s { color:#999;text-decoration:none;  }
 #footer .ft-con a{ margin:0 8px;}
+	.ft-xad-in{ width:960px; margin:0 auto 10px; overflow:hidden; }
 
 /*logo*/
 .logo{ position:absolute; top:20px; left:0; display:block;}
-#header .app-logo { position:absolute; right:10px; top:30px; width:194px; height:38px;}
+#header .app-logo { position:absolute; right:10px; top:30px; width:208px; height:38px;}
 .talk-logo { background:url(bgimg/talk_logo.png) no-repeat; _background:none; _filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/css/default/bgimg/talk_logo.png", sizingMethod="scale");}
 .live-logo { background:url(bgimg/live_logo.png) no-repeat; _background:none; _filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/css/default/bgimg/live_logo.png", sizingMethod="scale");}
 /*图标*/
@@ -70,30 +71,32 @@ a{ text-decoration:none; }
 .going { background-position:-128px 0;}
 .closed { background-position:-248px 0;}
 .guest-mark,
-.emcee-mark { display:inline-block; width:54px; height:18px; margin-top:5px; background-position:0 -55px; text-indent:-9999em;}
+.emcee-mark { display:inline-block; width:54px; height:18px; margin-top:5px; text-indent:-9999px;}
+.guest-mark { background-position: 0 -55px; }
 .emcee-mark { background-position:-89px -55px;}
-.btn-recommend,
-.btn-refresh { display:inline-block; width:116px; height:32px; background-position:0 -104px; line-height:9em; overflow:hidden; vertical-align:top;}
+.btn-recommend { display:inline-block;width:116px; height:32px;line-height:9em;background-position:0 -104px; overflow:hidden; vertical-align:top;}
 .btn-recommend:hover { background-position:-160px -104px;}
-.btn-refresh { width:60px; height:23px; background-position:0 -163px;}
-.btn-refresh:hover { background-position:-94px -163px;}
 
+/*未登录提示*/
+.not-login-tips{ padding:20px 0; border:1px solid #fdbb2c; background:#FFDA89; text-align:center;   }
+.not-login-tips p{ display:inline; }	
+	.btn-login{ display:inline-block; line-height:37px; text-indent:-9999px; }
+	.btn-sina-login{ float:none; display:inline-block; line-height:33px; text-indent:-9999px; }
+	.btn-custom-login{ display:inline-block; width:135px; height:32px; padding:0 9px 0 30px; background-position:0 -217px; color:#444; font-size:14px; line-height:32px; white-space:nowrap; }
+	.btn-custom-login:hover{ background-position:-194px -217px; color:#444; }
 /*在线直播*/
 	/*直播发布框*/
 	#live-page .post-title { top:7px; width:400px; height:23px; background:none; text-indent:0; font-size:14px; overflow:hidden;}
 	#live-page .post-title span { font-weight:bold;}
 	
 	/*微博列表*/
-	/*.feed-list { padding:0 0 20px;}*/
-	.feed-list .feed-tit { position:relative;}
-	.feed-list .feed-tit h3 { padding-left:5px;}
-	.feed-list .feed-tit h3 span,
-	.title-box span { margin-left:10px; font-size:12px; font-weight:normal; line-height:28px; color:#4444;}
+	.feed-list .title-box { position:relative;}
+	.feed-list .title-box h3 { padding-left:5px;}
+	.feed-list .title-box h3 span,
+	.title-box span { font-size:12px; font-weight:normal; line-height:28px; color:#4444;}
+	.feed-list .title-box h3 span input { margin:0 3px 0 10px;vertical-align:-3px;_vertical-align:-1px; }
 	.feed-refresh { float:right; padding-right:5px;}
 	.feed-refresh a { padding:4px 10px; border:1px solid #E7DC9B; background:#FFFDDD; color:#E2A120 !important; -moz-border-radius:-2px; -webkit-border-radius:-2px;}
-	/*.feed-refresh input { vertical-align:-3px;}
-	.feed-refresh label { margin:0 5px 0 3px; _vertical-align:-3px;}
-	.feed-refresh .btn-refresh { vertical-align:middle;}*/
 	.feed-list .user-pic a { display:block;}
 	.close { color:#707070;}
 	#talk-page .feed-list .feed-refresh { position:absolute; right:0;}
@@ -128,7 +131,9 @@ a{ text-decoration:none; }
 	/*直播嘉宾*/
 	.user-sidebar { margin:0 20px 25px;}
 	.user-sidebar li { margin:0; padding:0 10px 20px; _display:inline;}
-	.user-sidebar .general-btn { margin-left:120px;}
+	.user-sidebar .btn-s1 { margin-left:120px;}
+	.user-sidebar .addfollow-btn,
+	.user-sidebar .followed-btn{ margin:5px auto 0; }
 	
 	/*直播列表*/
 	.program-list { margin:0 20px 25px;}
@@ -164,7 +169,7 @@ a{ text-decoration:none; }
 	.talk-intro .bd p{ color:#707070; }
 	
 	/*talk-tab*/
-	.feed-tit .talk-tab{ position:absolute; left:1px; right:1px; padding:0; height:30px; background-position:0 -288px; _width:100%; }
+	.title-box .talk-tab{ position:absolute; left:1px; right:1px; padding:0; height:30px; background-position:0 -288px; _width:100%; }
 	.talk-tab span{ position:relative; float:left; margin:2px 0 0 5px; font-size:14px; }
 	.talk-tab span span{ padding:0 15px 0 10px; margin-top:1px;}
 	.talk-tab .cur{ background-position:0 -66px; font-weight:bold; }
@@ -176,8 +181,9 @@ a{ text-decoration:none; }
 	/*访谈问答列表*/
 	.talk-list .feed-list{ padding:0; _zoom:1;  }
 	.talk-list,
-	.ask-list{ position:relative; top:0; left:0;/*处理IE6、7定位元素不随父元素滚动BUG*/ height:600px; padding-right:10px; overflow-x:hidden; overflow-y:auto; }
-	.talk-list{ margin-bottom:40px; }
+	.ask-list{ position:relative; top:0; left:0;/*处理IE6、7定位元素不随父元素滚动BUG*/ padding-right:10px; overflow-x:hidden; overflow-y:auto; }
+	.talk-list{ max-height:600px; margin-bottom:20px; _zoom:1; }
+	.ask-list{ height:600px; }
 	.inte-list{ margin:5px 0 20px; border:1px solid #46B6E3; }
 	.emcee-com{ margin:5px 0 20px; border:1px solid #75C631; }
 	.talk-content{ position:relative; padding:20px; *zoom:1; }
@@ -190,9 +196,9 @@ a{ text-decoration:none; }
 	.ask-icon,
 	.reply-icon,
 	.emcee-icon{position:absolute; top:-5px; left:-1px; height:20px; width:43px; overflow:hidden; }
-	.ask-icon{ background-position:0 -207px; }
-	.reply-icon{ background-position:-63px -207px; }
-	.emcee-icon{ background-position:-126px -207px; }
+	.ask-icon{ background-position:0 -167px; }
+	.reply-icon{ background-position:-63px -167px; }
+	.emcee-icon{ background-position:-126px -167px; }
 
 /*外观方案*/
 	/* skin01 */
@@ -201,7 +207,7 @@ a{ text-decoration:none; }
 	.skin01 .feed-list .feed-info span a,
 	.skin01 .feed-list .feed-info p a,
 	.skin01 .gotop .txt,
-	.skin01 #footer .ft-con a { color:#333;}
+	.skin01 #footer .ft-con a { color:#0082CB;}
 	.skin01 a:hover,
 	.skin01 .feed-list .feed-info span a:hover,
 	.skin01 .feed-list .feed-info p a:hover,
@@ -253,7 +259,7 @@ a{ text-decoration:none; }
 	.skin05 .feed-list .feed-info span a,
 	.skin05 .feed-list .feed-info p a,
 	.skin05 .gotop .txt,
-	.skin05 #footer .ft-con a { color:#0082CB;}
+	.skin05 #footer .ft-con a { color:#999;}
 	.skin05 a:hover,
 	.skin05 .feed-list .feed-info span a:hover,
 	.skin05 .feed-list .feed-info p a:hover,
@@ -318,19 +324,20 @@ a{ text-decoration:none; }
 	.skin10 .feed-list .feed-info span a,
 	.skin10 .feed-list .feed-info p a,
 	.skin10 .gotop .txt,
-	.skin10 #footer .ft-con a { color:#999;}
+	.skin10 #footer .ft-con a { color:#558CAA;}
 	.skin10 a:hover,
 	.skin10 .feed-list .feed-info span a:hover,
 	.skin10 .feed-list .feed-info p a:hover,
 	.skin10 .gotop:hover .txt,
-	.skin10 #footer .ft-con a:hover { color:#390;}
+	.skin10 #footer .ft-con a:hover { color:#558CAA;}
 
 
 
 /*返回顶部*/
 .gotop { margin-left:481px; }
 
-
+/*没有微博提示*/
+.default-tips{ margin:15px 20px 10px; }
 
 
 

@@ -26,19 +26,19 @@ class show_mod extends action {
 		$id = V('g:id');
 		
 		if (empty($id)) {
-			$this->_showErr('参数错误', URL('pub'));
+			$this->_showErr(L('controller__show__defaultAction__paramsErr'), URL('pub'));
 		}
 		$mblog_info = DR('xweibo/xwb.getStatuseShow', '', $id);
 		
 		if ($mblog_info['errno']) {
-			$this->_showErr('您要访问的页面不存在', URL('pub'));
+			$this->_showErr(L('controller__show__defaultAction__notFoundPage'), URL('pub'));
 		}
 
 		//检查微博或用户是否被屏蔽
 		$wb = F('weibo_filter', $mblog_info['rst'], true);
 		
 		if (empty($wb)) {
-			$this->_showErr('您要访问的页面不存在', URL('pub'));
+			$this->_showErr(L('controller__show__defaultAction__notFoundPage'), URL('pub'));
 		}
 		$page = (int)V('g:page', 1);
 		$limit = 10;
@@ -47,7 +47,7 @@ class show_mod extends action {
 		$list = DR('xweibo/xwb.getComments', '', $id, $limit, $page);
 		
 		if (!empty($list['errno'])) {
-			$this->_showErr('获取评论失败，请重试', URL('show.default_action', 'id=' . $id));
+			$this->_showErr(L('controller__show__defaultAction__emptyTip'), URL('show.default_action', 'id=' . $id));
 		}
 		$list = $list['rst'];
 
@@ -95,19 +95,19 @@ class show_mod extends action {
 		$id = V('g:id');
 		
 		if (empty($id)) {
-			$this->_showErr('参数错误', URL('pub'));
+			$this->_showErr(L('controller__show__repos__paramsErr'), URL('pub'));
 		}
 		$mblog_info = DR('xweibo/xwb.getStatuseShow', '', $id);
 		
 		if ($mblog_info['errno']) {
-			$this->_showErr('您要访问的页面不存在', URL('pub'));
+			$this->_showErr(L('controller__show__repos__notFoundPage'), URL('pub'));
 		}
 
 		//检查微博或用户是否被屏蔽
 		$wb = F('weibo_filter', $mblog_info['rst'], true);
 		
 		if (empty($wb)) {
-			$this->_showErr('您要访问的页面不存在', URL('pub'));
+			$this->_showErr(L('controller__show__repos__notFoundPage'), URL('pub'));
 		}
 
 		//获取转发数与评论数
@@ -152,7 +152,7 @@ class show_mod extends action {
 			//$this->_setBackURL();
 
 			$this->_setBackURL(WAP_URL('show.reportSpam', "id={$cid}"));
-			TPL::assign('error', '微博ID不能为空');
+			TPL::assign('error', L('controller__show__reportSpamResult__weiboIdNotAllowEmpty'));
 		}
 
 		//设置返回页面url cookie
@@ -163,10 +163,10 @@ class show_mod extends action {
 		
 		if (empty($content)) {
 			$this->_setBackURL(WAP_URL('show.reportSpam', "id={$cid}"));
-			TPL::assign('error', '举报内容不能为空');
+			TPL::assign('error', L('controller__show__reportSpamResult__contentNotAllowEmpty'));
 		} elseif (strlen(utf8_decode($content)) > 300) {
 			$this->_setBackURL(WAP_URL('show.reportSpam', "id={$cid}"));
-			TPL::assign('error', '举报内容过长，限于100字');
+			TPL::assign('error', L('controller__show__reportSpamResult__lengthTooLong'));
 		}
 
 		//获取返回的页面

@@ -15,11 +15,11 @@
 				<div class="content">
 					<div class="main">
 						<div class="events-title">
-							<h3>活动</h3>
+							<h3><?php LO('events__defaultAction__event');?></h3>
 						</div>
 						<div class="tab-s2">
-							<span class="current"><span><a href="#">热门推荐</a></span></span>
-							<span><span><a href="<?php echo URL('event.mine');?>">我的活动</a></span></span>
+							<span class="current"><span><a href="#"><?php LO('events__defaultAction__hotRec');?></a></span></span>
+							<span><span><a href="<?php echo URL('event.mine');?>"><?php LO('events__defaultAction__myEvent');?></a></span></span>
 						</div>
 						<div class="event-box">
 							<?php Xpipe::pagelet('event.eventlist', array('type' => 'hot'));?>
@@ -27,10 +27,11 @@
 					</div>
 				</div>
 				<div class="aside">
-                        	<div class="launch-event-btn"><a href="<?php echo URL('event.create');?>">发起活动</a></div>
+				<div class="launch-event"><a class="btn-launch-event" href="<?php echo URL('event.create');?>"><?php LO('events__common__create');?></a></div>
                             <!--最新活动 开始-->
 							<?php Xpipe::pagelet('event.sideNewsEvents');?>
                             <!--最新活动 结束-->
+						<?php echo F('show_ad', 'sidebar', '');?>
 						</div>
 			</div>
 			<!-- 尾部 开始 -->

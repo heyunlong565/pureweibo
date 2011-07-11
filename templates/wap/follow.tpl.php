@@ -17,7 +17,7 @@
     	<tbody>
         	<tr>
             	<td><a href="<?php echo WAP_URL('ta', 'id=' . $user['id']); ?>"><img src="<?php echo $user['profile_image_url']; ?>" alt="<?php echo F('escape', $user['screen_name']); ?>" /></a></td>
-                <td><a href="<?php echo WAP_URL('ta', 'id=' . $user['id']); ?>"><?php echo F('verified', $user); ?></a><br />粉丝<?php echo $user['followers_count']; ?>人<br /><a href="<?php echo WAP_URL('wbcom.cancelFollowAlert', 'id=' . $user['id']); ?>">取消关注</a></td>
+				<td><a href="<?php echo WAP_URL('ta', 'id=' . $user['id']); ?>"><?php echo F('verified', $user); ?></a><br /><?php LO('index__follow__fansNum', $user['followers_count']);?><br /><a href="<?php echo WAP_URL('wbcom.cancelFollowAlert', 'id=' . $user['id']); ?>"><?php LO('index__follow__cancelFollowed');?></a></td>
             </tr>
         </tbody>
     </table>
@@ -26,9 +26,9 @@
 	<?php endforeach; ?>
 	<?php else: ?>
 		<?php if (V('g:page', 1) > 1):?>
-		<p>已到最后一页</p>
+		<p><?php LO('index__follow__endPage');?></p>
 		<?php else: ?>
-		<p>您暂时还没有关注别人</p>
+		<p><?php LO('index__follow__emptyTip');?></p>
 		<?php endif; ?>
 		<div class="s"></div>
 	<?php endif; ?>

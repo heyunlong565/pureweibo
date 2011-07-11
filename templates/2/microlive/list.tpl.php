@@ -19,10 +19,10 @@
 					<!-- 站点导航 结束 -->
 				</div>
 				<div class="content">
-                	<div class="talk-hd"><img src="<?php echo $liveInfo['banner_img'];?>" alt="" /></div>
 					<div class="main-wrap">
                         <div class="main">
                             <div class="main-bd">
+                            <div class="live-banner"><img src="<?php echo isset($liveInfo['banner_img']) ? $liveInfo['banner_img'] : W_BASE_URL.'img/'.WB_LANG_TYPE_CSS.'/live_bg.jpg';?>" alt="" /></div>
 							<?php Xpipe::pagelet('live.liveList');?>
                             </div>
                         </div>
@@ -34,11 +34,6 @@
 							<!-- 推广区 开始-->
 							<?php //include '../module/publicity.html' ?>
 							<!-- 推广区 结束-->
-							<!-- ad180 开始 -->
-							<div class="xad-box xad-box-p3">
-								<a href="#" class="icon-close-btn icon-bg"></a>
-							</div>
-							<!-- ad180 结束 -->
 							<!-- 在线主持人列表 -->
 							<?php Xpipe::pagelet('live.liveBaseMaster', array('info' => $liveInfo));?>
 							<!-- end -->

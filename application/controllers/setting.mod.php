@@ -48,6 +48,9 @@ class setting_mod {
 
 	/// 头像设置
 	function myface() {
+		if (!HAS_DIRECT_UPDATE_PROFILE_IMAGE) {
+			APP::redirect('setting.tag', 2);
+		}
 		$uInfo = DR('xweibo/xwb.getUserShow', '', USER::uid());
 		$uInfo = $uInfo['rst'];
 
@@ -283,7 +286,7 @@ class setting_mod {
 			}
 			$cs=V('p:custom_skin',json_encode($json_array));
 			
-			//$cs='{"colors":"#066664,#134333,#233333,2,#433333,#533333","bg":"http://demo.xweibo.cn/var/data/skinbg/6c9964624f003470f23399da453f098c.jpg","tiled":1,"fixed":1,"align":1}';//166
+			//$cs='{"colors":"#066664,#134333,#233333,2,#433333,#533333","bg":"http://demo.xweibo.cn/img/skinbg/6c9964624f003470f23399da453f098c.jpg","tiled":1,"fixed":1,"align":1}';//166
 			//$a=strlen($cs);
 			
 			if($cs!=NULL){
@@ -325,6 +328,8 @@ class setting_mod {
 			}
 			//TPL::assign('customSkin',$customSkin);
 			//TPL::display('customSkin');
+			
+			$customSkin['lang_opt'] = APP::getLang();
 			//暂时不使用默认的模板引擎
 			APP::redirect( W_BASE_URL . 'css/default/skin_define/skin.css.php'.'?customSkin='.json_encode($customSkin),3);
 		}		
@@ -342,7 +347,7 @@ class setting_mod {
 		if ($this->_isPost()) {
 			///如何防止上传相同内容的图片？？？
 			if(!USER::isUserLogin()){
-				APP::ajaxRst(FALSE,610005,'您尚未登录');
+				APP::ajaxRst(FALSE,610005, L('controller__setting__notLogin'));
 				return;
 			}
 			else{
@@ -355,20 +360,20 @@ class setting_mod {
 			$script='window.location="/js/blank.html?rand='.microtime().'";';
 			while ($file && $file['tmp_name']) {
 				if ($file['size'] > $maxSize) {
-					APP::JSONP(FALSE,3040012,'上传背景图片的大小不能超过2M，请重新选择',$callback,$script);
+					APP::JSONP(FALSE,3040012, L('controller__setting__sizeLimit'),$callback,$script);
 					break;
 				}
 				$info = getimagesize($file['tmp_name']);
 				if ($info[2] != 3&&$info[2] != 2) {
 					//APP::ajaxRst(FALSE,610003,'上传的图片文件不为PNG/JPG格式，请重新选择');
-					APP::JSONP(FALSE,610003,'上传的图片文件不为PNG/JPG格式，请重新选择',$callback,$script);
+					APP::JSONP(FALSE,610003,L('controller__setting__uploadImgType'),$callback,$script);
 					break;
 				}
 				//上传文件
 				$file_obj = APP::ADP('upload');
 				///以sina_uid md5为名保存文件
 				if (!$file_obj->upload('skinbg', WB_SKIN_BGIMG_UPLOAD_DIR . md5($sina_uid), P_VAR_NAME, 'png,jpeg,jpg', $maxSize)) {
-					APP::JSONP(FALSE,610007,'复制文件时出错,上传失败',$callback,$script);
+					APP::JSONP(FALSE,610007, L('controller__setting__copyImgError'),$callback,$script);
 					break;
 				}
 				//获取上传文件的信息
@@ -378,12 +383,12 @@ class setting_mod {
 				return;
 			}
 			if($file&&$file['tmp_name']==''&&$file['size']==0){
-				APP::JSONP(FALSE,3040012,'上传背景图片的大小不能超过2M，请重新选择',$callback,$script);
-				break;
+				APP::JSONP(FALSE,3040012, L('controller__setting__sizeLimit'),$callback,$script);
+				return;
 			}
 			else{
-				APP::JSONP(FALSE,610008,'服务器错误，请稍候重试',$callback,$script);
-				break;
+				APP::JSONP(FALSE,610008, L('controller__setting__serverError'),$callback,$script);
+				return;
 			}
 		}
 		else{

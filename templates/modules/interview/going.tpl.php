@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" <?php if ($interview['backgroup_color']){ echo "class='skin{$interview['backgroup_color']}'"; }?>>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>在线访谈-行进中 - Powered By X微博</title>
+<title><?php echo F('web_page_title', false, F('escape', $interview['title']));?></title>
 <?php TPL::module('interview/include/css_link', array('interview'=>$interview) );?>
 <?php TPL::module('interview/include/js_link');?>
 
@@ -24,10 +24,17 @@
                 
 				<div class="content">
 					<div class="main">
+						<?php if ( !USER::isUserLogin() ) {?>
+						<div class="not-login-tips">
+							<p><?php LO('modules_interview_login_tip');?></p>
+							<a href="#" class="btn-login" rel="e:lg"><?php LO('modules_interview_login_tag');?></a>
+						</div>
+						<?php }?>
+						
 						<!-- 微博发布框 开始-->
 						<?php 
 							// Build Title
-							$title  = '<div class="title-txt">我有一个问题向</div><div class="btn-guest"><span>嘉宾列表</span><em class="arrow"></em>';
+							$title  = L('modules_interview_going_ask');
 							$title .= '<ul class="guest-list hidden">';
 							foreach ($interview['guest'] as $aGuest) 
 							{
@@ -61,12 +68,12 @@
 					<!-- 访谈简介 开始-->
                     <div class="talk-intro">
                         <div class="hd">
-                        	<p><span class="going">进行中</span></p>
-                            <p class="time">访谈时间：<span><?php echo date($interview['dateFormat'], $interview['start_time']).' - '.date($interview['dateFormat'], $interview['end_time']); ?></span></p>
-                        	<p><a href="#" class="btn-recommend" rel="e:sd,m:<?php echo F('share_weibo', 'interview', $interview);?>">推荐给好友</a></p>
+                        	<p><span class="going"><?php LO('modules_interview_going_going');?></span></p>
+                            <p class="time"><?php LO('modules_interview_going_time');?><span><?php echo date($interview['dateFormat'], $interview['start_time']).' - '.date($interview['dateFormat'], $interview['end_time']); ?></span></p>
+                        	<p><a href="#" class="btn-recommend" rel="e:sd,t:share,m:<?php echo F('share_weibo', 'interview', $interview);?>"><?php LO('modules_interview_going_recommend');?></a></p>
                         </div>
                         <div class="bd">
-                             <h4>访谈简介：</h4>
+                             <h4><?php LO('modules_interview_going_title');?></h4>
                            	<p><?php echo $interview['desc']; ?></p>
                         </div>
                     </div>
@@ -77,13 +84,12 @@
                     <!-- 访谈主持人 结束-->
 					
 					<!-- 访谈嘉宾 开始-->
-					<?php Xpipe::pagelet('interview.guestList', array('guestList'=>$interview['guest'])); ?>
+					<?php Xpipe::pagelet('interview.guestList', array('guestList'=>$interview['guest'],'friendList'=>$friendList)); ?>
 					<!-- 访谈嘉宾 结束-->
                     
                     <!-- 访谈列表 开始-->
                     <?php TPL::module('interview/include/program_list', array('interviewList'=>$interviewList)); ?>
                     <!-- 访谈列表 结束-->
-                    
 				</div>
                 <!-- 右边栏 结束 -->
 			</div>

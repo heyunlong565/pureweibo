@@ -1,6 +1,6 @@
 ﻿@charset "utf-8";
 /*
-  维护者：林毅
+  维护者：林毅、蔡伟江
   文档作用：404、错误页面的样式
 */
 
@@ -8,46 +8,13 @@
 body, p, h3{ margin:0; padding:0;}
 body{ background:#f0f0f0; color:#666; font:14px/1.5 Tahoma, Geneva, sans-serif; }
 
-/*#container { width:800px; }
-#container.single { background:#fff none!important;}
-#container .content { margin:auto; }
-#container.single .content .main { padding:0; }
-*/
-/*404错误页面*/
-/*.error-box {padding:30px 0;overflow:hidden;padding-left:50px;zoom:1;position:relative;}
-.error-box .error-404-bg {background:url(bgimg/error_404_bg.png) no-repeat;height:313px;width:608px;}
-.error-box .error-busy-bg {background:url(bgimg/error_busy_bg.png) no-repeat;height:313px;width:600px;}
-.error-box .error-force-bg {background:url(bgimg/error_force_bg.png) no-repeat;height:387px;width:619px;}
-.error-box .error-rest-bg {background:url(bgimg/error_rest_bg.png) no-repeat;height:322px;width:603px;}
-.error-box .error-404-con {position:absolute;left:330px;top:190px;}
-.error-box .error-404-con p {font-size:12px;}
-.error-box .error-busy-con {position:absolute;left:330px;top:130px;}
-.error-box .error-force-con {position:absolute;left:350px;top:180px;}
-.error-box .error-rest-con {position:absolute;left:340px;top:170px;}
-.error-box p {font-size:14px;line-height:1.6;}
-.error-box p a {color:#0082cb;font-size:12px;line-height:2;}
-*/
-/*禁止访问*/
-/*.inhibit {margin:0 auto;overflow:hidden;padding:150px 0;width:270px;}
-.inhibit-icon {background:url(bgimg/inhibit_icon.png) no-repeat;float:left;height:64px;width:64px;margin-right:20px;}
-.inhibit-txt {float:left;margin-top:5px;}
-.inhibit-txt p strong {color:#f00;line-height:2;}
-*/
-/*404错误页面*/
-/*.error-box .inhibit-icon {background-position:0 0;}
-.error-box .not-found-icon {background-position:-144px 0;}
-.error-info {float:left;}
-.error-info .error-title {}
-.error-info .error-con p strong{color:#f00;}
-.inhibit-tit {background-position:0 -136px;}
-.not-exist-tit {background-position:0 -200px;}
-*/
-/*错误页面共用样式 - new*/
+/*错误页面共用样式*/
 a{ color:#1A88B1; font-size:12px; text-decoration:none; }
 a:hover{ text-decoration:underline; }
 .error{ position:absolute; left:50%; top:50%; height:292px; width:682px; margin:-146px 0 0 -341px;  overflow:hidden; }
 	.error p{ margin:3px 0; }
 	.error .b{ margin-bottom:10px; }
+	.error h3{ margin-bottom:15px; font: 24px Microsoft YaHei, "黑体", "宋体", sans-serif; letter-spacing:2px; color:#444;  }
 	
 	.err-404{ background:url(bgimg/404_bg.png) no-repeat; }
 	.err-busy{ background:url(bgimg/err_busy_bg.png) no-repeat; }
@@ -55,11 +22,12 @@ a:hover{ text-decoration:underline; }
 	.err-upgrade{ background:url(bgimg/err_upgrade_bg.png) no-repeat; }
 
 	.error .error-con{ position:absolute;  left:70px; width:330px; }
-	.err-404 .error-con{ top:125px;}
-	.err-404 .error-con a{ margin-left:5px; }  
+	.err-404 .error-con{ top:77px;}
 	.err-busy .error-con{ top:60px; }
-	.err-busy h3{ margin-bottom:13px; font:bold 20px Microsoft YaHei, Arial, Helvetica, sans-serif; letter-spacing:2px;  }
-	.err-inhibit .error-con{ top:110px; }
+	.err-inhibit .error-con{ top:69px; }
+	.err-upgrade .error-con{ top:76px;}
+	
 	.err-inhibit .error-con p{ margin-bottom:20px; }
 	.err-inhibit .error-con a{ margin-right:10px; }
-	.err-upgrade .error-con{ top:118px;}
+	.err-busy h3{ margin-bottom:13px; }
+	.err-404 .error-con a{ margin-left:5px; }  

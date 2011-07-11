@@ -146,7 +146,7 @@ class site_list_mod extends action
 	 */
 	function addMember()
 	{
-		$listId 	= (int)V('p:listId',0);		//分组id
+		$listId 	= V('p:listId',0);		//分组id
 		$nickname 	= V('p:nickname','');		//成员昵称
 		$url		= URL('mgr/site_list.memberList', 'listId='.$listId);
 		$json = V('g:json', false);		// 是否返回json
@@ -183,7 +183,7 @@ class site_list_mod extends action
 	function delMember()
 	{
 		// Check list id
-		$listId = (int)V('r:listId',0);	//类别id
+		$listId = V('r:listId',0);	//类别id
 		$json = V('g:json', false);		// 是否返回json
 
 		if(empty($listId)) {

@@ -12,21 +12,21 @@
 <script type="text/javascript" src="<?php echo W_BASE_URL;?>js/extra/colorpicker.js"></script>
 <script type="text/javascript" src="<?php echo W_BASE_URL;?>js/admin/microlive.js"></script>
 <script type="text/javascript" src="<?php echo W_BASE_URL ?>js/datepick/jquery.datepick.min.js"></script>
-<script type="text/javascript" src="<?php echo W_BASE_URL ?>js/datepick/jquery.datepick-zh-CN.js"></script>
+<script type="text/javascript" src="<?php echo W_BASE_URL ?>js/datepick/jquery.datepick-<?php echo APP::getLang();?>.js"></script>
 </head>
 <body class="main-body">
 	<div class="path"><p>当前位置：扩展工具<span>&gt;</span><a href="<?php echo URL('mgr/micro_interview');?>">在线访谈列表</a><span>&gt;</span><?php echo isset($interview['id']) ? '编辑' : '新建'; ?>在线访谈</p></div>
     <div class="main-cont">
         <h3 class="title"><?php echo isset($interview['id']) ? '编辑' : '新建'; ?>在线访谈</h3>
 		<div class="set-area">
-        	<div class="form-area">
+        	<div class="form">
     		 <form method="post" id="submitForm" action="<?php echo URL('mgr/micro_interview.saveInterview');?>">
     		    <input type="hidden" name="id" value="<?php echo isset($interview['id']) ? $interview['id'] : '';?>" />
                 <div class="form-row">
                     <label for="live-tit" class="form-field">标题</label>
                     <div class="form-cont">
-                        <input id="live-tit" vrel="_f|ne|sz=max:40,m:不多于20个字,ww" warntip="#tleTip" class="input-txt" name="title" value="<?php echo isset($interview['title']) ? F('escape', $interview['title']) : '';?>" type="text" /> <span class="tips-error hidden" id="tleTip"></span>
-                        <p class="form-tips">（限20个汉字）</p>
+                        <input id="live-tit" vrel="_f|ne|sz=max:30,m:不多于15个字,ww" warntip="#tleTip" class="input-txt" name="title" value="<?php echo isset($interview['title']) ? F('escape', $interview['title']) : '';?>" type="text" /> <span class="tips-error hidden" id="tleTip"></span>
+                        <p class="form-tips">（限15个汉字）</p>
                     </div>
                 </div>
                 <div class="form-row">
@@ -41,7 +41,7 @@
                     <label for="start-time" class="form-field">开始时间</label>
                     <div class="form-cont">
                         <div class="input start">
-                            <input type="text" name="start_date" id="start_date" class="input-txt form-el-w100" value="<?php echo date('Y-m-j',isset($interview['start_time'])?$interview['start_time']:time());?>" vrel="ne=m:请填写开始时间|chkdate" warntip="#startTip"/>
+                            <input type="text" name="start_date" id="start_date" class="input-txt w100" value="<?php echo date('Y-m-j',isset($interview['start_time'])?$interview['start_time']:time());?>" vrel="ne=m:请填写开始时间|chkdate" warntip="#startTip"/>
                         
                              <select name="start_h" id="start_h" class="hour">
                             <?php
@@ -77,7 +77,7 @@
                     <label for="end-time" class="form-field">结束时间</label>
                     <div class="form-cont">	
                         <div class="input end">
-                            <input type="text" name="end_date" id="end_date" class="input-txt form-el-w100" value="<?php echo date('Y-m-j',isset($interview['end_time'])?$interview['end_time']:time());?>" vrel="ne=m:请填写结束时间" warntip="#endTip" />
+                            <input type="text" name="end_date" id="end_date" class="input-txt w100" value="<?php echo date('Y-m-j',isset($interview['end_time'])?$interview['end_time']:time());?>" vrel="ne=m:请填写结束时间" warntip="#endTip" />
                             
                             <select name="end_h" id="end_h" class="hour">
                             <?php
@@ -110,7 +110,7 @@
                 <div class="form-row">
                     <label class="form-field">提醒时间</label>
                     <div class="form-cont">
-                    	<input type="text" vrel="ne|int" warntip="#remindTip" class="input-txt form-el-w100" name="notice_time" onchange="$('#noticeTimeSpan').html(this.value);" value="<?php echo isset($interview['notice_time']) ? $interview['notice_time']/60 : 5; ?>" /> 分
+                    	<input type="text" vrel="ne|int" warntip="#remindTip" class="input-txt w100" name="notice_time" onchange="$('#noticeTimeSpan').html(this.value);" value="<?php echo isset($interview['notice_time']) ? $interview['notice_time']/60 : 5; ?>" /> 分
                         <span class="form-tips">访谈开始前<span id="noticeTimeSpan"><?php echo isset($interview['notice_time']) ? $interview['notice_time']/60 : 5; ?></span>分钟提醒用户</span>
                     </div>
                     <span class="tips-error hidden" id="remindTip"></span>
@@ -132,7 +132,7 @@
 							<?php foreach($master_list as $item):?>
 							<tr>
                             	<td><span class="user-pic"><img src="<?php echo $item['profile_image_url'];?>" alt="" /></span></td>
-                                <td onclick="MicroAdmin.edit(this)"><p title="点击编辑" class="text"><?php echo $item['screen_name'];?></p><input value="<?php echo $item['screen_name'];?>" type="text" class="input-txt txt-s1 hidden" id="_holder" vrel="_f|<?php if($i == 1):?>ne=m:须指定首个主持人|<?php endif;?>username" warntip="#masterTip"><input type="hidden" name="master[]" id="master" value="<?php echo $item['id'];?>" /><span class="tips-error hidden" id="masterTip"></span></td></td>
+                                <td onclick="MicroAdmin.edit(this)"><p title="点击编辑" class="text"><?php echo $item['screen_name'];?></p><input value="<?php echo $item['screen_name'];?>" type="text" class="input-txt w130 hidden" id="_holder" vrel="_f|<?php if($i == 1):?>ne=m:须指定首个主持人|<?php endif;?>username" warntip="#masterTip"><input type="hidden" name="master[]" id="master" value="<?php echo $item['id'];?>" /><span class="tips-error hidden" id="masterTip"></span></td></td>
                                 <td><a class="icon-edit" href="#" onclick="MicroAdmin.edit(this);return false;">编辑</a><a class="icon-del" href="#" onclick="MicroAdmin.del(this);return false;">删除</a></td>
                             </tr>
 							<?php $i++;?>
@@ -140,7 +140,7 @@
 							<?php endif;?>
                             <tr id="addCol">
                                 <td><span class="user-pic"><img src="<?php echo W_BASE_URL;?>img/user_img_default.png" alt="" /></span></td>
-                                <td><input type="text"  class="input-txt txt-s1" warntip="#masterRequire" vrel="userrequire=m:须添加至少一个主持人"/><span class="tips-error hidden" id="masterRequire"></span></td>
+                                <td><input type="text"  class="input-txt w130" warntip="#masterRequire" vrel="userrequire=m:须添加至少一个主持人" onblur="MicroAdmin.add(this, 'master');return false;"/><span class="tips-error hidden" id="masterRequire"></span></td>
                                 <td><a href="javascript:;" class="icon-add" onclick="MicroAdmin.add(this, 'master');return false;">添加</a></td>
                             </tr>
                         </table>
@@ -161,7 +161,7 @@
 							<?php foreach($guest_list as $item):?>
 							<tr>
                             	<td><span class="user-pic"><img src="<?php echo $item['profile_image_url'];?>" alt="" /></span></td>
-                                <td onclick="MicroAdmin.edit(this)"><p title="点击编辑" class="text"><?php echo $item['screen_name'];?></p><input value="<?php echo $item['screen_name'];?>" type="text" class="input-txt txt-s1 hidden" id="_holder" vrel="_f|<?php if($i == 1):?>ne=m:须指定首个嘉宾|<?php endif;?>username" warntip="#masterTip"><input type="hidden" name="guest[]" id="guest" value="<?php echo $item['id'];?>" /><span class="tips-error hidden" id="masterTip"></span></td></td>
+                                <td onclick="MicroAdmin.edit(this)"><p title="点击编辑" class="text"><?php echo $item['screen_name'];?></p><input value="<?php echo $item['screen_name'];?>" type="text" class="input-txt w130 hidden" id="_holder" vrel="_f|<?php if($i == 1):?>ne=m:须指定首个嘉宾|<?php endif;?>username" warntip="#masterTip"><input type="hidden" name="guest[]" id="guest" value="<?php echo $item['id'];?>" /><span class="tips-error hidden" id="masterTip"></span></td></td>
                                 <td><a class="icon-edit" href="#" onclick="MicroAdmin.edit(this);return false;">编辑</a><a class="icon-del" href="#" onclick="MicroAdmin.del(this);return false;">删除</a></td>
                             </tr>
 							<?php $i++;?>
@@ -169,21 +169,21 @@
 							<?php endif;?>
                             <tr id="addCol">
                                 <td><span class="user-pic"><img src="<?php echo W_BASE_URL;?>img/user_img_default.png" alt="" /></span></td>
-                                <td><input type="text"  class="input-txt txt-s1" warntip="#guestRequire" vrel="userrequire=m:须添加至少一个嘉宾"/><span class="tips-error hidden" id="guestRequire"></span></td>
+                                <td><input type="text"  class="input-txt w130" warntip="#guestRequire" vrel="userrequire=m:须添加至少一个嘉宾" onblur="MicroAdmin.add(this, 'guest');return false;"/><span class="tips-error hidden" id="guestRequire"></span></td>
                                 <td><a href="javascript:;" class="icon-add" onclick="MicroAdmin.add(this, 'guest');return false;">添加</a></td>
                             </tr>
                         </table>
                     </div>
                 </div>
                 
-                <input type="hidden" name="banner_img" id="bannerImg" value="<?php echo isset($interview['banner_img']) ? $interview['banner_img'] : W_BASE_HTTP.W_BASE_URL.'img/talk_banner_960.png';?>" vrel="pic=f:banner,c:外观" warntip="#bannerTip"/>
-                <input type="hidden" name="cover_img" id="coverImg" value="<?php echo isset($interview['cover_img']) ? $interview['cover_img'] : W_BASE_HTTP.W_BASE_URL.'img/talk_logo_124.jpg';?>" vrel="pic=f:cover,c:封面" warntip="#coverTip"/>
-                <input type="hidden" name="backgroup_img" value="<?php echo isset($interview['backgroup_img']) ? $interview['backgroup_img'] : W_BASE_HTTP.W_BASE_URL.'img/live_bg_main.jpg';?>" id="backgroundImg" vrel="pic=f:background,c:背景" warntip="#bkTip"/>
+                <input type="hidden" name="banner_img" id="bannerImg" value="<?php echo isset($interview['banner_img']) ? $interview['banner_img'] : $default_banner_img;?>" vrel="pic=f:banner,c:外观" warntip="#bannerTip"/>
+                <input type="hidden" name="cover_img" id="coverImg" value="<?php echo isset($interview['cover_img']) ? $interview['cover_img'] : $default_cover_img;?>" vrel="pic=f:cover,c:封面" warntip="#coverTip"/>
+                <input type="hidden" name="backgroup_img" value="<?php echo isset($interview['backgroup_img']) ? $interview['backgroup_img'] : $default_backgroup_img;?>" id="backgroundImg" vrel="pic=f:background,c:背景" warntip="#bkTip"/>
                 <input type="hidden" name="backgroup_style" value="<?php echo isset($interview['backgroup_style']) ? $interview['backgroup_style'] : '';?>" id="backgroundStyle" />
                 <input type="hidden" name="custom" value="<?php if (isset($interview['custom_color']) && !empty($interview['custom_color'])):?>1<?php else:?>0<?php endif;?>" id="custom" />
                 <input type="hidden" name="bkcolor" id="bkcolor" value="<?php echo isset($interview['custom_color']) ? $interview['custom_color'] : '';?>"/>
                 <input type="hidden" name="linkcolor" id="linkcolor" value="<?php echo isset($interview['custom_color']) ? $interview['custom_color'] : '';?>"/>
-                <input type="hidden" name="color" id="color" value="<?php echo isset($interview['backgroup_color']) ? $interview['backgroup_color'] : '';?>"/>
+                <input type="hidden" name="color" id="color" value="<?php echo isset($interview['backgroup_color']) ? $interview['backgroup_color'] : '01';?>"/>
               </form>
 
                 <div class="slice-line"></div>
@@ -193,7 +193,7 @@
                     <label for="banner" class="form-field">外观设置</label>
                     <div class="form-cont">
                         <input type="file" class="btn-file" value="上传banner"  id="banner" name="pic" onchange="MicroAdmin.upload(this)"/><p class="form-tips">建议图片尺寸960*120px</p>
-                        <div class="banner-prev"><img src="<?php if (isset($interview['banner_img'])):?><?php echo F('fix_url',$interview['banner_img']); else: echo W_BASE_HTTP.W_BASE_URL.'img/talk_banner_960.png';?><?php endif;?>" title="banner" /></div>
+                        <div class="banner-prev"><img src="<?php if (isset($interview['banner_img'])): echo $interview['banner_img']; else: echo $default_banner_img; endif;?>" title="banner" /></div>
                     </div>
                     <span class="tips-error hidden" id="bannerTip"></span>
                    </form> 
@@ -204,7 +204,7 @@
                         <label for="cover" class="form-field">封面</label>
                         <div class="form-cont">
                             <input type="file" class="btn-file" value="上传banner" name="pic" id="cover" onchange="MicroAdmin.upload(this)"/><p class="form-tips">图片尺寸120*120px</p>
-                            <div class="cover-prev"><img src="<?php if (isset($interview['cover_img'])):?><?php echo F('fix_url',$interview['cover_img']); else: echo W_BASE_HTTP.W_BASE_URL.'img/talk_logo_124.jpg';?><?php endif;?>" title="banner" /></div>
+                            <div class="cover-prev"><img src="<?php echo isset($interview['cover_img']) ? $interview['cover_img'] : $default_cover_img;?>" title="banner" /></div>
                         </div>
                         <span class="tips-error hidden" id="coverTip"></span>
                     </form>
@@ -216,7 +216,7 @@
                     <div class="form-cont">
                         <input type="file" class="btn-file" value="上传banner" name="pic" id="background" onchange="MicroAdmin.upload(this)"/>
                         <div class="bg-prev">
-                            <img src="<?php if (isset($interview['backgroup_img'])):?><?php echo F('fix_url',$interview['backgroup_img']); else: echo W_BASE_HTTP.W_BASE_URL.'img/live_bg_main.jpg';?><?php endif;?>" title="banner" />
+                            <img src="<?php echo isset($interview['backgroup_img']) ? $interview['backgroup_img'] : $default_backgroup_img;?>" title="banner" />
                             <select name="backgroup_style">
                                 <option value="1" <?php if ((isset($interview['backgroup_style']) && $interview['backgroup_style'] != 2) || !isset($interview['backgroup_style'])):?>selected="selected"<?php endif;?>>平铺</option>
                                 <option value="2" <?php if (isset($interview['backgroup_style']) && $interview['backgroup_style'] == 2):?>selected="selected"<?php endif;?>>居中</option>
@@ -254,7 +254,7 @@
                         </div>
                     </div>
                 </div>
-                 <div class="btn-area"><a href="#" id="preview" class="general-btn btn-s2"><span>预览</span></a><a href="#" id="submitBtn" class="general-btn"><span>保存</span></a></div>
+                 <div class="btn-area"><a href="#" id="preview" class="btn-general highlight"><span>预览</span></a><a href="#" id="submitBtn" class="btn-general"><span>保存</span></a></div>
             </div>
 			</form>
         	
@@ -317,7 +317,7 @@
     
     // 外观选择项点击
     var styleUI = new Xwb.ui.Base({
-        view : $('.form-area')[0],
+        view : $('.form')[0],
         actionMgr:true,
         onactiontrig:function(e){
             var src = $(e.src);

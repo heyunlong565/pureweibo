@@ -4,12 +4,13 @@ require_once dirname(__FILE__). '/component_abstract.pls.php';
 /**
  * 可能感兴趣的人
  * @author yaoying
- * @version $Id: component_7.pls.php 11912 2011-03-23 08:43:59Z yaoying $
+ * @version $Id: component_7.pls.php 16827 2011-06-06 23:59:41Z jianzhou $
  *
  */
 class component_7_pls extends component_abstract_pls{
 	
-	function run($mod){
+	function run($mod)
+	{
 		parent::run($mod);
 		
 		//未登录，不使用
@@ -18,24 +19,26 @@ class component_7_pls extends component_abstract_pls{
 			return;
 		}
 		
+		
+		$cacheTime = 'g/'.V('-:tpl/cache_time/pagelet_component7');
 		$show_num = isset($mod['param']['show_num']) ? $mod['param']['show_num'] : FALSE;
-		$ret 	  = DR('components/guessYouLike.get', 'g/60', 0, $show_num);
+		$ret 	  = DR('components/guessYouLike.get', $cacheTime, 0, $show_num);
 		
 		if ($ret['errno']) {
-			$this->_error('components/guessYouLike.get 返回API错误：'. $ret['err']. '('. $ret['errno']. ')');
+			$this->_error(L('pls__component7__guessYouLike__apiError', $ret['err'], $ret['errno']));
+			//$this->_error('components/guessYouLike.get 返回API错误：'. $ret['err']. '('. $ret['errno']. ')');
 			return;
 		}elseif(empty($ret['rst'])){
-			$this->_error('components/guessYouLike.get返回列表为空。');
+			$this->_error(L('pls__component7__guessYouLike__dbError'));
 			return;
 		}elseif(!is_array($ret['rst'])){
-			$this->_error('components/guessYouLike.get 返回错误的非数组类型数据！');
+			$this->_error(L('pls__component7__guessYouLike__Error'));
 			return;
 		}
 		
 		$followedList = $this->_generateFollowedList($ret['rst']);
 		
 		TPL::module('component/component_' . $mod['component_id'], array('mod' => $mod, 'rs' => $ret['rst'], 'followedList' => $followedList));
-		
 	}
 	
 	/**

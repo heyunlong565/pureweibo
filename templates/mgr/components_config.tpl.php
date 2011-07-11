@@ -53,7 +53,7 @@
 			
 				<div class="set1">
 					<div class="sub-set-l">默认使用的话题：</div>
-					<div class="sub-set-r"><input class="input-box" type="text" vrel="ne=m:不能为空" warntip="#titleErr" name="topic" value="<?php echo F('escape', $cfg['topic']) ?>"/><span class="a-error hidden" id="titleErr"></span></div>
+					<div class="sub-set-r"><input class="input-txt" type="text" vrel="ne=m:不能为空" warntip="#titleErr" name="topic" value="<?php echo F('escape', $cfg['topic']) ?>"/><span class="tips-error hidden" id="titleErr"></span></div>
 				</div>
 				
 			<?php 
@@ -93,7 +93,7 @@
 				array_push($valids, 'ne=m:不能为空');
 
 			?>
-                    			<input class="input-box" name="show_num" type="text"<?php echo !empty($valids) ? 'vrel='.join('|', $valids):''?> value="<?php echo $cfg['show_num'];?>" warntip="#showNumErr"/><span id="showNumErr" class="a-error hidden"></span><?php if ($showNumSugg):?><p class="sub-tips">（<?php echo $showNumSugg;?>）</p><?php endif;?>
+                    			<input class="input-txt" name="show_num" type="text"<?php echo !empty($valids) ? 'vrel='.join('|', $valids):''?> value="<?php echo $cfg['show_num'];?>" warntip="#showNumErr"/><span id="showNumErr" class="tips-error hidden"></span><?php if ($showNumSugg):?><p class="sub-tips">（<?php echo $showNumSugg;?>）</p><?php endif;?>
                        		</label>
                     	</div>
                 	</div>

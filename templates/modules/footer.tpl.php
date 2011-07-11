@@ -1,9 +1,14 @@
+<?php if (!in_array(APP::getRequestRoute(), array('live','live.details','interview'))) {?>
+<div class="ft-xad">
+		<?php echo F('show_ad', 'global_footer', 'ft-xad-in');?>
+</div>
+<?php }?>
 <div id="footer">
 	<div class="ft-in">
 		<div class="ft-bg"></div>
 		<!-- ad页脚800 开始 -->
 		<!--<div class="xad-box xad-box-p4">
-			<a href="#" class="icon-close-btn icon-bg"></a>
+			<a href="#" class="ico-close-btn"></a>
 		</div>-->	
 		<!-- ad页脚800 结束 -->
 		<div class="ft-con">
@@ -14,7 +19,7 @@
 					<a target="_blank" href="http://www.miibeian.gov.cn/ "><?php echo V('-:sysConfig/site_record');?></a>
 				<?php endif; ?>
 			</em>
-			<a target="_blank" href="<?php echo W_BASE_URL.'wap.php'?>">WAP 版</a>
+				<a target="_blank" href="<?php echo W_BASE_URL.'wap.php'?>"><?php LO('modules__footer__wap');?></a>
 			<?php
 				$foot = "";
 				$foot = json_decode(V('-:sysConfig/foot_link'),true);
@@ -42,3 +47,18 @@
 		}
 	?>
 </div>
+<?php
+// 同步登录状态到附属站点  
+$site_uid	= USER::get('site_uid');
+$loginScript	= USER::get('syncLoginScript');
+//var_dump(array($site_uid, $loginScript));
+if ( $site_uid && $loginScript){
+	$accAdapter = APP::ADP('account');
+	$syncLogoutScript = $site_uid ? $accAdapter->syncLogin($site_uid) : '';
+	//echo F('escape', $syncLogoutScript);
+	if (!empty($syncLogoutScript)){
+		echo $syncLogoutScript;
+	}
+	USER::set('syncLoginScript',0);
+}
+?>

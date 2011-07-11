@@ -10,7 +10,7 @@ function error($msg = '', $display = false) {
 	}
 	
 	if (Xpipe::isRunning()) {
-		echo '<div class="api-error"><p>' . ($msg ? $msg : '服务器忙，请<a href="javascript:window.location.reload()">刷新</a>重试') . '</p></div>';
+		echo '<div class="api-error"><p>' . ($msg ? $msg : L('function__error__serverBusy')) . '</p></div>';
 	} else {
 		//$templates = array('error_busy', 'error_force','error_rest');
 		//$index = rand(0, sizeof($templates) - 1);

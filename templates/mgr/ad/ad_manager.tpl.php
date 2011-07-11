@@ -17,32 +17,29 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
 </script>
 </head>
 <body>
-<div class="main-wrap">
-	<div class="path"><span class="path-icon"></span>当前位置：<span>组件管理</span> &gt; <span>广告管理</span> &gt; <span>广告位列表</span>
-	</div>
-	<div class="set-wrap">
-
-<h4 class="main-title"> 广告位列表</h4>
-		<div class="set-area-int">
-        	
+<div class="main-body">
+	<div class="path"><p>当前位置：界面管理<span>&gt;</span>广告</p></div>
+	<div class="main-cont">
+		<h3 class="title"> 广告位列表</h3>
+		<div class="set-area">
 				<table width="100%" border="0" cellpadding="0" cellspacing="0" class="table">
 					<colgroup>
-						<col class="num" />
-    					<col class="pos"/>
-    					<col class="range"/>
-						<col class="status"  />
-						<col class="mod" />
+						<col class="w50" />
+    					<col/>
+    					<col class="w120"/>
+						<col class="w120"  />
+						<col class="w150" />
     				</colgroup>
-                    <thead class="td-title-bg">
+                    <thead class="tb-tit-bg">
 					<tr>
-						<th><div class="td-inside">编号</div></th>
-						<th><div class="td-inside">广告位</div></th>
-   					  	<th><div class="td-inside">广告投放范围</div></th>
-						<th><div class="td-inside">广告位状态</div></th>
-   					  	<th><div class="td-inside">操作</div></th>
+						<th><div class="th-gap">编号</div></th>
+						<th><div class="th-gap">广告位</div></th>
+   					  	<th><div class="th-gap">广告投放范围</div></th>
+						<th><div class="th-gap">广告位状态</div></th>
+   					  	<th><div class="th-gap">操作</div></th>
 				  	</tr>
               		</thead>
-              		
+                    <tfoot class="tb-foot-bg"></tfoot>
                 	<tbody>
 					<?php if (isset($data) && is_array($data)) {foreach($data as $index => $row) {?>
 				  	<tr>
@@ -51,9 +48,8 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
    					  	<td><?php echo $row['description'];?></td>
    					  	<td><?php echo $row['using']?'启用中':'已禁用';?></td>
 						<td class="mod-td">
-								
-									<a href="javascript:delConfirm('<?php echo URL('mgr/ad.stateChg', 'id='. $row['id'] . '&state='.(int)!(int)$row['using'] , 'admin.php')?>', '确认要改变该状态吗?')" class="using"><?php echo $row['using']?'禁用':'启用';?></a>
-									<a href="<?php echo URL('mgr/ad.edit', 'id='. $row['id'] , 'admin.php')?>" class="page-set">设置</a>
+									<a href="<?php echo URL('mgr/ad.edit', 'id='. $row['id'] , 'admin.php')?>" class="icon-set">设置</a>
+									<a href="javascript:delConfirm('<?php echo URL('mgr/ad.stateChg', 'id='. $row['id'] . '&state='.(int)!(int)$row['using'] , 'admin.php')?>', '确认要改变该状态吗?')" class="icon-forbid"><?php echo $row['using']?'禁用':'启用';?></a>
 								
 						</td>
 					</tr>

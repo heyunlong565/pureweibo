@@ -22,13 +22,10 @@
 				</div>
 				
 				<div class="content">
-                	<div class="talk-hd">
-                		<img src="<?php echo ( isset($config['banner_img'])?$config['banner_img']:W_BASE_URL.'img/talk_pic_800.png'); ?>" alt="" />
-                	</div>
-                	
 					<div class="main-wrap">
                         <div class="main">
                             <div class="main-bd">
+							<div class="talk-banner"><img src="<?php echo $banner_img;?>" alt="" /></div>
                             <?php Xpipe::pagelet('interview.index_list');?>
                             </div>
                         </div>
@@ -37,11 +34,6 @@
 							<?php Xpipe::pagelet('common.userPreview');?>
 							<!-- 用户信息 结束-->
 							
-							<!-- ad180 开始 -->
-							<div class="xad-box xad-box-p3">
-								<a href="#" class="icon-close-btn icon-bg"></a>
-							</div>
-							<!-- ad180 结束 -->
 							<!-- 在线主持人 开始-->
 							<?php Xpipe::pagelet('interview.baseMasterList', array( 'masterList'=>$userlist, 'friendList'=>$friendList ) );?>
 							<!-- 在线主持人 结束-->

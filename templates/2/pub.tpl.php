@@ -58,6 +58,7 @@ if(!defined('IN_APPLICATION')){
                         //echo F('show_ad', 'sidebar', 'xad-box xad-box-p3');
                         ?>
                         
+						<?php echo F('show_ad', 'sidebar', '');?>
 						</div>
 					</div>
 				</div>

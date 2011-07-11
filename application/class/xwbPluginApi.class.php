@@ -66,6 +66,8 @@ class xwbPluginApi{
 	 */
 	function _request($A, $P, $T, $F)
 	{
+		$log_func_start_time = microtime(TRUE);
+		
 		$params = array();
 		$params['A'] = $A;
 		$params['P'] = $P;
@@ -78,6 +80,10 @@ class xwbPluginApi{
 		$info = $this->http->getHttpInfo();
 		$code = $this->http->getCode();
 
+		$logParam = array('$info'=>$info, 'params'=>$params, 'code'=>$code, 'result'=>$ret);
+		LogMgr::warningLog($log_func_start_time, 'api', "[plugin]Request", LOG_LEVEL_WARNING, $logParam);
+		LOGSTR('api', "[plugin]Request", LOG_LEVEL_INFO, $logParam, $log_func_start_time);
+		
 		return $ret;
 	}
 } 

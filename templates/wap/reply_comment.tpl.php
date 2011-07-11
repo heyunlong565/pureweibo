@@ -8,15 +8,15 @@
 <body <?php F('wap_font_set'); ?>>
 <?php TPL::plugin('wap/include/top_logo', '', false); ?>
 <?php TPL::plugin('wap/include/nav', array('is_top' => true), false); ?>
-&nbsp;<a href="<?php echo $backURL; ?>">返回前一页</a>
+&nbsp;<a href="<?php echo $backURL; ?>"><?php LO('wbcom__replyComment__goBack');?></a>
 <div class="send">
 	<form method="post" action="<?php echo WAP_URL('wbcom.sendReplyComment'); ?>">
 		<input type="hidden" name="mid" value="<?php echo $mid; ?>" />
 		<input type="hidden" name="cid" value="<?php echo $cid; ?>" />
 		<input type="hidden" name="reply_user" value="<?php echo F('escape', $reply_user); ?>" />
-		<span>回复<?php echo F('escape', $reply_user); ?>,内容只显示前140字:</span><br />
+		<span><?php LO('wbcom__replyComment__label_replyTips', F('escape', $reply_user));?></span><br />
 		<textarea id="content" name="content" rows="5" cols="10"></textarea>
-		<div><input type="submit" value="回复" /> <input type="submit" value="回复并转发" name="rt" /></div>
+		<div><input type="submit" value="<?php LO('wbcom__replyComment__btnReply');?>" /> <input type="submit" value="<?php LO('wbcom__replyComment__btnReplyAndRepost');?>" name="rt" /></div>
 	</form>
 </div>
 <?php TPL::plugin('wap/include/nav', array('is_top' => false), false); ?>

@@ -21,6 +21,7 @@ include_once P_CLASS.'/oauth.class.php';
 	var $consumer;
 	var $storage;
 	var $format = 'json';
+	var $logType = 'api';
 
 	/**
 	 * 构造函数
@@ -71,9 +72,16 @@ include_once P_CLASS.'/oauth.class.php';
 			$oauth_token_secret = isset($token['oauth_token_secret']) ? $token['oauth_token_secret'] : '';
 			$this->token = new OAuthConsumer($oauth_token, $oauth_token_secret);
 		} elseif ($type == 2) {
-			$this->token = new OAuthConsumer(WB_USER_OAUTH_TOKEN, WB_USER_OAUTH_TOKEN_SECRET);
+			$token = DS('accountProxy.getRandomAccount');
+			if ($token) {
+				$this->token = new OAuthConsumer($token['token'], $token['secret']);
+			} else {
+				$this->token = new OAuthConsumer(WB_USER_OAUTH_TOKEN, WB_USER_OAUTH_TOKEN_SECRET);
+			}
 		} elseif ($type == 3) {
 			$this->token = new OAuthConsumer($oauth_token, $oauth_token_secret);
+		} elseif ($type == 4) {
+			$this->token = new OAuthConsumer(WB_USER_OAUTH_TOKEN, WB_USER_OAUTH_TOKEN_SECRET);
 		} else {
 			$this->token = null;
 		}
@@ -176,6 +184,12 @@ include_once P_CLASS.'/oauth.class.php';
 					$error_code = '1020807';
 				} elseif (strpos($error['error'] , '不能关注自己')) {
 					$error_code = '1020808';
+				} elseif (strpos($error['error'], '关注人数已达到上限')) {
+					$error_code = '1020809';
+				} elseif (strpos($error['error'], '接下来的时间想想如何让大家都来关注你吧')) {
+					$error_code = '1020811';
+				} elseif (strpos($error['error'], '你今天已经关注很多喽')) {
+					$error_code = '1020810';
 				} else {
 					$error_code = '1020104';
 				}
@@ -1801,17 +1815,18 @@ include_once P_CLASS.'/oauth.class.php';
 	 * @param array|string $token
 	 * @param bool $sign_in_with_Weibo
 	 * @param string $url
+	 * @param string $lang
      * @return string
      */
-    function getAuthorizeURL($token, $sign_in_with_Weibo = TRUE , $url)
+    function getAuthorizeURL($token, $sign_in_with_Weibo = TRUE , $url, $lang = 'zh-Hans')
 	{
         if (is_array($token)) {
             $token = $token['oauth_token'];
         }
         if (empty($sign_in_with_Weibo)) {
-            return WEIBO_API_URL.'oauth/authorize' . "?oauth_token={$token}&oauth_callback=" . urlencode($url);
+            return WEIBO_API_URL.'oauth/authorize' . "?oauth_token={$token}&oauth_callback=" . urlencode($url) .'&lang='.$lang;
         } else {
-            return WEIBO_API_URL.'oauth/authenticate' . "?oauth_token={$token}&oauth_callback=". urlencode($url);
+            return WEIBO_API_URL.'oauth/authenticate' . "?oauth_token={$token}&oauth_callback=". urlencode($url) .'&lang='.$lang;
         }
     }
 
@@ -1839,6 +1854,7 @@ include_once P_CLASS.'/oauth.class.php';
 		$params['passwd'] = $password;
 
 		$this->http->setUrl($url);
+		$this->http->setHeader('API-RemoteIP', F('get_client_ip'));
 		$this->http->setData($params);
 		$response = $this->http->request();
 
@@ -1893,6 +1909,7 @@ include_once P_CLASS.'/oauth.class.php';
      */
     function oAuthRequest($url, $method, $parameters, $multi = false, $userType = false)
 	{
+		$log_func_start_time = microtime(TRUE);
 		/*
 		if (!isset($parameters['ip']) || empty($parameters['ip'])) {
 			$parameters['ip'] = F('get_client_ip');
@@ -1945,9 +1962,14 @@ echo '<pre>';
 var_dump($http_url);
 var_dump($result);
 */
+		$logParam = array('url'=>$http_url, 'params'=>$parameters, 'code'=>$code, 'result'=>$result, 'error'=>$this->http->getError());
+		LogMgr::warningLog($log_func_start_time, $this->logType, "[oAuthRequest]API Request method=$method", LOG_LEVEL_WARNING, $logParam);
+		LOGSTR($this->logType, "[oAuthRequest]API Request method=$method", LOG_LEVEL_INFO, $logParam, $log_func_start_time);
+		
 		if (200 != $code) {
 			//log
-			APP::LOG('url: '.$http_url." \r\ncode: ".$code." \r\nret: ".$result . "\r\nerror: " . $this->http->getError()."\r\nbase_string:: ".$request->base_string."\r\nkey_string: ".$request->key_string);
+			$logMsg = 'url: '.$http_url." \r\ncode: ".$code." \r\nret: ".$result . "\r\nerror: " . $this->http->getError()."\r\nbase_string:: ".$request->base_string."\r\nkey_string: ". strtr($request->key_string, array(WB_SKEY => '%APP_SKEY%'));
+			LOGSTR($this->logType, "[oAuthRequest]API Request method=$method&".$logMsg);
 			if (0 == $code) {
 				return RST('', '1040002', 'Access Timeout or Access denied', 0);
 			}
@@ -1972,9 +1994,8 @@ var_dump($result);
 	 */
 	function sourceRequest($url, $method, $parameters)
 	{
-		if (!isset($parameters['ip']) || empty($parameters['ip'])) {
-			$parameters['ip'] = F('get_client_ip');
-		}
+		$log_func_start_time = microtime(TRUE);
+		
 		$parameters['source'] = WB_AKEY;
 		$method = strtoupper($method);
         switch ($method) {
@@ -1985,19 +2006,26 @@ var_dump($result);
 				$url = $url.'&'.http_build_query($parameters);
 			}
 			$this->http->setUrl($url);
+			$this->http->setHeader('API-RemoteIP', F('get_client_ip'));
 			$result = $this->http->request();
 			$code = $this->http->getState();
+			
+			$logParam = array('url'=>$url, 'params'=>$parameters, 'code'=>$code, 'result'=>$result, 'error'=>$this->http->getError());
+			LogMgr::warningLog($log_func_start_time, $this->logType, "[sourceRequest]API Request method=$method", LOG_LEVEL_WARNING, $logParam);
+			LOGSTR($this->logType, "[sourceRequest]API Request method=$method", LOG_LEVEL_INFO, $logParam, $log_func_start_time);
+			
 			if (200 != $code) {
 				//log
-				APP::LOG('url: '.$this->http->getUrl()." \r\ncode: ".$code." \r\nret: ".$result. "\r\nerror: " . $this->http->getError());
+				$logMsg = 'url: '.$this->http->getUrl()." \r\ncode: ".$code." \r\nret: ".$result. "\r\nerror: " . $this->http->getError();
+				LOGSTR($this->logType, "[sourceRequest]API Request method=$method&".$logMsg);
 				if (0 == $code) {
 					return RST('', '1040002', 'Access Timeout or Access denied', 0);
 				}
 				return $this->throwException($result);
 			}
 
-			$result = json_decode($result, true);
-			//$result = json_decode(preg_replace('#(?<=[,\{\[])\s*("\w+"):(\d{6,})(?=\s*[,\]\}])#si', '${1}:"${2}"', $result), true);
+			//$result = json_decode($result, true);
+			$result = json_decode(preg_replace('#(?<=[,\{\[])\s*("\w+"):(\d{6,})(?=\s*[,\]\}])#si', '${1}:"${2}"', $result), true);
 			return RST($result);
         }
     }
@@ -2127,7 +2155,7 @@ var_dump($result);
 		$url = WEIBO_API_URL.'provinces.'.$this->format;
 		$params = array();
 
-		$response = $this->oAuthRequest($url, 'get', $params);
+		$response = $this->sourceRequest($url, 'get', $params);
 
 		return $response;
 	}
@@ -2154,12 +2182,27 @@ var_dump($result);
 	 *
 	 * @return array
 	 */
-	function emotions()
+	function emotions($language = false, $type = false)
 	{
 		$url = WEIBO_API_URL.'emotions.'.$this->format;
 		$params = array();
+		switch ($language) {
+			case 'zh_cn':
+				$lang = 'cnname';
+				break;
+			case 'zh_tw':
+				$lang = 'twname';
+				break;
+			default:
+				$lang = 'cnname';
+		}
+		$params['language'] = $lang;
 
-		$response = $this->oAuthRequest($url, 'post', $params);
+		if ($type) {
+			$params['type'] = $type;
+		}
+
+		$response = $this->sourceRequest($url, 'get', $params);
 
 		return $response;
 	}
@@ -2568,7 +2611,7 @@ var_dump($result);
 
 		$response = $this->oAuthRequest($url, 'get', $params);
 
-		return purify($response);
+		return $response;
 	}
 
 	/**
@@ -2974,7 +3017,7 @@ var_dump($result);
 			$response = $this->oAuthRequest($url, 'get', $params);
 		}
 
-		return $response;
+		return purify($response);
 	 }
 	 
 
@@ -3027,13 +3070,28 @@ var_dump($result);
 		$params['is_short'] = $is_short;
 		$params['is_batch'] = $is_batch;
 
-		if ($this->consumer->key == WB_AKEY ) {
-			$response = $this->oAuthRequest($url, 'get', $params);
-		} else {
-			$response = $this->ssoSourceRequest($url, 'get', $params);
-		}
+		$response = $this->oAuthRequest($url, 'get', $params);
 
 		return $response;
 	}
+ 
+	 /**
+	  * 取得一个短链接所对应的页面信息，包含页面的title，原始的长链接，富内容（元数据）
+	  *
+	  * @param string $urls 短链接id，多个用逗号隔开
+	  *
+	  * @return array
+	  */
+	 function shortUrlBatchInfo($urls)
+	 {
+		$url = WEIBO_API_URL.'short_url/batch_info.'.$this->format;
+		$params = array();
+		$params['url_short'] = $urls;
+
+		$response = $this->sourceRequest($url, 'get', $params);
+
+		return $response;
+	 }
+
 }
 

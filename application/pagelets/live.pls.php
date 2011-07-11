@@ -34,15 +34,15 @@ class live_pls {
 			$difference_minutes = floor($difference_time % 86400 % 3600 / 60);
 			$difference_seconds = floor($difference_time % 86400 % 3600 % 60);
 			if ($difference_date != 0) {
-				$difference = $difference_date.'天';
+				$difference = L('pls__live__liveIndexList__day', $difference_date);
 			}
 			if ($difference_hour != 0) {
-				$difference .= $difference_hour.'小时';
+				$difference .= L('pls__live__liveIndexList__hour', $difference_hour);
 			}
 			if ($difference_minutes != 0) {
-				$difference .= $difference_minutes.'分';
+				$difference .= L('pls__live__liveIndexList__min', $difference_minutes);
 			}
-			$difference .= $difference_seconds.'秒';
+			$difference .= L('pls__live__liveIndexList__sec', $difference_seconds);
 		}
 		/// 获取活动总记录数
 		TPL::module('microlive/news_live', array('list' => $list, 
@@ -96,9 +96,9 @@ class live_pls {
 				$list_member = $ulist['rst'];
 			}
 			/// 与主持人的关注关系
-			$list_fans = DR('xweibo/xwb.getFriendIds', null, USER::uid(), null, null, -1, 5000);
+			$list_fans = (USER::isUserLogin()) ? DR('xweibo/xwb.getFriendIds', null, USER::uid(), null, null, -1, 5000) : array();
 			$listFans = array();
-			if (empty($list_fans['errno'])) {
+			if ( isset($list_fans['rst']['ids']) ) {
 				$listFans = $list_fans['rst']['ids'];
 			}
 			/*
@@ -181,7 +181,7 @@ class live_pls {
 			}
 		}
 
-		TPL::module('microlive/live_detail_users', array('master_list' => $master_list, 'guest_list' => $guest_list));
+		TPL::module('microlive/live_detail_users', array('master_list'=>$master_list, 'guest_list'=>$guest_list, 'friendList'=>F('get_user_friend_ids')));
 	}
 
 	/**
@@ -200,40 +200,35 @@ class live_pls {
 		$id = V('g:id');
 		$page = V('g:page', 1);
 		$limit = 20;
-		$wb_id_array = DS('microLive.getMicroLiveWbs', 'g0/1800', $id, 1, $page, $limit);
-		$total = DS('microLive.getCount', 'g0/1800', $id);
+		$gMtype = V('g:gMType', false);
+		$params = $gMtype ? array('gMtype'=>$gMtype) : array();
+		$wb_id_array = DS('microLive.getMicroLiveWbs', 'g0/180', $id, 1, $page, $limit, false, $params);
+		$total = DS('microLive.getCount', 'g0/180', $id, $params);
 
 		$list = array();
 		$news_list = array();
 		if ($wb_id_array ) {
 			$wb_ids = array();
 			$wids = array();
-			foreach ($wb_id_array as $var) {
-				$wb_ids[] = $var['wb_id'];
-				$wids[$var['wb_id']] = array('type' => $var['type'], 'state' => $var['state']);
-			}
-			$list = DR('xweibo/xwb.getStatusesBatchShow', '', implode(',', $wb_ids));
-			if (empty($list['errno'])) {
-				$list = $list['rst'];
-				foreach ($list as $var) {
-					if (isset($var['estate']) && $var['estate'] == 'deleted') {
-						/// 如果该微博已经被删除，也删除该直播的微博信息
-						DR('microLive.deleteLiveWb', '', $id, $var['id']);
-						continue;
-					}
-					/// 区分发微博者是主持人，嘉宾还是网友
-					if ('2' == $wids[$var['id']]['type']) {
-						$var['user']['live_user_type'] = 'master';
-					} elseif ('3' == $wids[$var['id']]['type']) {
-						$var['user']['live_user_type'] = 'guest';
-					}
-					$news_list[] = $var;
+			foreach ($wb_id_array as $var) 
+			{
+				$item = json_decode($var['weibo'], true);
+				if ( !isset($item['id']) ) { continue; } 
+				
+				/// 区分发微博者是主持人，嘉宾还是网友
+				if ('2' == $var['type']) {
+					$item['user']['live_user_type'] = 'master';
+				} elseif ('3' == $var['type']) {
+					$item['user']['live_user_type'] = 'guest';
 				}
+				$news_list[] = $item;
 			}
 		}
 
 		$info = $infos['liveInfo'];
-		$list_title = $info['state'] == 'E' ? '直播内容<span class="close">(已结束)</span>' : '直播内容<span>(共有'.$total.'条)</span>';
+		$list_title = $info['state'] == 'E' ? L('pls__live__liveWblist__endTip') : L('pls__live__liveWblist__startTip', $total);
+		$listWbId   = empty($news_list) ? '' : $news_list[0]['id'];
+		$wb_id		= $this->_getCurWbId($listWbId);
 		$params = array();
 		$params['list'] = $news_list;
 		$params['list_title'] = $list_title;
@@ -243,10 +238,31 @@ class live_pls {
 		$params['show_list_title'] = true;
 		$params['show_unread_tip'] = false;
 		$params['show_feed_refresh'] = true;
-		$params['empty_msg'] = '暂时没有相关的话题微博';
+		$params['show_title_when_empty'] = true;
+		$params['empty_msg'] = L('pls__live__liveWblist__emptyLiveTip');
+		$params['total_count'] = $total;
+		$params['page_type'] = 'live';
 		TPL::module('microlive/live_detail_wb', array('params' => $params));
 
-		return array('cls'=>'wblist', 'list' => F('format_weibo',$news_list), 'liveid' => $info['id'], 'wb_id' => !empty($news_list) ? $news_list[0]['id'] : '');
+		return array('cls'=>'wblist', 'list' => F('format_weibo',$news_list), 'liveid' => $info['id'], 'wb_id'=>$wb_id, 'gMType'=>(bool)$gMtype);
+	}
+	
+	
+	/**
+	 * 获取用户阅读过的最大 微博ID
+	 * @param $id
+	 */
+	function _getCurWbId($id)
+	{
+		$wbKey		 = 'live#maxwbId';
+		$sessionWbId = USER::V($wbKey);
+		if ( empty($sessionWbId) || ($sessionWbId && $id && $id>$sessionWbId) )
+		{
+			USER::V($wbKey, $id);
+			return $id;
+		}
+		
+		return $sessionWbId;
 	}
 }
 ?>

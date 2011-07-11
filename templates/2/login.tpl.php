@@ -20,7 +20,7 @@
                                 <div class="weibo-login-info">
                                     <div class="icon-head"></div>
                                     <div class="weibo-login-con">
-                                        <p>您还没有登录，请选择登录方式：</p>
+										<p><?php LO('login__account__chooseLoginWay');?></p>
                                     </div>
                                 </div>
 								<div class="weibo-login-area">
@@ -30,19 +30,19 @@
 										$tips = $site_info['site_name'].'';
 										?>
 										<div>
-											<a href="<?php echo $site_callback_url;?>" class="btn-web-account bind-btn-bg"><?php echo $site_info['site_name'];?>登录</a><span><a href="<?php echo $site_info['reg_url'];?>">注册帐号</a></span>
+											<a href="<?php echo $site_callback_url;?>" class="btn-web-account bind-btn-bg"><?php echo $site_info['site_name'];?><?php LO('login__account__loginTip');?></a><span><a href="<?php echo $site_info['reg_url'];?>"><?php LO('login__account__regTip');?></a></span>
 										</div>
 											<?php 
 									}
 									if ($use_sina_login) {
-										$tips = empty($tips) ? '新浪微博帐号' : $tips.'或新浪微博帐号'; 
+										$tips = empty($tips) ? L('login__account__weiboAccount') : L('login__account__otherAccount', $tips);
 										?>
 										<div>
-											<a rel="e:lg,t:1,from:<?php echo $sina_callback_url;?>" href="#" class="btn-sina-account bind-btn-bg">新浪微博帐号登录</a><span><a target="_blank" href="<?php echo W_BASE_HTTP.URL('account.goSinaReg');?>">开通微博</a></span>
+											<a rel="e:lg,t:1,from:<?php echo $sina_callback_url;?>" href="#" class="btn-sina-account bind-btn-bg"><?php LO('login__account__weiboAccountLogin');?></a><span><a target="_blank" href="<?php echo W_BASE_HTTP.URL('account.goSinaReg');?>"><?php LO('login__account__regWeiboTip');?></a></span>
 										</div>
 											<?php 
 									}?>
-									<p class="tips">提示：您可以使用<?php echo $tips;?>登录本网站</p>
+									<p class="tips"><?php LO('login__account__chooseAccountLogin', $tips);?></p>
 								</div>
                              </div>
                         </div>

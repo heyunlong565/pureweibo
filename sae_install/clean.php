@@ -4,7 +4,7 @@
 $secret = md5(SAE_ACCESSKEY.SAE_SECRETKEY);
 if(!isset($_REQUEST['secret']) || empty($_REQUEST['secret']) || trim($_REQUEST['secret']) !== $secret) exit;
 
-
+/*
 $s = new SaeStorage;
 
 define('SAE_DOMAIN', 'xweibo');
@@ -14,7 +14,7 @@ define('CONFIG_DOMAIN',     'config');
 $filename = md5('config');
 $s->delete(CONFIG_DOMAIN,$filename);
 $s->delete(SAE_DOMAIN,$filename);
-
+*/
 //清空MC
 
 

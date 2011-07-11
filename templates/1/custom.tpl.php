@@ -46,6 +46,7 @@ if(!defined('IN_APPLICATION')){
 			}
 		}
 		?>
+						<?php echo F('show_ad', 'sidebar', '');?>
 		</div>
 	</div>
 	<!-- 尾部 开始 -->

@@ -20,10 +20,8 @@
 					<div class="main-wrap">
 						<div class="main">
                         	<div class="main-bd">
-                                <div class="title-box">
-									<h3>我收到的通知</h3>
-                                </div>
-								<?php Xpipe::pagelet('common.notices', USER::uid());?>
+                        		<?php  TPL::plugin('include/mymsg_header'); ?>
+                                <?php Xpipe::pagelet('common.notices', USER::uid());?>
 							</div>
                         </div>
 						<div class="aside">
@@ -32,6 +30,7 @@
 							<!-- 用户标签 开始-->
 							<?php Xpipe::pagelet('common.userTag');?>
 							<?php Xpipe::pagelet('common.sideComponents', array('type'=>2) );?>
+						<?php echo F('show_ad', 'sidebar', '');?>
 						</div>
 					</div>
 				</div>

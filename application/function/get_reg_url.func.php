@@ -23,9 +23,21 @@ function get_reg_url()
 		$loginCallBack = '&loginCallBack='.urlencode($loginCallBack);
 	}
 	
+	$lang = '';
+	switch(APP::getLang()) {
+		case 'zh_cn':
+			$lang = 'zh-Hans';
+			break;
+		case 'zh_tw':
+			$lang = 'zh-Hant';
+			break;
+		case 'en':
+			$lang = 'en';
+			break;
+	}
 	$oauthCbUrl = W_BASE_HTTP.URL('account.oauthCallback', $callbackOpt).$loginCallBack;
 
-	$params_str = 'oauth_token='.urlencode($token['oauth_token']).'&oauth_callback='.urlencode($oauthCbUrl);
+	$params_str = 'oauth_token='.urlencode($token['oauth_token']).'&oauth_callback='.urlencode($oauthCbUrl).'&lang='.$lang;
 
 	$url = WEIBO_API_URL.'oauth/register?'.$params_str;
 

@@ -30,17 +30,18 @@
     var params = dequery(location.search);
     
     var type = params['type']||1;
-    var num = params['count'];
-    document.write('<div class="share share-'+type+'" onclick="share()"><span><em id="count">...</em></span></div>');
+    var num = 0;
+    document.write('<div class="share share-'+type+'" onclick="share()"></div>');
     
     function q(key) { return params[key]||''; }
 // ----
 var appkey = q('appkey') || 1681459862;
 var jsc = +new Date;
 
+/*
 if(num)
     getCount();
-
+*/
 function getJSON(s) {
 	var data;
 	var jsonp;

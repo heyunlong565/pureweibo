@@ -19,7 +19,10 @@
 function profile_image_url($url, $type = 'index')
 {
 	if (strpos($url, 'http') === false) {
-		$id = $url % 4 + 1;
+		//$id = $url % 4 + 1;
+		//解决长ID问题
+		$id = (substr($url+100,-2)*1) % 4 + 1;
+		
 		if ($type == 'index') {
 			$size = 50;
 		} elseif ($type == 'comment') {

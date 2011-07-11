@@ -53,13 +53,13 @@ class file_upload
         if(!is_dir($filePath)) {
             // 检查目录是否编码后的
         	if(!mkdir($filePath)){
-               $this->fileInfo['errmsg']  =  '上传目录'.$filePath.'不存在';
+               $this->fileInfo['errmsg']  =  L('adapter__load__fileUpload__uploadDirNotExist', $filePath);
                $this->fileInfo['errcode'] = 40050;
                return false;
             }
         }else{
         	if(!is_writable($filePath)){
-        		$this->fileInfo['errmsg']  =  '上传目录'.$filePath.'不可写';
+        		$this->fileInfo['errmsg']  =  L('adapter__load__fileUpload__uploadDirNotWritable', $filePath);
         		$this->fileInfo['errcode'] = 40050;
         		return false;
         	}
@@ -70,7 +70,7 @@ class file_upload
         	return false;
         }
         $this->fileInfo['errcode'] = 0;
-        $this->fileInfo['errmsg'] = '上传成功!';
+        $this->fileInfo['errmsg'] = L('adapter__load__fileUpload__success');
         $this->fileInfo['extension'] = $this->_getExt($file['name']);
         $this->fileInfo['savepath'] = $filePath
          							.$this->fileInfo['savename']
@@ -169,19 +169,19 @@ class file_upload
         //文件上传成功，进行自定义规则检查
         //检查文件大小
         if(!$this->_checkSize($file['size'])) {
-            $this->fileInfo['errmsg'] = '上传文件大小不符！';
+            $this->fileInfo['errmsg'] = L('adapter__load__fileUpload__uploadFileSize');
             $this->fileInfo['errcode'] = 40012;
             return false;
         }
-        //检查文件Mime类型.flash 根据流形式上传的不检测
+        //检查文件后缀名类型
         if(!$this->_checkType($file['name'])) {
-            $this->fileInfo['errmsg'] = '上传文件MIME类型不允许！';
+            $this->fileInfo['errmsg'] = 'Error File Type';
             $this->fileInfo['errcode'] = 40013;
             return false;
         }
         //检查是否合法上传
         if(!$this->_checkUpload($file['tmp_name'])) {
-            $this->fileInfo['errmsg'] = '非法上传文件！';
+            $this->fileInfo['errmsg'] = L('adapter__load__fileUpload__illegalUploadFiles');
             $this->fileInfo['errcode'] = 40050;
             return false;
         }
@@ -197,31 +197,31 @@ class file_upload
     {
          switch($errorNo) {
             case 1:
-                $this->fileInfo['errmsg'] = '上传的文件超过了 php.ini 中 upload_max_filesize 选项限制的值';
+                $this->fileInfo['errmsg'] = L('adapter__load__fileUpload__uploadFileErr1');
                 $this->fileInfo['errcode'] = 40012;
                 break;
             case 2:
-                $this->fileInfo['errmsg'] = '上传文件的大小超过了 HTML 表单中 MAX_FILE_SIZE 选项指定的值';
+                $this->fileInfo['errmsg'] = L('adapter__load__fileUpload__uploadFileErr2');
                 $this->fileInfo['errcode'] = 40012;
                 break;
             case 3:
-                $this->fileInfo['errmsg'] = '文件只有部分被上传';
+                $this->fileInfo['errmsg'] = L('adapter__load__fileUpload__uploadFileErr3');
                 $this->fileInfo['errcode'] = 40010;
                 break;
             case 4:
-                $this->fileInfo['errmsg'] = '没有文件被上传';
+                $this->fileInfo['errmsg'] = L('adapter__load__fileUpload__uploadFileErr4');
                 $this->fileInfo['errcode'] = 40010;
                 break;
             case 6:
-                $this->fileInfo['errmsg'] = '找不到临时文件夹';
+                $this->fileInfo['errmsg'] = L('adapter__load__fileUpload__uploadFileErr5');
                 $this->fileInfo['errcode'] = 40050;
                 break;
             case 7:
-                $this->fileInfo['errmsg'] = '文件写入失败';
+                $this->fileInfo['errmsg'] = L('adapter__load__fileUpload__uploadFileErr6');
                 $this->fileInfo['errcode'] = 40050;
                 break;
             default:
-                $this->fileInfo['errmsg'] = '未知上传错误！';
+                $this->fileInfo['errmsg'] = L('adapter__load__fileUpload__uploadFileErr7');
                 $this->fileInfo['errcode'] = 40050;
         }
         return ;

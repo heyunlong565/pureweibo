@@ -13,12 +13,12 @@
 	
 	<div class="ta">
     	<form method='post' id='search_box' action="<?php echo WAP_URL('search');?>">
-        <div class="g">输入关键字：</div>
+        <div class="g"><?php LO('search__default__label_keyword');?></div>
 		<input type="hidden" name='<?php echo WAP_SESSION_NAME;?>' value='<?php echo V('r:'.WAP_SESSION_NAME) ?>'/>
         <input type="text" name='k' value="<?php echo  htmlspecialchars(V('r:k','')) ;?>" /><br />
 	    <input type="hidden" name='m' value='search'/>
-        <input type="submit" name='search_sina' value="搜索本站及新浪微博"/>
-	    <input type="submit" name='search_app' value="搜索本站" />
+        <input type="submit" name='search_sina' value="<?php LO('search__default__btnSearchAll');?>"/>
+	    <input type="submit" name='search_app' value="<?php LO('search__default__btnSearchLocal');?>" />
         </form>
     </div>
 	<?php
@@ -31,11 +31,11 @@
 <?php
 	if($m=='search'):
 ?>
-<span>全部</span>&nbsp;
+<span><?php LO('search__default__label_all');?></span>&nbsp;
 <?php
 	else:
 ?>
-<a href="<?php echo WAP_URL('search','k='.V('r:k')."&base_app=".$base_app)?>">全部</a>&nbsp;
+<a href="<?php echo WAP_URL('search','k='.V('r:k')."&base_app=".$base_app)?>"><?php LO('search__default__label_all');?></a>&nbsp;
 <?php
 endif;
 ?>
@@ -43,11 +43,11 @@ endif;
 <?php
 if($m=='search.user'):
 ?>
-<span>用户</span>&nbsp;
+<span><?php LO('search__default__label_user');?></span>&nbsp;
 <?php
 	else:
 ?>
-<a href="<?php echo WAP_URL('search.user','k='.V('r:k')."&base_app=".$base_app)?>">用户</a>&nbsp;
+<a href="<?php echo WAP_URL('search.user','k='.V('r:k')."&base_app=".$base_app)?>"><?php LO('search__default__label_user');?></a>&nbsp;
 <?php
 endif;
 ?>
@@ -55,11 +55,11 @@ endif;
 <?php
 if($m=='search.weibo'):
 ?>
-<span>微博</span>&nbsp;
+<span><?php LO('search__default__label_weibo');?></span>&nbsp;
 <?php
 	else:
 ?>
-<a href="<?php echo WAP_URL('search.weibo','k='.V('r:k')."&base_app=".$base_app)?>">微博</a>&nbsp;
+<a href="<?php echo WAP_URL('search.weibo','k='.V('r:k')."&base_app=".$base_app)?>"><?php LO('search__default__label_weibo');?></a>&nbsp;
 <?php
 endif;
 ?>
@@ -69,14 +69,14 @@ endif;
 if($m=='search'||$m=='search.user'):
 ?>
    
-    <div class="g row">找到的用户如下：</div>
+    <div class="g row"><?php LO('search__default__label_foundUsersTips');?></div>
     <?php
     if(empty($users)) {
 	if(V('g:page')>1) {
-		echo '<div class="c">返回上一页</div>';
+		echo '<div class="c">'.L('search__default__label_goBack').'</div>';
 	}
 	else {
-		echo '<div class="c">没有符合条件的用户，请输入其他关键字再试 </div>';	
+		echo '<div class="c">'.L('search__default__label_noFoundUsers').'</div>';	
 	}
 	
     }
@@ -95,15 +95,15 @@ if($m=='search'||$m=='search.weibo'):
 ?>
 
     
-    <div class="g row">找到的微博如下：</div>
+    <div class="g row"><?php LO('search__default__label_foundWeibosTips');?></div>
     <?php
     if(empty($list)) {
 	if(V('g:page')>1) {
-		echo '<div class="c" 无其他结果,<a href="'.URL('search',"k=".V('g:k')."&&base_app=".V('g:base_app')).'">返回第一页</a></div>';
+		echo '<div class="c"><a href="'.URL('search',"k=".V('g:k')."&&base_app=".V('g:base_app')).'">'.L('search__default__label_goBack').'</a></div>';
 		
 	}
 	else {	
-		echo '<div class="c">没有符合条件的微博，请输入其他关键字再试 </div>';
+		echo '<div class="c">'.L('search__default__label_noFoundWeibos').'</div>';
 	}
     }
     else {

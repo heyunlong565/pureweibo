@@ -16,7 +16,7 @@
             	<div class="serch-user">
 					<form action="<?php echo URL('mgr/users.getBanUser');?>" method="post">
             			<span><strong>搜索包含以下昵称的用户</strong></span>
-                		<span><input name="keyword" class="input-box box-address-width" type="text" /></span>
+                		<span><input name="keyword" class="input-txt box-address-width" type="text" /></span>
                 		<span class="serch-btn"><input name="submit" type="submit" value="搜索" /></span>
                     </form>
            		</div>

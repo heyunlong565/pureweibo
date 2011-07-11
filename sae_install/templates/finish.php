@@ -22,7 +22,6 @@
 						<li>1、<?php echo $_LANG['xweibo_admin_comment'];?></li>
 						<li>2、<?php echo $_LANG['xweibo_security_tip'];?></li>
 						<li>3、<?php echo $_LANG['xweibo_clear_cache'];?></li>
-						<li>4、<?php echo $_LANG['xweibo_api_warn'];?></li>
 					</ul>
 					<div class="btn-area">
 						<a href="<?php echo $admin_url;?>" class="btn-active-admin all-bg"></a>

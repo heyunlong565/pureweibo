@@ -72,6 +72,8 @@ $_LANG['dbhost_comment'] = '默认值为localhost';
 $_LANG['user_memcache'] = '使用缓存';
 $_LANG['tablepre_comment'] = '同一数据库运行多个网站时，请修改前缀';
 $_LANG['mysql_connect'] = 'mysql 连接失败';
+$_LANG['wb_lang_type'] = '系统语言';
+$_LANG['wb_lang_type_comment'] = 'Xweibo使用的语言';
 $_LANG['cache'] = '缓存设置';
 $_LANG['memcache_comment'] = '如果您的网站使用了缓存，请填写以下信息';
 $_LANG['mc_host'] = 'memcached地址';
@@ -166,7 +168,7 @@ $_LANG['error_./user_config.php'] = '没有./user_config.php文件的读写权�
 $_LANG['error_./var'] = '没有./var目录的读写权限';
 $_LANG['error_./var/cache'] = '没有./var/cache目录的读写权限';
 $_LANG['error_./var/data'] = '没有./var/data目录的读写权限';
-$_LANG['error_./var/data/fonts'] = '没有./var/data/fonts目录的读写权限';
+$_LANG['error_./img/fonts'] = '没有./img/fonts目录的读写权限';
 $_LANG['error_./var/data/logo'] = '没有./var/data/logo目录的读写权限';
 $_LANG['error_./var/upload'] = '没有./var/upload目录的读写权限';
 $_LANG['error_./install/data'] = '没有./install/data目录的读写权限';
@@ -176,4 +178,6 @@ $_LANG['error_file_get_contents( )'] = '不支持file_get_contents扩展';
 $_LANG['error_imagettftext( )'] = '没有安装freeType';
 $_LANG['error_mhash( )'] = '不支持mhas';
 $_LANG['error_mhash,hash_hmac( )'] = '不支持mhash或hash_hmac方法';
+
+$_LANG['upgrade_ver_error'] = '您当前安装的xweibo版本是：%s，要升级到%s版本，要求的版本是%s，建议您选择重新安装';
 ?>

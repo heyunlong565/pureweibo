@@ -21,7 +21,7 @@
 						<div class="main">
                             <div class="main-bd">
                                 <div class="title-box">
-									<h3><?php echo '我的粉丝（'. $userinfo['followers_count'].'）';?></h3>
+									<h3><?php LO('index__fans__myFans');?>（<?php echo $userinfo['followers_count'];?>）</h3>
                                 </div>
 								<?php Xpipe::pagelet('user.fansList', $userinfo ); ?>
                             </div>
@@ -32,6 +32,7 @@
 							<!-- 用户标签 开始-->
 							<?php Xpipe::pagelet('common.userTag');?>
 							<?php Xpipe::pagelet('common.sideComponents', array('type'=>2) );?>
+							<?php echo F('show_ad', 'sidebar', '');?>
 						</div>
 					</div>
 				</div>

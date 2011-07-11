@@ -11,13 +11,13 @@
 <?php TPL::plugin('wap/include/my_preview', '', false); ?>
 <?php TPL::plugin('wap/include/msg_common', '', false); ?>
 <?php if (!empty($list)): ?>
-<?php TPL::plugin('wap/include/feedlist', array('list' => array_filter($list, 'ispure')), false); ?>
+<?php TPL::plugin('wap/include/feedlist', array('list' => $list), false); ?>
 <?php else: ?>
 	<div class="f-list">
 	<?php if (V('g:page', 1) > 1):?>
-	已到最后一页
+	<?php LO('index__atme__endPage');?>
 	<?php else: ?>
-	还没有人@您
+	<?php LO('index__atme__emptyTip');?>	
 	<?php endif; ?>
 	</div>
 <?php endif; ?>

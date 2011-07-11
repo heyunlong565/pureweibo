@@ -16,7 +16,7 @@
             		
             		<?php if ($propertiesHtm) { echo $propertiesHtm; } ?>
 					<div class="btn-area">
-						<a class="general-btn highlight" href="#" id="submitBtn">确定</a>
-						<a class="general-btn" href="#" id="pop_cancel">取消</a>
+						<a class="btn-general highlight" href="#" id="submitBtn">确定</a>
+						<a class="btn-general" href="#" id="pop_cancel">取消</a>
 					</div>
                 <?php }?>

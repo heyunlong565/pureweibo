@@ -4,7 +4,7 @@
         <div class="form-row">
             <label class="form-field">标题</label>
             <div class="form-cont">
-                <input class="input-txt form-el-w130" type="text" vrel="ne=m:不能为空" warntip="#titleErr" name="data[title]" value="<?php echo F('escape', $data['title']) ?>"/>
+                <input class="input-txt w130" type="text" vrel="ne=m:不能为空" warntip="#titleErr" name="data[title]" value="<?php echo V('r:title', F('escape', $data['title'])); ?>"/>
                 <span class="tips-error hidden" id="titleErr"></span>
             </div>
         </div>
@@ -73,7 +73,7 @@
                 </label>
                 <a href="javascript:;" id="showArea">创建一个用户组</a>
                 <span id="addArea" class="hidden">
-                分组名称: <input type="text" class="input-txt form-el-w130" id="Groupname" /> <a href="javascript:;" class="icon-add" id="addGroup"> 添加分组 </a> <a href="javascript:;" class="icon-del" id="calGroup">取消 </a>
+                分组名称: <input type="text" class="input-txt w130" id="Groupname" /> <a href="javascript:;" class="icon-add" id="addGroup"> 添加分组 </a> <a href="javascript:;" class="icon-del" id="calGroup">取消 </a>
                 </span>
                 <span class="tips-error hidden" id="newListNameErr">该用户组已存在</span>
             </div>	
@@ -106,8 +106,8 @@
                     <?php }}?>
                     <tr>
                         <td>&nbsp;</td>
-                        <td><input type="text"  class="input-txt txt-s1" name="nickname" id="nickname"/> <span class="tips-error hidden">该用户不存在</span> </td>
-                        <td><input type="text" class="input-txt txt-s1" name="remark" id="remark"/></td>
+                        <td><input type="text"  class="input-txt w130" name="nickname" id="nickname"/> <span class="tips-error hidden">该用户不存在</span> </td>
+                        <td><input type="text" class="input-txt w130" name="remark" id="remark"/></td>
                         <td><a href="javascript:;" class="icon-add" rel="e:addUser">添加</a></td>
                     </tr>
                 </table>
@@ -142,7 +142,7 @@
                 </select>
                 <a href="javascript:;" id="showArea">创建一个用户组</a>
                 <span id="addArea" class="hidden">
-                分组名称: <input type="text" class="input-txt form-el-w130" id="Groupname"> <a href="javascript:;" class="icon-add" id="addGroup"> 添加分组 </a> <a href="javascript:;" class="icon-del" id="calGroup">取消 </a>
+                分组名称: <input type="text" class="input-txt w130" id="Groupname"> <a href="javascript:;" class="icon-add" id="addGroup"> 添加分组 </a> <a href="javascript:;" class="icon-del" id="calGroup">取消 </a>
                 </span>
                 <span class="tips-error hidden" id="newListNameErr">该用户组已存在</span>
             </div>
@@ -175,8 +175,8 @@
                     <?php }}?>
                     <tr>
                         <td>&nbsp;</td>
-                        <td><input type="text"  class="input-txt txt-s1" name="nickname" id="nickname"/> <span class="tips-error hidden">该用户不存在</span> </td>
-                        <td><input type="text" class="input-txt txt-s1" name="remark" id="remark"/></td>
+                        <td><input type="text"  class="input-txt w130" name="nickname" id="nickname"/> <span class="tips-error hidden">该用户不存在</span> </td>
+                        <td><input type="text" class="input-txt w130" name="remark" id="remark"/></td>
                         <td><a href="javascript:;" class="icon-add" rel="e:addUser">添加</a></td>
                     </tr>
                 </table>
@@ -221,6 +221,7 @@
                     ?>
                 </select>
             
+            	<input type="hidden" name="param[uid]" value="<?php echo SYSTEM_SINA_UID;?>">
 				<?php if( 20 < count($list) ) {?>
                     <p  rel="sel5">系统只支持创建20个微博列表数据源。<a href="<?php echo URL('mgr/site_list'); ?>">管理我的微博列表</a></p>
                 <?php } else { ?>
@@ -229,7 +230,7 @@
 							<a href="javascript:;" id="showArea">增加微博列表</a>
 						</span>
                         <span id="addArea" class="hidden">
-                          微博列表: <input type="text" name='name' class="input-txt form-el-w130" id="Groupname"> <a href="javascript:;" class="icon-add" id="addGroup"> 添加列表 </a> <a class="icon-del" href="javascript:;" id="calGroup">取消 </a>
+                          微博列表: <input type="text" name='name' class="input-txt w130" id="Groupname"> <a href="javascript:;" class="icon-add" id="addGroup"> 添加列表 </a> <a class="icon-del" href="javascript:;" id="calGroup">取消 </a>
                         </span>
                         <span class="tips-error hidden" id="newListNameErr">该列表已存在</span>
                 <?php } ?>
@@ -264,7 +265,7 @@
                     <?php }}?>
                     <tr>
                         <td>&nbsp;</td>
-                        <td><input type="text"  class="input-txt txt-s1" name="nickname" id="nickname"/> <span class="tips-error hidden">该用户不存在</span> </td>
+                        <td><input type="text"  class="input-txt w130" name="nickname" id="nickname"/> <span class="tips-error hidden">该用户不存在</span> </td>
                         <td><a href="javascript:;" class="icon-add" rel="e:addUser">添加</a></td>
                     </tr>
                 </table>
@@ -299,9 +300,9 @@
                     <div id="topic_idLabel" <?php if($topic_get > 0) {echo " style='display:none;' ";} ?>>
                         <p class="input-item">推荐话题列表<span class="form-tips"> </span></p>
                         <?php if (isset($data['param']['topics']) && is_array($data['param']['topics'])) {foreach ($data['param']['topics'] as $topic) {?>
-                        <p class="input-item"><input type="text" class="input-txt form-el-w130" name="param[topics][]" value="<?php echo $topic?>" /> <a class="icon-del" href='javascript:;' onclick="delIcs(this);">删除</a></p>
+                        <p class="input-item"><input type="text" class="input-txt w130" name="param[topics][]" value="<?php echo $topic?>" /> <a class="icon-del" href='javascript:;' onclick="delIcs(this);">删除</a></p>
                         <?php }}?>
-                        <p class="input-item"><input type="text" class="input-txt form-el-w130" name="param[topics][]" /> <a class="icon-add" href="javascript:;" onclick="addIcs(this)">添加</a></p>
+                        <p class="input-item"><input type="text" class="input-txt w130" name="param[topics][]" /> <a class="icon-add" href="javascript:;" onclick="addIcs(this)">添加</a></p>
 <!--
                         <label for="topic_id" ></label>
                             <select name="param[topic_id]">
@@ -320,7 +321,7 @@
         <div class="form-row">
             <label class="form-field">设定话题</label>
             <div class="form-cont">
-            	<input type="text" class="input-txt form-el-w130" name="param[topic]" value="<?php echo $data['param']['topic'];?>" />
+            	<input type="text" class="input-txt w130" name="param[topic]" value="<?php echo $data['param']['topic'];?>" />
             </div>
         </div>
         
@@ -330,15 +331,15 @@
             <h4 class="main-title" rel="<?php echo 'group_id:',$pmId ;?>"><a href="#" class="btn-add" rel="e:add"><span rel="add">添加新类别</span></a>数据来源:</h4>
             <table width="100%" border="0" cellpadding="0" cellspacing="0"  class="table">
                 <colgroup>
-                    <col style="width:80px;" />
+                    <col class="w80" />
                     <col/>
                     <col class="operate-w13" />
                 </colgroup>
                 <thead class="td-title-bg">
                     <tr>
-                        <th style="padding:0 4px;">类别名称</th>
-                        <th style="padding:0 4px;">类别使用的用户列表</th>
-                        <th style="padding:0 4px;">操作</th>
+                        <th><div class="gap">类别名称</div></th>
+                        <th><div class="gap">类别使用的用户列表</div></th>
+                        <th><div class="gap">操作</div></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -383,7 +384,7 @@
         <div class="form-row">
             <label class="form-field">话题关键字</label>
             <div class="form-cont">
-            	<input class="input-txt form-el-w130" type="text" vrel="ne=m:不能为空" warntip="#titleErr" name="param[topic]" value="<?php echo F('escape', $data['param']['topic']) ?>"/>
+            	<input class="input-txt w130" type="text" vrel="ne=m:不能为空" warntip="#titleErr" name="param[topic]" value="<?php echo F('escape', $data['param']['topic']) ?>"/>
                 <span class="tips-error hidden" id="titleErr"></span>
             </div>
         </div>
@@ -393,7 +394,7 @@
         <div class="form-row">
             <label class="form-field">链接</label>
             <div class="form-cont">
-                <input class="input-txt form-el-w130" type="text" name="param[link]" value="<?php echo isset($data['param']['link']) ? $data['param']['link'] : 'http://'; ?>"/>
+                <input class="input-txt w130" type="text" name="param[link]" value="<?php echo isset($data['param']['link']) ? $data['param']['link'] : 'http://'; ?>"/>
                 <input type="hidden" name="param[src]" id="imgSrc" value="" />
                 <p class="form-tips">如不需要链接，此处留空即可</p>
             </div>
@@ -401,14 +402,14 @@
         <div class="form-row">
 			<label class="form-field">图片宽度</label>
             <div class="form-cont">
-                 <p style="padding-top:3px;">560px</p>
+                 <p class="text" >560px</p>
             	<input type="hidden" name="param[width]" value="560" />
             </div>
         </div>
         <div class="form-row">
 			<label class="form-field">图片高度</label>
             <div class="form-cont">
-                <p><input class="input-txt form-el-w130" type="text" name="param[height]" value="<?php echo isset($data['param']['height']) ? $data['param']['height'] : ''; ?>"/></p>
+                <p><input class="input-txt w130" type="text" name="param[height]" value="<?php echo isset($data['param']['height']) ? $data['param']['height'] : ''; ?>"/></p>
                 <p class="form-tips">高度为空时，默认为上传图片的高度</p>
             </div>
         </div>
@@ -482,7 +483,7 @@
                 $showNumHtml = '<div class="form-row">
                                     <label for="number2"  class="form-field">显示'. $num_type .'数</label>
 									<div class="form-cont">
-                                        <input class="input-txt form-el-w130" name="param[show_num]" type="text" '. $validsStr .' value="'. $showNumValue .'" warntip="#showNumErr"/>
+                                        <input class="input-txt w130" name="param[show_num]" type="text" '. $validsStr .' value="'. $showNumValue .'" warntip="#showNumErr"/>
 										<span id="showNumErr" class="tips-error hidden"></span>
                                         '. $showNumSugTip .'
 									</div>
@@ -536,9 +537,9 @@
                 $pageSetting = '<div class="form-row">
 									<label class="form-field">显示方式</label>
 									<div class="form-cont">
-										<p class="input-item"><input class="ipt-radio" type="radio" name="param[page_type]" value="1" #pageTypeChecked# >分页显示，每页显示<input class="input-txt" type="text" name="param[show_num]" value="#showNumValue#" style="width:20px; margin:0 5px;" vrel="ne" #pageTypeDisabled# />条<p>
+										<p class="input-item"><input class="ipt-radio" type="radio" name="param[page_type]" value="1" #pageTypeChecked# >分页显示，每页显示<input class="input-txt w30" type="text" name="param[show_num]" value="#showNumValue#" vrel="ne" #pageTypeDisabled# />条<p>
 										
-										<p class="input-item"><input class="ipt-radio" type="radio" name="param[page_type]" value="0" #pageSizeChecked# >仅显示<input class="input-txt" type="text" name="param[show_num]" value="#showNumValue#" style="width:20px;  margin:0 5px;" vrel="ne" #pageSizeDisabled# />条</p>
+										<p class="input-item"><input class="ipt-radio" type="radio" name="param[page_type]" value="0" #pageSizeChecked# >仅显示<input class="input-txt w30" type="text" name="param[show_num]" value="#showNumValue#" vrel="ne" #pageSizeDisabled# />条</p>
 									</div>
                                 </div>';
                 
@@ -563,9 +564,9 @@
             <div class="form-cont">
                 <input type="file" class="btn-file" id="upload_file" name="img" onChange="preview(this)" />
             
-                <div id="img_preview" <?php if( empty($imgPreview) ){echo 'style="display:none"'; }?>>
+                <div id="img_preview" <?php if( empty($imgPreview) ){echo 'style="display:none"'; }?> class="img-preview">
                     <p>效果预览</p>
-                    <img src="<?php echo $imgPreview; ?>" style="width:220px; height:50px;" />
+                    <img src="<?php echo $imgPreview; ?>"  />
                 </div>
                 <div class="preview_loading" id="preview_loading"  style="display:none;">正在上传图片，请稍候...</div>
                 <iframe name="img_upload" style="display:none;"></iframe>
@@ -576,8 +577,8 @@
     
 
     <div class="btn-area">
-        <a class="general-btn btn-s2" href="#" id="submitBtn"><span>确定</span></a>
-        <a class="general-btn" href="#" id="pop_cancel"><span>取消</span></a>
+        <a class="btn-general highlight" href="#" id="submitBtn"><span>确定</span></a>
+        <a class="btn-general" href="#" id="pop_cancel"><span>取消</span></a>
     </div>
       
 </div>

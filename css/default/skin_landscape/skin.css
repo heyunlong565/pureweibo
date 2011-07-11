@@ -93,13 +93,14 @@ a,
 /*两栏菜单*/
 .menu .menu-custom,
 .menu .menu-over{ background:url(bgimg/menu_bg.png) repeat-x 0 -123px; }
+.menu .menu-over a{ color:#fff; }
 .menu .menu-custom a,
 .menu .menu-custom a:visited,
 .menu .menu-over a:visited { color:#fff; }
 .menu li{ background:url(bgimg/menu_bg.png) no-repeat right -84px;}
 .menu li.last{ background:none; }
 .menu a,
-.menu a:visited { color:#000;}
+.menu a:visited { color:#000; }
 .menu .sub-pubmenu a:visited { color:#444; }
 .menu .menu-bg{ background:url(bgimg/menu_bg.png) repeat-x 0 -47px;}
 .menu .menu-bg .l-bg,

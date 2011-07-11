@@ -10,16 +10,16 @@
 <body class="main-body">
     <div class="path"><p>当前位置：扩展工具<span>&gt;</span>在线直播列表</p></div>
     <div class="main-cont">
-        <h3 class="title"><a href="<?php echo URL('mgr/wb_live.create');?>" class="general-btn"><span>新建在线直播</span></a><a href="<?php echo URL('mgr/wb_live.set');?>" class="general-btn"><span>编辑在线直播基本信息</span></a>在线直播列表</h3>
+        <h3 class="title"><a href="<?php echo URL('mgr/wb_live.create');?>" class="btn-general"><span>新建在线直播</span></a><a href="<?php echo URL('mgr/wb_live.set');?>" class="btn-general"><span>编辑在线直播基本信息</span></a>在线直播列表</h3>
         <div class="set-area">
             <table width="100%" border="0" cellpadding="0" cellspacing="0" class="table">
                 <colgroup>
-                    <col class="h-w60"/>
+                    <col class="w60"/>
                     <col/>
-                    <col class="h-w140"/>
-                    <col class="h-w140" />
-                    <col class="h-w70" />
-                    <col class="h-w180"/>
+                    <col class="w140"/>
+                    <col class="w140" />
+                    <col class="w70" />
+                    <col class="w180"/>
                 </colgroup>
                 <thead class="tb-tit-bg">
                     <tr>
@@ -51,7 +51,7 @@
                         <td><?php 
                         	if ($aRecord['status']=='P'){echo '<span class="no-start">未开始</span>';} 
                         	elseif ($aRecord['status']=='E'){echo '<span class="finish">已结束</span>';} 
-                        	else {echo '<span class="going">开始中</span>';}
+                        	else {echo '<span class="going">进行中</span>';}
                         ?></td>
     					<td><a href="<?php echo URL('mgr/wb_live.modify', array('id'=>$aRecord['id'], 'page'=>$currentPage));?>" class="icon-edit">编辑</a>
     						<a href="<?php echo URL('mgr/wb_live.approveWbList', array('id'=>$aRecord['id']) ); ?>" class="icon-approve">审批</a>

@@ -17,18 +17,18 @@
 ?>
 	
 	
-    <div class="row"><span>个人资料</span></div>
+    <div class="row"><span><?php LO('ta__profile__label_profile');?></span></div>
     <div class="c">
 	<div><?php echo F('escape', $userinfo['screen_name'], ENT_QUOTES);?>
 					
 					<?php
 					if($userinfo['gender']=='m'):
 					?>
-					男
+					<?php LO('ta__profile__label_genderMale');?>
 					<?php
 					else:
 					?>
-					女
+					<?php LO('ta__profile__label_genderFemale');?>
 					<?php
 					endif;
 					?>

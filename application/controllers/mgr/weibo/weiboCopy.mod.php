@@ -13,8 +13,8 @@ class weiboCopy_mod extends action {
 		$keyword = V('r:keyword');
 		$rows = V('r:rows', 20);
 
-		$start = strtotime($start_date);
-		$end = strtotime($end_date);
+		$start = strtotime($start_date.' 00:00:00');
+		$end = strtotime($end_date . ' 23:59:59');
 
 		$query = array(
 			'keyword' => $keyword,
@@ -48,7 +48,6 @@ class weiboCopy_mod extends action {
 		DS('xweibo/weiboCopy.disabled', '', $id, $v);
 		if ($v == 1) {
 			// 取得微博信息
-			DR('xweibo/xwb.setToken','', 2);
 			$rst = DR('xweibo/xwb.getStatuseShow','', $id);
 			if (isset($rst['errno']) && $rst['errno']) {
 				$this->_error('没有被屏蔽的微博', $_SERVER['HTTP_REFERER'] );

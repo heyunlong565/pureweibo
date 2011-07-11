@@ -11,12 +11,12 @@ class event_pls {
 		$joinList = array();
 		$join_list = array();
 		if ('hot' == $params['type']) {
-			$list = DS('events.eventSearch', 'g0/1800', '', 1, '', false, $offset, $limit);
+			$list = DS('events.eventSearch', '', '', 1, '', false, $offset, $limit);
 			/// 获取活动总记录数
 			$count = DS('events.getEventCount', 'g0/1800', 1);
 			if (empty($list)) {
 				/// 没有推荐活动，获取参加人数多的正常活动列表
-				$list = DS('events.eventSearch', 'g0/1800', '', 3, '', true, $offset, $limit);
+				$list = DS('events.eventSearch', '', '', 3, '', true, $offset, $limit);
 				$count = DS('events.getEventCount', 'g0/1800', 3);
 			}
 
@@ -34,11 +34,18 @@ class event_pls {
 			}
 		} elseif ('attend' == $params['type']) {
 			/// 我参加的活动
-			$list = DS('events.getMineAttendEvents', 'g0/1800', USER::uid(), $page, $limit);
+			$list = DS('events.getMineAttendEvents', '', USER::uid(), $page, $limit);
 			/// 获取活动总记录数
 			$count = DS('events.getMineAttendEventsCount', 'g0/1800', USER::uid());
+		} else if ( 'all'==$params['type'] ) {
+			$list = DS('events.eventSearch', '', '', '', '', false, $offset, $limit);
+			/// 获取活动总记录数
+			$count = DS('events.getEventCount', 'g0/1800');
+		} elseif ('more' == $params['type']) {
+			$list = DS('events.eventSearch', '', '', 8, '', false, $offset, $limit);
+			$count = DS('events.getEventCount', 'g0/1800');
 		} else {
-			$list = DS('events.eventSearch', 'g0/1800', '', '', USER::uid(), false, $offset, $limit);
+			$list = DS('events.eventSearch', '', '', '', USER::uid(), false, $offset, $limit);
 			/// 获取活动总记录数
 			$count = DS('events.getEventCount', 'g0/1800', '', USER::uid());
 		}
@@ -55,7 +62,7 @@ class event_pls {
 	 * 侧栏热门活动
 	 */
 	function sideHotEvents() {
-		$events = DS('events.eventSearch', 'g0/1800','', 1, '', false, 0, 5);
+		$events = DS('events.eventSearch', '','', 1, '', false, 0, 5);
 		TPL::module('side_hot_events', array('events' => $events));
 	}
 
@@ -63,7 +70,7 @@ class event_pls {
 	 * 侧栏最新活动
 	 */
 	function sideNewsEvents() {
-		$events = DS('events.eventSearch', 'g0/1800', '', 8, '', false, 0, 5);
+		$events = DS('events.eventSearch', '', '', 8, '', false, 0, 5);
 		TPL::module('side_news_events', array('events' => $events));
 	}
 
@@ -132,23 +139,14 @@ class event_pls {
 		$limit = 20;
 
 		///获取评论活动的微博列表
-		$list_comment = DS('events.getEventComments', 'g0/1800', $eid);
+		$list_comment = DS('events.getEventComments', '', $eid, $page, $limit);
+		$count = DS('events.getCount');
 		$list = array();
 		if ($list_comment) {
 			$wb_ids = array();
 			foreach ($list_comment as $var) {
-				$wb_ids[] = $var['wb_id'];
-			}
-			$list = DR('xweibo/xwb.getStatusesBatchShow', '', implode(',', $wb_ids));
-			if (empty($list['errno'])) {
-				$list = $list['rst'];
-				foreach ($list as $key=>$var) {
-					if (isset($var['estate']) && $var['estate'] == 'deleted') {
-						/// 如果该微博已经被删除，也删除该活动的评论
-						DS('events.deleteEventComment', '', $eid, $var['id']);
-						unset($list[$key]);
-					}
-				}
+				$item = json_decode($var['weibo'], true);
+				$list[] = $item;
 			}
 		}
 
@@ -159,7 +157,9 @@ class event_pls {
 		$param['show_filter_type'] = false;
 		$param['show_list_title'] = false;
 		$param['show_unread_tip'] = false;
-		$param['empty_msg'] = '暂时没有评论';
+		$param['empty_msg'] = L('pls__eventComment__emptyCommentTip');
+		$param['total_count'] = $count;
+		$param['page_type'] = 'event';
 		TPL::module('eventweibos', array('param' => $param, 'info' => $infos['info']));
 
 		return array('cls'=>'wblist', 'list' => F('format_weibo',$list));
@@ -225,7 +225,7 @@ class event_pls {
 		$event = array();
 		if ($eid) {
 			///获取活动的详细信息
-			$event = DS('events.getEventById', 'g0/1800', $eid);
+			$event = DS('events.getEventById', '', $eid);
 		}
 		TPL::module('eventform', array('event' => $event));
 	}

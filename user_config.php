@@ -23,7 +23,7 @@ define('XWB_INSTALL_COVER',		'1');
 /// 产品标识串,每次安装重新生成 ,　date("mdHis") 用于重新安装时，自动更新MC前缀等
 define('APP_FLAG_VER',	'');
 /// MC　KEY　的前缀
-define('MC_PREFIX',			'XWB20_MC_'.APP_FLAG_VER);
+define('MC_PREFIX',			'XWB_MC_'.APP_FLAG_VER);
 //----------------------------------------------------------------------
 if (XWB_SERVER_ENV_TYPE!=='sae'){
 	/// 产品安装路径
@@ -60,7 +60,7 @@ define('IS_USE_CAPTCHA',	'');
 //----------------------------------------------------------------------
 /// HTTP		适配器选择配置  fsockopen curl
 define('HTTP_ADAPTER',		'saeproxy');
-/// CACHE 		适配器选择配置
+/// CACHE 		适配器选择配置 file serialize memcache
 define('CACHE_ADAPTER',		'sae');
 /// ACCOUNT		适配器选择配置
 define('ACCOUNT_ADAPTER',	'dzUcenter');
@@ -81,6 +81,8 @@ define('SESSION_ADAPTER', 'default');
 
 //mail处理
 define('MAIL_ADAPTER',		'sae');
+//log处理
+define('LOG_ADAPTER',		'db');
 /// MC 的 HOST 配置
 define('MC_HOST', 			'');
 //----------------------------------------------------------------------
@@ -122,11 +124,23 @@ define('MAX_UPLOAD_FILE_SIZE',	'1');
 define('XPLUGIN_API_KEY', '');
 /// xwb 插件通讯的api请求过期时间
 define('XPLUGIN_API_TIMESTAMP', 600);
-/// xwb 微博秀页面缓存时间
-define("WEIBO_SHOW_PAGE_TIME", 500);
-/// 内容输出开关配置用于故障恢复：　true (全部开启),false (全部关闭),"111111111"($str[$type-1]的值，决定类型为$type的内容输出是否关闭)
+/// 内容输出开关配置用于故障恢复：　true (全部开启),false (全部关闭),'111111111'($str[$type-1]的值，决定类型为$type的内容输出是否关闭)
 define("WEIBO_SHOW_CACHE_SWITCH",	TRUE);
+
+/// xwb 日志等级, 0:不记录任何错误;1:记录错误日志;2:错误+警告;
+// 3:info等级,只有在info等级和url里带有 _loginfo=1 同时存在时，才会记录, 4:info等级的都显示
+define('LOG_LEVEL', 2);
+define('LOG_LEVEL_ERROR', 	'error');
+define('LOG_LEVEL_WARNING', 'warning');
+define('LOG_LEVEL_INFO', 	'info');
+/// xwb 日志, DB、IO、MC、API长操作时间, 以秒为单位
+define('LOG_DB_WARNING_TIME', 0.5);
+define('LOG_IO_WARNING_TIME', 0.5);
+define('LOG_MC_WARNING_TIME', 0.5);
+define('LOG_API_WARNING_TIME', 1);
 //----------------------------------------------------------------------
 /// 强制使用　xwb 本地化关系开关, TRUE:关系本地化， false:sina关系　
 //define('XWB_PARENT_RELATIONSHIP', TRUE);
 //----------------------------------------------------------------------
+///　强制使用　PAGE_TYPE_CURRENT　布局模板
+//define('PAGE_TYPE_CURRENT', 2);

@@ -11,7 +11,7 @@
 	TPL::plugin('wap/include/nav', array('is_top' => true), false);
 	?>
 	<div class="row">
-		<a href="<?php echo V('s:PHP_SELF','wap.php')."?m=celeb"?>">行业</a>
+	<a href="<?php echo V('s:PHP_SELF','wap.php')."?m=celeb"?>"><?php LO('celeb__celebStarSortList__industry');?></a>
 		-<?php echo strip_tags($title);?>
 	</div>
    

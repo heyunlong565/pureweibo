@@ -8,29 +8,32 @@
 
 	$id = (string)$id;
 	
-	$source = preg_replace("#(<a\s+href=[\"'][^\"']+[\"'][^>]*)(>.+?</a>)#i", "\$1 target=\"_blank\"\$2", $source);
-
-	//简化的JSON数据对象
-	$json_element = array(
-		'cr' => $created_at, //create time
-		'f' => isset($favorited) ? 1: 0, //is favorited
-		's' => $source, //来源
-		'tx' => $text //文本内容
-	);
-
-	if (isset($thumbnail_pic)) {
-		$json_element['tp'] = $thumbnail_pic;
-		$json_element['mp'] = $bmiddle_pic;
-		$json_element['op'] = $original_pic;
+	if (!isset($xwb_weibo_verify)) {
+		$source = preg_replace("#(<a\s+href=[\"'][^\"']+[\"'][^>]*)(>.+?</a>)#i", "\$1 target=\"_blank\"\$2", $source);
 	}
 
-	$json_element['u'] = array(
-		'id' => (string)$user['id'], //用户ID
-		'sn' => $user['screen_name'], //显示的名称
-		'p' => $user['profile_image_url'],
-		'v' => $user['verified'] ? 1: 0
-	);
+	//if (!isset($xwb_weibo_verify)) {
+		//简化的JSON数据对象
+		$json_element = array(
+			'cr' => $created_at, //create time
+			//'f' => isset($favorited) ? 1: 0, //is favorited
+			's' => $source, //来源
+			'tx' => $text //文本内容
+		);
 
+		if (isset($thumbnail_pic)) {
+			$json_element['tp'] = $thumbnail_pic;
+			$json_element['mp'] = $bmiddle_pic;
+			$json_element['op'] = $original_pic;
+		}
+
+		$json_element['u'] = array(
+			'id' => (string)$user['id'], //用户ID
+			'sn' => $user['screen_name'], //显示的名称
+			'p' => $user['profile_image_url'],
+			'v' => $user['verified'] ? 1: 0
+		);
+//	}
 
 	// xxx前发表
 	$format_time = F('format_time', $created_at);
@@ -64,21 +67,21 @@
 	<a href="<?php echo $profile_url;?>"><img width="50" height="50" src="<?php echo $user_img;?>" alt="<?php echo $nick;?>" title="<?php echo $nick;?>" /></a>
 	<!-- 在线直播 主持人和嘉宾的区别 -->
 	<?php if (isset($user['live_user_type']) && $user['live_user_type'] == 'master'):?>
-	<span class="emcee-mark">主持人</span>
+	<span class="emcee-mark"><?php LO('modules__feed__master');?></span>
 	<?php elseif (isset($user['live_user_type']) && $user['live_user_type'] == 'guest'):?>
-	<span class="guest-mark">嘉宾</span>
+	<span class="guest-mark"><?php LO('modules__feed__guest');?></span>
 	<?php endif;?>
 	<!-- end -->
 	</div>
 <?php elseif ($header == 2): //热门转发?>
 	<div class="hot-total">
-		<strong id="hotNum"></strong>
-		<em>转发</em>
+		<strong id="hotNum"><?php echo isset($repostCnt) ? $repostCnt : ''; ?></strong>
+		<em><?php LO('modules__feed__repost');?></em>
 	</div>
 <?php elseif ($header == 3): //热门评论?>
 	<div class="hot-total">
-		<strong id="hotNum"></strong>
-		<em>评论</em>
+		<strong id="hotNum"><?php echo isset($commentCnt) ? $commentCnt : ''; ?></strong>
+		<em><?php LO('modules__feed__comment');?></em>
 	</div>
 <?php endif;?>
 	<div class="feed-content">
@@ -102,10 +105,10 @@
 
 			<div class="show-img">
 				<p>
-					<a href="#" class="icon-piup icon-bg">收起</a>
-					<a href="#" class="icon-src icon-bg">查看原图</a>
-					<a href="#" class="icon-trunleft icon-bg">向左转</a>
-					<a href="#" class="icon-trunright icon-bg">向右转</a>
+					<a href="#" class="ico-piup">收起</a>
+					<a href="#" class="ico-src">查看原图</a>
+					<a href="#" class="ico-turnleft">向左转</a>
+					<a href="#" class="ico-turnright">向右转</a>
 				</p>
 
 
@@ -130,14 +133,14 @@
 				$errmsg = '';
 				switch (true) {
 					case in_array(1, $errno):
-						$errmsg = '内容有错！';
+						$errmsg = L('modules__feed__retError1');
 						break;
 					case in_array(2, $errno):
-						$errmsg = '该用户已经被屏蔽';
+						$errmsg = L('modules__feed__retError2');
 						break;
 					case in_array(3, $errno):
 					case in_array(4, $errno):
-						$errmsg = '原微博已被屏蔽';
+						$errmsg = L('modules__feed__retError3');
 						break;
 				}
 			} else {
@@ -147,28 +150,32 @@
 				//原创用户信息
 				$rtUser = &$rt['user'];
 
-				//转发消息JSON部分
-				$json_element['rt'] = array(
-					'cr' => $rt['created_at'],
-					'f' => $rt['favorited'],
-					'id' => (string)$rt['id'],
-					's' => $rt['source'],
-					'tx' => $rt['text'],
-					'fl' => $rtUser['following'] ? 1: 0,
-					'sn' => $rtUser['screen_name'],
-					'u' => array(
-						'id' => (string)$rtUser['id'],
+				//if (!isset($xwb_weibo_verify)) {
+					//转发消息JSON部分
+					$json_element['rt'] = array(
+						'cr' => $rt['created_at'],
+						//'f' => $rt['favorited'],
+						'id' => (string)$rt['id'],
+						's' => $rt['source'],
+						'tx' => $rt['text'],
+						//'fl' => $rtUser['following'] ? 1: 0,
 						'sn' => $rtUser['screen_name'],
-						'v' => $rtUser['verified']? 1: 0,
-						'p' => $rtUser['profile_image_url']
-					)
-				);
+						'u' => array(
+							'id' => (string)$rtUser['id'],
+							'sn' => $rtUser['screen_name'],
+							'v' => $rtUser['verified']? 1: 0,
+							'p' => $rtUser['profile_image_url']
+						)
+					);
 
-				if (isset($rt['thumbnail_pic'])) {
-					$json_element['rt']['tp'] = $rt['thumbnail_pic'];
-					$json_element['rt']['mp'] = $rt['bmiddle_pic'];
-					$json_element['rt']['op'] = $rt['original_pic'];
-				}
+					if (isset($rt['thumbnail_pic'])) {
+						$json_element['rt']['tp'] = $rt['thumbnail_pic'];
+						$json_element['rt']['mp'] = $rt['bmiddle_pic'];
+						$json_element['rt']['op'] = $rt['original_pic'];
+					}
+				//}
+
+
 
 				//创始用户昵称
 				$rtNick = F('escape', $rtUser['screen_name']);
@@ -197,7 +204,7 @@
 			<div class="box-t skin-bg"><span class="skin-bg"></span></div>
 			<div class="forward box-content">
 				<p><a href="<?php echo URL('ta',array('id' => $rtUser['id']));?>">@<?php echo $rtNick;?><?php echo F('verified', $rtUser);?></a>：<?php echo $rtText;?>
-				<span><a href="<?php echo $rtLink;?>" id="lk_fw">原文转发</a>|<a href="<?php echo $rtLink;?>" id="lk_cm">原文评论</a></span>
+			<span><a href="<?php echo $rtLink;?>" id="lk_fw"><?php LO('modules__feed__retRepost');?></a>|<a href="<?php echo $rtLink;?>" id="lk_cm"><?php LO('modules__feed__retComment');?></a></span>
 				</p>
 			<?php if (!empty($rt['thumbnail_pic'])): ?>
 				<div class="preview-img">
@@ -214,25 +221,26 @@
 		//end 转发微博内容部分
 	?>
 	<div class="feed-info"><p>
-	<?php if ($uid == $user['id']):?><a href="#" rel="e:dl">删除</a>|<?php endif;?><a href="#" rel="e:fw" id="fw">转发</a><?php if ($favorited):?>|<a href="#" rel="e:ufr,t:1">取消收藏</a><?php else:?>|<a href="#" rel="e:fr">收藏</a><?php endif;?>|<a href="javascript:;"<?php if (!$disable_comment):?> rel="e:cm"<?php endif;?> id="cm">评论</a>
-	</p><span><a href="<?php echo $link;?>"><?php echo $format_time;?></a> 来自 <?php echo $source;?></span>
+	<?php if ($uid == $user['id']):?><a href="#" rel="e:dl"><?php LO('modules__feed__delete');?></a>|<?php endif;?><a href="#" rel="e:fw" id="fw"><?php LO('modules__feed__repost'); echo isset($repostCnt) ? "($repostCnt)" : ''; ?></a>|<?php $favorited=isset($favorited) ? $favorited : false; if($favorited):?><a href="#" rel="e:ufr,t:1"><?php LO('modules__feed__unfav');?></a><?php else: ?><a href="#" rel="e:fr"><?php LO('modules__feed__fav');?></a><?php endif; ?>|<a href="javascript:;"<?php if (!$disable_comment):?> rel="e:cm"<?php endif;?> id="cm"><?php LO('modules__feed__comment');echo isset($commentCnt) ? "($commentCnt)" : ''; ?></a>
+	</p><span><a href="<?php if (isset($xwb_weibo_verify)):?>#<?php else:?><?php echo $link;?><?php endif;?>"><?php echo $format_time;?></a> <?php if (isset($xwb_weibo_verify)) :?><?php LO('modules__feed__informationIsNotAudited');?><?php else:?><?php LO('modules__feed__source', $source);?><?php endif;?></span>
 	
 	<?php if (isset($is_show) && $is_show && USER::uid()){ // 举报功能，只有在微博详细也才显示  ?>
-		&nbsp;&nbsp;|&nbsp;&nbsp;<a href="#" rel="e:rs">举报</a>
+		&nbsp;&nbsp;|&nbsp;&nbsp;<a href="#" rel="e:rs"><?php LO('modules__feed__report');?></a>
 	<?php } ?>
 	
-	<?php if (isset($is_show) && $is_show && USER::aid()){?> ｜ <?php if (isset($filter_state) && is_array($filter_state) && in_array(3, $filter_state)) {?><span>已屏蔽</span><?php } else {?> <a href="#" rel="e:blm">屏蔽该微博</a><?php }}?>
+	<?php if (isset($is_show) && $is_show && USER::aid()){?> ｜ <?php if (isset($filter_state) && is_array($filter_state) && in_array(3, $filter_state)) {?><span><?php LO('modules__feed__blocked');?></span><?php } else {?> <a href="#" rel="e:blm"><?php LO('modules__feed__blockWeibo');?></a><?php }}?>
     </div>
   </div>
 <?php
-//</li>
-//将每条微博的内容保存到一个对象，最后以json格式输出到页面
+//if (!isset($xwb_weibo_verify)) {
+	/// 将每条微博的内容保存到一个对象，最后以json格式输出到页面
 	$json = APP::getData('json', 'WBDATA', array());
 
 	if (!isset($json[$id])) {
 		$json[$id] = $json_element;
 		APP::setData('json', $json, 'WBDATA');
 	}
+//}
 ?>
 
 <?php if (isset($is_show) && $is_show && USER::uid()){ // 举报功能，只有在微博详细也才显示  ?>

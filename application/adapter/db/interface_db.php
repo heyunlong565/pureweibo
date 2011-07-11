@@ -159,7 +159,20 @@ class interface_db
 	 *@param $msg string log message
 	 *@param $type 错误类型
 	 */
-	function log($msg, $type='db') {
-		LOGSTR($type, $msg);
+	function log($msg, $extra=array()) {
+		LOGSTR('db', $msg, LOG_LEVEL_ERROR, $extra);
+	}
+	
+	function infoLog($msg, $extra=array(), $startTime=false) {
+		LOGSTR('db', $msg, LOG_LEVEL_INFO, $extra, $startTime);
+	}
+	
+	function waringLog($startTime, $msg, $extra=array()) 
+	{
+		$used	 = microtime(TRUE)-$startTime;
+		$longExe = $startTime && LOG_DB_WARNING_TIME && $used>LOG_DB_WARNING_TIME;
+		if ($longExe) {
+			LOGSTR('db', $msg." Used=$used", LOG_LEVEL_WARNING, $extra);
+		}
 	}
 }

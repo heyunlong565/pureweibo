@@ -262,6 +262,7 @@ class mysql_db extends interface_db
 		return $this->execute($sql);
 	}
 	
+	
 	/**
 	 * 得到读数据库连接(使用主从数据库)时，如果不是主从架构，则返回唯一的连接(主从设置可以站点根目录中的config.php中设置)
 	 * @param $mode 'read'|'write' 使用读服务器还是写服务器
@@ -269,15 +270,17 @@ class mysql_db extends interface_db
 	 * @param $reconnect boolean 指定是否强制重新连接,true为强制重连
 	 * @return resource 返回mysql读数据库连接
 	 */
-	function getConnect($mode = 'write', $index = null, $reconnect = false) {
-		static $connect = null;
+	function getConnect($mode = 'write', $index = null, $reconnect = false) 
+	{
+		$log_func_start_time 	= microtime(TRUE);
+		static $connect 		= null;
 		static $count_reconnect = 0;// 重连次数
-		static $error_connect = 0;// 连接错误的服务器数
-
+		static $error_connect 	= 0;// 连接错误的服务器数
 		$mode = in_array($mode, array('write', 'read')) ? strtolower($mode) : 'write';
-
+		
 		// 如果第一次连接
-		if (!isset($connect[$mode]) || $reconnect !== false) {
+		if (!isset($connect[$mode]) || $reconnect !== false) 
+		{
 			$count_reconnect = 0; // 重新计算重连次数
 			// 如果设置时使用读服务器，但没有相关配置项，则尝试使用写服务器
 			if ($mode == 'read' && isset($this->params['slaves']) && !empty($this->params['slaves'])) {
@@ -292,7 +295,9 @@ class mysql_db extends interface_db
 			}
 
 			// 检查配置项完整
-			if (!(isset($p['host']) && isset($p['user']) && isset($p['pwd']) )) {
+			if (!(isset($p['host']) && isset($p['user']) && isset($p['pwd']) )) 
+			{
+				$this->log('[getConnect]Mysql config error', $p);
 				$this->debug && print('Mysql config error');
 				exit;
 				//return $this->getWriteConnect();
@@ -301,54 +306,74 @@ class mysql_db extends interface_db
 				$p['port'] = 3306;
 			}
 
+			$this->infoLog('[getConnect]Create Mysql ('.$mode.')connection:Host:'.$p['host'].':'.$p['port'].' , User:'.$p['user']);
 			$this->debug && print('Create Mysql (' . $mode . ')connection:Host:' .$p['host'] . ':' . $p['port'] . ' , User:' . $p['user'] . ' , ' . $p['pwd'] . "<br />");
-			
 			$connect[$mode] = @mysql_connect($p['host'] . ':' . $p['port'], $p['user'], $p['pwd']);
 
 			// 如果连接失败，则尝试连接下一台读服务器
-			if (!$connect[$mode]) {
-				$this->log('连接失败.Error:'.mysql_error());
+			if (!$connect[$mode]) 
+			{
+				$this->log('[getConnect]数据库连接失败.Error:'.mysql_error(), $p);
 				F('error', mysql_error());
-				if ($mode == 'read') {
+				if ($mode == 'read') 
+				{
 					++ $error_connect;
 					//如查所有读服务器都连接失败,尝试连接写服务器
-					if ($error_connect >= $count) {
+					if ($error_connect >= $count) 
+					{
+						$this->infoLog('[getConnect]Try to connect next (write)server');
 						$this->debug && print('Try to connect next (write)server<br />'."\n");
 						return $this->getConnect();
 					}
+					
 					if (++$index > $count) {
 						$index = 0;
 					}
+					
+					$this->infoLog('[getConnect]Try to connect next (read)server');
 					$this->debug && print('Try to connect next (read)server<br />'."\n");
 					return $this->getConnect('read', $index);
 				} else {
+					$this->log('[getConnect]Connect Mysql server error', $p);
 					exit('Connect Mysql server error.<br />' . "\n");
 				}
 			}
+			
+			
 			// 默认使用UTF8编码
 			$p['charset'] = isset($p['charset']) ? $p['charset'] : 'UTF8';
 			$this->_setCharset($p['charset'], $connect[$mode]);
 			//mysql_query('SET NAMES ' . $p['charset'], $connect[$mode]);
+			
 			// 默认使用和写数据库相同的库名
 			if (!isset($p['db'])) {
 				$p['db'] = $this->params['db'];
 			}
+			
+			$this->infoLog('[getConnect]Using db:'.$p['db']);
 			$this->debug && print('Using db:' . $p['db'] . "<br />\n");
 			mysql_select_db($p['db'], $connect[$mode]);
 		}
+		
 		// 如果出现长时间没mysql动作而引起超时，则尝试重连，重连次数为3
-		if (!mysql_ping($connect[$mode])) {
-			if ($count_reconnect < 3) {
+		if (!mysql_ping($connect[$mode])) 
+		{
+			if ($count_reconnect < 3) 
+			{
 				$count_reconnect ++;
 				mysql_close($connect[$mode]);
+				
+				$this->infoLog('[getConnect]Try reconnect');
 				$this->debug && print('Try reconnect<br />' . "\n");
 				return $this->getConnect('read', $index, true);
 			} else {
+				$this->log('[getConnect]Reconnect MySQL read server error');
 				$this->debug && print("Reconnect MySQL read server error <br />\n");
 				return false;
 			}
 		}
 		//$this->last_query_connect = $connect;
+		$this->waringLog($log_func_start_time, '[getConnect]数据库链接');
 		return $connect[$mode];
 	}
 	
@@ -364,6 +389,7 @@ class mysql_db extends interface_db
 			$sql = $charset ? "character_set_connection={$charset}, character_set_results={$charset}, character_set_client=binary" : '';
 			$sql .= $version > '5.0.1' ? ((empty($sql) ? '' : ', ')."sql_mode=''") : '';
 			$sql && mysql_query("SET {$sql}", $link_identifier);
+			$this->infoLog('[_setCharset]'.$sql);
 		}
 	}
 	
@@ -388,13 +414,15 @@ class mysql_db extends interface_db
 	 * @param $sql string SQL语句
 	 * @return int|false 失败则返回false,成功则返回mysql resource
 	 */
-	function execute($sql) {
+	function execute($sql) 
+	{
+		$log_func_start_time = microtime(TRUE);
 		$sql = $this->pushSql($sql);
 		$conn = $this->autoConnect($sql);
 		if (!$conn) return false;
 		$rs= mysql_query($sql, $conn);
 		if (!$rs) {
-			$this->log('query error:'. mysql_error($conn) . '. SQL:' . $sql );
+			$this->log('[execute]query error:'. mysql_error($conn) . '. SQL:' . $sql );
 		}
 		// 查询后的状态
 		$this->state = array(
@@ -406,6 +434,8 @@ class mysql_db extends interface_db
 					'errno' => mysql_errno($conn)
 					);
 
+		$this->waringLog($log_func_start_time, '[execute]数据库查询', $this->state);
+		$this->infoLog('[execute]查询后的状态', $this->state, $log_func_start_time);
 		$this->debug && print_r($this->state);
 		return $rs ? $rs : false;
 	}
@@ -423,7 +453,9 @@ class mysql_db extends interface_db
 	 * @param $sql string SQL查询语句
 	 * @return array|false 成功则返回二维数组
 	 */
-	function query($sql, $fetch_mode = MYSQL_ASSOC) {
+	function query($sql, $fetch_mode = MYSQL_ASSOC) 
+	{
+		$log_func_start_time = microtime(TRUE);
 		if (!$rs = $this->execute($sql)) {
 			return false;
 		}
@@ -435,6 +467,7 @@ class mysql_db extends interface_db
 		if ($this->autoFree) {
 			$this->free($rs);
 		}
+		$this->waringLog($log_func_start_time, "[query]数据库查询:sql=$sql");
 		return $data;
 	}
 
@@ -457,7 +490,9 @@ class mysql_db extends interface_db
 	 * @param $sql string SQL查询语句
 	 * @return array|false 成功则返回第一条记录，找不到记录则返回空数组，失败返回false
 	 */
-	function getRow($sql) {
+	function getRow($sql) 
+	{
+		$log_func_start_time = microtime(TRUE);
 		if (!$rs = $this->execute($sql)){
 			return false;
 		}
@@ -468,6 +503,8 @@ class mysql_db extends interface_db
 		if ($this->autoFree) {
 			$this->free($rs);
 		}
+		
+		$this->waringLog($log_func_start_time, "[getRow]数据库查询:sql=$sql");
 		return $rst;
 	}
 	

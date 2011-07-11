@@ -71,14 +71,14 @@ class wbcom_mod extends action
 		$content = trim(V('p:content', ''));
 		$len = strlen($content);
 		if ($len == 0) {
-			$this->_showErr('请输入微博内容', $this->_getBackURL());
+			$this->_showErr(L('controller__wbCom__postWB__inputTip'), $this->_getBackURL());
 		}
 		
 		$contentLen = $this->_getFixStrlen($content);
 		
 		//420字限制
 		if ($contentLen > 840) {
-			$this->_showErr('不能超过420个字', $this->_getBackURL());
+			$this->_showErr(L('controller__wbCom__postWB__lengthTooLong'), $this->_getBackURL());
 		}
 		
 		if ($contentLen > 280) {
@@ -105,7 +105,7 @@ class wbcom_mod extends action
 			sleep(1);
 		}
 		
-		$this->_showErr('发表成功，立即返回前一页', $this->_getBackURL());
+		$this->_showErr(L('controller__wbCom__postWB__postSuccess'), $this->_getBackURL());
 	}
 	
 	/**
@@ -129,7 +129,7 @@ class wbcom_mod extends action
 		
 		$result = DR('xweibo/xwb.repost', '', $mid, $content, $is_comment);
 		if (!empty($result['errno'])) {
-			$this->_showErr('转发失败，请重试', URL('show.repos', 'id=' . $mid));
+			$this->_showErr(L('controller__wbCom__reposWB__errorTip'), URL('show.repos', 'id=' . $mid));
 		}
 		
 		APP::redirect('index', 2);
@@ -151,7 +151,7 @@ class wbcom_mod extends action
 		}
 		
 		if ($content === '') {
-			$this->_showErr('评论内容不能为空', $this->_getBackURL());
+			$this->_showErr(L('controller__wbCom__comment__emptyTip'), $this->_getBackURL());
 		}
 		
 		$content = $this->_autoCut($content);
@@ -163,7 +163,7 @@ class wbcom_mod extends action
 		}
 		
 		if (!empty($result['errno'])) {
-			$this->_showErr('评论失败，请重试', $this->_getBackURL());
+			$this->_showErr(L('controller__wbCom__comment__errorTip'), $this->_getBackURL());
 		}
 		
 		APP::redirect($this->_getBackURL(), 3);
@@ -210,8 +210,8 @@ class wbcom_mod extends action
 			APP::redirect('index', 2);
 		}
 		
-		TPL::assign('title', '取消关注');
-		TPL::assign('msg', '确定要取消对此人的关注吗?');
+		TPL::assign('title', L('controller__wbCom__cancelFollowAlert__title'));
+		TPL::assign('msg', L('controller__wbCom__cancelFollowAlert__isSure'));
 		TPL::assign('confirmURL', WAP_URL('wbcom.deleteFriendship', 'id=' . $id . '&is_follower=0'));
 		TPL::assign('backURL', $this->_getBackURL(true));
 		
@@ -229,8 +229,8 @@ class wbcom_mod extends action
 			APP::redirect('index', 2);
 		}
 		
-		TPL::assign('title', '解除粉丝');
-		TPL::assign('msg', '确定要解除此人对你的关注吗?');
+		TPL::assign('title', L('controller__wbCom__cancelFanAlert__title'));
+		TPL::assign('msg', L('controller__wbCom__cancelFanAlert__isSure'));
 		TPL::assign('confirmURL', WAP_URL('wbcom.deleteFriendship', 'id=' . $id . '&is_follower=1'));
 		TPL::assign('backURL', $this->_getBackURL(true));
 		
@@ -245,14 +245,14 @@ class wbcom_mod extends action
 	{
 		$mid = V('g:mid');
 		if (empty($mid)) {
-			$this->_showErr('参数错误', $this->_getBackURL());
+			$this->_showErr(L('controller__wbCom__addFav__paramError'), $this->_getBackURL());
 		}
 		
 		$result = DR('xweibo/xwb.createFavorite', '', $mid);
 		if (!empty($result['errno'])) {
-			$this->_showErr('添加收藏失败', $this->_getBackURL());
+			$this->_showErr(L('controller__wbCom__addFav__errorTip'), $this->_getBackURL());
 		} else {
-			$this->_showErr('添加收藏成功', URL('index.favorites'));
+			$this->_showErr(L('controller__wbCom__addFav__addFavSuccess'), URL('index.favorites'));
 		}
 	}
 	
@@ -264,8 +264,8 @@ class wbcom_mod extends action
 	{
 		$mid = V('g:mid');
 		
-		TPL::assign('title', '取消收藏');
-		TPL::assign('msg', '确定要取消对此微博的收藏吗?');
+		TPL::assign('title', L('controller__wbCom__delFavAlert__title'));
+		TPL::assign('msg', L('controller__wbCom__delFavAlert__isSure'));
 		TPL::assign('confirmURL', WAP_URL('wbcom.delfav', 'mid=' . $mid));
 		TPL::assign('backURL', $this->_getBackURL(true));
 		
@@ -294,8 +294,8 @@ class wbcom_mod extends action
 	{
 		$mid = V('g:mid');
 		
-		TPL::assign('title', '删除微博');
-		TPL::assign('msg', '确定要删除这条微博吗?');
+		TPL::assign('title', L('controller__wbCom__delWBAlert__title'));
+		TPL::assign('msg', L('controller__wbCom__delWBAlert__isSure'));
 		TPL::assign('confirmURL', WAP_URL('wbcom.delWB', 'mid=' . $mid));
 		TPL::assign('backURL', $this->_getBackURL(true));
 		
@@ -324,8 +324,8 @@ class wbcom_mod extends action
 	{
 		$cid = V('g:cid');
 		
-		TPL::assign('title', '删除评论');
-		TPL::assign('msg', '确定要删除这条评论吗?');
+		TPL::assign('title', L('controller__wbCom__delCommentAlert__title'));
+		TPL::assign('msg', L('controller__wbCom__delCommentAlert__isSure'));
 		TPL::assign('confirmURL', WAP_URL('wbcom.delComment', 'cid=' . $cid));
 		TPL::assign('backURL', $this->_getBackURL(true));
 		
@@ -357,7 +357,7 @@ class wbcom_mod extends action
 		$reply_user = V('g:reply_user');
 		
 		if (empty($mid) || empty($cid) || empty($reply_user)) {
-			$this->_showErr('参数错误', $this->_getBackURL());
+			$this->_showErr(L('controller__wbCom__replyComment__paramError'), $this->_getBackURL());
 		}
 		
 		TPL::assign('backURL', $this->_getBackURL(true));
@@ -379,14 +379,14 @@ class wbcom_mod extends action
 		$content = trim(V('p:content'));
 		
 		if (empty($mid) || empty($cid) || empty($reply_user)) {
-			$this->_showErr('参数错误', $this->_getBackURL());
+			$this->_showErr(L('controller__wbCom__sendReplyComment__paramError'), $this->_getBackURL());
 		}
 		
 		if (empty($content)) {
-			$this->_showErr('回复内容不能为空', URL('wbcom.replyComment', array('mid' => $mid, 'cid' => $cid, 'reply_user' => $reply_user)));
+			$this->_showErr(L('controller__wbCom__sendReplyComment__inputTip'), URL('wbcom.replyComment', array('mid' => $mid, 'cid' => $cid, 'reply_user' => $reply_user)));
 		}
 		
-		$reply_str = '回复@' . $reply_user . ':';
+		$reply_str = L('controller__wbCom__sendReplyComment__replyTip', $reply_user);
 		$content = $this->_autoCut($content, (140 - ceil($this->_getFixStrlen($reply_str) / 2)));
 		
 		$rp_rst = DR('xweibo/xwb.reply', '', $mid, $cid, $content);
@@ -398,16 +398,16 @@ class wbcom_mod extends action
 		
 		if (!empty($rp_rst['errno'])) {
 			if ($rp_rst['errno'] == '1020504') {
-				$this->_showErr('原微博已被作者删除，不可再对其进行评论回复', $this->_getBackURL());
+				$this->_showErr(L('controller__wbCom__sendReplyComment__replyErrorTip1'), $this->_getBackURL());
 			}
 			
 			if ($rp_rst['errno'] == '1020503') {
-				$this->_showErr('回复评论失败，因为内容长度超出了限制', URL('wbcom.replyComment', array('mid' => $mid, 'cid' => $cid, 'reply_user' => $reply_user)));
+				$this->_showErr(L('controller__wbCom__sendReplyComment__replyErrorTip2'), URL('wbcom.replyComment', array('mid' => $mid, 'cid' => $cid, 'reply_user' => $reply_user)));
 			}
 			
-			$this->_showErr('回复评论失败, 请重试', URL('wbcom.replyComment', array('mid' => $mid, 'cid' => $cid, 'reply_user' => $reply_user)));
+			$this->_showErr(L('controller__wbCom__sendReplyComment__replyErrorTip3'), URL('wbcom.replyComment', array('mid' => $mid, 'cid' => $cid, 'reply_user' => $reply_user)));
 		} else {
-			$this->_showErr('回复成功', $this->_getBackURL());
+			$this->_showErr(L('controller__wbCom__sendReplyComment__replySuccess'), $this->_getBackURL());
 		}
 	}
 	
@@ -427,14 +427,14 @@ class wbcom_mod extends action
 		$mblog_info = DR('xweibo/xwb.getStatuseShow', '', $id);
 		
 		if ($mblog_info['errno']) {
-			$this->_showErr('您要访问的页面不存在', URL('pub'));
+			$this->_showErr(L('controller__wbCom__viewPhoto__notExistPage'), URL('pub'));
 		}
 
 		//检查微博或用户是否被屏蔽
 		$wb = F('weibo_filter', $mblog_info['rst'], true);
 		
 		if (empty($wb) || !isset($wb['bmiddle_pic'])) {
-			$this->_showErr('您要访问的页面不存在', URL('pub'));
+			$this->_showErr(L('controller__wbCom__viewPhoto__notExistPage'), URL('pub'));
 		}
 		
 		TPL::assign('vp', $v);
@@ -453,16 +453,16 @@ class wbcom_mod extends action
 		$nick = trim(V('p:nick', ''));
 		
 		if ($nick === '') {
-			$this->_showErr('昵称不能为空', URL('index.setinfo'));
+			$this->_showErr(L('controller__wbCom__saveInfo__nickNotEmpty'), URL('index.setinfo'));
 		}
 		
 		$nickFixLen = $this->_getFixStrlen($nick);
 		if ($nickFixLen > 10) {
-			$this->_showErr('昵称不能超过20个字母或10个汉字', URL('index.setinfo'));
+			$this->_showErr(L('controller__wbCom__saveInfo__nickLengthTooLong'), URL('index.setinfo'));
 		}
 		
 		if ($nickFixLen < 2) {
-			$this->_showErr('昵称不能少于4个字母或2个汉字', URL('index.setinfo'));
+			$this->_showErr(L('controller__wbCom__saveInfo__nickLengthTooShort'), URL('index.setinfo'));
 		}
 		
 		$gender = V('p:gender');
@@ -476,14 +476,14 @@ class wbcom_mod extends action
 		
 		if (!empty($rst['errno'])) {
 			if ($rst['errno'] == '1020104') {
-				$this->_showErr('简介不能超过70个字', URL('index.setinfo'));
+				$this->_showErr(L('controller__wbCom__saveInfo__descLengthTooLong'), URL('index.setinfo'));
 			}
 			
 			if ($rst['errno'] == '1021301') {
-				$this->_showErr('昵称重复，请使用其它昵称', URL('index.setinfo'));
+				$this->_showErr(L('controller__wbCom__saveInfo__nickRepeat'), URL('index.setinfo'));
 			}
 			
-			$this->_showErr('修改失败', URL('index.setinfo'));
+			$this->_showErr(L('controller__wbCom__saveInfo__errorTip'), URL('index.setinfo'));
 		}
 		
 		DD('xweibo/xwb.getUserShow');
@@ -511,10 +511,15 @@ class wbcom_mod extends action
 	*/
 	function sendMsgFrm()
 	{
+		// 是否开启私信
+		if ( !HAS_DIRECT_MESSAGES ) {
+			$this->_showErr(L('controller__wbCom__sendMsgFrm__notExistPage'), URL('index'));
+		}
+		
 		$rid = V('g:rid', 0);
 		$rname = trim(V('g:rname', ''));
 		$st = V('g:st', 1); //来源页 1我的私信 2我的粉丝
-		$backLink = ($st == 1 ? '<a href="' . $this->_getBackURL(true) . '">返回我的私信</a>' : '<a href="' . $this->_getBackURL(true) . '">返回我的粉丝</a>');
+		$backLink = ($st == 1 ? L('controller__wbCom__sendMsgFrm__backToMyMessage', $this->_getBackURL(true)) : L('controller__wbCom__sendMsgFrm__backToMyFans', $this->_getBackURL(true)));
 		
 		TPL::assign('rid', $rid);
 		TPL::assign('rname', $rname);
@@ -534,13 +539,13 @@ class wbcom_mod extends action
 		$text = trim(V('p:content', ''));
 		
 		if ($text === '') {
-			$this->_showErr('请输入私信内容', URL('index.message'));
+			$this->_showErr(L('controller__wbCom__sendMsg__inputMessage'), URL('index.message'));
 		}
 		
 		$text = $this->_autoCut($text, 140);
 		if (empty($id)) {
 			if (empty($name)) {
-				$this->_showErr('请输入粉丝姓名', URL('index.message'));
+				$this->_showErr(L('controller__wbCom__sendMsg__inputFanName'), URL('index.message'));
 			}
 			
 			$id = $name;
@@ -550,10 +555,10 @@ class wbcom_mod extends action
 		
 		if (!empty($rst['errno'])) {
 			if ($rst['errno'] == '1020902') {
-				$this->_showErr('发送失败, 他还没有关注你，暂时不能发私信给他哦！', URL('index.message'));
+				$this->_showErr(L('controller__wbCom__sendMsg__errorTip1'), URL('index.message'));
 			}
 			
-			$this->_showErr('发送失败', URL('index.message'));
+			$this->_showErr(L('controller__wbCom__sendMsg__errorTip2'), URL('index.message'));
 		}
 		
 		APP::redirect('index.message', 2);
@@ -567,8 +572,8 @@ class wbcom_mod extends action
 	{
 		$id = V('g:id');
 		
-		TPL::assign('title', '删除私信');
-		TPL::assign('msg', '确定要删除这条私信吗?');
+		TPL::assign('title', L('controller__wbCom__delMsgAlert__title'));
+		TPL::assign('msg', L('controller__wbCom__delMsgAlert__isSure'));
 		TPL::assign('confirmURL', WAP_URL('wbcom.delMsg', 'id=' . $id));
 		TPL::assign('backURL', $this->_getBackURL(true));
 		
@@ -585,7 +590,7 @@ class wbcom_mod extends action
 		if (!empty($id)) {
 			$rst = DR('xweibo/xwb.deleteDirectMessage', '', $id);
 			if (!empty($rst['errno'])) {
-				$this->_showErr('删除失败', $this->_getBackURL());
+				$this->_showErr(L('controller__wbCom__delMsg__errorTip'), $this->_getBackURL());
 			}
 			/// 删除私信缓存
 			DD('xweibo/xwb.getDirectMessages');

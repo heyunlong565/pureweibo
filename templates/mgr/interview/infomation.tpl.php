@@ -12,19 +12,19 @@
 	<div class="path"><p>当前位置：扩展工具<span>&gt;</span><a href="<?php echo URL('mgr/micro_interview');?>">在线访谈列表</a><span>&gt;</span>在线访谈基本信息</p></div>
     <div class="main-cont">
 		<div class="set-area">
-        	<div class="form-area">
+        	<div class="form">
                 <div class="form-row">
                     <form id="fileForm" action="<?php echo URL('mgr/micro_interview.upload');?>" method="post" enctype="multipart/form-data">
                         <span class="tips-error hidden" id="bannerTip"></span>
                         <label for="banner" class="form-field">头图设置</label>
                         <div class="form-cont">
                             <input type="file" class="btn-file" value="上传banner" name="pic" onchange="MicroAdmin.upload(this)" id="pic"/><p class="form-tips">建议图片尺寸800*126px</p>
-                            <div class="banner-edit"><img src="<?php if (isset($config['banner_img'])):?><?php echo F('fix_url',$config['banner_img']); else: echo W_BASE_URL;?>img/talk_pic_800.png<?php endif;?>" title="banner" id="preview" /></div>
+							<div class="banner-edit"><img src="<?php echo isset($config['banner_img']) ? $config['banner_img'] : $default_banner_img; ?>" title="banner" id="preview" /></div>
                         </div>
                     </form>
                 </div>
                 <form target="" action="<?php echo URL('mgr/micro_interview.saveBase');?>" method="post" id="submitForm">
-                <input type="hidden" name="banner_img" id="bannerImg" value="<?php if (isset($config['banner_img'])): echo $config['banner_img']; else: echo W_BASE_URL.'img/talk_pic_800.png'; endif;?>" />
+                <input type="hidden" name="banner_img" id="bannerImg" value="<?php if (isset($config['banner_img'])): echo $config['banner_img']; else: echo $default_banner_img; endif;?>" />
                 <div class="form-row">
                     <label for="intro" class="form-field">关于在线访谈</label>
                     <textarea id="intro" name="desc" class="input-area area-s1" vrel="ne=m:请填写关于在线访谈信息。" warntip="#aboutErr" ><?php echo isset($config['desc']) ? $config['desc'] : ''; ?></textarea>
@@ -44,14 +44,14 @@
 							<?php foreach($userlist as $item):?>
 							<tr>
                             	<td><span class="user-pic"><img src="<?php echo $item['profile_image_url'];?>" alt="" /></span></td>
-                                <td onclick="MicroAdmin.edit(this)"><p title="点击编辑" class="text"><?php echo $item['screen_name'];?></p><input value="<?php echo $item['screen_name'];?>" type="text" class="input-txt txt-s1 hidden" id="_holder" vrel="_f|ne=m:须指定至少一个主持人|username" warntip="#masterTip"><input type="hidden" name="master[]" id="master" value="<?php echo $item['id'];?>" /><span class="tips-error hidden" id="masterTip"></span></td></td>
+                                <td onclick="MicroAdmin.edit(this)"><p title="点击编辑" class="text"><?php echo $item['screen_name'];?></p><input value="<?php echo $item['screen_name'];?>" type="text" class="input-txt w130 hidden" id="_holder" vrel="_f|ne=m:须指定至少一个主持人|username" warntip="#masterTip"><input type="hidden" name="master[]" id="master" value="<?php echo $item['id'];?>" /><span class="tips-error hidden" id="masterTip"></span></td></td>
                                 <td><a class="icon-edit" href="#" onclick="MicroAdmin.edit(this);return false;">编辑</a><a onclick="MicroAdmin.del(this);return false;" href="#" class="icon-del">删除</a></td>
                             </tr>
 							<?php endforeach;?>
 							<?php endif;?>
                             <tr id="addCol">
                                 <td><span class="user-pic"><img src="<?php echo W_BASE_URL;?>img/user_img_default.png" alt="" /></span></td>
-                                <td><input type="text"  class="input-txt txt-s1" warntip="#masterRequire" vrel="userrequire=m:须添加至少一个主持人"/><span class="tips-error hidden" id="masterRequire"></span></td>
+                                <td><input type="text"  class="input-txt w130" warntip="#masterRequire" vrel="userrequire=m:须添加至少一个主持人" onblur="MicroAdmin.add(this, 'master');return false;" /><span class="tips-error hidden" id="masterRequire"></span></td>
                                 <td><a href="javascript:;" class="icon-add" onclick="MicroAdmin.add(this, 'master');return false;">添加</a></td>
                             </tr>
                         </table>
@@ -63,9 +63,9 @@
                     <textarea  id="contact" name=contact class="input-area area-s1" vrel="ne=m:请填写联系信息。" warntip="#contactErr"><?php echo isset($config['contact']) ? $config['contact'] : '';?></textarea>
                     <span id="contactErr" class="tips-error hidden"></span>
                 </div>
-                <div class="btn-area" ><a href="javascript:;" id="submitBtn" class="general-btn btn-s2" name="保存修改"><span>保存修改</span></a></div>
+                <div class="btn-area" ><a href="javascript:;" id="submitBtn" class="btn-general highlight" name="保存修改"><span>保存修改</span></a></div>
                 
-                <input type="hidden" name="pic" id="picImg" vrel="pic=f:pic,c:头像" warntip="#bannerTip" value="<?php echo isset($config['banner_img']) ? $config['banner_img'] : W_BASE_HTTP.W_BASE_URL.'img/talk_pic_800.png';?>"/>
+                <input type="hidden" name="pic" id="picImg" vrel="pic=f:pic,c:头像" warntip="#bannerTip" value="<?php echo isset($config['banner_img']) ? $config['banner_img'] : $default_banner_img;?>"/>
                 
                 </form>
             </div>

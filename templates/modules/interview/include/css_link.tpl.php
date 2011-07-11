@@ -1,6 +1,13 @@
 <link href="<?php echo W_BASE_URL; ?>css/default/base.css" rel="stylesheet" type="text/css" />
+<?php if (WB_LANG_TYPE_CSS):?>
+<link href="<?php echo W_BASE_URL ?>css/default/skin_default/skin_<?php echo WB_LANG_TYPE_CSS;?>.css" rel="stylesheet" type="text/css" />
+<?php else:?>
 <link href="<?php echo W_BASE_URL; ?>css/default/<?php define('SKIN_CSS_PATH', 'skin_default'); echo SKIN_CSS_PATH;?>/skin.css" rel="stylesheet" type="text/css" />
+<?php endif;?>
 <link href="<?php echo W_BASE_URL; ?>css/default/app.css" rel="stylesheet" type="text/css" />
+<?php if (WB_LANG_TYPE_CSS):?>
+<link href="<?php echo W_BASE_URL ?>css/default/language/<?php echo WB_LANG_TYPE_CSS;?>.css" rel="stylesheet" type="text/css" />
+<?php endif;?>
 
 <style type="text/css">
 <?php 

@@ -17,7 +17,7 @@
 		<div class="form-row">
              <label class="form-field">标题</label>
             <div class="form-cont">
-                 <input class="input-txt form-el-w130" type="text" vrel="ne=m:不能为空" warntip="#titleErr" name="data[title]" value=""/>
+                 <input class="input-txt w130" type="text" vrel="ne=m:不能为空" warntip="#titleErr" name="data[title]" value="<?php echo V('r:title','')?>"/>
                  <span class="tips-error hidden" id="titleErr"></span>
             </div>
             
@@ -85,7 +85,7 @@
                 </label>
                 <a href="javascript:;" id="showArea">创建一个用户组</a>
                 <span id="addArea" class="hidden">
-                  分组名称: <input type="text" class="input-txt form-el-w130" id="Groupname"> <a href="javascript:;" class="icon-add" id="addGroup"> 添加分组 </a> <a href="javascript:;" class="icon-del" id="calGroup">取消 </a>
+                  分组名称: <input type="text" class="input-txt w130" id="Groupname"> <a href="javascript:;" class="icon-add" id="addGroup"> 添加分组 </a> <a href="javascript:;" class="icon-del" id="calGroup">取消 </a>
                 </span>
                 <span class="tips-error hidden" id="newListNameErr">该用户组已存在</span>
             </div>
@@ -118,8 +118,8 @@
                     <?php }}?>
                     <tr>
                         <td>&nbsp;</td>
-                        <td><input type="text"  class="input-txt txt-s1" name="nickname" id="nickname"/> <span class="tips-error hidden">该用户不存在</span> </td>
-                        <td><input type="text" class="input-txt txt-s1" name="remark" id="remark"/></td>
+                        <td><input type="text"  class="input-txt w130" name="nickname" id="nickname"/> <span class="tips-error hidden">该用户不存在</span> </td>
+                        <td><input type="text" class="input-txt w130" name="remark" id="remark"/></td>
                         <td><a href="javascript:;" class="icon-add" rel="e:addUser">添加</a></td>
                     </tr>
                 </table>
@@ -155,7 +155,7 @@
                 </select>
                 <a href="javascript:;" id="showArea">创建一个用户组</a>
                 <span id="addArea" class="hidden">
-                  分组名称: <input type="text" class="input-txt form-el-w130" id="Groupname"> <a href="javascript:;" class="icon-add" id="addGroup"> 添加分组 </a> <a href="javascript:;" class="icon-del" id="calGroup">取消 </a>
+                  分组名称: <input type="text" class="input-txt w130" id="Groupname"> <a href="javascript:;" class="icon-add" id="addGroup"> 添加分组 </a> <a href="javascript:;" class="icon-del" id="calGroup">取消 </a>
                 </span>
                 <span class="tips-error hidden" id="newListNameErr">该用户组已存在</span>
             </div>
@@ -187,8 +187,8 @@
                     <?php }}?>
                     <tr>
                         <td>&nbsp;</td>
-                        <td><input type="text"  class="input-txt txt-s1" name="nickname" id="nickname"/> <span class="tips-error hidden">该用户不存在</span> </td>
-                        <td><input type="text" class="input-txt txt-s1" name="remark" id="remark"/></td>
+                        <td><input type="text"  class="input-txt w130" name="nickname" id="nickname"/> <span class="tips-error hidden">该用户不存在</span> </td>
+                        <td><input type="text" class="input-txt w130" name="remark" id="remark"/></td>
                         <td><a href="javascript:;" class="icon-add" rel="e:addUser">添加</a></td>
                     </tr>
                 </table>
@@ -233,7 +233,7 @@
                         DR('xweibo/xwb.setToken', FALSE, 1);	// Set The Normal Tocken
                     ?>
                 </select>
-            
+            	<input type="hidden" name="param[uid]" value="<?php echo SYSTEM_SINA_UID;?>">
                 <?php if( 20 < count($list) ) {?>
                     
                     <p  rel="sel5">系统只支持创建20个微博列表数据源。<a href="<?php echo URL('mgr/site_list'); ?>">管理我的微博列表</a></p>
@@ -244,7 +244,7 @@
 						<a href="javascript:;" id="showArea">增加微博列表</a>
 					</span>
                     <span id="addArea" class="hidden">
-                      微博列表: <input type="text" class="input-txt form-el-w130" name='name' id="Groupname"> <a href="javascript:;" class="icon-add" id="addGroup"> 添加列表 </a> <a href="javascript:;" class="icon-del" id="calGroup">取消 </a>
+                      微博列表: <input type="text" class="input-txt w130" name='name' id="Groupname"> <a href="javascript:;" class="icon-add" id="addGroup"> 添加列表 </a> <a href="javascript:;" class="icon-del" id="calGroup">取消 </a>
                     </span>
                     <span class="tips-error hidden" id="newListNameErr">该列表已存在</span>
                 <?php } ?>
@@ -279,7 +279,7 @@
                     <?php }}?>
                     <tr>
                         <td>&nbsp;</td>
-                        <td><input type="text"  class="input-txt txt-s1" name="nickname" id="nickname"/> <span class="tips-error hidden">该用户不存在</span> </td>
+                        <td><input type="text"  class="input-txt w130" name="nickname" id="nickname"/> <span class="tips-error hidden">该用户不存在</span> </td>
                         <td><a href="javascript:;" class="icon-add" rel="e:addUser">添加</a></td>
                     </tr>
                 </table>
@@ -314,7 +314,7 @@
                 
                 <div id="topic_idLabel" <?php if($topic_id < 1) {echo " style='display:none;' ";} ?>>
                         <p class="input-item">推荐话题列表 <span class="form-tips"></span></p>
-                        <p class="input-item"><input type="text" class="input-txt form-el-w130" name="param[topics][]" /> <a href="javascript:;" class="icon-add" onclick="addIcs(this);">添加</a></p>
+                        <p class="input-item"><input type="text" class="input-txt w130" name="param[topics][]" /> <a href="javascript:;" class="icon-add" onclick="addIcs(this);">添加</a></p>
                         <!--
                         <select name="param[topic_id]">
                         <?php  foreach($list['rst'] as $row): if ($row['type'] < 1) {?>
@@ -331,7 +331,7 @@
 		<div class="form-row">
 			<label class="form-field">设定话题</label>
             <div class="form-cont">
-            	<input class="input-txt form-el-w130" type="text" name="param[topic]" />
+            	<input class="input-txt w130" type="text" name="param[topic]" />
             </div>
 		</div>
 		
@@ -340,7 +340,7 @@
 		<div class="form-row">
 			<label class="form-field">话题关键字</label>
 			<div class="form-cont">
-            	<input class="input-txt form-el-w130" type="text" vrel="ne=m:不能为空" warntip="#titleErr" name="param[topic]" value=""/>
+            	<input class="input-txt w130" type="text" vrel="ne=m:不能为空" warntip="#titleErr" name="param[topic]" value=""/>
                 <span class="tips-error hidden" id="titleErr"></span>
             </div>
         </div>
@@ -350,7 +350,7 @@
 		<div class="form-row">
 			<label class="form-field">链接</label>
             <div class="form-cont">
-				<input class="input-txt form-el-w130" type="text" name="param[link]" value="<?php echo isset($data['param']['link']) ? $data['param']['link'] : 'http://'; ?>"/>
+				<input class="input-txt w130" type="text" name="param[link]" value="<?php echo isset($data['param']['link']) ? $data['param']['link'] : 'http://'; ?>"/>
 				<input type="hidden" name="param[src]" id="imgSrc" value="" />
                 <p class="form-tips">如不需要链接，此处留空即可</p>
             </div>
@@ -358,7 +358,7 @@
 		<div class="form-row">
             <label class="form-field">图片宽度:</label>
             <div class="form-cont">
-                 <p style="padding-top:3px;">560px</p>
+                 <p class="text">560px</p>
                 <input type="hidden" name="param[width]" value="560" />
             </div>
 		</div>
@@ -366,7 +366,7 @@
 			<label class="form-field">图片高度: </label>
             <div class="form-cont">
             	
-                <p><input class="input-txt form-el-w130" type="text" name="param[height]" value="<?php echo isset($data['param']['height']) ? $data['param']['height'] : ''; ?>"/></p>
+                <p><input class="input-txt w130" type="text" name="param[height]" value="<?php echo isset($data['param']['height']) ? $data['param']['height'] : ''; ?>"/></p>
                 <p class="form-tips">高度为空时，默认为上传图片的高度</p>
             </div>
         </div>
@@ -413,12 +413,12 @@
 					case 6:
 					case 14:
 					case 17:
+					case 19:
 						$showNumSugg = '设置范围3至20之间';
 						array_push($valids, 'bt=min:3,max:20,m:范围为3-20');
 					break;
 					case 15:
 					case 18:
-					case 19:
 						$showNumSugg = '设置值最少为3';
 						array_push($valids, 'bt=min:3,m:最少为3');
 						break;
@@ -445,7 +445,7 @@
 				$showNumHtml = '<div class="form-row">
 		                   			<label for="number2" class="form-field">显示'. $num_type .'数</label>
 									<div class="form-cont">
-		                   				<input class="input-txt form-el-w130" name="param[show_num]" type="text" '. $validsStr .' value="'. $showNumValue .'" warntip="#showNumErr"/>
+		                   				<input class="input-txt w130" name="param[show_num]" type="text" '. $validsStr .' value="'. $showNumValue .'" warntip="#showNumErr"/>
 										<span id="showNumErr" class="tips-error hidden"></span>
 		                   				'. $showNumSugTip .'
 									</div>
@@ -497,9 +497,9 @@
 				$pageSetting = '<div class="form-row">
 									<label class="form-field">显示方式</label>
 									<div class="form-cont">				
-										<p class="input-item"><input class="ipt-radio" type="radio" name="param[page_type]" value="1" #pageTypeChecked# >分页显示，每页显示<input class="input-txt input-disabled" type="text" name="param[show_num]" value="#showNumValue#" style="width:20px; margin:0 5px;" vrel="ne" disabled="disabled" />条</p>
+										<p class="input-item"><input class="ipt-radio" type="radio" name="param[page_type]" value="1" #pageTypeChecked# >分页显示，每页显示<input class="input-txt w30 input-disabled" type="text" name="param[show_num]" value="#showNumValue#" vrel="ne" disabled="disabled" />条</p>
 										
-										<p class="input-item"><input class="ipt-radio" type="radio" name="param[page_type]" value="0" #pageSizeChecked# >仅显示<input class="input-txt" type="text" name="param[show_num]" value="#showNumValue#" style="width:20px; margin:0 5px;" vrel="ne" checked="checked" />条</p>
+										<p class="input-item"><input class="ipt-radio" type="radio" name="param[page_type]" value="0" #pageSizeChecked# >仅显示<input class="input-txt w30" type="text" name="param[show_num]" value="#showNumValue#" vrel="ne" checked="checked" />条</p>
 									</div>
 								</div>';
 				
@@ -521,7 +521,7 @@
 				<label for="img"  class="form-field">Banner图片</label>
                 <div class="form-cont">
 					<input type="file" class="btn-file" id="upload_file" name="img" onChange="preview(this)" />
-                    <div id="img_preview" <?php if( empty($imgPreview) ){echo 'style="display:none"'; }?>>
+                    <div id="img_preview" <?php if( empty($imgPreview) ){echo 'style="display:none"'; }?> class="img-preview">
                         <p>效果预览:</p>
                         <img src="<?php echo $imgPreview; ?>" style="width:220px; height:50px;" />
                     </div>
@@ -532,8 +532,8 @@
 		</form>
         <?php } ?>
         <div class="btn-area">
-            <a class="general-btn btn-s2" href="#" id="submitBtn"><span>确定</span></a>
-            <a class="general-btn" href="#" id="pop_cancel"><span>取消</span></a>
+            <a class="btn-general highlight" href="#" id="submitBtn"><span>确定</span></a>
+            <a class="btn-general" href="#" id="pop_cancel"><span>取消</span></a>
         </div>
         </div>
 </div>

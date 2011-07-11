@@ -1,4 +1,4 @@
-﻿+----------------------------------+
++----------------------------------+
  Xweibo 软件系统简介
 +----------------------------------+
 Xweibo是一款可以搭建微博系统的开源解决方案。Xweibo基于新浪开放API，通过绑定新浪微博帐号可实现与新浪微博的无缝连接。具备目前微博流行的各种丰富的功能，远期会与新浪微博完全同步，并提供持续升级服务支持。同时提供强大的管理后台，可为客户提供全新的运营支撑，方便运营人员向用户推送内容并与用户进行全方位互动。Xweibo是完全免费开源的，如果不能完全满足客户的需求，客户可以自由修改，也可以向我们提出宝贵建议，我们会在下一版本进行改进。
@@ -34,7 +34,7 @@ WEB服务器：Apache (支持httpd, Zeus, IIS 等WEB服务器)
 +----------------------------------+
  Xweibo 软件的二次开发
 +----------------------------------+
-1. Xweibo支持与您原有站点的账号系统进行连接，2.0版内置了针对Discuz!的账号适配器，只需少许操作即可实现Discuz!与Xweibo的账号连接。请参阅《Xweibo与Discuz!账号连接文档》；
+1. Xweibo支持与您原有站点的账号系统进行连接，2.1版内置了针对Discuz!的账号适配器，只需少许操作即可实现Discuz!与Xweibo的账号连接。请参阅《Xweibo与Discuz!账号连接文档》；
 2. Xweibo支持了换肤机制，除了默认提供的皮肤之外，您也可以自行开发定制皮肤。请参阅《Xweibo系统皮肤制作帮助文档》。
 
 您可以在以下地址下载以上的两个文档： http://x.weibo.com/download_official.php
@@ -47,18 +47,15 @@ WEB服务器：Apache (支持httpd, Zeus, IIS 等WEB服务器)
 Xweibo 讨论区：          http://bbs.x.weibo.com
 Xweibo 相关产品:         http://x.weibo.com/products.php
 
-下载开发文件：
-Xweibo2.0使用说明书:                       http://x.weibo.com/download/doc_2.0/Xweibo_v2.0_guide.doc
-Xweibo与Discuz！帐号连接文档：             http://x.weibo.com/download/doc_2.0/Xweibo_v2.0_account.doc
-Xweibo2.0系统皮肤制作帮助文档:             http://x.weibo.com/download/doc_2.0/Xweibo_v2.0_skin.doc
-协议附件-合作微博产品需求文档范本:         http://x.weibo.com/download/doc_2.0/Xweibo_v2.0_agreement.doc
-Xweibo2.0运维文档:                         http://x.weibo.com/download/doc_2.0/Xweibo_v2.0_operation.doc 
-Xweibo通用的帐号连接与配置开发文档：       http://x.weibo.com/download/doc_2.0/Xweibo_v2.0_account_common.rar
-Xweibo2.0前端交互框架开发文档(javascript): http://x.weibo.com/download/doc_2.0/Xweibo_v2.0_js-docs.zip
-Xweibo2.0微博API接口说明文档：             http://x.weibo.com/download/doc_2.0/Xweibo_v2.0_XweiboAPI.rar
-Xweibo2.0设计页面psd图例：                 http://x.weibo.com/download/doc_2.0/Xweibo_v2.0_design_psd.rar 
-Xweibo2.0设计规范图例：                    http://x.weibo.com/download/doc_2.0/Xweibo_v2.0_design_standard.rar 
+下载开发文件（http://x.weibo.com/download.html）
+Xweibo2.1使用说明书                
+Xweibo与Discuz！帐号连接文档            
+Xweibo2.1系统皮肤制作帮助文档            
+Xweibo2.1运维文档                          
+Xweibo通用的帐号连接与配置开发文档     
+Xweibo2.1前端交互框架开发文档(javascript)
+Xweibo2.1微博API接口说明文档             
+Xweibo2.1设计页面psd图例                
+Xweibo2.1设计规范图例                  
 
-更多下载：http://x.weibo.com/index.php/download
-
-
+更多内容查看：http://x.weibo.com

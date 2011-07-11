@@ -2,7 +2,7 @@
 	<div class="float-info">
 		<label>
 			</label><p>类别名称：</p>
-			<input type="text" name="link-text" id="content" class="input-box pop-w9" vrel="ne=m:不能为空" warntip="#textErr" value="<?php echo $item_name; ?>"><span id="textErr" class="hidden a-error">验证错误提示</span>
+			<input type="text" name="link-text" id="content" class="input-txt pop-w9" vrel="ne=m:不能为空" warntip="#textErr" value="<?php echo $item_name; ?>"><span id="textErr" class="hidden tips-error">验证错误提示</span>
 	</div>
 	<div class="float-info">
 		<p>数据来源：</p>

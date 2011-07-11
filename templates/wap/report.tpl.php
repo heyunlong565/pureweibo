@@ -15,17 +15,17 @@
 	?>
 	
 	<div class='c'>
-		<div>举报用户:<?php echo $info['user']['screen_name']?></div>
-		<div>举报原因:</div>
+		<div><?php LO('show__reportSpam__label_reportUser');?><?php echo $info['user']['screen_name']?></div>
+		<div><?php LO('show__reportSpam__label_reportReason');?></div>
 		<form method="post" action="<?php echo WAP_URL('show.reportSpamResult')?>">
 		<input type="hidden" name="cid" value="<?php echo $info['id']?>"/>
 		<textarea id="content" name="content" rows="5" cols="10"></textarea>
-		<div><input type="submit" value="提交" /></div>
+		<div><input type="submit" value="<?php LO('show__reportSpam__btnSubmit');?>" /></div>
 		</form>
 	</div>
 	<div class='c'>
 		<div>
-			举报内容:<br />
+			<?php LO('show__reportSpam__label_reportContent');?><br />
 			<?php
 			echo $info['text'];
 			?>
@@ -34,15 +34,13 @@
 	<?php
 	else:
 	?>
-	<div>对不起，请选择特定的微博再进行举报！</div>
+	<div><?php LO('show__reportSpam__label_notice');?></div>
 	<?php
 	endif;
 	?>
 	<br/>
 		<div>
-			
-			如果您在微博中发现有色情、暴力或者其它违规的内容,请提交上述信息,我们将尽快处理.您的隐私会得到严格的保护.每周还将有机会获得我们送出的精美礼品.<br />
-			举报电话:4006900000 听到提示音后按2键(按当地市话标准计费)
+			<?php LO('show__reportSpam__label_tips');?>
 		</div>
 	</div>
 		<?php

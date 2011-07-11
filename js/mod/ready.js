@@ -15,7 +15,8 @@
         Req = X.request,
         Util = X.util,
         Box = X.ui.MsgBox,
-        Pagelet = X.ax.Pagelet;
+        Pagelet = X.ax.Pagelet,
+        win = this;
 
     // 监听pipe开始事件
     X.on('pipe.start', function(cfg){
@@ -25,7 +26,7 @@
             cfg = {};
 
         // 绑定到空间
-    	X.cfg = cfg;
+    	X.cfg = $.extend({}, win.__gloCfg||{}, cfg);
 
         // 绑定全局页面action
         X.use('action').bind(document.body);
@@ -51,20 +52,22 @@
     
     .on('pipe.end', function(){
     	
-    	if(X.cfg.wbList){
+    	if(X.cfg.wbList ){
     	    
     	    //查询页面中微博列表评论和转发数
     	    
     	    var list = X.cfg.wbList, ids = [], wb;
     	    
-    	    for(var id in list){
-    	        ids.push(id);
-    	        // 内容内转发的微博id
-    	        var wb = list[id];
-    	        wb.rt && ids.push(wb.rt.id);
-    	    }
-    	    Req.counts(ids.join(','), $.noop);
-    	    ids = null;
+			if( getCfg('uid') ) {
+				for(var id in list){
+					ids.push(id);
+					// 内容内转发的微博id
+					var wb = list[id];
+					wb.rt && ids.push(wb.rt.id);
+				}
+				Req.counts(ids.join(','), $.noop);
+				ids = null;
+			}
     	    
     	    
             // 解析页面中微博的短链接
@@ -75,9 +78,11 @@
                     var id = Act.getRel(this,'w',this);
                     if(id){
                         var wb = list[id];
-                        var sls = wb.shortlinks;
-                        if(sls && sls.length){
-                            X.mod.shortlink.renderWeiboShortlink(jq, wb, sls);
+                        if (wb){
+                            var sls = wb.shortlinks;
+                            if(sls && sls.length){
+                                X.mod.shortlink.renderWeiboShortlink(jq, wb, sls);
+                            }
                         }
                     }
                 });

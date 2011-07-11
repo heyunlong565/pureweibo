@@ -48,8 +48,8 @@ class serialize_cache
 
 		if ( !file_exists($p['p']) ) {return false;}
 
-                $content = IO::read($p['p']);
-		$d = unserialize(preg_replace("#<\?php .*;\?>\n#sm" , "", $content));
+        $content = IO::read($p['p']);
+		$d = json_decode(str_replace("<?php die('Permission denied');?>\n", "", $content), true);
 		$d = $d[$key];
 		if ( empty($d['ttl']) || $d['timeout'] > APP_LOCAL_TIMESTAMP ){
 			$data[$key]=$d['data'];
@@ -60,7 +60,7 @@ class serialize_cache
 
 	function set($key, $value, $ttl = 0) {
 		$vData	= array($key => array('data' => $value, 'timeout'=> ( APP_LOCAL_TIMESTAMP + $ttl), 'ttl' => $ttl));
-		$formatData = "<?php die('Permission denied');?>\n" . serialize($vData);
+		$formatData = "<?php die('Permission denied');?>\n" . json_encode($vData);
 		$p = $this->_getSavePath($key);		
 		
 		//清除GET中的静态缓存数据

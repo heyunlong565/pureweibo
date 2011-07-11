@@ -12,14 +12,14 @@
 <body class="main-body">
 	<div class="path"><p>当前位置：运营管理<span> &gt; <a href="/admin.php?m=mgr/page_manager">页面设置</a> &gt; </span>自定义微博列表</p></div>
     <div class="main-cont">
-        <h3 class="title"><a href="javascript:add('add');" class="general-btn"><span>添加自定义微博</span></a>自定义微博列表</h3>
+        <h3 class="title"><a href="javascript:add('add');" class="btn-general"><span>添加自定义微博</span></a>自定义微博列表</h3>
 		<div class="set-area">
             <table class="table" cellpadding="0">
                 <colgroup>
-                    <col class="h-w50"/>
-                    <col class="h-w70" />
+                    <col class="w50"/>
+                    <col class="w70" />
                     <col />
-                    <col class="h-w150"/>
+                    <col class="w150"/>
                 </colgroup>
                 <thead class="tb-tit-bg">
                     <tr>
@@ -59,16 +59,16 @@
 
 <script type="text/javascript">
 var HtmlMode=['<form id="addForm" action="<?php echo URL('mgr/site_list.addList');?>" method="post"  name="add-newlink">',
-            	'	<div class="pop-form">',
+            	'	<div class="form-box">',
             	'		<div class="form-row">',
-            	'			<label for="link-text">新列表名字</label>',
+            	'			<label for="link-text" class="form-field">新列表名字</label>',
             	'			<div class="form-cont">',
-            	'			<input name="name" class="input-txt" type="text" value="" warntip="#nameTip" vrel="_f|sz=max:10,m:长度不要超过8个字|ne=m:不能为空|uni=m:该名字已存在"/><span class="tips-error hidden" id="nameTip"></span>',
+            	'			<input name="name" class="ipt-txt" type="text" value="" warntip="#nameTip" vrel="_f|sz=max:10,m:长度不要超过8个字|ne=m:不能为空|uni=m:该名字已存在"/><span class="tips-error hidden" id="nameTip"></span>',
             	'		</div>',
             	'	</div>',
                 '   <div class="btn-area">',
-                '    	<a href="#" id="pop_submit" class="general-btn btn-s2"><span>确定</span></a>',
-                '    	<a href="#" id="pop_cancel" class="general-btn"><span>取消</span></a>',
+                '    	<a href="#" id="pop_submit" class="btn-general highlight"><span>确定</span></a>',
+                '    	<a href="#" id="pop_cancel" class="btn-general"><span>取消</span></a>',
                 '    </div>',
                 '    </div>',
                 '</form>'].join('');

@@ -2,7 +2,7 @@
 /**
  * 转发模块（前台）
  * @author yaoying<yaoying@staff.sina.com.cn>
- * @version $Id: share.mod.php 12191 2011-03-29 07:13:45Z yaoying $
+ * @version $Id: share.mod.php 16573 2011-05-30 08:52:05Z heli $
  *
  */
 class share_mod{
@@ -28,7 +28,7 @@ class share_mod{
 		$title = (string)V('G:title');
 		
 		if(empty($url)){
-			APP::tips(array('tpl' => 'e404', 'msg' => '参数不存在url'));
+			APP::tips(array('tpl' => 'e404', 'msg' => L('controller__share__paramNotUrl')));
 		}
 		
 		$this->_getRelateUidData();
@@ -69,7 +69,7 @@ class share_mod{
 	function _organizeText($url, $title){
 		$text = urldecode($title). ' '. $url;
 		if(isset($this->_relateUidData['screen_name'])){
-			$text .= " （分享自 @{$this->_relateUidData['screen_name']}）";
+			$text .= L('controller__share__fromWho', $this->_relateUidData['screen_name']);
 		}
 		return $text;
 	}

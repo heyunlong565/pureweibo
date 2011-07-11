@@ -27,7 +27,11 @@ elseif(defined('SKIN_CONSTUM_DIR')):
 ?>
 <!-- 皮肤目录 -->
 
+<?php if (WB_LANG_TYPE_CSS):?>
+<link href="<?php echo W_BASE_URL ?>css/default/<?php echo SKIN_CONSTUM_DIR;?>/skin_<?php echo WB_LANG_TYPE_CSS;?>.css" rel="stylesheet" type="text/css" />
+<?php else:?>
 <link href="<?php echo W_BASE_URL ?>css/default/<?php echo SKIN_CONSTUM_DIR;?>/skin.css" rel="stylesheet" type="text/css" />
+<?php endif;?>
 
 
 <?php
@@ -35,10 +39,14 @@ else:
 ?>
 <!-- 默认皮肤-->
 
-
+<?php if (!WB_LANG_TYPE_CSS):?>
 <link href="<?php echo W_BASE_URL ?>css/default/skin_default/skin.css" rel="stylesheet" type="text/css" />
+<?php endif;?>
 
 
 <?php
 endif;
 ?>
+<?php if (WB_LANG_TYPE_CSS):?>
+<link href="<?php echo W_BASE_URL ?>css/default/language/<?php echo WB_LANG_TYPE_CSS;?>.css" rel="stylesheet" type="text/css" />
+<?php endif;?>

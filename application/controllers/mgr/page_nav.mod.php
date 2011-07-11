@@ -38,7 +38,7 @@ class page_nav_mod extends action
 		// set db and return
 		$result = DR('common/sysConfig.set', FALSE, PAGE_TYPE_SYSCONFIG, $pageType);
 		if ($result['rst']) {
-			$this->_redirect('updatePageTypeSuccTip');
+			$this->_redirect('default_action');
 		}
 		$this->_error('操作失败！', $url);
 	}
@@ -161,11 +161,19 @@ class page_nav_mod extends action
 		
 		// organize data
 		$db 		  		= APP::ADP('db');
+		$data['in_use'] = isset($data['in_use'])?'1':'0';
 		$data['isNative'] 	= 0;
 		$data['sort_num'] 	= 0;
 		//$data['in_use'] 	= 0;
 		//$data['is_blank'] 	= 0;
 		$data['type'] 		= PAGE_TYPE_CURRENT;
+		// url过滤
+		if ( isset($data['url']) && $data['url'])
+		{
+			$data['url'] = F('fix_url', $data['url'], 'http://', 'http://'); 
+		}
+		
+		
 		if ( $db->save($data,'',T_NAV) )
 		{
 			// insert page's component

@@ -17,7 +17,8 @@
  *
  * @return bool|array 
  */
-function get_user_show($ids = false, $cache = false) {
+function get_user_show($ids=false, $cache=false, $isName=FALSE) 
+{
 	if (empty($ids)) {
 		return false;
 	}
@@ -39,7 +40,7 @@ function get_user_show($ids = false, $cache = false) {
 			for ($p=1; $p <=$pageCnt; $p++) {
 				$offset = ($p-1) * 20;
 				$idsTmp = array_slice($ids_array, $offset, 20);
-				$rspTmp = DR('xweibo/xwb.getUsersBatchShow', '', implode(',', $idsTmp));
+				$rspTmp = $isName ? DR('xweibo/xwb.getUsersBatchShow', false, false, implode(',', $idsTmp)) : DR('xweibo/xwb.getUsersBatchShow', '', implode(',', $idsTmp));
 				if (!empty($rspTmp['errno'])) {
 					continue;
 				}
@@ -47,7 +48,7 @@ function get_user_show($ids = false, $cache = false) {
 			}
 			$result['rst'] = $resultTmp;
 		} else {
-			$result = DR('xweibo/xwb.getUsersBatchShow', $cache, $ids);
+			$result = $isName ? DR('xweibo/xwb.getUsersBatchShow', $cache, false, $ids) : DR('xweibo/xwb.getUsersBatchShow', $cache, $ids);
 		}
 	}
 	return $result;

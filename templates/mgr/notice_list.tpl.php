@@ -77,7 +77,7 @@ function show_detail(notice_id) {
 	<h3 class="title">发布新通知</h3>
 	<div class="set-area">
         <form id="notice_frm" action="<?php echo URL('mgr/notice.saveNotice'); ?>" method="post">
-            <div class="form-area">
+            <div class="form">
                 <div class="form-row">
                     <label class="form-field">接收对象</label>
                     <div class="form-cont">
@@ -107,7 +107,7 @@ function show_detail(notice_id) {
                     </div>
                 </div>
                 <div class="btn-area">
-                    <a href="javascript:;" class="general-btn btn-s2" onclick="javascript:post_notice();"><span>发布</span></a>
+                    <a href="javascript:;" class="btn-general highlight" onclick="javascript:post_notice();"><span>发布</span></a>
                  </div>
             </div>
         </form>
@@ -116,10 +116,10 @@ function show_detail(notice_id) {
     <div class="set-area">
         <table width="100%" border="0" cellpadding="0" cellspacing="0" class="table">
             <colgroup>
-                    <col class="h-w70"/>
+                    <col class="w70"/>
                     <col />
-                    <col class="h-w150" />
-                    <col class="h-w80" />
+                    <col class="w150" />
+                    <col class="w80" />
             </colgroup>
             <thead class="tb-tit-bg">
                 <tr>

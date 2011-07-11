@@ -10,7 +10,7 @@
 	TPL::plugin('wap/include/top_logo','',false);
 	TPL::plugin('wap/include/nav', array('is_top' =>true), false);
 	?>
-	<div class="row">行业</div>
+	<div class="row"><?php LO('celeb__default__industry');?></div>
 	<div class="c">
 		
 		<?php

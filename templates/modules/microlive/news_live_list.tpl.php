@@ -1,5 +1,5 @@
 <div class="tit-hd">
-	<h3>精彩直播</h3>
+	<h3><?php LO('modules_microlive_news_live_list_title');?></h3>
 </div>
 <div class="talk-list">
 	<?php if ($list):?>
@@ -12,14 +12,14 @@
 			<h4>
 			<a href="<?php echo URL('live.details', array('id' => $item['id']));?>" target="_blank"><?php echo F('escape', $item['title']);?></a>
 			<?php if ($item['start_time'] <= APP_LOCAL_TIMESTAMP && $item['end_time'] > APP_LOCAL_TIMESTAMP):?>
-			<span class="active">(进行中)</span>
+			<span class="active">(<?php LO('modules_microlive_news_live_list_running');?>)</span>
 			<?php elseif ($item['start_time'] > APP_LOCAL_TIMESTAMP):?>
 				<?php if ($item['notice_time'] >= APP_LOCAL_TIMESTAMP):?>
-				<a class="icon-remind icon-bg" href="#" rel="e:remind,u:<?php echo USER::uid();?>,t:<?php echo F('escape', $item['title']);?>,c:<?php echo F('share_weibo', 'live_tips', $item);?>,n:<?php echo $item['notice_time'];?>">提醒我</a>
+				<a class="ico-remind" href="#" rel="e:remind,u:<?php echo USER::uid();?>,t:<?php echo F('escape', $item['title']);?>,c:<?php echo F('share_weibo', 'live_tips', $item);?>,n:<?php echo $item['notice_time'];?>"><?php LO('modules_microlive_news_live_list_remind');?></a>
 				<?php endif;?>
-			<span class="unplayed">(未开始)</span>
+			<span class="unplayed">(<?php LO('modules_microlive_news_live_list_ready');?>)</span>
 			<?php else:?>
-			<span class="finish">(已结束)</span>
+			<span class="finish">(<?php LO('modules_microlive_news_live_list_closed');?>)</span>
 			<?php endif;?>
 			</h4>
 			<p class="time"><?php echo F('format_time.foramt_show_time',$item['start_time']);?> - <?php echo F('format_time.foramt_show_time',$item['end_time']);?></p>
@@ -30,11 +30,11 @@
 	<?php TPL::module('page', array('list' => $list, 'count' => $count, 'limit' => $limit, 'type' => 'live'));?>
 	<?php else:?>
 	<div class="default-tips">
-		<div class="icon-tips all-bg"></div>
+		<div class="icon-tips"></div>
 		<?php if (USER::get('isAdminAccount')):?>
-		<p>还没有在线直播，你可以在 后台管理中心-扩展工具-在线直播 添加设置</p>
+		<p><?php LO('modules_microlive_news_live_list_emptyForAdmin');?></p>
 		<?php else:?>
-		<p>还没有在线直播，你可以看看其他页面。 </p>
+		<p><?php LO('modules_microlive_news_live_list_empty');?></p>
 		<?php endif;?>
 	</div>
 	<?php endif;?>

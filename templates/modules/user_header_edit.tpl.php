@@ -1,6 +1,6 @@
 						<div id="picture" class="form-body modify-face">
                             <div class="form-info">
-                                <p>请点击“浏览”按钮，选择你电脑中的图片作为微博头像</p>
+							<p><?php LO('modules__userHeaderEdit__choosePic');?></p>
                             </div>
 							<script type="text/javascript">
                             var imageSize = '<?php echo MAX_UPLOAD_FILE_SIZE;?>';
@@ -24,30 +24,30 @@
                                 var errText = '';
                                 switch(+returnCode) {
                                     case 40012:
-                                        errText = '你的图片文件超出'+imageSize+'M或宽高超出2880像素，请选择文件和尺寸较小的图片';
+										errText = '<?php LO('modules__userHeaderEdit__imageSize1');?>'+imageSize+'<?php LO('modules__userHeaderEdit__imageSize2');?>';
                                         break;
                                     case 40013:
-                                        errText = '图片文件类型错误';
+										errText = '<?php LO('modules__userHeaderEdit__imageTypeError');?>';
                                         break;
                                     case 40001:
                                     case 40002:
                                     case 40003:
                                     case 40050:
-                                        errText = '保存头像出错';
+										errText = '<?php LO('modules__userHeaderEdit__saveHeaderError');?>';
                                         break;
                                     case 40010:
-                                        errText = '损坏的图片文件（扩展名与图片类型不相符）';
+										errText = '<?php LO('modules__userHeaderEdit__DamageImage');?>';
                                         break;
                                     case 40051:
                                         // 开始上传
                                         Xwb.ui.MsgBox.getTipBox().autoHide = false;
-                                        Xwb.ui.MsgBox.tipWarn('正在上传...');
+										Xwb.ui.MsgBox.tipWarn('<?php LO('modules__userHeaderEdit__imageUploading');?>');
                                         break;
 									case 1040016:
-										errText = '抱歉，目前不允许修改个人头像，请联系网站管理员！';
+										errText = '<?php LO('modules__userHeaderEdit__notAllowModify');?>';
 										break;
                                     case 0:
-                                        errText = '修改头像成功';
+										errText = '<?php LO('modules__userHeaderEdit__modifySuccess');?>';
                                         Xwb.ui.MsgBox.success('', errText, function(){
                                             Xwb.ui.MsgBox.getTipBox().display(false);
                                             location.href = Xwb.request.mkUrl('index');
@@ -64,6 +64,27 @@
                                     Xwb.ui.MsgBox.alert('', errText);
                                 }
                             }
+                            function requestLanguage_xweibo_flash(){
+                    			var language = new Object();
+								language["CX0182"] = "<?php LO('modules__userHeaderEdit__chooseHeaderPic');?>";
+								language["CX0184"] = "<?php LO('modules__userHeaderEdit__loadingPicWaitFor');?>";
+								language["CX0186"] = "<?php LO('common__template__cancel');?>";
+								language["CX0187"] = "<?php LO('modules__userHeaderEdit__browse');?>";
+								language["CX0188"] = "<?php LO('common__template__save');?>";
+								language["CX0189"] = "<?php LO('modules__userHeaderEdit__imageUploadNotice1');?>";
+								language["CX0190"] = "<?php LO('modules__userHeaderEdit__imageUploadNotice2');?>";
+								language["CX0191"] = "<?php LO('modules__userHeaderEdit__imageUploadNotice3');?>";
+								language["CX0192"] = "<?php LO('modules__userHeaderEdit__imageUploadNotice4');?>";
+								language["CX0194"] = "<?php LO('modules__userHeaderEdit__rotate');?>";
+								language["CX0195"] = "<?php LO('modules__userHeaderEdit__rotateLeft');?>";
+								language["CX0196"] = "<?php LO('modules__userHeaderEdit__imageTypeLimit');?>";
+								language["CX0197"] = "<?php LO('modules__userHeaderEdit__editor');?>";
+								language["CX0198"] = "<?php LO('modules__userHeaderEdit__previewArea');?>";
+                    			language["CX0197"] = "<?php LO('modules__userHeaderEdit__editor');?>";
+                    			language["CX0198"] = "<?php LO('modules__userHeaderEdit__previewArea');?>";
+
+                    			return language;
+                    		}
                             </script>
                             <div id='avatarSwf'></div>
                         </div>

@@ -61,12 +61,11 @@ $(function() {
     <div class="main-cont">
         <h3 class="title">活动管理</h3>
 		<div class="set-area">
-			<div class="operate-cont">
+			<div class="search-area">
 				<form method="get" action="" id="searchForm">
-            	<div class="form-s2">
                 	<div class="item">
                     	<label><strong>搜索活动</strong></label>
-                        <input name="keyword" class="ipt-txt form-el-w200" type="text" value="<?php echo F('escape', V('r:keyword'));?>" />
+                        <input name="keyword" class="ipt-txt w200" type="text" value="<?php echo F('escape', V('r:keyword'));?>" />
                         <select name="state" class="select form-el-w5">
                             <option value="">全部</option>
                             <?php foreach ($states as $k=>$v) {?>
@@ -74,20 +73,19 @@ $(function() {
                             <?php }?>
                         </select>
                         <input type="hidden" name="m" value="mgr/events.getList" />
-                        <a href="javascript:$('#searchForm').submit();" class="general-btn"><span>搜索</span></a>
+                        <a href="javascript:$('#searchForm').submit();" class="btn-general"><span>搜索</span></a>
                     </div>
-           		</div>
 				</form>
 			</div>
 
 			<table class="table" cellpadding="0" cellspacing="0" width="100%" border="0">
 				<colgroup>
 					<col />
-					<col class="h-w100" />
-					<col class="h-w150" />
-					<col class="h-w80" />
-					<col class="h-w80" />
-					<col class="h-w150" />
+					<col class="w100" />
+					<col class="w150" />
+					<col class="w80" />
+					<col class="w80" />
+					<col class="w150" />
 				</colgroup>
 				<thead class="tb-tit-bg">
 					<tr>

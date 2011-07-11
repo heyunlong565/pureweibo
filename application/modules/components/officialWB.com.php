@@ -28,7 +28,7 @@ class officialWB extends PageModule{
 		$cfg = $this->configList();
 
 		if (empty($cfg['list_id'])) {
-			DR('xweibo/xwb.setToken', '', 2);
+			DR('xweibo/xwb.setToken', '', 4);
 			//不存在，创建list
 			$rs = DR('xweibo/xwb.createUserLists', null, SYSTEM_SINA_UID, '微博频道'.time('Ymd'));
 
@@ -56,7 +56,7 @@ class officialWB extends PageModule{
 	 */
 	function createNewList($name) 
 	{
-		DR('xweibo/xwb.setToken', '', 2);
+		DR('xweibo/xwb.setToken', '', 4);
 		
 		// 判断list 总数，list count 最多20个
 		$listCount = DR('xweibo/xwb.getUserListsCounts', null, SYSTEM_SINA_UID);
@@ -81,9 +81,12 @@ class officialWB extends PageModule{
 	 * 获取list内的所有用户
 	 *
 	 */
-	function getUsers($listId='', $cursor=null) {
+	function getUsers($listId='', $cursor=null, $uid=null) {
+		if (!$uid) {
+			$uid = SYSTEM_SINA_UID;
+		}
 		$listId = $listId ? $listId : $this->getListId();
-		return DR('xweibo/xwb.getUserListsMember', null, SYSTEM_SINA_UID, $listId, $cursor);
+		return DR('xweibo/xwb.getUserListsMember', null, $uid, $listId, $cursor);
 	}
 
 	/**
@@ -91,7 +94,7 @@ class officialWB extends PageModule{
 	 *
 	 */
 	function addUser($uid, $listId='') {
-		DR('xweibo/xwb.setToken', '', 2);
+		DR('xweibo/xwb.setToken', '', 4);
 
 		$listId = $listId ? $listId : $this->getListId();
 		$rs = DR('xweibo/xwb.createUserListsMember', null, SYSTEM_SINA_UID, $listId, $uid);
@@ -109,7 +112,7 @@ class officialWB extends PageModule{
 	 *
 	 */
 	function delUser($uid, $listId='') {
-		DR('xweibo/xwb.setToken', '', 2);
+		DR('xweibo/xwb.setToken', '', 4);
 
 		$listId = $listId ? $listId : $this->getListId();
 		$rs = DR('xweibo/xwb.deleteUserListsMember', null, SYSTEM_SINA_UID, $listId, $uid);
@@ -124,16 +127,20 @@ class officialWB extends PageModule{
 	 * 获取list内用户最新的N条微博
 	 *
 	 */
-	function get($num = null, $listId='', $page = 1) {
+	function get($num = null, $listId='', $page = 1, $uid = null) {
 		if (!$num) {
 			$cfg = $this->configList();
 			$num = $cfg['show_num'];
+		}
+		
+		if (!$uid) {
+			$uid = SYSTEM_SINA_UID;
 		}
 
 		$listId = $listId ? $listId : $this->getListId();
 		
 		//DR('xweibo/xwb.setToken', '', 2);  //API文档说不用登录
-		$rs = DR('xweibo/xwb.getUserListIdStatuses', null, SYSTEM_SINA_UID, $listId, $num, $page);
+		$rs = DR('xweibo/xwb.getUserListIdStatuses', null, $uid, $listId, $num, $page);
 		//DR('xweibo/xwb.setToken', '', 1);
 
 		//成功返回
@@ -164,14 +171,12 @@ class officialWB extends PageModule{
 		}
 		
 		// delete the api list
-		DR('xweibo/xwb.setToken', '', 2);
+		DR('xweibo/xwb.setToken', '', 4);
 		$rs = DR('xweibo/xwb.deleteUserListId', null, SYSTEM_SINA_UID, $listId);
 		DR('xweibo/xwb.setToken', '', 1);
 
 		return $rs;
 	}
-	
-	
 	
 	/**
 	 * 获取list内的用户数

@@ -10,12 +10,14 @@
 .main-wrap:after,
 .main:after,
 .live-newest .item:after,
-.guests-list ul:after { content:' '; display:block; height:0; clear:both; }
+.guests-list ul:after,
+#header .hd-in:after { content:' '; display:block; height:0; clear:both; }
 #container,
 #container .main-wrap,
 .live-newest .item,
 .talk-newest .item,
-.guests-list ul { zoom:1; }
+.guests-list ul,
+#header .hd-in { zoom:1; }
 
 /*主体布局*/
 #container { position:relative; margin:0 auto 10px; width:960px; }
@@ -23,18 +25,18 @@
 #container .content { margin-left:160px;_margin-left:157px; }
 #container .main-wrap { padding-right:200px;zoom:1; }
 #container .content .main { float:left;min-height:1px;width:100%; }
-#container .main .main-bd { padding-bottom:20px; margin:15px 20px 0; _display:inline; _zoom:1;}
-#container .content .aside { float:left;margin-right:-200px;margin-top:15px;width:200px; }
+#container .main .main-bd { padding-bottom:20px; margin:20px 20px 0; _display:inline; _zoom:1;}
+#container .content .aside { float:left; width:200px; margin-right:-200px; margin-top:20px; }
 
-#container.single .content .main{ padding:30px 0 25px;}
+#container.single .content .main{ padding:20px 0 25px;}
 #container.single .main-wrap { padding:0; }
 
 #container.single { background:url( bgimg/bg_content_single.png ) repeat-y;}
-
-#header { margin-bottom:10px;height:100px; }
-#header .hd-in { width:960px;overflow:hidden; }
+#header .hd-in { width:960px; min-height:80px; margin-bottom:10px; _height:80px; }
 #header .hd-in .logo { float:left;margin:30px 0 0 10px; }
-#header .hd-in .hd-xad { float:right;margin-top:15px; }
+	.nav .inner-nav{ width:960px; }
+
+.new-tips { margin-left:308px; }
 
 #footer { position:relative;margin-bottom:25px; }
 #footer .ft-in { position:relative;margin:0 auto;height:60px;line-height:60px;width:960px;}
@@ -46,23 +48,58 @@
 #footer .ft-con a{ margin:0 8px;}
 
 #user-recommand #container .content  { margin-left:0; }
+
+.ico-pub,
+.ico-rank,
+.ico-live,
+.ico-talk,
+.ico-star,
+.ico-home,
+.ico-app,
+.ico-events,
+.ico-mywb,
+.ico-ct1,
+.ico-ct2,
+.ico-ct3,
+.ico-ct4 { display:inline-block;background:url( bgimg/ico_extra.png ) no-repeat; }
+
+.ico-pub { background-position: -2px 0; }
+.ico-rank { background-position: -2px -32px; }
+.ico-live { background-position: -2px -64px; }
+.ico-talk { background-position: -2px -96px; }
+.ico-star { background-position: -2px -128px; }
+.ico-home { background-position: -2px -160px; }
+.ico-app { background-position: -2px -192px; }
+.ico-events { background-position: -2px -224px; }
+.ico-mywb { background-position:-2px -256px; }
+.ico-ct1 { background-position:-2px -288px; }
+.ico-ct2 { background-position:-2px -320px; }
+.ico-ct3 { background-position:-2px -352px; }
+.ico-ct4 { background-position:-2px -384px; }
+
 .site-nav { width:160px; }
-.site-nav .nav-bd { padding:8px 0;width:158px; }
-.nav-block { margin:0 8px;padding:13px 0 12px;border-top:1px solid #fff;border-bottom:1px solid #e3e3e3;font-size:12px;overflow:hidden;*zoom:1; }
-.nav-block.first { border-top:none; }
-.nav-block.last { border-bottom:none; }
-.nav-block .search-box{ float:none;}
-.nav-block h3 { position:relative;font-weight:700;font-size:14px; line-height:22px; line-height:25px\9;}
-.nav-block h3 a { display:block;width:140px;text-decoration:none; }
-.no-line { background:none !important; }
-.nav-block ul { margin:2px 0;list-style:none;  }
-.nav-block ul li { position:relative;margin:2px 0; line-height:22px; line-height:25px\9; _zoom:1; }
-.nav-block a { display:block;padding-top:2px;*padding-top:1px;width:142px;height:23px; line-height:25px\9; *height:24px;text-indent:28px;cursor:pointer; }
-.nav-block h3 s { position:absolute;top:8px;left:15px;width:5px;height:11px;background:url( bgimg/icon_bg.png ) -8px -936px no-repeat; }
-.nav-block h3 .cur s { position:absolute;top:8px;width:5px;height:11px;background:url( bgimg/icon_bg.png ) -8px -960px no-repeat; }
+.site-nav .nav-bd { padding:13px 0 0;width:160px; }
+.nav-block { margin:0 10px;padding:7px 0 9px;font-size:12px;overflow:hidden;*zoom:1;background:url( bgimg/site_nav_line.png ) center bottom no-repeat; }
+.nav-block h3 { position:relative;font-size:14px; }
+.nav-block h3 a,
+.nav-block ul li a { display:block;width:140px;text-decoration:none;font-weight:400;color:#000;text-indent:31px;cursor:pointer; }
+.nav-block h3 a { padding-top:2px;height:22px; }
+.nav-block ul li a { padding-top:3px;height:21px; }
+.nav-block ul { list-style:none;margin:2px 0;  }
+.nav-block ul li { position:relative; _zoom:1;color:#666; }
+.nav-block ul li a:link,
+.nav-block ul li a:visited,
+.nav-block ul li a:hover { color:#666; }
+
+.nav-block h3 a:hover,
+.nav-block ul li a:hover { background-color:#f1f1f1; }
+
+.nav-block h3 s,
+.nav-block h3 .cur s { position:absolute;left:10px;top:4px;width:16px;height:16px; }
+.nav-block ul li a:hover,
 .nav-block .cur { border-radius:2px; }
-.nav-block .manage:link,
-.nav-block .manage:visited { color:#f00; }
+.nav-block .cur { color:#fff !important;font-weight:700; }
+.nav-block a:hover { text-decoration:none; }
 
 /*站点导航的右边计数样式*/
 .nav-block h3 .square,
@@ -100,10 +137,6 @@
 /*微博列表*/
 .feed-list .feed-tit { background:#F7F7F7; }
 
-/*登录提示*/
-.login-tips{ width:558px;}
-.login-tips .tips-txt{ width:300px;}
-
 /*广告*/
 .xad-box-p1 { margin:20px 0;}
 
@@ -114,7 +147,15 @@
 #weibo_login #container .content,
 #guide-page #container .content { margin-left:0;}
 #inhibit #container.single { background:#fff; }
-#comments #container .main-bd { margin:30px 20px 0; }
+#pub #container.single .main { padding-top:0; }
+#user-recommend #container .main-bd,
+#pub-topic #container .main-bd { margin-top:0; }
+#messages .title-box { margin:5px 0 9px;padding-bottom:6px;border:solid #dedede;border-width:0 0 1px; }
+#messages .title-box h3{ background:none;font-weight:400;font-size:12px;line-height:0;padding-top:20px;color:#707070; }
+#messages .title-box h3 span {  }
+#atme .tab-s2 { margin-bottom:20px; }
+#comments .list-handle { margin-top:11px; }
+#comments .tab-s4 { margin:10px 0 0;padding-bottom:5px;padding-left:10px;border-bottom:1px solid #dedede; }
 
 /*错误页面 403 帐号被封*/
 .inhibit {margin:0 auto;overflow:hidden;padding:140px 0;width:430px;}
@@ -136,4 +177,8 @@
 #guide-wide .form-info .sub-menu a { line-height:23px; margin-left:0;background:#f0f0f0; color:#707070;}
 #guide-wide .form-info .sub-menu .current { background:#8dd7f5; color:#fff;}
 #guide-wide strong { float:left; line-height:25px;}
-/*#guide-wide .user-item { width:290px;}*/
+
+/*底部广告*/
+.ft-xad-in{ width:960px; margin:0 auto 10px; overflow:hidden; }
+/*头部广告*/
+.hd-xad-in{ width:720px; }

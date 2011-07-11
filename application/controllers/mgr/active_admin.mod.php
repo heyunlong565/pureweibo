@@ -14,7 +14,7 @@ class active_admin_mod {
 
 		//判断是否有管理员
 		$rs = DR('mgr/adminCom.getAdminByUid');
-		if($rs['rst']) {
+		if(WB_USER_OAUTH_TOKEN && WB_USER_OAUTH_TOKEN_SECRET && $rs['rst']) {
 			APP :: redirect(URL('mgr/admin.login', '', 'admin.php'), 3);
 		}
 	}
@@ -55,11 +55,12 @@ class active_admin_mod {
                             'sina_uid' => $this->_getUserInfo('sina_uid'),
                             'pwd' => md5($pwd),
                             'add_time' =>APP_LOCAL_TIMESTAMP,
-                            'is_root' => 1
+                            'group_id' => 1 // 1为超级管理员
 			);
 
-		$rs = DR('mgr/adminCom.saveAdminById', '', $data);
 		if (strtolower(XWB_SERVER_ENV_TYPE)==='sae'){
+			// 由于SAE下无法得到原先站长，因此如果存在有该sina用户id则先删除
+			DR('mgr/adminCom.delAdmin','', $sina_uid, true);
 			$config_arr = array(
 							'WB_USER_NAME' => $name,
 							'WB_USER_EMAIL' => $email,
@@ -88,9 +89,10 @@ class active_admin_mod {
 	        $config_file = F('set_define_value', $config_file, $config_arr);
 			IO::write(ROOT_PATH . 'user_config.php', $config_file);
 		}
+		$rs = DR('mgr/adminCom.saveAdminById', '', $data);
 		
 		session_regenerate_id();   //防御Session Fixation
-        USER::set('isAdminAccount', $sina_uid);
+        USER::set('isAdminAccount', 1);// 1为超级管理员
         USER::set('isAdminReport', 1);	//设置为上报
 		exit('{"state":"200"}');
 	}

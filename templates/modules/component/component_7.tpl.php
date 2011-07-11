@@ -11,10 +11,11 @@ if(!defined('IN_APPLICATION')){
 if(!function_exists('getRecommendReason')){
 	function getRecommendReason($reason) 
 	{			
-		static $texts = array(
-			'topic' => '你们有相同的话题',
-			'area'  => '你们在同一个地区',
-			'tag'   => '你们有相同的标签'
+		static $texts;
+		$texts = array(
+			'topic' => L('modules_component_component_7_reason_topic'),
+			'area'  => L('modules_component_component_7_reason_reason'),
+			'tag'   => L('modules_component_component_7_reason_tag')
 		);
 		return isset($texts[$reason]) ? $texts[$reason]: '';
 	}
@@ -22,7 +23,7 @@ if(!function_exists('getRecommendReason')){
 
 ?>
 
-<div class="user-list-s1">
+<div class="mod-aside user-list-s1">
 	<div class="hd"><h3><?php echo F('escape', $mod['title']);?></h3></div>
 	<!-- <p>有鼠标滑过头像，会有惊喜发现</p> -->
 	<div class="bd">
@@ -50,9 +51,9 @@ if(!function_exists('getRecommendReason')){
 
 						<p class="name"><a href="<?php echo $profile_url;?>"><?php echo $nick;?></a></p>
 						<?php if (isset($followedList[(string)$u['id']])):?>
-							<em>已关注</em>
+							<em><?php LO('modules_component_component_2_followed');?></em>
 						<?php else: ?>
-							<a class="addfollow-btn" rel="e:fl,u:<?php echo $u['id'];?>,t:2" href="#">加关注</a>
+							<a class="addfollow-btn" rel="e:fl,u:<?php echo $u['id'];?>,t:2" href="#"><?php LO('modules_component_component_2_follow');?></a>
 						<?php endif;?>
 						<p class="txt"><?php echo $reasonText;?></p>
 						</div>

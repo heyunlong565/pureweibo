@@ -25,15 +25,18 @@
 	        
 	        this.width = _el.offsetWidth;
 	        this.height = _el.offsetHeight;
-	        
-	        if($.browser.msie) {
+            
+            var ver = this.browserVer = parseInt($.browser.version);
+
+	        if($.browser.msie && (document.documentMode || ver) < 9 ) {
 	            var _matrix = 'DXImageTransform.Microsoft.Matrix';
-	            
+
 	            _el.style.filter = 'progid:DXImageTransform.Microsoft.Matrix()';
 	            _el.filters.item(_matrix).SizingMethod = "auto expand";
-	            $(_el).addClass('narrow-move');
+
+                $(_el).addClass('narrow-move');
 	            _matrix = NULL;
-	        }else {
+	        } else {
 	            this.canvas = $('<canvas></canvas>')
 	                .attr({
 	                    'height': this.height,
@@ -52,6 +55,9 @@
 	
 	            }
 	        }
+            var container = _el.parentNode;
+            this._clientWidth = container.clientWidth;//变换区域宽度
+            this._clientHeight = container.clientHeight;//变换区域高度
 	        
 	        this.element = _el;
 	    },
@@ -159,10 +165,16 @@
 	            
 	            _el.width = drawW;
 	            _el.height = drawH;
+                
+                //_el.style.top = ( this._clientHeight - _el.offsetHeight ) / 2 + "px";
+                //_el.style.left = ( this._clientWidth - _el.offsetWidth ) / 2 + "px";
+                
 	            //修正IE8下图片占位的问题
 	            //18是操作菜单的高度
-	            if($.browser.version == 8) {
-	                _el.parentNode.style.height = _el.offsetHeight+18;
+	            if((document.documentMode || this.browserVer) == 8) {
+	                var $_el = $(_el);
+                    $(_el).css({ 'display': 'block', 'margin-left': (this._clientWidth - _el.offsetWidth) / 2 })
+                    .parent().height($_el.height());
 	            }
 	        }
 	    }
@@ -465,7 +477,7 @@
                     }
                 }
                 this.each(function(){
-                	if(this.Complete){
+                	if(this.complete){
                 		fixFn.call(this);
                 	} else {
                 		this.onload = fixFn ;
@@ -550,11 +562,15 @@
             
             if(opt.prevBtn)
                 $(opt.prevBtn).mousedown(leftMousedown).mouseup(mouseup).click(function(){return false;});
-          
+							
+			if(opt.moveScorll) {
+				nxtBtn.hover(rightMousedown,mouseup);
+				prevBtn.hover(leftMousedown,mouseup);
+			}
             var offw = 0;
             if(opt.items){
                 $(scrollor).find(opt.items).each(function(){
-                    offw+=this.offsetWidth;
+                    offw += $(this).outerWidth(true);
                 });
                 $(scrollor).find(opt.ct||':first-child').css('width', offw);
             }
@@ -562,7 +578,105 @@
             updateStatus();
             
             return opt;
-        }
+        },
+		scrollView: function() {
+		   var parent = this,
+		   
+				childrens = parent.children(),
+			   
+			   //时间触发计时器
+			   timer,
+			   
+			   //滚动触发周期, 真实等待时间应该为 delay - 1000 - 500
+			   //1000是滚动效果的时长
+			   //500是淡入效果时长
+			   delay = 4000;
+		   
+		   if (!childrens.length) {
+			   return;
+		   }
+		   
+		   //滚动到下一条
+		   function scrollToNext(callback) {
+			   var $last = $(parent.children(':last'));
+			   
+			   var height = $last.height();
+			   
+			   $last
+			   .height(0)
+			   .css({opacity: 0, 'font-size':0, overflow: 'hidden'})
+			   .remove()
+			   .prependTo(parent)
+			   .animate({height: height}, 1000, 'cubicOut', function(){$last.css({'font-size': '12px'});})
+			   .animate({opacity: 1}, 500, function() {
+					!timer && $.isFunction(callback) && callback();   
+			   });
+	  
+		   }
+		   
+		   //设置计时器,开始滚动
+		   function startScroll () {
+			   if (!timer) {
+				timer = window.setInterval(scrollToNext, delay);
+			   }
+		   }
+		   
+		   //计算内容高度，如果内容高度小于等于高度，则不启动滚动效果
+		   var contentHeight = 0;
+		   
+		   $.each(childrens, function(i, node) {
+			   contentHeight += $(node).height();
+		   });
+		   
+		   if (contentHeight > parent.height()) {
+			   //鼠标飘过的控制，
+			   //mouseover时停止计时器，但当前的滚动会继续，直至单次完成。
+			   parent.hover(function(){
+				   if (timer) {
+					   timer = window.clearInterval(timer);
+				   }
+				   
+			   }, function() {
+				   startScroll();
+			   });
+			   
+			   startScroll();
+		   }
+	   }
+	   //整块的循环移动
+	   //Count 一次移动子元素数量
+	   //delay 移动间隔时间
+	   //animateTime 动画执行时间
+	   ,scrollMass : function(Count,delay,animateTime){
+			var parent =this,
+				length = parent.children().length,
+				timer,
+				delay = delay,
+				tmp = parent.children()[0].offsetWidth * Count,
+				p = false;
+		   if (length <= Count) {
+			   return this; 
+		   }
+		   function scrollNext(){
+				parent.animate({marginLeft:-tmp},animateTime?animateTime:1000,function(){
+					if( timer !=0 ){
+						parent.css('marginLeft',0);
+						parent.append( parent.children(':lt(' +  Count + ')') );
+					}
+					if( p ) return;
+					start();
+				});
+		   };
+		   
+		   function start(){ timer = window.setTimeout(scrollNext,delay); }
+		   this.hover(function(){ 
+				p = true ;clearTimeout(timer); 
+		   },function(){ 
+				p = false;start();
+		   });
+		   start();
+		   return this;
+	   }
 	});
 	
 /**
@@ -603,6 +717,10 @@ function init(){
 
 // entry
 function entry(keys, cls){
+    if (!keys) {
+        return;
+    }
+    
     if(!inited)
       init();
   
@@ -787,5 +905,9 @@ $.cookie = function(name, value, options) {
         return cookieValue;
     }
 };
+
+$.easing.cubicOut = function (x, t, b, c, d) {
+return c*((t=t/d-1)*t*t + 1) + b;
+} 
 
 })(Xwb, jQuery);

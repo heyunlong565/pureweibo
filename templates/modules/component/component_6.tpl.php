@@ -13,27 +13,29 @@
 	}
 ?>
 
-<div class="top10">
+<div class="mod-aside top10">
     <div class="hd"><h3><?php echo F('escape', $mod['title']);?></h3></div>
-    <ul>
-
-	<?php
-		$count  = 1;
-		if (!empty($rs)) 
-		{
-			foreach ($rs as $row) 
-			{
-				$topic 	= F('escape', $row['topic']);
-				$url 	= URL('search.weibo', array('base_app' => $base_app, 'k' => isset($row['query']) ? $row['query']: $row['topic']));
-	?>
-		         <li>
-		            <div class="ranking<?php if ($count < 4):?> r-<?php echo $count;?><?php endif;?> skin-bg"><?php echo $count;?></div>
-		            <a href="<?php echo $url;?>"><?php echo $topic;?></a>
-		        </li>
-	<?php 
-			$count++;
-			}
-		}
-	?>
-	</ul>
+    <div class="bd">
+        <ul>
+    
+        <?php
+            $count  = 1;
+            if (!empty($rs)) 
+            {
+                foreach ($rs as $row) 
+                {
+                    $topic 	= F('escape', $row['topic']);
+                    $url 	= URL('search.weibo', array('base_app' => $base_app, 'k' => isset($row['query']) ? $row['query']: $row['topic']));
+        ?>
+                     <li>
+                        <div class="ranking<?php if ($count < 4):?> r-<?php echo $count;?><?php endif;?> skin-bg"><?php echo $count;?></div>
+                        <a href="<?php echo $url;?>"><?php echo $topic;?></a>
+                    </li>
+        <?php 
+                $count++;
+                }
+            }
+        ?>
+        </ul>
+    </div>
 </div>

@@ -57,41 +57,39 @@ function ajax_load_add(id)
 <body id="star-userlist" class="main-body">
 	<div class="path"><p>当前位置：用户管理<span>&gt;</span><a href="<?php echo URL('mgr/celeb_mgr.starCatList'); ?>">名人管理</a><span>&gt;</span>名人列表</p></div>
     <div  class="main-cont">
-    	<h3 class="title"><a class="general-btn" href="javascript:openPop('<?php echo URL('mgr/celeb_mgr.addStar', array('pid'=>V('g:c_id1'),'cid'=>V('g:c_id2'))); ?>','添加名人');"><span>添加名人</span></a>名人列表</h3>
+    	<h3 class="title"><a class="btn-general" href="javascript:openPop('<?php echo URL('mgr/celeb_mgr.addStar', array('pid'=>V('g:c_id1'),'cid'=>V('g:c_id2'))); ?>','添加名人');"><span>添加名人</span></a>名人列表</h3>
 		<div class="set-area">
-        	<div class="operate-cont">
-            	<div class="form-s2">
-                	<form action="<?php echo URL('mgr/celeb_mgr.starList');?>" id="searchUser" method="post">
+        	<div class="search-area">
+                <form action="<?php echo URL('mgr/celeb_mgr.starList');?>" id="searchUser" method="post">
                     <div class="item">
                         <label><strong>搜索包含以下昵称的名人</strong></label>
-                        <input name="nick" class="ipt-txt form-el-w200" type="text" value="<?php echo $search_arr['nick']; ?>"/>
+                        <input name="nick" class="ipt-txt w200" type="text" value="<?php echo $search_arr['nick']; ?>"/>
                         <span><select name="c_id1" class="input-box" onchange="javascript:ajax_load(this.value);"><option value="0">所有顶级分类</option><?php foreach ($topCat as $cat_id => $cat_name): echo ('<option value="' . $cat_id . '"' . ($cat_id == $search_arr['cid_1'] ? ' selected="selected"' : '') . '>' . $cat_name . '</option>'); endforeach; ?></select></span>
                         <span id="cid_2_span"><select name="c_id2" class="select"><option value="0">所有二级分类</option><?php foreach ($secCat as $cat_id => $cat_name): echo ('<option value="' . $cat_id . '"' . ($cat_id == $search_arr['cid_2'] ? ' selected="selected"' : '') . '>' . $cat_name . '</option>'); endforeach; ?></select></span>
-                        <a href="javascript:$('#searchUser').submit();" class="general-btn"><span>搜索</span></a>
+                        <a href="javascript:$('#searchUser').submit();" class="btn-general"><span>搜索</span></a>
                         <!--<span class="tips-error hidden" id="nickTip"></span>-->
                         <input type="hidden" name="char_index" value="" id="charIndexInput" disabled="disabled" />
                     </div>
-                    </form>
-                </div>
+                </form>
             </div>
-			<div class="operate-cont">
+			<div class="search-area">
 				<p class="link-index">
 					<strong>按字母检索</strong>
 					<?php for($i = 1; $i <= 26; $i++): 
-						$charUrl = ($i==$search_arr['char_index']) ? '<strong style="margin-left:6px; color:red;">'.chr(64 + $i).'</strong>' 
+						$charUrl = ($i==$search_arr['char_index']) ? '<strong class="selected" >'.chr(64 + $i).'</strong>' 
 									: '<a href="#" onclick="charIndexSearch('.$i.')" >'.chr(64 + $i).'</a>';
 						echo ($charUrl); 
 					endfor; ?>
-						<?php if (0===$search_arr['char_index']) { echo '<strong style="margin-left:10px; color:red;">其它</strong>'; } else {echo '<a href="javascript:void(0);" onclick="charIndexSearch(-1)">其它</a>'; }?>
+						<?php if (0===$search_arr['char_index']) { echo '<strong  class="selected" >其它</strong>'; } else {echo '<a href="javascript:void(0);" onclick="charIndexSearch(-1)">其它</a>'; }?>
 				</p>
 			</div>
             <table class="table" cellpadding="0" cellspacing="0" width="100%" border="0">
                 <colgroup>
-                    <col class="h-w70" />
-                    <col class="h-w140" />
-                    <col class="h-w150" />
+                    <col class="w70" />
+                    <col class="w140" />
+                    <col class="w150" />
                     <col />
-                    <col class="h-w210" />
+                    <col class="w210" />
                 </colgroup>
                 <thead class="tb-tit-bg">
                 <tr>

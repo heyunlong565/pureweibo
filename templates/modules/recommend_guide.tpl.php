@@ -5,7 +5,7 @@
 					<?php if (V('-:sysConfig/wb_page_type', '1') == '2'): ?>
 					<div class="form-info">
 						<span class="tab-s4" id="cate_menu">
-							<strong>热门推荐：</strong>
+						<strong><?php LO('modules__recommendGuide__hotRecTitle');?></strong>
 							<?php if (is_array($category)):
 								$i = 0;
 								foreach($category as $key =>$item): ?>
@@ -21,7 +21,7 @@
                     <div class="active-wrap">
                     	<?php if (V('-:sysConfig/wb_page_type', '1') == '1'): ?>
                     	<div class="cate-menu">
-							<h3>热门推荐</h3>
+						<h3><?php LO('modules__recommendGuide__hotRec');?></h3>
 							<ul id="cate_menu">
 								<?php if (is_array($category)):
 									$i = 0;
@@ -40,9 +40,9 @@
                         		<?php //TPL::module('user_list', array('users' => $users, 'fids' => $fids)); ?>
                         	</div>
                             <div class="select-user">
-                            		<span class="all"><label for="check"><input type="checkbox" rel="e:sa" id="check" />已选择了<span>0</span>个用户</label></span>
+							<span class="all"><label for="check"><input type="checkbox" rel="e:sa" id="check" /><?php LO('modules__recommendGuide__chooseUsersNum');?></label></span>
                                 	<a class="click-btn" rel="e:submit" href="<?php echo URL('index');?>"></a>
-                                	<a class="end" href="<?php echo URL('index');?>">跳过&gt;&gt;</a>
+									<a class="end" href="<?php echo URL('index');?>"><?php LO('modules__recommendGuide__ship');?>&gt;&gt;</a>
                             </div>
                         </div>
                     </div>

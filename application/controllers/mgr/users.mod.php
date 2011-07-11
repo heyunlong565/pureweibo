@@ -10,7 +10,7 @@ class users_mod extends action {
      */
 	function ban() {
 		$is_ban = (int)V('g:ban',0);
-        $sina_uid = (int)V('g:id',0);
+        $sina_uid = V('g:id',0);
 		$p = V('g:p','');
 
         //如果为封禁操作
@@ -234,12 +234,15 @@ class users_mod extends action {
 	  *  对用户进行1禁言、2禁止登录和3清除用户（禁止发言、禁止登录、禁止他人查看、禁止他的微博展示） 4恢复正常
 	  */
 	
-	function userAction(){
-		$type=(int)V('r:type',NULL);
-		$screen_name=V('r:name',NULL);
-		$sina_uid=V('r:id',NULL);
+	function userAction()
+	{
+		$type		 = (int)V('r:type',NULL);
+		$screen_name = V('r:name',NULL);
+		$sina_uid	 = V('r:id',NULL);
+		
 		//判断sina_uid是否存在于新浪账户
-		if((($screen_name!=NULL&&trim($screen_name)!='')||$sina_uid!=NULL)&&in_array($type,array(1,2,3,4))){
+		if((($screen_name!=NULL&&trim($screen_name)!='')||$sina_uid!=NULL)&&in_array($type,array(1,2,3,4)))
+		{
 			if(!isset($sina_uid)){
 				$rst=DR('xweibo/xwb.getUserShow','',NULL,NULL,trim($screen_name));
 				if($rst['errno']==0&&isset($rst['rst']['id'])){
@@ -260,6 +263,7 @@ class users_mod extends action {
 				}
 			}
 			if(isset($sina_uid)&&(!isset($onlyDisplay)||$onlyDisplay==FALSE)){
+
 				DD('mgr/userCom.getUserActionList');
 				if($type!=NULL){
 					DR('mgr/userCom.setUserAction','',$sina_uid,$type);
@@ -272,10 +276,16 @@ class users_mod extends action {
 						DR('events.batchUpdateEvents', '', $sina_uid, 3);
 						//批量删除用户组里面的数据
 						DR('mgr/userRecommendCom.delUserByUid', '', $sina_uid);
-						
-						
+						// 删除用户发的所有通过审核的微博
+						$rs = DR('xweibo/weiboCopy.deleteByUid','',$sina_uid);
+						// 删除用户发的未通过审核的微博
+						$rs = DR('weiboVerify.deleteByUid', '', $sina_uid);
+						// 删除用户发的未通过审核的评论
+						$rs = DR('CommentVerify.delCommentByUid', '', $sina_uid);
 					}
-					$this->_succ('操作已成功', array('userAction'));
+					
+					$redirect = V('r:call_back', array('userAction'));
+					$this->_succ('操作已成功', $redirect);
 						
 				}
 			}
@@ -291,8 +301,9 @@ class users_mod extends action {
 			
 		}
 		
+		$callBack = $sina_uid ? URL('mgr/users.search') : URL('mgr/users.userAction');
+		TPL::assign('callBack', $callBack);
 		TPL::display('mgr/user/user_action','',0,FALSE);
-		
 	}
 	
 	

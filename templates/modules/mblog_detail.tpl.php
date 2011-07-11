@@ -15,15 +15,15 @@
 						</ul>
 						</div>
 						<div class="add-comment" id="topCmtBox">
-							<p class="title">发表评论</p>
+						<p class="title"><?php LO('modules__mblog__pubComment');?></p>
 							<div class="post-comment-main">
-								<a href="javascript:;" class="icon-face-choose all-bg" rel="e:ic"></a>
+								<a href="javascript:;" class="icon-face-choose" rel="e:ic"></a>
 								<div class="comment-r">
 									<textarea class="comment-textarea style-normal" id="inputor"></textarea>
 									<div>
-										<a href="javascript:;" class="general-btn" rel="e:sd"><span>评论</span></a>                       			
-										<span class="keyin-tips" id="warn">还可以输入<span>70</span>个字</span>
-										<label><input type="checkbox" id="sync">同时发一条微博</label>
+									<a href="javascript:;" class="btn-s1" rel="e:sd"><span><?php LO('modules__mblog__comment');?></span></a>                       			
+										<span class="keyin-tips" id="warn"><?php LO('modules__mblog__inputLength');?></span>
+										<label><input type="checkbox" id="sync"><?php LO('modules__mblog__atTheSameTimePubWeibo');?></label>
 									</div>
 								</div>
 							</div>
@@ -32,7 +32,7 @@
 							<ul id="cmtCt"></ul>
 							<div class="list-footer hidden" id="pager">
 								<div class="page" id="page">
-									<a class="general-btn" href="javascript:;" id="first" rel="e:fi"><span>首页</span></a><a class="general-btn" href="javascript:;" id="pre" rel="e:pr"><span>上一页</span></a><a class="general-btn" href="javascript:;" id="next" rel="e:nx"><span>下一页</span></a>
+								<a class="btn-s1" href="javascript:;" id="first" rel="e:fi"><span><?php LO('modules__mblog__indexPage');?></span></a><a class="btn-s1" href="javascript:;" id="pre" rel="e:pr"><span><?php LO('modules__mblog__prePage');?></span></a><a class="btn-s1" href="javascript:;" id="next" rel="e:nx"><span><?php LO('modules__mblog__nextPage');?></span></a>
 								</div>
 							</div>
 						</div>	

@@ -2,7 +2,7 @@
 	/**
 	 * 本站最新开通微博的用户列表
 	 * 需要参数参见component_15_pls
-	 * @version $Id: component_15.tpl.php 14573 2011-04-26 06:28:14Z linyi1 $
+	 * @version $Id: component_15.tpl.php 16466 2011-05-27 11:33:53Z zhenquan $
 	 */
 	if(!defined('IN_APPLICATION')){
 		exit('ACCESS DENIED!');
@@ -10,7 +10,7 @@
 	
 ?>
 
-<div class="user-sidebar">
+<div class="mod-aside user-sidebar">
     <div class="hd"><h3><?php echo F('escape', $mod['title']);?></h3></div>
 	<div class="bd">
     <ul>
@@ -27,9 +27,9 @@
             <p><a href="<?php echo $url;?>"><?php echo $nick;?></a></p>
 			<?php if ((string)$u['sina_uid'] !== (string)$uid) {?>
 				<?php if (!isset($followedList[(string)$u['sina_uid']])):?>
-				<a href="#" class="sub-link" rel="e:fl,t:2">加关注</a>
+				<a href="#" class="sub-link" rel="e:fl,t:2"><?php LO('modules_component_component_2_follow');?></a>
 				<?php else:?>
-				<em>已关注</em>
+				<em><?php LO('modules_component_component_2_followed');?></em>
 				<?php endif;?>
 			<?php } else {?>
 				<em>&nbsp;</em>

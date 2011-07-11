@@ -10,9 +10,9 @@
 	TPL::plugin('wap/include/top_logo', '', false);
 	TPL::plugin('wap/include/nav', array('is_top' => true), false);
 	?>
-    <div class="c"><a class="back" href="<?php echo $backURL; ?>">返回</a></div>
-    <div class="c"><img src="<?php echo $image; ?>" alt="查看图片" /></div>
-    <div class="c"><?php if ($vp): ?>原图<?php else: ?><a href="<?php echo WAP_URL('wbcom.viewPhoto', 'id=' . $id . '&v=1'); ?>">原图</a><?php endif; ?>&nbsp;<?php if (!$vp): ?>缩略图<?php else: ?><a href="<?php echo WAP_URL('wbcom.viewPhoto', 'id=' . $id . '&v=0'); ?>">缩略图</a><?php endif; ?></div>
+    <div class="c"><a class="back" href="<?php echo $backURL; ?>"><?php LO('wbcom__viewPhoto__label_goBack');?></a></div>
+    <div class="c"><img src="<?php echo $image; ?>" alt="<?php LO('wbcom__viewPhoto__label_viewImage');?>" /></div>
+    <div class="c"><?php if ($vp): ?><?php LO('wbcom__viewPhoto__label_originalImage');?><?php else: ?><a href="<?php echo WAP_URL('wbcom.viewPhoto', 'id=' . $id . '&v=1'); ?>"><?php LO('wbcom__viewPhoto__label_originalImage');?></a><?php endif; ?>&nbsp;<?php if (!$vp): ?><?php LO('wbcom__viewPhoto__label_thumbnail');?><?php else: ?><a href="<?php echo WAP_URL('wbcom.viewPhoto', 'id=' . $id . '&v=0'); ?>"><?php LO('wbcom__viewPhoto__label_thumbnail');?></a><?php endif; ?></div>
 	<?php
 	TPL::plugin('wap/include/nav', array('is_top' => false), false);
 	TPL::plugin('wap/include/foot', '', false);

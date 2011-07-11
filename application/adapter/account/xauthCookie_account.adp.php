@@ -69,10 +69,10 @@ define('WAP_LOGIN_URL', 		'http://domain/waplogin.php');
 class xauthCookie_account {
 	function xauthCookie_account() {
 		if (!XAUTH_TK_DATA_SIGN_FUNC){
-			$this->_warning('XAUTH_TK_DATA_SIGN_FUNC 不能为空，为保证安全，TOKEN必须启用签名');
+			$this->_warning(L('adapter__account__xauthCookie__tokenMustStart'));
 		}
 		if (!XAUTH_TK_DATA_ENCRIPT_KEY || XAUTH_TK_DATA_ENCRIPT_KEY=='XWEIBO_KEY_2010'){
-			$this->_warning('为保证安全，账号适配器中的签名和加密公钥你必须更改 XAUTH_TK_DATA_ENCRIPT_KEY ');
+			$this->_warning(L('adapter__account__xauthCookie__keyMustChange'));
 		}
 	}
 	/**
@@ -136,7 +136,7 @@ class xauthCookie_account {
 		if (method_exists($this, $actFunc)){
 			return $this->$actFunc();
 		}else{
-			$this->_warning('无法在当前账号适配器中找到你请求的远程ACTION方法['.$actFunc.']');
+			$this->_warning(L('adapter__account__xauthCookie__notFoundFun', $actFunc));
 		}
 	}
 	
@@ -218,7 +218,7 @@ class xauthCookie_account {
 		$result = $http->request('post');
 		$code = $http->getState();
 		if ($code != 200) {
-			return RST(false, $code, '登录失败，请检查远程登录验证接口');
+			return RST(false, $code, L('adapter__account__xauthCookie__loginError'));
 		}
 		return RST($result);
 	}
@@ -334,7 +334,7 @@ class xauthCookie_account {
 				$signStr = sprintf(XAUTH_TK_DATA_SIGN_FORMAT, $signStr, XAUTH_TK_DATA_ENCRIPT_KEY);
 				return $this->$signFunc($signStr);
 			}else{
-				$this->_warning('无法在本类中找到你配置的签名方法['.$signFunc.']');
+				$this->_warning(L('adapter__account__xauthCookie__notFoundClassFun', $signFunc));
 			}
 		}
 		return $signStr;		
@@ -375,11 +375,11 @@ class xauthCookie_account {
 				$tkStr = json_encode($tokenData);
 				break;
 			default:
-				$this->_warning('账号适配器配置 [XAUTH_TK_DATA_FORMAT] 错误');
+				$this->_warning(L('adapter__account__xauthCookie__dataFormatErr'));
 			break;
 		}
 		if (empty($tkStr)){
-			$this->_warning('TOKEN为空，或者无法将TOKEN数据转换成['.XAUTH_TK_DATA_FORMAT.']格式的字符串');
+			$this->_warning(L('adapter__account__xauthCookie__tokenEmpty', XAUTH_TK_DATA_FORMAT));
 		}
 		return $this->_encrypt($tkStr, 'encode');
 	}
@@ -404,11 +404,11 @@ class xauthCookie_account {
 				$rst = json_decode($tokenStr, 1);
 				break;
 			default:
-				$this->_warning('账号适配器配置 [XAUTH_TK_DATA_FORMAT] 错误');
+				$this->_warning(L('adapter__account__xauthCookie__dataFormatErr'));
 			break;
 		}
 		if (empty($rst)){
-			$this->_warning('TOKEN为空，或者无法将TOKEN数据转换成['.XAUTH_TK_DATA_FORMAT.']格式的字符串');
+			$this->_warning(L('adapter__account__xauthCookie__tokenEmpty', XAUTH_TK_DATA_FORMAT));
 		}
 		return $rst;
 	}
@@ -428,7 +428,7 @@ class xauthCookie_account {
 			if (method_exists($this, $encFunc)){
 				return $this->$encFunc($string, $operation);
 			}else{
-				$this->_warning('无法在账号适配器中找到你配置的加密解密方法['.XAUTH_TK_DATA_ENCRIPTION.']');
+				$this->_warning(L('adapter__account__xauthCookie__notFoundsecFun', XAUTH_TK_DATA_ENCRIPTION));
 			}
 		}else{
 			return $string;

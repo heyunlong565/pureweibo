@@ -72,14 +72,14 @@ class celeb_mod
 		$sort = $sort_list = $list = array();
 		$id = V('g:id',0);
 		if(!is_numeric($id)) {
-			APP::tips(array('tpl'=>'e404', 'msg'=>'抱歉你所访问的数据不存在'));
+			APP::tips(array('tpl'=>'e404', 'msg'=> L('controller__common__dataNotExist')));
 		}
 		
 		$sort 		= DS('Celeb.getSort', 'g1/0', $id);
 		$sort_list 	= DS('Celeb.getCatList', 'g1/0', $id);
 		
 		if(!isset($sort['status']) || !$sort['status']){
-			APP::tips(array('tpl'=>'e404', 'msg'=>'抱歉你所访问的数据不存在'));
+			APP::tips(array('tpl'=>'e404', 'msg'=> L('controller__common__dataNotExist')));
 		}
 		
 		foreach($sort_list as $value) {
@@ -106,7 +106,7 @@ class celeb_mod
 		$sort_list = $list = $index_list = $sort_parent = array();
 		$id = V('g:id',0);
 		if(!is_numeric($id)) {
-			APP::tips(array('tpl'=>'e404', 'msg'=>'抱歉你所访问的数据不存在'));
+			APP::tips(array('tpl'=>'e404', 'msg'=> L('controller__common__dataNotExist')));
 		}
 
 		
@@ -116,7 +116,7 @@ class celeb_mod
 		}
 		
 		if(!isset($sort['status']) || !$sort['status'] || !isset($sort_parent['status']) || !$sort_parent['status']){
-			APP::tips(array('tpl'=>'e404', 'msg'=>'抱歉你所访问的数据不存在'));
+			APP::tips(array('tpl'=>'e404', 'msg'=> L('controller__common__dataNotExist')));
 		}
 		
 		$ret = DS('Celeb.getUserList', 'g2/0', null, $id, null, null, null, null, 'char_index');

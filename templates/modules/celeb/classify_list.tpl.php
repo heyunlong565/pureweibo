@@ -18,9 +18,9 @@ if(!defined('IN_APPLICATION')){
     </li>
     <?php endforeach;} else {?>
 		<?php if (USER::aid()) {?>
-			名人堂还没有内容，请到<b>后台管理中心</b>-<b>用户管理</b>-<a href="<?php echo URL('mgr/admin.index','#4,4', 'admin.php');?>">名人管理</a>中添加设置
+			<?php LO('modules_celeb_classify_list_adminEmptyTip', URL('mgr/admin.index','#4,4', 'admin.php'));?>
 		<?php } else {?>
-			名人堂还没有内容，等待管理员添加，你可以访问其他页面碰碰运气
+			<?php LO('modules_celeb_classify_list_emptyTip');?>
 		<?php }?>
 	<?php }?>
 </ul>

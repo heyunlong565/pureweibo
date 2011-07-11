@@ -1,14 +1,14 @@
 						<!-- 访谈内容 开始-->  
                         <div class="title-box">
-                        	<h3>访谈内容<span>(共有<em class="que-num"><?php echo $wbList['allAskCnt']; ?></em>个问题 <em class="rep-num"><?php echo $wbList['answerCnt']; ?></em>个回复)</span></h3>
+                        	<h3><?php LO('modules_interview_answerweibo_nopage_count', $wbList['allAskCnt'], $wbList['replyCnt']); ?></h3>
                         </div>
                         
 						<div class="feed-list talk-list">
                         	<!-- 问答列表 开始 -->
                             <?php if( $wbList['answerCnt']<=0 ){ ?>
 								<div class="default-tips" id="emptyTip">
-									<div class="icon-tips all-bg"></div>
-									<p>暂时没有微博</p>
+									<div class="icon-tips"></div>
+									<p><?php LO('modules_interview_answerweibo_nopage_weiboEmpty');?></p>
 								</div>
 								<ul id="xwb_weibo_list_ct"></ul>
 							<?php } else 
@@ -55,7 +55,7 @@
 													$wb['uid'] = $curUid;
 													
 													echo '<div class="talk-content guest-reply" rel="w:'. $wb['id'].'">';
-				                                    TPL::module('feed', $wb);
+				                                    TPL::module('interview/feed_answer', $wb);
 													echo '<div class="reply-icon"></div></div>';
 												}
 											}

@@ -9,7 +9,7 @@
 *
 ***************************************************/
 class pub_mod
-{
+{	
 	function default_action() {
 		$uid = USER::uid();
 		
@@ -47,6 +47,17 @@ class pub_mod
 		TPL :: display('looklook');
 	}
 
+	
+	/*
+	//热门话题的　全页面缓存HOOK　全页面缓存　1000　秒
+	function _xcache_topics(){
+		return array(
+			'K'=>sprintf("_xcache_topics#%d#%d#%d", PAGE_TYPE_CURRENT, V('g:base_app', 1), V('g:navId', 1)),
+			'T'=>300
+		);
+	}
+	*/
+	
 	/**
 	 * 话题排行榜
 	 *

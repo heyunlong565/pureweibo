@@ -9,9 +9,9 @@ if(!defined('IN_APPLICATION')){
 }
 ?>
 <div class="pub-feed-list">
-    <div class="column-title">
+    <div class="title-box">
         <div></div>
-		<a class="icon-change" href="<?php echo URL('pub.look');?>">更多&gt;&gt;</a>
+		<a class="more" href="<?php echo URL('pub.look');?>"><?php LO('modules_component_component_9_more');?>&gt;&gt;</a>
         <h3><?php /*随便看看*/ echo F('escape', $mod['title']);?></h3>
     </div>
     

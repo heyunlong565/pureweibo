@@ -689,55 +689,29 @@ class fsockopen_http
             return $this->_do_url($location, 'get');
         }
 
-		/****************************/
-		$log = V('g:log');
-		if ($log == 1) {
-			list($usec, $sec) = explode(" ", microtime());
-			$end_ex_time = (float)$usec + (float)$sec;
-
-			$db = APP::ADP('db');
-
-			$db->setTable('api_log');
-			$db->setAutoFree(true);
-			$data_log = array();
-			$data_log['url'] = $this->_serverUrl;
-			$data_log['http_code'] = $this->status;
-			//post, 记录post数据
-			if (strtolower($this->_method) == 'post') {
-				$data_log['post_data'] = $this->_request_params;
-			}
-			$data_log['ret'] = $body;
-			$data_log['request_time'] = $end_ex_time - $start_ex_time;
-			$data_log['total_time'] = $end_ex_time - $start_ex_time;
-			$data_log['s_ip'] = $_SERVER['SERVER_ADDR'];
-			$data_log['log_time'] = date('Y-m-d H:i:s',APP_LOCAL_TIMESTAMP);
-			$db->save($data_log);
-		}
-		/****************************/
-
-		//记录错误日志
-		if ($this->status != 200) {
-			list($usec, $sec) = explode(" ", microtime());
-			$end_ex_time = (float)$usec + (float)$sec;
-
-			$db = APP::ADP('db');
-
-			$db->setTable('api_log');
-			$db->setAutoFree(true);
-			$data_log = array();
-			$data_log['url'] = $this->_serverUrl;
-			$data_log['http_code'] = $this->status;
-			//post, 记录post数据
-			if (strtolower($this->_method) == 'post') {
-				$data_log['post_data'] = $this->_request_params;
-			}
-			$data_log['ret'] = $body;
-			$data_log['request_time'] = $end_ex_time - $start_ex_time;
-			$data_log['total_time'] = $end_ex_time - $start_ex_time;
-			$data_log['s_ip'] = $_SERVER['SERVER_ADDR'];
-			$data_log['log_time'] = date('Y-m-d H:i:s',APP_LOCAL_TIMESTAMP);
-			$db->save($data_log);
-		}
+		//记录调试或错误日志
+//		if ((V('g:log')==1) || ($this->getState()!=200)) {
+//			list($usec, $sec) = explode(" ", microtime());
+//			$end_ex_time = (float)$usec + (float)$sec;
+//
+//			$db = APP::ADP('db');
+//
+//			$db->setTable(T_LOG_HTTP);
+//			$db->setAutoFree(true);
+//			$data_log = array();
+//			$data_log['url'] = $this->_serverUrl;
+//			$data_log['http_code'] = $this->status;
+//			//post, 记录post数据
+//			if (strtolower($this->_method) == 'post') {
+//				$data_log['post_data'] = $this->_request_params;
+//			}
+//			$data_log['ret'] = $body;
+//			$data_log['request_time'] = $end_ex_time - $start_ex_time;
+//			$data_log['total_time'] = $end_ex_time - $start_ex_time;
+//			$data_log['s_ip'] = $_SERVER['SERVER_ADDR'];
+//			$data_log['log_time'] = date('Y-m-d H:i:s',APP_LOCAL_TIMESTAMP);
+//			$db->save($data_log);
+//		}
 
 		$this->_request_params = null;
         // return the body buf

@@ -18,7 +18,7 @@
 				<form method="post" action="<?php echo URL('mgr/weibo/disableWeibo.search')?>">
             	<div class="serch-user">
             		<span><strong>微博地址</strong></span>
-                	<input name="url" class="input-box box-address-width" type="text" value="<?php echo V('g:keyword');?>" />
+                	<input name="url" class="input-txt box-address-width" type="text" value="<?php echo V('g:keyword');?>" />
                 	<span class="serch-btn"><input name="" type="submit" value="搜索" /></span>
            		</div>
 				</form>

@@ -78,7 +78,7 @@ function user_filter($data, $alone = false, $chk_publish = false){
  */
 function user_filter_check($data, $config, $filter_data) {
 	if (!user_field_exists($data)) {
-		return array('error'=>'被检查的数据缺少必要的数据项', 'data'=>$data);
+		return array('error'=> L('function__userFilter__missParams'), 'data'=>$data);
 	}
 	if ($config['check']) {
 		$r = chk_user_content($data, $config, $filter_data);

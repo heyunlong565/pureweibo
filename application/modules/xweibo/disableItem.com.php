@@ -204,6 +204,69 @@ class disableItem {
 		RST(false, $errno, $msg, $display, $log);
 	}
 
+	
+	
+	/**
+	 * 获取所有列表
+	 * @param array $params, 查询参数
+	 * @param int $offset
+	 * @param int $limit
+	 */
+	function getList($params=array(), $offset=0, $limit=10)
+	{
+		// Escape Var
+		$offset	 = $this->db->escape($offset);
+		$limit	 = $this->db->escape($limit);
+
+		$where = $this->_buildWhere($params);
+		$sql   = "Select * From {$this->table} $where Order By kw_id Desc Limit $offset, $limit ";
+		return $this->db->query($sql);
+	}
+	
+	
+	
+	/**
+	 * 获取总数
+	 * @param array $params 其它参数
+	 */
+	function getListCount($params=array())
+	{
+		$where = $this->_buildWhere($params);
+		$sql   = "Select count(*) From {$this->table} $where ";
+		return $this->db->getOne($sql);
+	}
+	
+	
+	
+	/**
+	 * 构建where 语句
+	 * @param array $params
+	 */
+	function _buildWhere($params)
+	{
+		$type 	= isset($params['type']) ? $params['type'] : 1;
+		$where = " Where type=$type ";
+		
+		// Start Time
+		if ( isset($params['startTime']) && ($startTime=$this->db->escape($params['startTime'])) )
+		{
+			$where .= " And add_time>='$startTime' ";
+		}
+		
+		// End Time
+		if ( isset($params['endTime']) && ($endTime=$this->db->escape($params['endTime'])) )
+		{
+			$where .= " And add_time<='$endTime' ";
+		}
+		
+		// Keyword
+		if ( isset($params['keyword']) && ($keyword=$this->db->escape($params['keyword'])) )
+		{
+			$where .= " And `comment` Like '%$keyword%' ";
+		}
+		
+		return $where;
+	}
 }
 
 

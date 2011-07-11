@@ -1,14 +1,14 @@
 								<?php if (empty($list)) {?>
 									<!-- comments list empty tip -->
 									<div class="default-tips">
-										<div class="icon-tips all-bg"></div>
+										<div class="icon-tips"></div>
 										<?php if (V('g:page', 1) > 1):?>
-										<p>已到最后一页</p>
+										<p><?php LO('modules__comment__pageTip');?></p>
 										<?php else:?>
 											<?php if ($type == 'to'):?>
-												<p>暂时还没有收到任何评论</p>
+											<p><?php LO('modules__comment__myComment');?></p>
 											<?php else:?>
-												<p>暂时还没有发出任何评论</p>
+											<p><?php LO('modules__comment__CommentSend');?></p>
 											<?php endif;?>
 										<?php endif;?>
 									</div>
@@ -16,7 +16,7 @@
 									<?php } else {?>
                                     <div class="list-handle">
                                         <!--<span class="total">143条</span>-->
-										<label><input type="checkbox" rel="e:sa" />全选</label><em>|</em><a href="javascript:;" rel="e:da">删除</a>
+										<label><input type="checkbox" rel="e:sa" /><?php LO('modules__comment__selectAll');?></label><em>|</em><a href="javascript:;" rel="e:da"><?php LO('modules__comment__delete');?></a>
                                     </div>
 									<ul id="cmtCt">
                                 <?php if ($list):?>
@@ -45,11 +45,11 @@
                                         <div class="comment-c">
                                             <p class="c-info"><a href="<?php  echo URL('ta',array('id' => $item['user']['id']));?>"><?php echo F('escape', $item['user']['screen_name']);?><?php echo F('verified', $item['user']);?></a> <?php echo APP::F('format_text', $item['text']);?>(<?php echo APP::F('format_time', $item['created_at']);?>)</p>
                                             <div class="c-for" id="cmtBoxCt">
-                                                <a class="icon-reply icon-bg" href="javascript:;" rel="e:rp" rel="<?php echo F('escape', $item['user']['screen_name']);?>">回复</a>
+											<a class="ico-reply" href="javascript:;" rel="e:rp" rel="<?php echo F('escape', $item['user']['screen_name']);?>"><?php LO('modules__comment__reply');?></a>
                                                 <?php if ($item['status']['user']['id'] == $uid  || $item['user']['id'] == $uid):?>
-                                                <a class="icon-del icon-bg hidden" href="javascript:;" rel="e:dl">删除</a>
+												<a class="ico-del hidden" href="javascript:;" rel="e:dl"><?php LO('modules__comment__delete');?></a>
                                                 <?php endif;?>
-                                                <p>回复微博：<a href="<?php  echo URL('show',array('id' => $item['status']['id']));?>"><?php echo APP::F('format_text', $item['status']['text'], 'comment');?></a></p>
+												<p><?php LO('modules__comment__replyWeibo');?><a href="<?php  echo URL('show',array('id' => $item['status']['id']));?>"><?php echo F('format_text', F('cut_string', $item['status']['text'], 50), 'comment'); ?></a></p>
                                             </div>
                                         </div>
                                     </div>
@@ -61,7 +61,7 @@
     
                                     <div class="list-handle">
                                         <!--<span class="total">143条</span>-->
-										<label><input type="checkbox" rel="e:sa" />全选</label><em>|</em><a href="javascript:;" rel="e:da">删除</a>
+										<label><input type="checkbox" rel="e:sa" /><?php LO('modules__comment__selectAll');?></label><em>|</em><a href="javascript:;" rel="e:da"><?php LO('modules__comment__delete');?></a>
                                     </div>
                                     <!-- 分页 结束-->
 									<?php TPL::module('page', array('list' => $list, 'limit' => $limit));?>

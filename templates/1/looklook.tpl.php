@@ -7,7 +7,7 @@ if(!defined('IN_APPLICATION')){
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title><?php echo F('web_page_title', false, '随便看看');?></title>
+<title><?php echo F('web_page_title', false, L('lookLook__pug__casualLookTitle'));?></title>
 <?php TPL::plugin('include/css_link');?>
 <?php TPL::plugin('include/js_link');?>
 <link href="<?php echo W_BASE_URL; ?>css/default/pub.css" rel="stylesheet" type="text/css" />
@@ -24,9 +24,9 @@ if(!defined('IN_APPLICATION')){
 					<div class="main">
 						<!-- 随便看看 开始-->
 						<div class="pub-feed-list">
-    						<div class="column-title">
-        						<a class="icon-change icon-bg" href="#"  rel="e:rl">换一批</a>
-        						<h3>随便看看</h3>
+    						<div class="title-box">
+								<a class="ico-change" href="#"  rel="e:rl"><?php LO('lookLook__pub__change');?></a>
+								<h3><?php LO('lookLook__pug__casualLook');?></h3>
     						</div>
 
     						<?php if(is_array($list['rst']) || !empty($list['rst'])): 
@@ -43,7 +43,7 @@ if(!defined('IN_APPLICATION')){
     							);
     						?>
     						<?php elseif($list['errno'] != 0 && defined('IS_DEBUG') && IS_DEBUG): ?>
-    							“随便看看”模块遇到问题：<?php echo $list['err']. '（错误代码：'. $list['errno']. '）'; ?>
+								<?php LO('lookLook__pug__errorMsg', $list['err'], $list['errno']);?>
     						<?php endif; ?>
 
 						</div>
@@ -62,6 +62,7 @@ if(!defined('IN_APPLICATION')){
                         }
                         //echo F('show_ad', 'sidebar', 'xad-box xad-box-p3');
                         ?>
+						<?php echo F('show_ad', 'sidebar', '');?>
 				</div>
 			</div>
 			<!-- 底部 开始-->

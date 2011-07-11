@@ -7,14 +7,14 @@
 </head>
 <body <?php F('wap_font_set'); ?>>
 <?php TPL::plugin('wap/include/top_logo', '', false); ?>
-<p>您尚未开通<?php echo F('escape', $site_name); ?>，绑定新浪微博账号可立即开通。</p>
+<p><?php LO('account__accountBind__notBindToWeibo', F('escape', $site_name));?></p>
 <form action="<?php echo WAP_URL('account.doLogin'); ?>" method="post">
-新浪微博账号:<br/><input type="text" name="account" size="30" value=""/>
+<?php LO('account__accountBind__sinaWeibo');?><br/><input type="text" name="account" size="30" value=""/>
 <br/>
-密码:<br/><input type="password" name="password" size="30" value=""/><br/>
+<?php LO('account__accountBind__password');?><br/><input type="password" name="password" size="30" value=""/><br/>
 <input type="hidden" name="backURL" value="" />
 <input type="hidden" name="loginType" value="2" />
-<input type="submit" name="submit" value="绑定" /><br/>
+<input type="submit" name="submit" value="<?php LO('account__accountBind__bindBtn');?>" /><br/>
 </form>
 </body>
 </html>

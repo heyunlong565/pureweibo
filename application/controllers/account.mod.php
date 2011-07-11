@@ -82,6 +82,7 @@ class account_mod {
 			   TPL::assign('site_info', $site_info); 
 		}
 		
+		TPL::assign('login_way', $login_way);
 		TPL::assign('use_sina_login', $use_sina_login);   
 		TPL::assign('use_site_login', $use_site_login);  
 
@@ -91,7 +92,8 @@ class account_mod {
 		TPL::assign('site_callback_url', $site_callback_url);
 		TPL::assign('sina_callback_url', $sina_callback_url);
 		
-		TPL::display('login', array(), 0, 'modules');
+		$loginTpl = V('-:sysConfig/sysLoginModel') ? 'login' : 'login_pub';
+		TPL::display($loginTpl, array(), 0, 'modules');
 	}
 	
 	/// 初始化附属站信息,并根据附属站同步登录信息
@@ -115,6 +117,7 @@ class account_mod {
 		$site_uid	= USER::get('site_uid');
 		$site_uname = 'Guest';
 		$site_name	= 'NoneSite';
+		$site_login_report = 0;
 		if ($login_way == 2 || $login_way == 3) {
 			$sUser = $this->accAdapter->getInfo();
 			if (is_array($sUser)){
@@ -126,19 +129,14 @@ class account_mod {
 			
 			//　从  附属站　同步到  Xweibo  
 			if (!empty($site_uid) && !USER::isUserLogin()){
-			
-				 $user = $this->getBindInfo($site_uid, 'uid');
-				 if (!empty($user) && is_array($user) && !empty($user['access_token']) && !empty($user['token_secret']) ){
-				 	 $this->_setSinaLoginSession(array(
+				$site_login_report = 1;
+				$user = $this->getBindInfo($site_uid, 'uid');
+				if (!empty($user) && is_array($user) && !empty($user['access_token']) && !empty($user['token_secret']) ){
+					$this->_setSinaLoginSession(array(
 				 	   		'oauth_token'=> $user['access_token'],
 				 	   		'oauth_token_secret'=> $user['token_secret']
 				 	   ), $user);
-					 if (!isset($_COOKIE['site_login_report']) || ($_COOKIE['site_login_report'] != 1)) {
-						 F('report', 'site_login', 'http');
-						 setcookie('site_login_report', 1);
-					 }
-				 }
-
+				}
 			}
 			
 			//　从 Xweibo　同步到附属站
@@ -155,6 +153,12 @@ class account_mod {
 		USER::set('site_uid',	$site_uid);
 		USER::set('site_uname', $site_uname);
 		USER::set('site_name',	$site_name);
+		
+		if(isset($site_login_report) && 1 == $site_login_report && (!isset($_COOKIE['site_login_report']) || ($_COOKIE['site_login_report'] != 1))){
+			F('report', 'site_login', 'http');
+			setcookie('site_login_report', 1);
+		}
+		
 	}
 	
 	/// 检查状态状态，全局使用, 是一个 preDoAction
@@ -197,6 +201,7 @@ class account_mod {
 		$loginCallBack = APP::getRequestRoute();
 		//$querystring = isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : '';
 		$q = V('g',array());
+		if ( isset($q[R_GET_VAR_NAME]) ){ unset($q[R_GET_VAR_NAME]); }
 		$querystring = $q ? http_build_query($q) : '';
 		// 1 使用新浪帐号登录，2 使用附属站帐号登录 3 可同时使用两种帐号登录
 		$login_way = V('-:sysConfig/login_way', 1)*1;
@@ -246,6 +251,7 @@ class account_mod {
 		
 		$oauthUrl	 = DS('xweibo/xwb.getTokenAuthorizeURL', '', $oauthCbUrl);
 		//&from=xweibo 取消特制的XWEIBO授权页面
+		//$oauthUrl	.= '&forcelogin=true&xwb_'.$callbackOpt;
 		$oauthUrl	.= '&xwb_'.$callbackOpt;
 		return $oauthUrl;
 	}
@@ -292,19 +298,18 @@ class account_mod {
 			USER::set('user_max_notice_time', $maxTime);
 			
             $inData = array();
-            $inData['first_login']	= APP_LOCAL_TIMESTAMP;
-			$inData['sina_uid']	= $uInfo['id'];
-			$inData['nickname']	= $uInfo['screen_name'];
-			$inData['max_notice_time'] = $maxTime;
+            $inData['first_login']		= APP_LOCAL_TIMESTAMP;
+			$inData['sina_uid']			= $uInfo['id'];
+			$inData['nickname']			= $uInfo['screen_name'];
+			$inData['max_notice_time'] 	= $maxTime;
+			$inData['followers_count'] 	= $uInfo['followers_count'];
+			$token 						= USER::getOAuthKey(TRUE);
+			$inData['access_token']		= $token['oauth_token'];
+			$inData['token_secret']		= $token['oauth_token_secret'];
 			
-			// 本地关系的时候保留token信息
+			// 本地关系,初始化用户首页List
 			if ( XWB_PARENT_RELATIONSHIP ) 
 			{
-				$token 					= USER::getOAuthKey(TRUE);
-				$inData['access_token']	= $token['oauth_token'];
-				$inData['token_secret']	= $token['oauth_token_secret'];
-				
-				// 初始化用户首页List
 				DS('xweibo/xwb.initUserIndexList', FALSE, $inData['sina_uid']);
 			}
 			
@@ -316,20 +321,14 @@ class account_mod {
 		 	 //var_dump($user);exit;
 		 	 USER::set('site_uid', $user['uid']);
 		 	 
-		 	// 本地关系的时候保留token信息
-			if ( XWB_PARENT_RELATIONSHIP ) 
-			{
-				$noToken 	= !isset($user['access_token']) || empty($user['access_token']);
-				$noSecret	= !isset($user['token_secret']) || empty($user['token_secret']);
-				if ( $sina_uid && ($noToken || $noSecret) )
-				{
-					$token 					= USER::getOAuthKey(TRUE);
-					$inData 				= array();
-					$inData['access_token']	= $token['oauth_token'];
-					$inData['token_secret']	= $token['oauth_token_secret'];
-					DR('mgr/userCom.insertUser', FALSE, $inData, $sina_uid);
-				}
-			}
+		 	 $inData 					= array();
+		 	 $inData['followers_count'] = $uInfo['followers_count'];
+		 	 $inData['nickname']		= $uInfo['screen_name'];
+ 	 		 $token 					= USER::getOAuthKey(TRUE);
+			 $inData['access_token']	= $token['oauth_token'];
+			 $inData['token_secret']	= $token['oauth_token_secret'];
+		 	 
+			DR('mgr/userCom.insertUser', FALSE, $inData, $sina_uid);
 		 }
 		 
 		 return false;
@@ -410,6 +409,32 @@ class account_mod {
 			case 'login'	: 
 				/// 上报
 				F('report', 'sina_login', 'http');
+				if (USER::uid() === SYSTEM_SINA_UID) {
+					$token = USER::get('XWB_OAUTH_CONFIRM');
+					// 如果站长token发生变化，则修改user_config.php的token
+					if ($token['oauth_token'] != WB_USER_OAUTH_TOKEN || $token['oauth_token_secret'] != WB_USER_OAUTH_TOKEN_SECRET) {
+						if (XWB_SERVER_ENV_TYPE === 'sae') {
+							$storage = new SaeStorage();
+							$content = $storage->read(CONFIG_DOMAIN, md5(CONFIG_DOMAIN));
+							parse_str($content, $config);
+							$config['user_oauth_token'] = $token['oauth_token'];
+							$config['oauth_token_secret'] = $token['user_oauth_token_secret'];
+							$content = http_build_query($config);
+							$storage->write(CONFIG_DOMAIN, md5(CONFIG_DOMAIN), $content);
+						} else {
+							// 修改user_config.php和绑定信息
+							$config_file = IO::read(ROOT_PATH . 'user_config.php');
+							$config_arr = array(
+											'WB_USER_OAUTH_TOKEN' => $oauth_token,
+											'WB_USER_OAUTH_TOKEN_SECRET' => $oauth_token_secret
+										);
+
+							//更新user_config数据
+							$config_file = F('set_define_value', $config_file, $config_arr);
+							IO::write(ROOT_PATH . 'user_config.php', $config_file);	
+						}
+					}
+				}
 			default 		:
 				//设置同步　登录退出状态，在 footer　中输出JS通知 
 				USER::set('syncLoginScript', 1);
@@ -476,7 +501,7 @@ class account_mod {
 		
 		//设置已读的最新消息时间戳
 		$user_info = DR('mgr/userCom.getByUid', 'p', $uInfo['id']);
-		$maxNoticeTime = isset($user_info['rst']['max_notice_time']) ? (int)$user_info['rst']['max_notice_time'] : APP_LOCAL_TIMESTAMP;
+		$maxNoticeTime = isset($user_info['rst']['max_notice_time']) ? $user_info['rst']['max_notice_time'] : APP_LOCAL_TIMESTAMP;
 		USER::set('user_max_notice_time', $maxNoticeTime);
 		
 		// 设置个性域名
@@ -486,9 +511,9 @@ class account_mod {
 			USER::set('domain_name',    $domain);
 		}
 		
-		//检查当前帐号是否是　管理员 
-		if ($this->_chkIsAdminAcc($uInfo['id'])){
-			USER::set('isAdminAccount',	$uInfo['id']);
+		//检查当前帐号是否为管理员 
+		if ($rs = $this->_chkIsAdminAcc($uInfo['id'])){
+			USER::set('isAdminAccount',	$rs);
 		}
 		
 		//封禁检查
@@ -496,10 +521,15 @@ class account_mod {
 		return $uInfo;
 	}
 	
-	/// 检查是否是管理员
+	/**
+	 * 检查是否是管理员
+	 * @param $sina_uid string sina帐号
+	 * @return false|int
+	 */
 	function _chkIsAdminAcc($sina_uid){
-		$adm = $rs = DS('mgr/adminCom.getAdminByUid','', $sina_uid);
-		return (!empty($adm));
+		$rs = DS('mgr/adminCom.getAdminByUid','', $sina_uid);
+		$ret = !empty($rs) && isset($rs[0]['group_id'])?$rs[0]['group_id'] : false;
+		return $ret;
 	}
 	
 	/// 检查　用户　是否被封禁
@@ -623,8 +653,8 @@ class account_mod {
 					return $inData;
 				} else {
 					///记录日志
-					$msg = "api: getBindUser\r\n id: $v\r\n type: $type\r\n errno: {$ret['errno']}\r\n err: {$ret['err']}";
-					APP::LOG($msg, 'xplug');
+					$msg = "[getBindInfo]api: getBindUser\r\n id: $v\r\n type: $type\r\n errno: {$ret['errno']}\r\n err: {$ret['err']}";
+					LOGSTR('xplug', $msg);
 				}
 			}
 		   	else {
@@ -634,8 +664,8 @@ class account_mod {
 					$bindUser = $bindUser['rst'];
 					if (!empty($bindUser['errno'])) {
 						///记录日志
-						$msg = "api: updateBindUser\r\n uid: {$result['uid']}\r\n sina_uid: {$result['sina_uid']}\r\n access_token: {$result['access_token']}\r\n token_secret: {$result['token_secret']}\r\n errno: {$bindUser['errno']}\r\n err: {$bindUser['err']}";
-						APP::LOG($msg, 'xplug');
+						$msg = "[getBindInfo]api: updateBindUser\r\n uid: {$result['uid']}\r\n sina_uid: {$result['sina_uid']}\r\n access_token: {$result['access_token']}\r\n token_secret: {$result['token_secret']}\r\n errno: {$bindUser['errno']}\r\n err: {$bindUser['err']}";
+						LOGSTR('xplug', $msg);
 					}
 				}
 			}
@@ -678,8 +708,8 @@ class account_mod {
 				$bindUser = $bindUser['rst'];
 				if (!empty($bindUser['errno'])) {
 					///记录日志
-					$msg = "api: addBindUser\r\n uid: {$result['uid']}\r\n sina_uid: {$result['sina_uid']}\r\n access_token: {$result['access_token']}\r\n token_secret: {$result['token_secret']}\r\n errno: {$bindUser['errno']}\r\n err: {$bindUser['err']}";
-					APP::LOG($msg, 'xplug');
+					$msg = "[_xwbBBSplugin]api: addBindUser\r\n uid: {$result['uid']}\r\n sina_uid: {$result['sina_uid']}\r\n access_token: {$result['access_token']}\r\n token_secret: {$result['token_secret']}\r\n errno: {$bindUser['errno']}\r\n err: {$bindUser['err']}";
+					LOGSTR('xplug', $msg);
 				}
 			}
 		}

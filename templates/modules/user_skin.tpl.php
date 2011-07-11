@@ -2,7 +2,7 @@
 <div class="skin-set" id="skinSet">
 	<div id="colorSelector" style="display:none;"><div style="background-color: #0000ff"></div></div>
 	<div id="csArea" class="cp-parent"  style="display:none;">
-		<div class="cp-oper"><span class="txt" id="cltitle">主链接色</span><span class="c-view" id="cRealColor"><span style="background:#0082cb;"></span></span><label>#<input value="" class="input-txt" id="colorshow" /></label></div>
+	<div class="cp-oper"><span class="txt" id="cltitle"><?php LO('modules__userSkin__linkColor');?></span><span class="c-view" id="cRealColor"><span style="background:#0082cb;"></span></span><label>#<input value="" class="input-txt" id="colorshow" /></label></div>
 		<a href="#" class="btn-close" rel="e:closeCls"></a>
 	</div>
 	<style type="text/css"></style>
@@ -18,11 +18,11 @@
 			<?php
 			endforeach;
 			?>
-			<span class="<?php if(defined('SKIN_CONSTUM_PATH')) echo 'current';?>" id="custom"><a href="javascript:;">自定义皮肤</a></span>
+				<span class="<?php if(defined('SKIN_CONSTUM_PATH')) echo 'current';?>" id="custom"><a href="javascript:;"><?php LO('modules__userSkin__customSkin');?></a></span>
             
 			<div class="btn-area">
-                <a href="#" class="general-btn highlight" rel="e:save"><span>保存</span></a>
-                <a href="#" class="general-btn" rel="e:cancel"><span>取消</span></a>
+			<a href="#" class="btn-s1 btn-s1-light" rel="e:save"><span><?php LO('common__template__save');?></span></a>
+			<a href="#" class="btn-s1" rel="e:cancel"><span><?php LO('common__template__cancel');?></span></a>
             </div>
         </div>
     </div>
@@ -92,27 +92,27 @@
 		<div class="skin-custom <?php if(!defined('SKIN_CONSTUM_PATH')) echo 'hidden'?> ">
 			<div class="skin-setbg">
 				<div class="upload-pic">
-					<img rel='<?php if(isset($customSkin['bg'])) echo 'u:1'?>' src="<?php if(isset($customSkin['bg'])) echo $customSkin['bg']; else echo W_BASE_URL.'img/upload_pic.png'?>" alt="" id="previewImg"/>
-					<a href="#" class="icon-del-pic <?php if(!isset($customSkin['bg'])) echo 'hidden';?>" id="closeImg" title="删除背景"></a>
+					<img rel='<?php if(isset($customSkin['bg'])) echo 'u:1'?>' src="<?php if(isset($customSkin['bg'])) echo $customSkin['bg']; else echo W_BASE_URL.'img/'.WB_LANG_TYPE_CSS.'/upload_pic.png'?>" alt="" id="previewImg"/>
+					<a href="#" class="ico-del-pic <?php if(!isset($customSkin['bg'])) echo 'hidden';?>" id="closeImg" title="<?php LO('modules__userSkin__deleteBg');?>"></a>
 				</div>	
 				<div class="oper-area">
 					<div class="frm-row">
 						<form id="xwb_back_form" target="" action="<?php echo URL('setting.skinBGUpload');?>" enctype="multipart/form-data" method="post">
-					        <input type="file" value="上传图片" id="xwb_back_file" name="skinbg" />
+						<input type="file" value="<?php LO('modules__userSkin__uploadPic');?>" id="xwb_back_file" name="skinbg" />
 					    </form>
 					</div>
 
-					<h5>设置背景图</h5>
+					<h5><?php LO('modules__userSkin__setBgImg');?></h5>
 					<div class="setbg-way">
-						<label for="bg-repeat" rel="e:bgLevel"><input type="checkbox" <?php if(isset($customSkin['tiled'])&&$customSkin['tiled']=='1') echo 'checked=checked'?> id="bg-repeat" />背景平铺</label>
+					<label for="bg-repeat" rel="e:bgLevel"><input type="checkbox" <?php if(isset($customSkin['tiled'])&&$customSkin['tiled']=='1') echo 'checked=checked'?> id="bg-repeat" /><?php LO('modules__userSkin__bgTile');?></label>
 					</div>
 					<div class="setbg-way">
-						<label for="bg-fixed"  rel="e:bgStrong"><input type="checkbox" <?php if(isset($customSkin['fixed'])&&$customSkin['fixed']=='1') echo 'checked=checked'?> id="bg-fixed" />背景固定</label>
+					<label for="bg-fixed"  rel="e:bgStrong"><input type="checkbox" <?php if(isset($customSkin['fixed'])&&$customSkin['fixed']=='1') echo 'checked=checked'?> id="bg-fixed" /><?php LO('modules__userSkin__bgFixed');?></label>
 					</div> 
 					<div class="btn-align-bg" id="align">
-						<a href="#" class="<?php if(isset($customSkin['align'])&&$customSkin['align']=='1') echo 'cur'?>" rel="e:bgPlace,w:1">居左</a>
-						<a href="#" class="<?php if(isset($customSkin['align'])&&$customSkin['align']=='2') echo 'cur'?>" rel="e:bgPlace,w:2">居中</a>
-						<a href="#" class="<?php if(isset($customSkin['align'])&&$customSkin['align']=='3') echo 'cur'?>" rel="e:bgPlace,w:3">居右</a>
+					<a href="#" class="<?php if(isset($customSkin['align'])&&$customSkin['align']=='1') echo 'cur'?>" rel="e:bgPlace,w:1"><?php LO('modules__userSkin__left');?></a>
+					<a href="#" class="<?php if(isset($customSkin['align'])&&$customSkin['align']=='2') echo 'cur'?>" rel="e:bgPlace,w:2"><?php LO('modules__userSkin__align');?></a>
+					<a href="#" class="<?php if(isset($customSkin['align'])&&$customSkin['align']=='3') echo 'cur'?>" rel="e:bgPlace,w:3"><?php LO('modules__userSkin__right');?></a>
 					</div>
 				</div>
 			</div>	
@@ -161,7 +161,7 @@
 				</div>
 			
 				<div class="color-scheme">
-					<p>你还可以选择配色方案，丰富背景和字体颜色</p>
+				<p><?php LO('modules__userSkin__chooseScheme');?></p>
 					<div class="color-draw">
 						<div class="color-area" id="color-area">
 							<?php
@@ -171,19 +171,19 @@
 							}
 							if(isset($autoColor)&&$autoColor&&count($printColor)==5):
 							?>
-							<a href="#" rel="e:cls,t:0" key="<?php echo $printColor[0]?>" class="cur" title="主链接色"><span style="background:#<?php echo $printColor[0]?>;"></span></a>
-							<a href="#" rel="e:cls,t:1" key="<?php echo $printColor[1]?>" title="辅链接色"><span style="background:#<?php echo $printColor[1]?>;"></span></a>
-							<a href="#" rel="e:cls,t:2" key="<?php echo $printColor[2]?>" title="主背景色"><span style="background:#<?php echo $printColor[2]?>;"></span></a>
-							<a href="#" rel="e:cls,t:3" key="<?php echo $printColor[3]?>" title="标题字体色"><span style="background:#<?php echo $printColor[3]?>;"></span></a>
-							<a href="#" rel="e:cls,t:4" key="<?php echo $printColor[4]?>" title="主文字色"><span style="background:#<?php echo $printColor[4]?>;"></span></a>
+							<a href="#" rel="e:cls,t:0" key="<?php echo $printColor[0]?>" class="cur" title="<?php LO('modules__userSkin__linkColor');?>"><span style="background:#<?php echo $printColor[0]?>;"></span></a>
+							<a href="#" rel="e:cls,t:1" key="<?php echo $printColor[1]?>" title="<?php LO('modules__userSkin__sublinkColor');?>"><span style="background:#<?php echo $printColor[1]?>;"></span></a>
+							<a href="#" rel="e:cls,t:2" key="<?php echo $printColor[2]?>" title="<?php LO('modules__userSkin__mainBgColor');?>"><span style="background:#<?php echo $printColor[2]?>;"></span></a>
+							<a href="#" rel="e:cls,t:3" key="<?php echo $printColor[3]?>" title="<?php LO('modules__userSkin__titleFontColor');?>"><span style="background:#<?php echo $printColor[3]?>;"></span></a>
+							<a href="#" rel="e:cls,t:4" key="<?php echo $printColor[4]?>" title="<?php LO('modules__userSkin__mainContentColor');?>"><span style="background:#<?php echo $printColor[4]?>;"></span></a>
 							<?php
 							else:
 							?>
-							<a href="#" rel="e:cls,t:0" key="0082cb" class="cur" title="主链接色"><span style="background:#0082cb;"></span></a>
-							<a href="#" rel="e:cls,t:1" key="44b1da" title="辅链接色"><span style="background:#44b1da;"></span></a>
-							<a href="#" rel="e:cls,t:2" key="8dd7f5" title="主背景色"><span style="background:#8dd7f5;"></span></a>
-							<a href="#" rel="e:cls,t:3" key="000" title="标题字体色"><span style="background:#000;"></span></a>
-							<a href="#" rel="e:cls,t:4" key="444" title="主文字色"><span style="background:#444;"></span></a>
+							<a href="#" rel="e:cls,t:0" key="0082cb" class="cur" title="<?php LO('modules__userSkin__linkColor');?>"><span style="background:#0082cb;"></span></a>
+							<a href="#" rel="e:cls,t:1" key="44b1da" title="<?php LO('modules__userSkin__sublinkColor');?>"><span style="background:#44b1da;"></span></a>
+							<a href="#" rel="e:cls,t:2" key="8dd7f5" title="<?php LO('modules__userSkin__mainBgColor');?>"><span style="background:#8dd7f5;"></span></a>
+							<a href="#" rel="e:cls,t:3" key="000" title="<?php LO('modules__userSkin__titleFontColor');?>"><span style="background:#000;"></span></a>
+							<a href="#" rel="e:cls,t:4" key="444" title="<?php LO('modules__userSkin__mainContentColor');?>"><span style="background:#444;"></span></a>
 							<?php
 							endif;
 							?>

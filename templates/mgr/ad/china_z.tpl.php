@@ -30,7 +30,7 @@ function replaceAll() {
 						<p>2，请将网站Appkey填入以下输入框，并点击“更新广告位”按钮，所有付费广告将立刻生效展现。</p>
                     	<label for="focus-title">
 						    AppKey:
-                        	<input type="text" name="code" class="input-box home-focus-w" value="<?php echo $ad_site_id;?>"/>
+                        	<input type="text" name="code" class="input-txt home-focus-w" value="<?php echo $ad_site_id;?>"/>
                         </label>
 						<span class="sub-tips sub-tips-block">请务必输入真实的AppKey，有任何问题，请联系ChinaZ联盟</span>
                     </div>

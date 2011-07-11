@@ -11,7 +11,9 @@
 
 class file_io
 {
-	var $err = "";
+	var $err 	 = "";
+	var $logType = 'io';
+	
 	function file_io() {
 		
 	}
@@ -20,41 +22,63 @@ class file_io
 		
 	}
 	
-	function write($file, $data, $append = false){
+	function write($file, $data, $append = false)
+	{
+		$log_func_start_time = microtime(TRUE);
+		
 		if (!file_exists($file)){
-			if (!$this->mkdir(dirname($file))) return false;
+			if (!$this->mkdir(dirname($file))) {
+				LOGSTR($this->logType, "[write]Can not create the folder, File=$file", LOG_LEVEL_ERROR);
+				return false;
+			}
 		}
 		$len  = false;
 		$mode = $append ? 'ab' : 'wb';
 		$fp = @fopen($file, $mode);
 		if (!$fp) {
-			LOGSTR('io', 'fopen file error,file:' . $file);
+			LOGSTR($this->logType, '[write]fopen file error,file:'.$file, LOG_LEVEL_ERROR);
 			exit("Can not open file $file !");
 		}
 		flock($fp, LOCK_EX);
 		$len = @fwrite($fp, $data);
 		flock($fp, LOCK_UN);
 		@fclose($fp);
+		
+		LogMgr::warningLog($log_func_start_time, $this->logType, "[write]file=$file&result=$len", LOG_LEVEL_WARNING);
+		LOGSTR($this->logType, "[write]file=$file&result=$len", LOG_LEVEL_INFO, array(), $log_func_start_time);
 		return $len;
 	}
 	
 	function read($file) {
+		$log_func_start_time = microtime(TRUE);
+		
 		if (!file_exists($file)){
+			LOGSTR($this->logType, "[read]File not exists, File=$file", LOG_LEVEL_ERROR);
 			return false;
 		}
 		if (!is_readable($file)) {
-			LOGSTR('io', 'file can not be read,file:' . $file);
+			LOGSTR($this->logType, '[read]file can not be read,file:'.$file, LOG_LEVEL_ERROR);
 			return false;
 		}
+		
+		$result = '';
 		if (function_exists('file_get_contents')){
-			return file_get_contents($file);
+			$result = file_get_contents($file);
 		}else{
-			return (($contents = file($file))) ? implode('', $contents) : false; 
+			$result = (($contents = file($file))) ? implode('', $contents) : false; 
 		}
+		
+		LogMgr::warningLog($log_func_start_time, $this->logType, "[read]file=$file", LOG_LEVEL_WARNING);
+		LOGSTR($this->logType, "[read]Input:file=$file", LOG_LEVEL_INFO, array(), $log_func_start_time);
+		return $result;
 	}
 	
 	/// get files and dirs not use recursion
-	function ls($dir,$r=false,$info=false) {
+	function ls($dir,$r=false,$info=false) 
+	{
+		LOGSTR($this->logType, "[ls]Input: dir=$dir&recursion=$r&info=$info", LOG_LEVEL_INFO);
+		$log_func_start_time = microtime(TRUE);
+		
 		if (empty($dir)) $dir = '.';
 		if(!file_exists($dir) || !is_dir($dir)){return false;}
 		$fs = array();
@@ -72,23 +96,38 @@ class file_io
 				}
 			}
 		}
+		LogMgr::warningLog($log_func_start_time, $this->logType, "[ls]dir=$dir&recursion=$r&info=$info", LOG_LEVEL_WARNING);
+		LOGSTR($this->logType, "[ls]Output", LOG_LEVEL_INFO, $fs, $log_func_start_time);
 		return $fs;
 	}
 	
-	function mkdir($path) {
+	
+	function mkdir($path) 
+	{
+		LOGSTR($this->logType, "[mkdir]Input: path=$path", LOG_LEVEL_INFO);
+		$log_func_start_time = microtime(TRUE);
+		
 		$rst = true;
 		if (!file_exists($path)){
 			$this->mkdir(dirname($path));
 			$rst = @mkdir($path, 0777);
 		}
+		
+		LogMgr::warningLog($log_func_start_time, $this->logType, "[mkdir]Input: path=$path", LOG_LEVEL_WARNING);
+		LOGSTR($this->logType, "[mkdir]Output", LOG_LEVEL_INFO, array('rst'=>$rst), $log_func_start_time);
 		return $rst;
 	}
 	
-	function rm($path){
+	
+	function rm($path)
+	{
+		LOGSTR($this->logType, "[rm]Input: path=$path", LOG_LEVEL_INFO);
+		$log_func_start_time = microtime(TRUE);
+		
 		$path = rtrim($path,'/\\ ');
 		if ( !is_dir($path) ){ return @unlink($path); }
 		if ( !$handle= opendir($path) ){ 
-			LOGSTR('io', 'opendir error,dir:' . $path);
+			LOGSTR($this->logType, '[rm]opendir error,dir:'.$path, LOG_LEVEL_ERROR);
 			return false; 
 		}
 		
@@ -99,17 +138,20 @@ class file_io
 				$this->rm($file);
 			} else {
 				if(!@unlink($file)){
-					LOGSTR('io','delete file error when delete dir,file:'.$file);
+					LOGSTR($this->logType,'[rm]delete file error when delete dir,file:'.$file, LOG_LEVEL_ERROR);
 					return false;
 				}
 			}
-
 		}
+		
 		closedir($handle);
 		if(!rmdir($path)){
-			LOGSTR('io', 'delete dir error,dir:'. $path);
+			LOGSTR($this->logType, '[rm]delete dir error,dir:'.$path, LOG_LEVEL_ERROR);
 			return false;
 		}
+		
+		LogMgr::warningLog($log_func_start_time, $this->logType, "[rm]Input: path=$path", LOG_LEVEL_WARNING);
+		LOGSTR($this->logType, "[rm]Rm success", LOG_LEVEL_INFO, array(), $log_func_start_time);
 		return true;
 	}
 	
@@ -128,6 +170,8 @@ class file_io
 			"write"		=> is_writable($path)
 			);
 		clearstatcache();
+		
+		LOGSTR($this->logType, "[info]Input:path=$path&key=$key", LOG_LEVEL_INFO, array('Output'=>$key?$result[$key]:$result));
 		return $key ? $result[$key] : $result;
 	}
 }

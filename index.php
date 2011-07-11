@@ -14,7 +14,7 @@ ob_start();
 /// 入口名称
 define('ENTRY_SCRIPT_NAME','index');
 /// 当前入口的默认模块路由
-define('R_DEF_MOD', "index");
+define('R_DEF_MOD', "pub");
 /// 强制的路由模式　如果你尝试使用　rewrite　功能　失败，可以通过此选项快速恢复网站正常
 //define('R_FORCE_MODE', 0);
 
@@ -22,7 +22,7 @@ define('R_DEF_MOD', "index");
 require_once 'application/init.php';
 
 ///检查是否安装
-if (XWB_SERVER_ENV_TYPE!=='sae' && !WB_AKEY ) {
+if (XWB_SERVER_ENV_TYPE!=='sae' && (!WB_AKEY) ) {
 	header("Location: install/index.php");
 	exit;
 }
@@ -43,7 +43,13 @@ $GLOBALS[V_GLOBAL_NAME]['MIX_TPL'] = TRUE;
 APP::addPreDoAction('apiStop.check', 'c', false, array('welcome.retry'));// 检查API是否中
 APP::addPreDoAction('account.initSiteInfo',	 'm', false, array('pipe.t'));
 APP::addPreDoAction('account.allowedLogin',	 'm', false,array('account.logout'));
-APP::addPreDoAction('account.gloCheckLogin', 'm', false, array('feedback.*','custom.*','welcome.retry', 'pipe.t','authImage.paint', 'search.recommend', 'account.*', 'pub', 'pub.*', 'api/*', 'output.*','setting.getSkin'));
+
+if ( USER::sys('sysLoginModel') ) {
+	APP::addPreDoAction('account.gloCheckLogin', 'm', false, array('feedback.*','welcome.retry', 'pipe.t','authImage.paint', 'account.*', 'api/*', 'output.*','setting.getSkin', 'interview.*', 'live.*'));
+} else {
+	APP::addPreDoAction('account.gloCheckLogin', 'm', false, array('feedback.*','custom.*','welcome.retry', 'pipe.t','authImage.paint', 'account.*', 'pub', 'pub.*', 'api/*', 'output.*','setting.getSkin', 'interview.*', 'live.*'));
+}
+
 /// 初始化应用程序
 APP::init();
 //---------------------------------------------------------
@@ -289,6 +295,33 @@ APP::addPreDoAction('test_func','f', array(1,2,3,4,5));
 “_after_  +  action名”	的方法 会在 action 执行完成后被执行，如果中途执行了 exit  或者 reidirect 则可能被忽略
 */
 //---------------------------------------------------------
+
+/*
+XWEIBO XCACHE 　控制器级的缓存HOOK(全页面缓存功能兼容XPIPE)　功能　
+"_xcache_ +  action名”	的方法 会在 action 执行前被执行,此方法返回缓存选项,用于实现控制器缓存
+注：要使用控制器级的缓存HOOK，请在所有　缓冲输出控制函数　ob_*fulsh()　前;
+把缓存内容提交给 APP::xcache($contents); 函数
+
+设置或者获取当前GET请求的缓存选项
+APP::xcacheOpt($cacheOpt);
+
+可以通知　XCACHE　不再缓存当前页面
+通知代码为：
+APP::xcacheOpt(false);
+DS发生错误后会自动通知　XCACHE　不再缓存当前HTML页面
+
+
+CTRL_CACHE_HOOK_ENABLE 常量可以控制关闭此功能
+
+APP::requestKey() 可获取请求标识，虽可偷懒，不建议直接使用
+
+缓存HOOK函数实例
+function _xcache_mfunc(){
+	return  array('K'=>APP::requestKey(), 'T'=>20);
+}
+*/
+
+
 /*
 验证码使用 不区分大小写 每次重新加载图片会自动更改
 图片标签：

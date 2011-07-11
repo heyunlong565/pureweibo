@@ -4,32 +4,52 @@ require_once dirname(__FILE__). '/component_abstract.pls.php';
 /**
  * 明星推荐列表
  * @author yaoying
- * @version $Id: component_2.pls.php 11912 2011-03-23 08:43:59Z yaoying $
+ * @version $Id: component_2.pls.php 16917 2011-06-08 07:39:22Z jianzhou $
  * 
  */
-class component_2_pls extends component_abstract_pls{
+class component_2_pls extends component_abstract_pls
+{
 	
-	function run($mod){
+	function run($mod)
+	{
 		parent::run($mod);
 		
-		$ret = DR('components/star.get', 'g/300', $mod['param']);
+		//取缓存
+		$isLogin   = USER::isUserLogin();
+		$cacheTime = V('-:tpl/cache_time/pagelet_component2');
+		$dataTime  = $isLogin ? "g/$cacheTime" : FALSE;
+		$cacheKey  = $isLogin ? FALSE : "component2#".md5( serialize($mod) );
+		if(ENABLE_CACHE && $cacheKey && ($content=CACHE::get($cacheKey)) ) 
+		{
+		    echo $content; return;
+		}
+		
+		
+		$ret = DR('components/star.get', $dataTime, $mod['param']);
 		if ($ret['errno']) {
-			$this->_error('components/star.get 返回API错误：'. $ret['err']. '('. $ret['errno']. ')');
+			$this->_error(L('pls__component2__star__apiError', $ret['err'], $ret['errno']));
+			//$this->_error('components/star.get 返回API错误：'. $ret['err']. '('. $ret['errno']. ')');
 			return;
 	 	}elseif(empty($ret['rst'])){
-			$this->_error('components/star.get 无数据。');
+			$this->_error(L('pls__component2__star__dbError'));
 			return;
 	 	}elseif(!is_array($ret['rst'])){
-			$this->_error('components/star.get 返回错误的非数组类型数据。');
+			$this->_error(L('pls__component2__star__Error'));
 			return;
 	 	}
 	 	
 		$followedList = $this->_generateFollowedList($ret['rst']);
 		
-		TPL::module('component/component_' . $mod['component_id'], array('mod' => $mod, 'rs' => $ret['rst'], 'followedList' => $followedList));
 		
+		// 设置缓存
+		$content = TPL::module('component/component_'.$mod['component_id'], array('mod'=>$mod, 'rs'=>$ret['rst'], 'followedList'=>$followedList), false);
+		if (ENABLE_CACHE && $cacheKey && $content) {
+			CACHE::set($cacheKey, $content, $cacheTime);
+		}
 		
+		echo $content; return;
 	}
+	
 	
 	/**
 	 * 生成本组件内的用户rst数组资源内已经关注的用户数组，类型为：

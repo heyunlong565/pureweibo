@@ -31,11 +31,11 @@
 		<h3 class="title">系统信息</h3>
 		<div class="box">
 			<div class="btn-group clear">
-				<p>Xweibo版本：xweibo标准版2.0</p>
-				<a class="general-btn" href="http://weibo.com/xweibo" target="_blank"><span>关注Xweibo官方</span></a>
-				<a class="general-btn" href="http://x.weibo.com/index.php/help" target="_blank"><span>帮助中心</span></a>
-				<a class="general-btn" href="http://x.weibo.com/index.php/cooperation" target="_blank"><span>联系客服 </span></a>
-				<a class="general-btn" href="mailto:xweibo@vip.sina.com"><span>意见反馈</span></a>
+				<p>Xweibo版本：xweibo标准版<?php echo WB_VERSION;?></p>
+				<a class="btn-general" href="http://weibo.com/xweibo" target="_blank"><span>关注Xweibo官方</span></a>
+				<a class="btn-general" href="http://x.weibo.com/index.php/help" target="_blank"><span>帮助中心</span></a>
+				<a class="btn-general" href="http://x.weibo.com/index.php/cooperation" target="_blank"><span>联系客服 </span></a>
+				<a class="btn-general" href="mailto:xweibo@vip.sina.com"><span>意见反馈</span></a>
 			</div>
 		</div>
 		<h3 class="title">官方动态</h3>

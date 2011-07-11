@@ -40,8 +40,7 @@ class adminCom {
 		if ($keyword) {
 				$where = ' WHERE `sina_uid` = ' . $keyword;
 		}
-
-		$sql = 'SELECT * FROM ' . $db->getPrefix() . T_ADMIN . $where . ' ORDER BY `id` LIMIT ' . $offset . ',' . $each;
+		$sql = 'SELECT * FROM ' . $db->getPrefix() . T_ADMIN . ' LEFT JOIN ' . $db->getTable(T_ADMIN_GROUP) . ' ON group_id=gid' . $where . ' ORDER BY `id` LIMIT ' . $offset . ',' . $each;
 		return RST($db->query($sql));
 	}
 
@@ -50,14 +49,14 @@ class adminCom {
      * @param int $id
      * @return boolean
      */
-	function delAdmin($id) {
+	function delAdmin($id, $is_sina_uid = false) {
 		if (!is_numeric($id)) {
 			return RST(false, $errno=1210002, $err='Parameter must be a number');
 		}
 		$this->_cleanCache();
 		$db = APP :: ADP('db');
 		$db->setTable(T_ADMIN);
-		return RST($db->delete($id));
+		return RST($db->delete($id, '', $is_sina_uid?'sina_uid':'id'));
 
 	}
 
@@ -92,6 +91,17 @@ class adminCom {
 		$db = APP :: ADP('db');
 		$db->setTable(T_ADMIN);
         return RST($db->save($data, $id));
+	}
+
+	/**
+	 * 得到组信息
+	 *@param $group_id int
+	 *@return array
+	 */
+	function getGroupInfo($group_id) {
+		$db = APP :: ADP('db');
+		$rs = $db->get($group_id, T_ADMIN_GROUP, 'gid');
+		return RST($rs);
 	}
 
 	/*

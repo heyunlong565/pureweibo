@@ -4,21 +4,34 @@ require_once dirname(__FILE__). '/component_abstract.pls.php';
 /**
  * 用户推荐模块
  * @author yaoying
- * @version $Id: component_3.pls.php 15738 2011-05-12 01:13:05Z qiping $
+ * @version $Id: component_3.pls.php 16917 2011-06-08 07:39:22Z jianzhou $
  *
  */
-class component_3_pls extends component_abstract_pls{
+class component_3_pls extends component_abstract_pls
+{
 	
-	function run($mod){
+	function run($mod)
+	{
 		parent::run($mod);
 		
-		$ret = DR('components/recommendUser.get', 'g/300', $mod['param']);
+		//取缓存
+		$isLogin   = USER::isUserLogin();
+		$cacheTime = V('-:tpl/cache_time/pagelet_component3');
+		$dataTime  = $isLogin ? "g/$cacheTime" : FALSE;
+		$cacheKey  = $isLogin ? FALSE : "component3#".md5( serialize($mod) );
+		if(ENABLE_CACHE && $cacheKey && ($content=CACHE::get($cacheKey)) ) 
+		{
+		    echo $content; return;
+		}
+		
+		
+		$ret = DR('components/recommendUser.get', $dataTime, $mod['param']);
 		
 		if ($ret['errno']) {
 			//$this->_error('components/recommendUser.get 返回API错误：'. $ret['err']. '('. $ret['errno']. ')');
 			return;
 	 	}elseif(!is_array($ret['rst'])){
-			$this->_error('components/recommendUser.get 返回错误的非数组类型数据。');
+			$this->_error(L('pls__component3__recommentUser__getError'));
 			return;
 	 	}elseif(empty($ret['rst'])){
 			//$this->_error('components/recommendUser.get 无数据。');
@@ -31,8 +44,15 @@ class component_3_pls extends component_abstract_pls{
 			$rs[]=$row;
 		}		
 		$rs = APP::F('user_filter', $rs);
-		TPL::module('component/component_' . $mod['component_id'], array('mod' => $mod, 'rs' => $rs, 'followedList' => $followedList));
 		
+		
+		// 设置缓存
+		$content = TPL::module('component/component_'.$mod['component_id'], array('mod'=>$mod, 'rs'=>$rs, 'followedList'=>$followedList), false);
+		if (ENABLE_CACHE && $cacheKey && $content) {
+			CACHE::set($cacheKey, $content, $cacheTime);
+		}
+		
+		echo $content; return;
 	}
 	
 	/**

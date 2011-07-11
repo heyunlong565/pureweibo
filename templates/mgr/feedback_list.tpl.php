@@ -57,11 +57,11 @@ $(function() {
 		<div class="set-area">
 			<table width="100%" border="0" cellpadding="0" cellspacing="0" class="table">
 				<colgroup>
-					<col class="h-w70" />
+					<col class="w70" />
 					<col />
-					<col class="h-w140" />
-					<col class="h-w170" />
-					<col class="h-w100" />
+					<col class="w140" />
+					<col class="w170" />
+					<col class="w100" />
 				</colgroup>
 				<thead class="tb-tit-bg">
 					<tr>

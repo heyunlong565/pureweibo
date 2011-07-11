@@ -8,13 +8,13 @@
 <body <?php F('wap_font_set'); ?>>
 <?php TPL::plugin('wap/include/top_logo', '', false); ?>
 <form action="<?php echo WAP_URL('account.doLogin'); ?>" method="post">
-新浪微博账号:<br/><input type="text" name="account" size="30" value=""/>
+<?php LO('account__sinaLogin__label_sinaAccount');?><br/><input type="text" name="account" size="30" value=""/>
 <br/>
-密码:<br/><input type="password" name="password" size="30" value=""/><br/>
+<?php LO('account__sinaLogin__label_sinaPassword');?><br/><input type="password" name="password" size="30" value=""/><br/>
 <input type="hidden" name="backURL" value="<?php echo F('escape', $backURL); ?>" />
 <input type="hidden" name="loginType" value="2" />
-<input type="submit" name="submit" value="登录" /><br/>
+<input type="submit" name="submit" value="<?php LO('account__sinaLogin__btnLogin');?>" /><br/>
 </form>
-<?php if ($login_way == 3): ?><a href="<?php echo WAP_URL('account.showLogin', 'lt=1'); ?>">使用<?php echo F('escape', $site_name, ENT_QUOTES); ?>账号登录</a><?php endif; ?>
+<?php if ($login_way == 3): ?><a href="<?php echo WAP_URL('account.showLogin', 'lt=1'); ?>"><?php LO('account__sinaLogin__lable_loginType', F('escape', $site_name, ENT_QUOTES));?></a><?php endif; ?>
 </body>
 </html>

@@ -24,7 +24,8 @@ var
 	getCfg = X.getCfg,
 	getUid = X.getUid,
 	getWb = X.getWb,
-	setWb = X.setWb;
+	setWb = X.setWb,
+    getText = X.lang.getText;
 
 if(!X.mod)
     X.mod = {};
@@ -271,20 +272,20 @@ var inst = X.use('Dlg', {
     appendTo : doc.body,
     autoCenter : true,
     dlgContentHtml : 'ForwardDlgContentHtml',
-    title:'转发到我的微博',
+    title: getText('转发到我的微博'),
     defBtn : 'forward',
     buttons : [
-        {title:'转 发', id:'forward'},
-        {title:'取 消', id:'cancel'}
+        {title: getText('转 发'), id:'forward'},
+        {title: getText('取 消'), id:'cancel'}
     ],
 
     checkText : function(){
         var v = $.trim( this.jqInputor.val() );
         var left = Util.calWbText(v);
         if (left >= 0)
-            this.jqWarn.html('您还可以输入'+left+'字');
+            this.jqWarn.html(getText('您还可以输入{0}字', left));
         else
-            this.jqWarn.html('已超出'+Math.abs(left)+'字');
+            this.jqWarn.html( getText( '已超出{0}字', Math.abs(left) ) );
         this.jqWarn.checkClass(exceedCS,left<0);
         return left>=0 && v;
     },
@@ -365,7 +366,7 @@ var inst = X.use('Dlg', {
         
         var v = this.checkText();
         if( v  === '' ){
-            v = '转发微博';
+            v = getText( '转发微博' );
         }else if( !v ){
             this.jqInputor.focus();
             this.isLoading = false;
@@ -378,19 +379,24 @@ var inst = X.use('Dlg', {
         });
         
         var d = this._predCfg;
+		var param = $.extend( {_route:X.getModule() },this.getParam());
         Util.disable( this.getButton('forward') , true);
-        Req.repost(d.id, v, uids.join(','), Util.getBind(this, 'onSubmitLoad'), { data : {_route:X.getModule() }});
+        Req.repost(d.id, v, uids.join(','), Util.getBind(this, 'onSubmitLoad'), { data : param });
     },
-    
+	
+    getParam : function(){
+		return {};
+	},
+	
     onSubmitLoad : function( e ){
         
         Util.disable( this.getButton('forward') , false);
         this.close();
         // todo : 关闭在tip隐藏后
         if(e.isOk()){
-            MB.tipOk('转发成功');
+            MB.tipOk(getText('转发成功'));
         }
-        else MB.tipWarn(e.getCode() == '1040016' ? '抱歉，目前微博转发功能暂不可用，请联系网站管理员！': e.getMsg());
+        else MB.tipWarn( e.getMsg( null, getText('微博转发') ));
         this.isLoading = false;
     },
     
@@ -485,13 +491,20 @@ ui.getFlash = function(opts, conf) {
 ui.WbElement = X.reg('WbElement', Util.create(Base,{
 	//this.$wb jQuery li微博对象
 	//this.wbData 数据对象
+    
+    //状态 0：正常 1：审核中
+    state : 0,
 
 	init: function() {
 		Base.prototype.init.apply(this, arguments);
 
 		this.picLoadState = 0;
 
-		this.isFw = this.wbData.rt ? 1: 0;
+        if (!this.state) {
+		    this.isFw = this.wbData.rt ? 1: 0;
+        } else {
+            this.isFw = this.$wb.find('.forward').length ? 1: 0;
+        }
 
 		this.$preview = this.$wb.find('div.preview-img');
 
@@ -551,19 +564,33 @@ ui.WbElement = X.reg('WbElement', Util.create(Base,{
 	closeVideo: function() {
 		this.switchView('video', 0);
 	},
+    
+    picSrc : function($type)
+    {
+        var $url, $type = $type || 'bmiddle';
+        
+        if (!this.state) {
+            var  wbData = this.wbData, data = this.isFw ? wbData.rt : wbData;
+            $url = data[$type == 'thumbnail' ? 'mp': 'op'];            
+        } else {
+            var $no = Math.ceil(Math.random()*4);
+                
+            $url = 'http://ww' + $no + '.sinaimg.cn/' + $type + '/' + this.psrc + '.jpg';
+        }
+        
+        return $url;
+    },
+
 
 	loadPic: function() {
 		this.picLoadState = 1;
 
 		var self = this, wbData = this.wbData;
-
-		var cfg = this.isFw ? {
-			org: wbData.rt['op'],
-			img: wbData.rt['mp']
-		}: {
-			org: wbData['op'],
-			img: wbData['mp']
-		};
+        
+        var cfg = {
+            org : this.picSrc('large'),
+            img : this.picSrc('bmiddle')
+        }
 
 //		cfg.fw = this.isFw;
 
@@ -672,7 +699,7 @@ ui.WbElement = X.reg('WbElement', Util.create(Base,{
 				this.$picBox && this.$picBox.hide();
 			} else if (type == 'video')
 			{
-				this.$video && this.$video.remove();
+				this.$video && this.$video.remove();				
 				this.$video = null;
 			}
 
@@ -730,9 +757,9 @@ mod.CmtBox = X.reg('CmtBox', Util.create(Base, {
         var left = Util.calWbText(val,70);
         var jqWarn = this.jqWarn;
         if (left >= 0)
-            jqWarn.html('还可以输入'+left+'个字');
+            jqWarn.html( getText('您还可以输入{0}字', left) );
         else
-            jqWarn.html('已超出'+Math.abs(left)+'个字');
+            jqWarn.html( getText('已超出{0}字', Math.abs(left)) );
 
         jqWarn.checkClass(this.exceedCS,left<0);
         
@@ -753,8 +780,9 @@ mod.CmtBox = X.reg('CmtBox', Util.create(Base, {
                 if(this.sndBtn) 
                     Util.disable( this.sndBtn , true );
                 this.sending   = true;
-                var replyCmtId = this.jqInputor.data('xwb_reply_cid');
-                if( replyCmtId && /^回复@.*?:/.test(v) )
+                var replyCmtId = this.jqInputor.data('xwb_reply_cid'),
+                    regx = new RegExp('^' + getText('回复') + '@.*?:');
+                if( replyCmtId && regx.test(v) )
                     Req.reply(
                       this.wbId, 
                       replyCmtId, 
@@ -786,7 +814,8 @@ mod.CmtBox = X.reg('CmtBox', Util.create(Base, {
                 this.pCt.postWeibo(data.wb, data.html);
             }
         }else {
-            MB.tipWarn(e.getCode() == 1040016 ? '抱歉，目前评论功能不可用，请联系网站管理员！': e.getMsg());
+            MB.tipWarn( e.getMsg(null, getText('评论') ) );
+			if( e.getCode() == '30000' ) this.reset();
         }
         if(!this.pCt.afterNofocus)
         	this.jqInputor.focus();
@@ -798,9 +827,9 @@ mod.CmtBox = X.reg('CmtBox', Util.create(Base, {
     reply : function(cmtId, nick){
         var holder = this.selectionHolder, 
             jq     = this.jqInputor,
-            rex    = /^回复@.*?:/;
+            rex    = new RegExp('^' + getText('回复') + '@.*?:');
         this.reset();
-        holder.setText('回复@' + nick + ':' + jq.val().replace(rex, ''));
+        holder.setText( getText('回复') + '@' + nick + ':' + jq.val().replace(rex, ''));
         jq.data('xwb_reply_cid', cmtId);
         this.checkText();
         setTimeout(function(){ holder.focusEnd(); }, 0);
@@ -932,7 +961,7 @@ mod.CommentArea = X.reg('CmtArea', Util.create(Base, {
         this.updateCmtCountUI(1, true);
         // 解析评论里的短链接
         X.mod.shortlink.render(jq, function(urlInfo, aHref){
-            aHref.title = urlInfo && urlInfo.url || '无效链接';
+            aHref.title = urlInfo && urlInfo.url || getText('无效链接');
         });
     },
     
@@ -984,7 +1013,7 @@ mod.CommentArea = X.reg('CmtArea', Util.create(Base, {
         }
         // 解析评论里的短链接
         X.mod.shortlink.render(this.jqCmtCt, function(urlInfo, aHref){
-            aHref.title = urlInfo && urlInfo.url || '无效链接';
+            aHref.title = urlInfo && urlInfo.url || getText('无效链接');
         });
     },
     
@@ -1012,12 +1041,14 @@ mod.CommentArea = X.reg('CmtArea', Util.create(Base, {
     
     updateCmtCountUI : function(count, cal){
         if( this.trigEl ){
+            var txt = getText('评论');
+            
             if(cal===undefined){
-                $ (this.trigEl).text('评论('+count+')');
+                $ (this.trigEl).text( txt + '('+count+')');
                 this.cmtCount = count;
             }else { 
                 this.cmtCount += count;
-                $ (this.trigEl).text('评论('+this.cmtCount+')');
+                $ (this.trigEl).text( txt + '('+this.cmtCount+')');
             }
         }
     },
@@ -1045,7 +1076,7 @@ mod.CommentArea = X.reg('CmtArea', Util.create(Base, {
     
     onDelTrig : function(e){
         var self = this;
-        MB.anchorConfirm(e.src, '确定要删除该评论吗？', function(bid){
+        MB.anchorConfirm(e.src, getText('确定要删除该评论吗？'), function(bid){
             if(bid === 'ok' && !self.deletingCmt){
                 self.deletingCmt = true;
                 Req.delComment(e.get('c'), function(re){
@@ -1124,7 +1155,7 @@ mod.MBlogCmtArea = X.reg('MBlogCmtArea', Util.create(mod.CommentArea, {
         }
         // 解析评论里的短链接
         X.mod.shortlink.render(this.jqCmtCt, function(urlInfo, aHref){
-            aHref.title = urlInfo && urlInfo.url || '无效链接';
+            aHref.title = urlInfo && urlInfo.url || getText('无效链接');
         });
     },
     
@@ -1166,7 +1197,7 @@ mod.MBlogCmtArea = X.reg('MBlogCmtArea', Util.create(mod.CommentArea, {
         this.topCmtBox.jqInputor.focus();
         // 解析评论里的短链接
         X.mod.shortlink.render(jq, function(urlInfo, aHref){
-            aHref.title = urlInfo && urlInfo.url || '无效链接';
+            aHref.title = urlInfo && urlInfo.url || getText('无效链接');
         });
     },
     
@@ -1820,9 +1851,9 @@ mod.PostBase = {
         var v = $.trim( this.jqInputor.val() );
         var left = Util.calWbText(v);
         if (left >= 0)
-            this.jqWarn.html('您还可以输入<span>'+left+'</span>字');
+            this.jqWarn.html( getText('您还可以输入{0}字', '<span>' + left + '</span>') );
         else
-            this.jqWarn.html('已超出<span>'+Math.abs(left)+'</span>字');
+            this.jqWarn.html( getText('已超出{0}字', '<span>' + ( - left ) + '</span>'));
             
         this.jqWarn.checkClass(exceedCS,left<0);     
         return left>=0 && v;
@@ -1841,7 +1872,7 @@ mod.PostBase = {
         }
     },
     
-    TOPIC_TIP : '请在这里输入自定义话题',
+    TOPIC_TIP : getText('请在这里输入自定义话题'),
     
     insertTopic : function(topic){
         if(!topic)
@@ -1929,12 +1960,12 @@ mod.PostBase = {
         }
 
         if( this.getUploader().isLoading() ){
-            MB.tipWarn('图片正在上传，请稍候..');
+            MB.tipWarn( getText('图片正在上传，请稍候..') );
             return;
         }
         
         if(this.sending){
-            MB.tipWarn('正在发布,请稍候..');
+            MB.tipWarn( getText('正在发布,请稍候..') );
             return;
         }
         
@@ -1973,7 +2004,7 @@ mod.PostBase = {
         
         if( !fn || !this.checkImg(fn) ){
             this.jqForm[0].reset();
-            MB.alert('', '只支持 jpg、png、gif格式的图片。', function(){
+            MB.alert('', getText('只支持{0}格式的图片。', 'jpg、png、gif') , function(){
                 self.jqInputor.focus();
             });
             return ;
@@ -1987,15 +2018,18 @@ mod.PostBase = {
     },
     
     onUploadLoad : function(e){
-        if( e.isOk() ){
+		if(typeof e != 'object'){
+			MB.alert('提示', "上传失败!");	
+		}	
+        else if( e.isOk() ){
             var data = e.getData();
             this.uploadPic = data.msg;
             this.jqPhotoName.html(Util.getFileName(this.jqImgFile.val(), 10) + T.get('UploadImgBtn') );
             this.jqPhotoName.cssDisplay(true);
-            !$.trim(this.jqInputor.val()) && this.selectionHolder.setText('分享图片');
+            !$.trim(this.jqInputor.val()) && this.selectionHolder.setText( getText('分享图片') );
             this.checkText();
         }else {
-            MB.alert('', e.getCode() == '1040016' ? '抱歉，目前图片发布功能不可用，请联系网站管理员！': e.getMsg());
+            MB.alert('', e.getMsg( getText('图片发布') ) );
             //this.jqBtnImg.cssDisplay(true);
             //this.jqForm.cssDisplay(true);
             this.$uploadBtn.cssDisplay(1);
@@ -2009,34 +2043,37 @@ mod.PostBase = {
     // 参数二为可选
     onSendLoad : function( e , callback){
         var jqInputor = this.jqInputor;
-        if(e.isOk()){
-            var jqMask = this.jqMask;
-            if(!jqMask){
-                this.jqMask = jqMask = this.jq('#xwb_succ_mask');
-                this.jqMaskPt = jqMask.parent();
+        if(e.isOk() || e.getCode() == '30000'){
+		
+            if(! this.jqMask ){
+                this.jqMask  = { succ: this.jq('#xwb_succ_mask'),veri:this.jq('#xwb_veri_mask') };
+                this.jqMaskPt = this.jqMask.succ.parent();
             }
             
+			var jqMask = e.isOk() ? this.jqMask.succ : this.jqMask.veri;
+			
             jqMask.cssDisplay(true)
                   .show()
                   .appendTo(this.jqMaskPt);
 
             jqInputor.focus();
             var self = this;
+			//动画执行前reset();
+			self.reset();
             jqMask.fadeOut(1800, function(){
                 // 修正IE下滤镜使得层不会隐藏的BUG，
                 // 如果不移除，则不会隐藏
                 jqMask.remove();
                 jqMask[0].style.filter = null;
-                self.reset();
                 callback && callback.call(self, e);
             });
             
             // 发送新微博事件
             // X.fire('wb.create', e.getData(), e);
         }else {
-            MB.alert('', e.getMsg(), function(){
-                Util.focusEnd(jqInputor[0]);
-            });
+			MB.alert('', e.getMsg(), function(){
+				Util.focusEnd(jqInputor[0]);
+			});
             this.sending = false;
         }
     }
@@ -2057,13 +2094,15 @@ X.reg('postBox', function(){
     
     $.extend(inst, {
         
-        title : '发微博',
+        title : getText('发微博'),
         
         closeable : true,
         autoCenter : true,
         appendTo : doc.body,
         
         mask : true,
+		
+		postTitle : 'dd',
         
         cs : 'win-post',
         
@@ -2072,6 +2111,10 @@ X.reg('postBox', function(){
         onViewReady : function(v){
             this.initEx();
         },
+		
+		setPostTitle :function(v){
+			this.jq('#postTitle').html(v);
+		},
         
         onbuttonclick : function(bid){
             if( bid == 'ok'){
@@ -2085,7 +2128,7 @@ X.reg('postBox', function(){
         
         onSendLoad : function(e){
             mod.PostBase.onSendLoad.call(this, e, function(e){
-                if( e.isOk()){
+                if( e.isOk() || e.getCode() == '30000'  ){
                     this.close();
                     // fix bug#334,IE下光标隐藏后不消失
                     this.jqInputor[0].blur();
@@ -2215,7 +2258,7 @@ mod.WeiboList = X.reg('WeiboList', Util.create(Base, {
  * @extends Xwb.ui.Base
  */
 mod.SearchEntry = X.reg('SearchEntry', Util.create(Base, {
-    focusText : '搜微博/找人',
+    focusText : getText('搜微博/找人'),
     focusCs   : 'search-box-focus',
     // 30个字节
     maxLen    : 30,
@@ -2295,10 +2338,10 @@ mod.shortlink = new X.ax.Shortlink({
                         
                         switch(uinf.type){
                             case 'music':
-                                jq.addClass('icon-music-url icon-bg');
+                                jq.addClass('ico-music-url');
                             break;
                             case 'video':
-                                jq.addClass('icon-video-url icon-bg');
+                                jq.addClass('ico-video-url');
                                 //检测是否有preview的div，没就生成
                                 if(fw){
                                     jqPreview = jqFw.find('>div.preview-img');
@@ -2319,7 +2362,7 @@ mod.shortlink = new X.ax.Shortlink({
                         		}
                             break;
                         }
-                    }else jq.attr('title', '无效链接');
+                    }else jq.attr('title', getText('无效链接') );
             	}else {
             	    if(__debug) console.warn('未解析链接：@'+sl+' From '+jq.attr('href')+',请在Xwb.ax.Shortlink.from内添加解析区域');
             	    jq.attr('title', jq.attr('href')||'');
@@ -2345,7 +2388,7 @@ return {
     appendTo:doc.body,
     cs:'win-mes',
     actionMgr : true,
-    title:'发私信',
+    title: getText('发私信'),
     autoCenter : true,
     closeable:true,
     mask:true,
@@ -2377,7 +2420,7 @@ return {
         var v = $.trim(this.jqContent.val()),
             left = Util.calWbText(v, 140);
         this.jqWord.html(
-            left >= 0 ? '您还可以输入'+left+'个字' : '已超出' + Math.abs(left) + '字'
+            left >= 0 ? getText('您还可以输入{0}字', left) : getText('已超出{0}字', Math.abs(left))
         );
         return left>=0 && v;
     },
@@ -2427,10 +2470,10 @@ return {
                     MB.alert('', e.getMsg());
                     break;
                 case 1010005:
-                    alert('内容长度不能超过140个字。');
+                    MB.alert(getText('内容长度不能超过140个字。'));
                     this.jqContent.focus();
                     break;
-                default : msg = e.getMsg();
+                default : msg = e.getMsg(null, '私信' );
             }
             if(msg && this.display()){
                 this.jqWarnPos.cssDisplay(true).text(msg);             
@@ -2446,7 +2489,7 @@ return {
 		if (!user)
 		{
 			self.jqWarnPos.cssDisplay(true)
-                .text('请输入要发送的用户昵称。');
+                .text( getText('请输入要发送的用户昵称。') );
 			return;
 		}
 
@@ -2495,8 +2538,8 @@ return {
         
         if(!content){
             if(!$.trim(this.jqContent.val()).length)
-                MB.tipWarn('请输入私信内容。');
-            else MB.tipWarn('内容长度不能超过140个字。');
+                MB.tipWarn( getText('请输入私信内容。') );
+            else MB.tipWarn( getText('内容长度不能超过140个字。') );
             this.jqContent.focus();
             return;
         }
@@ -2574,8 +2617,27 @@ var inst = X.use('Layer', function(proto){
             }
             
             // 显示主面板
-            if(num && !this.display())
+            if(num && !this.display()){
                 this.display(true);
+				if(!Xwb.util.ie6) this.keepTop();
+			}
+        },
+		
+		keepTop : function() {
+            var $tip = this.jq();
+            function fixPosition(fc) {
+                var scTop = $(document).scrollTop();
+                if (scTop > 30) {				     
+					$tip.css('top','0');
+                } else {
+					$tip.css('top','30px')
+                }
+            }  
+            $(window).scroll(fixPosition);
+            $(window).resize(function(){
+                fixPosition(1);   
+            });
+			fixPosition();//先调用一次调整位置
         },
         
         onclose : function(){
@@ -2622,12 +2684,13 @@ return inst;
 });
 
 
-// 换肤
+ // 换肤
 /**
  * @class Xwb.mod.Skin
  * 提供换肤功能
  * @extends Xwb.ui.Base
  */
+ /*
 X.mod.Skin = function(opt){
     var inst = X.use('base', $.extend({
         
@@ -2712,7 +2775,7 @@ X.mod.Skin = function(opt){
         
     }, opt));
     return inst;
-};
+}; */
 
 /**
  * @class Xwb.mod.feedback
@@ -2738,9 +2801,9 @@ X.reg('feedback', function(opt){
                 validators :{
                 	radio : function(elem,v,data,next){
                 		var mail = $(this.context.form).find('input[name="mail"]').val();
-                		var qq =  $(this.context.form).find('input[name="qq"]').val();
-                		if( mail == '邮箱地址' && qq == 'QQ' ){
-                			data.m = '至少填写一种联系方式';
+                		var qq =  $(this.context.form).find('input[name="tel"]').val();
+                		if( mail == getText('邮箱地址') && qq == getText('联系电话') ){
+                			data.m = getText('至少填写一种联系方式');
                 			this.report(false,data);
                 		} else
                 			this.report(true,data);
@@ -2748,12 +2811,9 @@ X.reg('feedback', function(opt){
                 	}
                 },
                 onsuccess : function(data, next){
-                    Req.feedback(data, function(e){
-                        if(!e.isOk())
-                            MB.tipWarn(e.getMsg());
-                        inst.close();
-                        next();
-                    });
+                    Req.feedback(data, function(){ });
+					inst.close();
+                    next();
                     return false;
                 }
             });
@@ -2765,8 +2825,8 @@ X.reg('feedback', function(opt){
         
         reset : function(){
             this.jq('[name=content]').val('').focus();
-            this.jq('[name=mail]').val('邮箱地址');
-            this.jq('[name=qq]').val('QQ');
+            this.jq('[name=mail]').val( getText('邮箱地址') );
+            this.jq('[name=tel]').val(getText('联系电话'));
             this.jq('#feedbackTip').cssDisplay(false);
         }
     }, opt));
@@ -3025,7 +3085,7 @@ X.reg('addFollow',function(cfg){
 		
 		cs:'add-topic',
 		
-		boxOutterHtml:'<div class="arrow all-bg"></div>',
+		boxOutterHtml:'<div class="arrow"></div>',
 		
 		closeable:true,
 		
@@ -3038,17 +3098,22 @@ X.reg('addFollow',function(cfg){
 					this.close();
 					break;
 				case 'submit':
-					data.lock(1);
-					Req.postReq(Req.apiUrl('action','addSubject'),{text:this.jq('#Content').val()},function(r){
-    					if(r.isOk()){
-    						X.fire('subrefresh',{'subject':self.jq('#Content').val(),type:'add'});
-    						self.close();
-    					} else {
-    						self.jq('.warn').prev('p').addClass('hidden');
-    						self.jq('.warn').removeClass('hidden').html(r.getError());
-    					}
-    					data.lock(0);
-    				});
+					if(Util.byteLen(this.jq('#Content').val())  <= 20){
+						data.lock(1);
+						Req.postReq(Req.apiUrl('action','addSubject'),{text:this.jq('#Content').val()},function(r){
+							if(r.isOk()){
+								X.fire('subrefresh',{'subject':self.jq('#Content').val(),type:'add'});
+								self.close();
+							} else {
+								self.jq('.warn').prev('p').cssDisplay(0);
+								self.jq('.warn').cssDisplay(1).html(r.getError());
+							}
+							data.lock(0);
+						});
+					} else {
+						self.jq('.warn').prev('p').cssDisplay(0);
+						self.jq('.warn').cssDisplay(1).html(getText('话题长度太长'));
+					}
 			}
 		},
 		beforeShow : function(){
@@ -3069,6 +3134,53 @@ X.reg('addFollow',function(cfg){
 	return layer;
 });
 
+X.reg('verifyBox',function(cfg){
+	var Box =  X.use('Box',$.extend({
+				contentHtml:'verify',
+				cs : 'verify-tips',
+				closeable:true,
+				autoCenter:true,
+				hidden:false,
+				setAnchor : function(anchorElem){
+                    this.anchorEl = anchorElem;
+                    return this;
+                },
+			   beforeShow : function(){
+					ui.Box.prototype.beforeShow.call(this);
+					if(this.anchorEl){
+						this.anchor(this.anchorEl, 'tc', function(ret, sw, sh){
+							ret[1]-=2;
+						});
+						var self = this;
+						this.slide('bc',true, function(){
+							ui.Box.prototype.afterShow.call(self);
+						});
+					}
+				},
+				
+				// 置为空，在效果完成后再调用父类afterShow
+				afterShow : $.noop,
+				
+				beforeHide : function(){
+					if(this.anchorEl){
+						this.slide('cb',false);
+						delete this.anchorEl;
+						return false;
+					}else ui.Box.prototype.beforeHide.call(this);
+				},
+				
+				afterHide : function(){
+					ui.Box.prototype.afterHide.call(this);
+					// 复原callback
+					this.onbuttonclick = ui.Box.prototype.onbuttonclick;
+				}
+			},cfg));
+			
+	X.reg('verifyBox',Box,true);
+	
+	return Box;
+});
+
 X.reg('MoreList', function(cfg) {
 	var layer = X.use('Layer', $.extend({
 	    
@@ -3084,10 +3196,10 @@ X.reg('MoreList', function(cfg) {
 
 			switch (data.e){
     			case 'abl':
-    				MB.confirm('提示', 
-    				           '确定将'+data.nick+'加入到黑名单吗？<span>你和' + 
-    				              (data.gender == 'f' ? '她': '他') + 
-    				              '将自动解除关注关系，并且她不能再关注你，给你发评论、私信、@通知。</span>', 
+                    data.gender = getText(data.gender == 'f' ? '她': '他');
+                    
+    				MB.confirm( getText('提示'), 
+    				           getText('确定将{nick}加入到黑名单吗？<span>你和{gender}将自动解除关注关系，并且{gender}不能再关注你，给你发评论、私信和@你。</span>', data), 
     				           function(click) {
                 					if (click === 'ok'){
                 						Req.blacklistAdd(uid, '', function(e) {
@@ -3125,7 +3237,6 @@ X.report = (function() {
 		//初始化上报参数
 		reqOpt = {
 			pjt: 'xwb',
-			ver: '2.0',
 			xt: 'stay'
 		};
 
@@ -3165,11 +3276,19 @@ X.report = (function() {
 	}
 
 	function report(params) {
+        if (!reqOpt.akey) {
+            reqOpt.akey = getCfg('akey');
+        }
+        
+        if (!reqOpt.ver) {
+            reqOpt.ver = getCfg('version');
+        }
+        
 		params.random = Math.random();
 		params.c_id = getUniqueUid();
-		params.akey = X.getCfg('akey');
-        params.p_id = X.getCfg('page');
-        var sinaid = X.getCfg('uid');
+		//params.akey = X.getCfg('akey');
+        params.p_id = getCfg('page');
+        var sinaid = getCfg('uid');
         
         if (sinaid) {
             params.uid = sinaid;
@@ -3218,8 +3337,7 @@ X.report = (function() {
 			var now = new Date().getTime(),
 
 			params = {
-				time: now - (lastTime ? lastTime: bootTime),
-				p: X.getCfg('page')
+				time: now - (lastTime ? lastTime: bootTime)
 			};
 
 			if (!lastTime && document.referrer)

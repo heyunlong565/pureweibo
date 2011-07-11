@@ -17,13 +17,12 @@
             <!-- 头部 结束-->
             
             <div id="container">
-                <div class="talk-hd"><img src="<?php echo ( isset($config['banner_img'])?$config['banner_img']:W_BASE_URL.'img/talk_pic_800.png'); ?>" alt="" /></div>
             	<div class="content">
                 	<div class="main">
-                	
+                		<div class="talk-banner"><img src="<?php echo (isset($config['banner_img'])?$config['banner_img']:W_BASE_URL.'img/talk_bg.jpg'); ?>" alt="" /></div>
                         <!-- 更多 开始 -->
                         <div class="tit-hd">
-                            <h3>精彩访谈</h3>
+							<h3><?php LO('interview__page__titleTip');?></h3>
                         </div>
                         <div class="talk-list">
                         <?php 
@@ -39,9 +38,9 @@
                                     </a>
                                 </div>
                                 <div class="info">
-								<?php if ( isset($aRecord['notice']) && $aRecord['notice'] ) { ?><a class="icon-remind icon-bg" href="#" rel="e:remind,u:<?php echo USER::uid();?>,t:<?php echo F('escape', "在线访谈 \"{$aRecord['title']}\" 即将开始");?>,c:<?php echo F('share_weibo', 'interview_tips', $aRecord);?>,n:<?php echo $aRecord['notice'];?>">提醒我</a> <?php } ?>
+								<?php if ( isset($aRecord['notice']) && $aRecord['notice'] ) { ?><a class="" href="#" rel="e:remind,u:<?php echo USER::uid();?>,t:<?php echo F('escape', L('interview__page__remindMeTip', $aRecord['title']));?>,c:<?php echo F('share_weibo', 'interview_tips', $aRecord);?>,n:<?php echo $aRecord['notice'];?>"><?php LO('interview__page__remindMe');?></a> <?php } ?>
                                 	<h4><a href="<?php echo URL('interview', array('id'=>$aRecord['id']) ); ?>" target="_blank"><?php echo $aRecord['title']; ?></a>
-                                       	<?php if ($aRecord['status']=='P'){echo '<span class="unplayed">(未开始)</span>'; } elseif ($aRecord['status']=='E'){ echo '<span class="finish">(已结束)</span>'; } else {echo '<span class="active">(进行中)</span>';}?>
+                                       	<?php if ($aRecord['status']=='P'){LO('interview__page__notStarted'); } elseif ($aRecord['status']=='E'){ LO('interview__page__end'); } else {LO('interview__page__going');}?>
                                     </h4>
                                     <p class="time"><?php echo date($aRecord['dateFormat'], $aRecord['start_time']).'-'.date($aRecord['dateFormat'], $aRecord['end_time'])?></p>
                                     <p><?php echo $aRecord['desc']; ?></p>
@@ -49,11 +48,11 @@
                             </div>  
                             <?php } } else { ?>  
 								<div class="default-tips">
-									<div class="icon-tips all-bg"></div>
+									<div class="icon-tips"></div>
 									<?php if (USER::get('isAdminAccount')):?>
-									<p>还没有在线访谈，你可以在 后台管理中心-扩展工具-在线访谈 添加设置</p>
+									<p><?php LO('interview__page__adminEmptyTip');?></p>
 									<?php else:?>
-									<p>还没有在线访谈，你可以看看其他页面。 </p>
+									<p><?php LO('interview__page__emptyTip');?></p>
 									<?php endif;?>
 									</div>
                             <?php } ?>                                  
@@ -70,11 +69,6 @@
                     <?php Xpipe::pagelet('common.userPreview');?>
                     <!-- 用户信息 结束-->
                     
-                    <!-- ad180 开始 -->
-                    <div class="xad-box xad-box-p3">
-                        <a href="#" class="icon-close-btn icon-bg"></a>
-                    </div>
-                    <!-- ad180 结束 -->
                     <!-- 主持人 开始-->
                    	<?php Xpipe::pagelet('interview.baseMasterList', array( 'masterList'=>$userlist, 'friendList'=>$friendList ) );?>
                     <!-- 主持人 结束-->

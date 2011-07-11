@@ -12,7 +12,7 @@
 <div class="path"><p>当前位置：扩展工具<span>&gt;</span><a href="<?php echo URL('mgr/wb_live');?>">在线直播列表</a><span>&gt;</span>在线直播基本信息</p></div>
     <div class="main-cont">
 		<div class="set-area">
-        	<div class="form-area">
+        	<div class="form">
                 <div class="form-row">
                     <form id="fileForm" action="<?php echo URL('mgr/wb_live.upload');?>" method="post" enctype="multipart/form-data">
 					<input type="hidden" name="thumb" value="0" />
@@ -21,7 +21,7 @@
                         <div class="form-cont">
                             <input type="file" class="btn-file" value="上传banner" name="pic" onchange="MicroAdmin.upload(this)" id="pic"/>
                             <p class="form-tips">建议图片尺寸800*126px</p>
-                            <div class="banner-edit"><img src="<?php if (isset($live['banner_img'])):?><?php echo F('fix_url',$live['banner_img']); else: echo W_BASE_URL;?>img/live_bg.jpg<?php endif;?>" title="banner" id="preview" /></div>
+                            <div class="banner-edit"><img src="<?php echo isset($live['banner_img']) ? $live['banner_img'] : $default_banner_img; ?>" title="banner" id="preview" /></div>
                         </div>
                     </form>
                 </div>
@@ -46,14 +46,14 @@
 							<?php foreach($userlist as $item):?>
 							<tr>
                             	<td><span class="user-pic"><img src="<?php echo $item['profile_image_url'];?>" alt="" /></span></td>
-                                <td onclick="MicroAdmin.edit(this)"><p title="点击编辑" class="text"><?php echo $item['screen_name'];?></p><input value="<?php echo $item['screen_name'];?>" type="text" class="input-txt txt-s1 hidden" id="_holder" vrel="_f|ne=m:须指定首个主持人|username" warntip="#masterTip"><input type="hidden" name="master[]" id="master" value="<?php echo $item['id'];?>" /><span class="tips-error hidden" id="masterTip"></span></td></td>
+                                <td onclick="MicroAdmin.edit(this)"><p title="点击编辑" class="text"><?php echo $item['screen_name'];?></p><input value="<?php echo $item['screen_name'];?>" type="text" class="input-txt w130 hidden" id="_holder" vrel="_f|ne=m:须指定首个主持人|username" warntip="#masterTip"><input type="hidden" name="master[]" id="master" value="<?php echo $item['id'];?>" /><span class="tips-error hidden" id="masterTip"></span></td></td>
                                 <td><a class="icon-edit" href="#" onclick="MicroAdmin.edit(this);return false;">编辑</a><a onclick="MicroAdmin.del(this);return false;" href="#" class="icon-del">删除</a></td>
                             </tr>
 							<?php endforeach;?>
 							<?php endif;?>
                             <tr id="addCol">
                                 <td><span class="user-pic"><img src="<?php echo W_BASE_URL;?>img/user_img_default.png" alt="" /></span></td>
-                                <td><input type="text"  class="input-txt txt-s1" warntip="#masterRequire" vrel="userrequire=m:须添加至少一个主持人"/><span class="tips-error hidden" id="masterRequire"></span></td>
+                                <td><input type="text"  class="input-txt w130" warntip="#masterRequire" vrel="userrequire=m:须添加至少一个主持人" onblur="MicroAdmin.add(this, 'master');return false;" /><span class="tips-error hidden" id="masterRequire"></span></td>
                                 <td><a href="javascript:;" class="icon-add" onclick="MicroAdmin.add(this, 'master');return false;">添加</a></td>
                             </tr>
                         </table>
@@ -65,9 +65,9 @@
                     <textarea  id="contact" name=contact class="input-area area-s1" vrel="ne=m:请填写联系信息。"  warntip="#contactTip" ><?php echo isset($live['contact']) ? $live['contact'] : '';?></textarea>
                     <span id="contactTip" class="tips-error hidden">请输入通知内容</span>
                 </div>
-                <div class="btn-area" ><a href="#" id="submitBtn" class="general-btn btn-s2"><span>确认</span></a></div>
+                <div class="btn-area" ><a href="#" id="submitBtn" class="btn-general highlight"><span>确认</span></a></div>
                 
-                <input type="hidden" name="pic" id="picImg" vrel="pic=f:pic,c:头像" warntip="#bannerTip" value="<?php echo isset($live['banner_img']) ? $live['banner_img'] : W_BASE_HTTP.''.W_BASE_URL.'img/live_bg.jpg';?>"/>
+                <input type="hidden" name="pic" id="picImg" vrel="pic=f:pic,c:头像" warntip="#bannerTip" value="<?php echo isset($live['banner_img']) ? $live['banner_img'] : $default_banner_img;?>"/>
                 
                 </form>
             </div>

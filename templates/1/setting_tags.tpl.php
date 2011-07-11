@@ -24,12 +24,12 @@
                             <div id="infomation" class="form-body">
                                 <div class="form-info">
                                     <span class="tab-s4">
-										<?php if (HAS_DIRECT_UPDATE_PROFILE):?>
-										<a href="<?php echo URL('setting.user');?>">基本资料</a>
-										<?php endif;?>
-										<a href="javascript:void(0)" class="current">个人标签</a>
+									<?php if (HAS_DIRECT_UPDATE_PROFILE):?>
+									<a href="<?php echo URL('setting.user');?>"><?php LO('setting__setting__baseInfo');?></a>
+									<?php endif;?>
+									<a href="javascript:void(0)" class="current"><?php LO('setting__setting__perTags');?></a>
                                     </span>
-									<span class="tips">以下信息将显示在您的<a href="<?php echo URL('index.profile');?>">微博页</a>，方便大家了解你。</span>
+									<span class="tips"><?php LO('setting__setting__noticeTip', URL('index.profile'));?></span>
                                 </div>
 								<?php Xpipe::pagelet('user.userTagEdit');?>
                             </div>
