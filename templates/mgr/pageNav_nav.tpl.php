@@ -17,13 +17,13 @@
             <form method="post" id="form1" action="<?php echo URL('mgr/page_nav.updateNav');?>">
                 <table class="table table-s1" width="100%" cellpadding="0" cellspacing="0" border="0">
                     <colgroup>
-                        <col class="h-w90" />
-                        <col class="h-w130" />
-                        <col class="h-w150"/>
+                        <col class="w90" />
+                        <col class="w130" />
+                        <col class="w150"/>
                         <col/>
-                        <col class="h-w50"/>
+                        <col class="w50"/>
                         <!--<col class="operate-w12"/>-->
-                        <col class="h-w120" />
+                        <col class="w120" />
                     </colgroup>
                     <thead class="tb-tit-bg">
                         <tr>
@@ -58,7 +58,7 @@
                         function aNavHtml($data, &$pageList, $isSon=FALSE)
                         {
                             $tpl = '<tr>
-                                <td><input type="text" name="data[#id#][sort_num]" value="#sort_num#" #isSon# class="ipt-txt form-el-w50"  vrel="isSave"/></td>
+                                <td><input type="text" name="data[#id#][sort_num]" value="#sort_num#" #isSon# class="ipt-txt w50"  vrel="isSave"/></td>
                                 <td><input type="text" name="data[#id#][name]" value="#name#" #isSon# class="ipt-txt" vrel="isSave"  flag="maxlen"/></td>
                                 <td>#pageIdSelect#</td>
                                 <td id="url_#id#">#url#</td>
@@ -76,9 +76,18 @@
                                 $pageName = $pageList[$data['page_id']]['page_name'];
                                 $url 	  = URL($pageList[$data['page_id']]['url'], $pageId, 'index.php');
 
-                                if ($data['page_id'] != 35) {
+                                if (!in_array($data['page_id'], array(3,6,35,7,8))) {
                                     $editLink = '<a href="'. URL('mgr/page_manager.setting', array('id'=>$data['page_id'])) .'" class="icon-set">设置</a>';
-                                }
+                                } elseif ($data['page_id'] == 7) {
+                                    $editLink = '<a href="'. URL('mgr/wb_live.set') .'" class="icon-set">设置</a>';
+	
+								} elseif ($data['page_id'] == 8) {
+                                    $editLink = '<a href="'. URL('mgr/micro_interview.set') .'" class="icon-set">设置</a>';
+	
+								} else {
+									$editLink = '';	
+
+								}
                             }
                             
                             $urlInputHtm 				= (0 > $data['page_id']) ? "<input type='text' name='data[{$data['id']}][url]' value='{$data['url']}' class='ipt-txt' vrel='isSave'/>" : '';
@@ -123,13 +132,13 @@
                             
                             // 增加二级导航
                             //if ( 1!=PAGE_TYPE_CURRENT || isset($aNav['son'])) {
-                                echo '<tr class="add-rows"><td colspan="6"><a href="javascript:;" rel="e:addnewlink,pid:'.$id.'" class="general-btn"><span>添加二级导航</span></a></td></tr>';
+                                echo '<tr class="add-rows"><td colspan="6"><a href="javascript:;" rel="e:addnewlink,pid:'.$id.'" class="btn-general"><span>添加二级导航</span></a></td></tr>';
                             //}
                         }
                         
                         // 增加主导栏链接
                         //if (2 == PAGE_TYPE_CURRENT){
-                            echo '<tr class="add-main-rows"><td colspan="6"><a href="javascript:;" rel="e:addnewlink,pid:0" class="general-btn "><span>添加主导航</span></a></td></tr>';	
+                            echo '<tr class="add-main-rows"><td colspan="6"><a href="javascript:;" rel="e:addnewlink,pid:0" class="btn-general "><span>添加主导航</span></a></td></tr>';	
                         //}
                     
                     ?>
@@ -137,7 +146,7 @@
                     </tbody>
                     
                 </table s>
-                <p class="btn-area"><a href="#this" onclick = "disabledConfrom();$('#form1').submit();" class="general-btn btn-s2"><span>提交</span></a></p>
+                <p class="btn-area"><a href="#this" onclick = "disabledConfrom();$('#form1').submit();" class="btn-general highlight"><span>提交</span></a></p>
             </form>
         </div>
     </div>
@@ -173,34 +182,59 @@
 		
 		var _modehtml=[
 				'<form name="add-newlink" id="sub" method="post">',
-           		'<div class="pop-form">',
+           		'<div class="form-box">',
            		'	<div class="form-row">',
-           		'		<label>导航名称</label>',
+           		'		<label class="form-field">导航名称</label>',
            		'		<div class="form-cont">',
-				'			<input type="text" class="input-txt" name="data[name]"  vrel="_f|ne|sz=max:12,m:最多6个汉字,ww" warntip="#warntip"/>',
+				'			<input type="text" class="ipt-txt" name="data[name]"  vrel="_f|ne|sz=max:12,m:最多6个汉字,ww" warntip="#warntip"/>',
                	'			<span id="warntip" class="tips-error hidden"></span>',
            		'		</div>',
            		'	</div>',
            		'	<div class="form-row">',
-           		'		<label>是否显示</label>',
-           		'		<div>',
-				'			<input type="radio" name="data[in_use]" checked="checked" value="1" /> &nbsp;立即生效&nbsp;',
-				'			<input type="radio" name="data[in_use]" value="0" /> &nbsp;稍后设置',
+           		'		<label class="form-field">链接页面</label>',
+           		'		<div class="form-cont">',
+				'			<select name="data[page_id]" class="w160" id="pageID">',
+				<?php
+				foreach ($pageList as $aPage)
+				{
+					echo "'<option value=\"{$aPage['page_id']}\" >{$aPage['page_name']}</option>',";
+				}
+				echo "'<optgroup label=\"--------------------------\"><option value=\"-1\" >导航链接</option></optgroup>',";
+				?>
+				'			</select>',
+				'			<input  type="text" class="ipt-txt hidden" disabled = "disabled" id="Url" name="data[url]" vrel="_f|ne" warntip="#urltip" value="http://" />',
+               	'			<span id="urltip" class="tips-error hidden"></span>',
+           		'		</div>',
+           		'	</div>',
+           		'	<div class="form-row">',
+           		'		<label class="form-field">&nbsp;</label>',
+           		'		<div class="form-cont">',
+				'			<label><input class="ipt-checkbox" type="checkbox" name="data[in_use]" checked="checked" value="1" /> &nbsp;立即显示在前台</label>',
            		'		</div>',
            		'	</div>',
                 '	<div class="btn-area">',
 				'		<input type="hidden" value="'+ e.get("pid") +'" id="parent_id" name="data[parent_id]" />',
-                '       <a class="general-btn btn-s2" href="#" id="subok"><span>确定</span></a>',
-                '       <a class="general-btn" href="#" rel="e:cal" id="pop_cancel"><span>取消</span></a>',
+                '       <a class="btn-general highlight" href="#" id="subok"><span>确定</span></a>',
+                '       <a class="btn-general" href="#" rel="e:cal" id="pop_cancel"><span>取消</span></a>',
                 '	</div>',
 				'</div>',
             '</form>'].join('');
       var show = function(){
   	   		Xwb.use('MgrDlg',{
 			dlgcfg:{
-				cs:'add-nav win-fixed',
+				cs:'win-nav win-fixed',
 				title:'新导航名',
-				destroyOnClose:true
+				destroyOnClose:true,
+				onViewReady:function(){
+					var self =this;
+					this.jq('#pageID').change(function(){
+						if($(this).val() == '-1'){
+							self.jq('#Url').removeAttr('disabled').removeClass('hidden');
+						} else {
+							self.jq('#Url').attr('disabled','disabled').addClass('hidden');
+						}
+					})
+				}
 				}
 			,valcfg:{
 				form:'#sub',

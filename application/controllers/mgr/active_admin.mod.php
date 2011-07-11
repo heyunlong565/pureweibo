@@ -14,7 +14,7 @@ class active_admin_mod {
 
 		//判断是否有管理员
 		$rs = DR('mgr/adminCom.getAdminByUid');
-		if($rs['rst']) {
+		if(WB_USER_OAUTH_TOKEN && WB_USER_OAUTH_TOKEN_SECRET && $rs['rst']) {
 			APP :: redirect(URL('mgr/admin.login', '', 'admin.php'), 3);
 		}
 	}
@@ -55,7 +55,7 @@ class active_admin_mod {
                             'sina_uid' => $this->_getUserInfo('sina_uid'),
                             'pwd' => md5($pwd),
                             'add_time' =>APP_LOCAL_TIMESTAMP,
-                            'is_root' => 1
+                            'group_id' => 1 // 1为超级管理员
 			);
 
 		$rs = DR('mgr/adminCom.saveAdminById', '', $data);
@@ -90,7 +90,7 @@ class active_admin_mod {
 		}
 		
 		session_regenerate_id();   //防御Session Fixation
-        USER::set('isAdminAccount', $sina_uid);
+        USER::set('isAdminAccount', 1);// 1为超级管理员
         USER::set('isAdminReport', 1);	//设置为上报
 		exit('{"state":"200"}');
 	}

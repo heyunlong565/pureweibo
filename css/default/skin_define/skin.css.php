@@ -47,6 +47,10 @@ function CUSTOM_CSS($type,$default=NULL){
 				$ret='';
 			}
 			break;
+		case 'LANG_OPT':/*语言选项*/
+			$ret=isset($customSkin['lang_opt']) ? $customSkin['lang_opt'] : $default;
+			return $ret;
+			break;	
 	}
 	echo $ret;
 }
@@ -137,7 +141,7 @@ a,
 #footer .ft-bg,
 .gotop .gotop-bg { background:#fff; }
 
-#footer .ft-bg { opacity:.4; filter:alpha(opacity=40); }
+#footer .ft-bg { opacity:.7; filter:alpha(opacity=70); }
 
 /*顶部导航菜单 - 设置页面*/
 .nav .user-link .manage,
@@ -151,25 +155,6 @@ a,
 .tab-s4 a:hover,
 .tab-s4 .current,
 .tab-s4 .current:visited { color:#fff; }
-
-.addfollow-btn,
-.followed-btn,
-.post-box .post-title,
-.post-box .share-btn,
-.post-box .share-btn:hover, 
-.post-box .share-btn-disable { background:url( <?php echo $BASE_URL?>bgimg/skin_bg.png ) no-repeat; }
-
-/*微博发布框*/
-.post-box .post-title { background-position:0 0; }
-.post-box .post-textarea { background-position:0 -32px; }
-.post-box .post-textarea .inner { background-position:right -112px; }
-.post-box .post-focus { background-position:0 -192px;}
-.post-box .post-focus .inner { background-position:right -272px; }
-
-.post-box .share-btn { background-position:0 -80px;}
-.post-box .share-btn:hover { background-position:-104px -80px;}
-.post-box .share-btn-disable { background-position:-208px -80px; cursor:default;}
-.post-box .share-btn-disable:hover { background-position:-208px -80px; cursor:default;}
 
 /*两栏菜单*/
 .menu { border-radius:3px;moz-border-radius:3px;-webkit-border-radius:3px;  }
@@ -210,15 +195,15 @@ a,
 
 /*公用类*/
 	
-	/*加关注和已关注按钮*/
-	.addfollow-btn,
-	.followed-btn { display:block; width:54px; height:21px; background-position:0 -40px; text-indent:-9999px; outline:none;cursor:pointer; }
-	.addfollow-btn:hover { background-position:-72px -40px;}
-	.followed-btn{ background-position:-144px -40px; cursor:default; }
-	
 	/*评论提示文字*/
 	.gray-text { color:#707070;}
 	
 	/* 默认表单样式 */
 	.form-area .form-item select {font-size:13px;}
 	#edit-event .form-area .form-item label {font-size:14px;}
+
+
+<?php
+	//包含不同语言的CSS
+	include('skin_'.CUSTOM_CSS('LANG_OPT').'.css');
+?>

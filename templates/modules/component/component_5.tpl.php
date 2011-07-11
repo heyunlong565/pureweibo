@@ -10,7 +10,7 @@
 ?>
 
 <div class="pub-feed-list">
-    <div class="column-title">
+    <div class="title-box">
         <h3><?php echo F('escape', $mod['title']);?></h3>
     </div>
 	<div class="feed-list">
@@ -19,11 +19,11 @@
 			TPL::module('feedlist', array('list' => $weiboList['rst']));
 		} elseif($weiboList['errno'] == -999999) {
 	?>
-		<div class="int-box load-fail icon-bg">所设置的自定义微博列表不存在，请通知管理员进行设置。</div>
+		<div class="int-box ico-load-fail"><?php LO('modules_component_component_5_empty');?></div>
 	<?php }elseif(defined('IS_DEBUG') && IS_DEBUG){ ?>
-		<div class="int-box load-fail icon-bg">[DEBUG 模式]<?php echo $weiboList['err']. '(Errno: '. $weiboList['errno']. ')'; ?></div>
+		<div class="int-box ico-load-fail">[DEBUG 模式]<?php echo $weiboList['err']. '(Errno: '. $weiboList['errno']. ')'; ?></div>
 	<?php }else{ ?>
-		<div class="int-box load-fail icon-bg">系统繁忙，微博列表获取不正常，请<a href="#" rel="e:rl">刷新</a>再试!</div>
+		<div class="int-box ico-load-fail"><?php LO('modules_component_component_5_sysError');?></div>
 	<?php } ?>
 	</div>
 	
@@ -38,7 +38,7 @@
 		if (isset($userList['rst']['users']) && is_array($userList['rst']['users']) && !empty($userList['rst']['users'])) {
 	?>
 	<div class="more-mbloger">
-        <span>列表成员：</span>
+        <span><?php LO('modules_component_component_5_memberList');?></span>
 		<div class="mbloger-list">
 
 		<?php	

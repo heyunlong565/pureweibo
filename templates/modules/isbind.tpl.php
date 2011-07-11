@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>oauth授权 - Powered By X微博</title>
+<title><?php echo F('web_page_title');?></title>
 <link rel="shortcut icon" href="<?php echo W_BASE_URL;?>favicon.ico" />
 <style type="text/css">
 body, p, h1{ margin:0; padding:0;}
@@ -25,12 +25,12 @@ a:hover {color:#0082cb;text-decoration:underline;}
 	<div id="wrapper">
 		<div class="oauth-box">
 			<div class="header">
-				<a href="http://login.sina.com.cn/regagreement.html" target="_blank" class="agreement">新浪网络服务使用协议</a>
-				<h1><a href="http://t.sina.com.cn" target="_blank" title="新浪微博">新浪微博</a></h1>
+			<a href="http://login.sina.com.cn/regagreement.html" target="_blank" class="agreement"><?php LO('modules__isBind__agreement');?></a>
+			<h1><a href="http://weibo.com" target="_blank" title="<?php LO('modules__isBind__sinaWeibo');?>"><?php LO('modules__isBind__sinaWeibo');?></a></h1>
 			</div>
 			<div class="isbound-con">
-				<p><strong>您的<em><?php echo $user_name; ?></em>新浪微博帐号已绑定过了，换个帐号试试吧</strong></p>
-				<p>[<span  id='time_sec'>5</span>]秒后自动跳转，如果浏览器没有反应，请<a href="<?php echo $sina_login_url ;?>">点击这里</a></p>
+				<p><strong><?php LO('modules__isBind__changAccount', $user_name);?></strong></p>
+				<p><?php LO('modules__isBind__autoJumpTip');?></a></p>
 			</div>
 		</div>
 	</div>

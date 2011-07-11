@@ -34,7 +34,7 @@ class ta_mod extends action {
 
                 /// 提示不存在
                 
-                $this->_showErr('抱歉你所访问的用户不存在',WAP_URL('pub'));
+                $this->_showErr(L('controller__ta__profile__emptyTip'),WAP_URL('pub'));
                 
             }
             $userinfo = DR('xweibo/xwb.getUserShow', 'p', null, $id, $name);
@@ -55,12 +55,12 @@ class ta_mod extends action {
 
             /// 提示不存在
             
-            $this->_showErr('抱歉你所访问的用户不存在',WAP_URL('pub'));
+            $this->_showErr(L('controller__ta__profile__emptyTip'),WAP_URL('pub'));
         } elseif (!empty($userinfo['filter_state'])) {
 
             /// 屏蔽用户
            
-            $this->_showErr('该用户已经给屏蔽了',WAP_URL('pub'));
+            $this->_showErr(L('controller__ta__profile__theUserHavedShied'),WAP_URL('pub'));
         }
 
         //页面代号
@@ -87,7 +87,7 @@ class ta_mod extends action {
             if (empty($id) && empty($name)) {
 
                 /// 提示不存在
-                $this->_showErr('错误的URL',WAP_URL('pub'));
+                $this->_showErr(L('controller__tab__follow__errorUrl'),WAP_URL('pub'));
             }
             $userinfo = DR('xweibo/xwb.getUserShow', 'p', null, $id, $name);
         } else {
@@ -108,7 +108,7 @@ class ta_mod extends action {
         if (empty($userinfo)) {
 
             /// 提示不存在
-             $this->_showErr('错误的URL',WAP_URL('pub'));
+             $this->_showErr(L('controller__tab__follow__errorUrl'),WAP_URL('pub'));
         }
         $list = DR('xweibo/xwb.getFriends', '', $userinfo['id'], null, null, ($page - 1) * $limit, $limit);
         TPL::assign('uid', USER::uid());
@@ -199,7 +199,7 @@ class ta_mod extends action {
             if (empty($id) && empty($name)) {
 
                 /// 提示不存在
-                $this->_showErr('抱歉你所访问的用户不存在',WAP_URL('pub'));
+                $this->_showErr(L('controller__ta__defaultAction__emptyTip'),WAP_URL('pub'));
                 
             }
             $userinfo = DR('xweibo/xwb.getUserShow', 'p', null, $id, $name);
@@ -220,12 +220,12 @@ class ta_mod extends action {
 
             /// 提示不存在
             
-            $this->_showErr('抱歉你所访问的用户不存在',WAP_URL('pub'));
+            $this->_showErr(L('controller__ta__defaultAction__emptyTip'),WAP_URL('pub'));
         } elseif (!empty($userinfo['filter_state'])) {
 
             /// 屏蔽用户
           
-            $this->_showErr('该用户已经给屏蔽了',WAP_URL('pub'));
+            $this->_showErr(L('controller__ta__defaultAction__theUserHavedShied'),WAP_URL('pub'));
         }
         
         if (USER::isUserLogin()) {
@@ -257,7 +257,7 @@ class ta_mod extends action {
         if (USER::isUserLogin()) {
             
             if (empty($id) && empty($name)) {
-                 $this->_showErr('抱歉你所访问的用户不存在',WAP_URL('pub'));
+                 $this->_showErr(L('controller__ta__fans__emptyTip'),WAP_URL('pub'));
                 
             }
             $userinfo = DR('xweibo/xwb.getUserShow', 'p', null, $id, $name);
@@ -280,7 +280,7 @@ class ta_mod extends action {
 
             /// 提示不存在
             
-            $this->_showErr('抱歉你所访问的用户不存在',WAP_URL('pub'));
+            $this->_showErr(L('controller__ta__fans__emptyTip'),WAP_URL('pub'));
         }
 
         /// 如果是自己，跳转到首页

@@ -72,7 +72,7 @@ class content_unit_mod extends action {
 			case 5:
 				$rs = DR('mgr/userRecommendCom.getById');
 				$re_list = $rs['rst'];
-				$row['target']= $re_list[0]['group_id'];
+				$row['target']= $re_list[1]['group_id'];
 				TPL::assign('re_list', $re_list);
 				$row['title'] = $row['unit_name'] = ($type === 2 ? '推荐关注' : $this->_unitName[$type]);
 				break;

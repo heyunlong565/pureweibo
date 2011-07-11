@@ -24,15 +24,15 @@
                         <!-- 用户列表 结束 -->
                     	<div class="tab-box">
 							<div class="tab-s2">
-								<a href="<?php echo URL('search.weibo', array('k' => V('r:k', ''), 'base_app' => V('r:wb_base_app', '0'))); ?>" class="show-all">查看全部</a>
-								<span <?php echo V('r:wb_base_app', '0') == 0 ? 'class="current"' : ''; ?>><span><a href="<?php echo URL('search', array('k' => V('r:k', ''), 'wb_base_app' => 0, 'us_base_app' => V('r:us_base_app', '0'))); ?>">来自新浪</a></span></span>
-								<span <?php echo V('r:wb_base_app', '0') == 1 ? 'class="current"' : ''; ?>><span><a href="<?php echo URL('search', array('k' => V('r:k', ''), 'wb_base_app' => 1, 'us_base_app' => V('r:us_base_app', '0'))); ?>">本站</a></span></span>
+							<a href="<?php echo URL('search.weibo', array('k' => V('r:k', ''), 'base_app' => V('r:wb_base_app', '0'))); ?>" class="show-all"><?php LO('search__defaultAction__seeAll');?></a>
+							<span <?php echo V('r:wb_base_app', '0') == 0 ? 'class="current"' : ''; ?>><span><a href="<?php echo URL('search', array('k' => V('r:k', ''), 'wb_base_app' => 0, 'us_base_app' => V('r:us_base_app', '0'))); ?>"><?php LO('search__defaultAction__fromSina');?></a></span></span>
+							<span <?php echo V('r:wb_base_app', '0') == 1 ? 'class="current"' : ''; ?>><span><a href="<?php echo URL('search', array('k' => V('r:k', ''), 'wb_base_app' => 1, 'us_base_app' => V('r:us_base_app', '0'))); ?>"><?php LO('search__defaultAction__local');?></a></span></span>
 							</div>
 						</div>
 	                    <?php if (!isset($list) || empty($list)) {?>
 	                    <div class="search-result">
-	                        <div class="icon-alert all-bg"></div>
-	                        <p><strong>找不到符合条件的微博，请输入其他关键字再试</strong></p>
+	                        <div class="icon-alert"></div>
+							<p><strong><?php LO('search__defaultAction__emptySearch');?></strong></p>
 	                    </div>
 	                    <?php } else {?>
 	                    <!-- 微博列表 开始-->
@@ -49,6 +49,7 @@
 				<!-- 关注的话题 -->
 							<?php Xpipe::pagelet('common.subjectFollowed',USER::uid()); ?>
 				<!-- 关注的话题 -->	
+						<?php echo F('show_ad', 'sidebar', '');?>
 				</div>
 			</div>
 			<!-- 底部 开始-->

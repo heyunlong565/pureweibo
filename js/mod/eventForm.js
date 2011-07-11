@@ -3,7 +3,8 @@
         Req = X.request,
         Util = X.util,
         Box = X.ui.MsgBox,
-        Pagelet = X.ax.Pagelet;
+        Pagelet = X.ax.Pagelet,
+        getText = X.lang.getText;
         
         X.use('pipeMgr').reg('event.eventForm',{
         	onViewReady:function(){
@@ -137,14 +138,14 @@
 			                            if (e.isOk()) {
 			                                window.location.href = data.url;
 			                            } else {
-			                                Box.tipWarn('保存失败', function(){
+			                                Box.tipWarn( getText('保存失败') , function(){
 			                                    islock = 0;
 			                                });
 			                            }
 			                            
 			                        });
 			                    } else {
-			                        Box.tipWarn('封面上传中，请稍候...', function(){
+			                        Box.tipWarn( getText('封面上传中，请稍候...'), function(){
 			                            islock = 0;
 			                        });
 			                    }
@@ -170,9 +171,9 @@
 			                            var cost = $cost.val();
 			                            
 			                            if (!cost || isNaN(cost) || cost < 0){
-			                                msg = '请填写正确的费用数';
+			                                msg = getText('请填写正确的费用数');
 			                            }else if(cost>10000)
-			                                msg = '费用不能超过10000元';
+			                                msg = getText('费用不能超过10000元');
 			                            
 			                            if(msg !== true){
 			                                $tip.text(msg)
@@ -206,7 +207,7 @@
 			                        $('#end_m').val()
 			                    );
 			                    if(start > end){
-			                        data.m = '开始时间不能晚于结束时间';
+			                        data.m = getText('开始时间不能晚于结束时间');
 			                        result = false;
 			                    }
 			                    this.report(result, data);

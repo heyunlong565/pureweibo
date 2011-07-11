@@ -143,7 +143,8 @@ class notice
 	*/
 	function getNoticeNum($sina_uid = 0)
 	{
-		$sql = "SELECT COUNT(*) FROM `" . $this->tb_notice . "` WHERE 1=1" . ($sina_uid > 0 ? " AND `notice_id` IN (SELECT `notice_id` FROM `" . $this->tb_recipients . "` WHERE `recipient_id` = 0 OR `recipient_id` = '" . $this->db->escape($sina_uid) . "') AND `available_time` <= " . APP_LOCAL_TIMESTAMP : '');
+		$firstTimeSql = $this->_getUserNoticeStart($sina_uid);
+		$sql = "SELECT COUNT(*) FROM `" . $this->tb_notice . "` WHERE 1=1" . ($sina_uid > 0 ? " AND `notice_id` IN (SELECT `notice_id` FROM `" . $this->tb_recipients . "` WHERE `recipient_id` = 0 OR `recipient_id` = '" . $this->db->escape($sina_uid) . "') $firstTimeSql AND `available_time` <= " . APP_LOCAL_TIMESTAMP : '');
 		
 		return RST($this->db->getOne($sql));
 	}
@@ -157,10 +158,31 @@ class notice
 	*/
 	function getNoticeList($sina_uid = 0, $offset = 0, $limit = 20)
 	{
-		$sql = "SELECT * FROM `" . $this->tb_notice . "` WHERE 1=1" . ($sina_uid > 0 ? " AND `notice_id` IN (SELECT `notice_id` FROM `" . $this->tb_recipients . "` WHERE `recipient_id` = 0 OR `recipient_id` = '" . $this->db->escape($sina_uid) . "') AND `available_time` <= " . APP_LOCAL_TIMESTAMP : '') . " ORDER BY `available_time` DESC LIMIT " . $offset . "," . $limit;
+		$firstTimeSql = $this->_getUserNoticeStart($sina_uid);
+		$sql = "SELECT * FROM `" . $this->tb_notice . "` WHERE 1=1" . ($sina_uid > 0 ? " AND `notice_id` IN (SELECT `notice_id` FROM `" . $this->tb_recipients . "` WHERE `recipient_id` = 0 OR `recipient_id` = '" . $this->db->escape($sina_uid) . "') $firstTimeSql AND `available_time` <= " . APP_LOCAL_TIMESTAMP : '') . " ORDER BY `available_time` DESC LIMIT " . $offset . "," . $limit;
 		
 		return RST($this->db->query($sql));
 	}
+	
+	
+	/**
+	 * 获取用户第一次登陆的available_time sql, 确保新注册的用户不接受之前的通知
+	 * @param unknown_type $sina_uid
+	 */
+	function _getUserNoticeStart($sina_uid)
+	{
+		$firstTimeSql = '';
+		if ($sina_uid)
+		{
+			$rst = DR('mgr/userCom.getByUid', FALSE, $sina_uid);
+			if ( isset($rst['rst']['first_login']) && $rst['rst']['first_login'] )
+			{
+				$firstTimeSql = " And `available_time` >='{$rst['rst']['first_login']}' ";
+			}
+		}
+		return $firstTimeSql;
+	}
+	
 	
 	/**
 	* 获取通知内容

@@ -20,6 +20,13 @@ define('R_FORCE_MODE', 0);
 header("Content-type:text/html; charset=utf-8");
 /// 初始化框架
 require_once 'application/init.php';
+
+///检查是否安装
+if (XWB_SERVER_ENV_TYPE!=='sae' && (!WB_AKEY) ) {
+	header("Location: install/index.php");
+	exit;
+}
+
 /// 预处理模块 , 必须在 APP::init 方法之前 定义
 /// APP::addPreDoAction('clientUser.autoLogin','c');
 /// 初始化应用程序

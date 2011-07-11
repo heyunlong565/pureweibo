@@ -33,7 +33,7 @@ class index_mod extends action
 		$userinfo = APP::F('user_filter', $this->uInfo, true);
 		if (empty($userinfo)) {
 			/// 提示不存在
-			$this->_showErr('抱歉你所访问的用户不存在', URL('pub'));
+			$this->_showErr(L('controller__index__userFilter__emptyTip'), URL('pub'));
 		}
 	}
 	
@@ -168,6 +168,11 @@ class index_mod extends action
 	 */
 	function _private_msg()
 	{
+		// 是否开启私信
+		if ( !HAS_DIRECT_MESSAGES ) {
+			$this->_showErr(L('controller__index__privateMsg__notFoundPage'), URL('index'));
+		}
+		
 		/// 页码数
 		$page = max(V('g:page'), 1);
 
@@ -404,6 +409,10 @@ class index_mod extends action
 		TPL::assign('uInfo', $this->uInfo);
 		$type = (int)V('g:type', 1);  //设置类型 1基本资料 2显示设置
 		if ($type === 1) {
+			if (!HAS_DIRECT_UPDATE_PROFILE) {
+				$url = URL('index.setinfo', 'type=2');
+				APP::redirect($url, 3);
+			}
 			$this->_display('setinfo');
 		} else {
 			$this->_display('setdisplay');

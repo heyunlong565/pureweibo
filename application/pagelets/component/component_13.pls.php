@@ -4,7 +4,7 @@ require_once dirname(__FILE__). '/component_abstract.pls.php';
 /**
  * 专题banner模块
  * @author yaoying
- * @version $Id: component_13.pls.php 10890 2011-02-28 11:06:34Z yaoying $
+ * @version $Id: component_13.pls.php 16280 2011-05-25 09:05:06Z heli $
  *
  */
 class component_13_pls extends component_abstract_pls{
@@ -13,7 +13,7 @@ class component_13_pls extends component_abstract_pls{
 		parent::run($mod);
 		
 		if(!isset($mod['param']['src']) || empty($mod['param']['src'])){
-			$this->_error('无图片');
+			$this->_error(L('pls__component13__banner__emptyTip'));
 			return ;
 		}
 		

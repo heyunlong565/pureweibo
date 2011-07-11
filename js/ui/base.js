@@ -472,7 +472,7 @@ ui.Base.prototype = {
      * @return [offsetX, offsetY]
      */
         offsetsTo : function(tar){
-            var tar = tar[0]||tar;
+            var tar = ( tar instanceof $ && tar[0] )||tar;
             var e;
             if(tar == window)
                 e = {left:jqDoc.scrollLeft(),top:jqDoc.scrollTop()};
@@ -694,8 +694,8 @@ M&iuml;&Aacute;&quot; /&gt;&lt;span id=&quot;t&quot;&gt;&lt;/span&gt;
               sz  = [jqWin.width(), jqWin.height()],
               dsz = [jq.width(), jq.height()],
               off = (sz[1] - dsz[1]) * 0.8;
-          this.view.style.left = Math.max((((sz[0] - dsz[0]) / 2) | 0), 0) + jqDoc.scrollLeft() + 'px';
-          this.view.style.top  = Math.max(off - off/2|0, 0)+jqDoc.scrollTop() + 'px';
+          this.view.style.left = Math.max((((sz[0] - dsz[0]) / 2) | 0), 0) + ( this.isFixed && !Util.ie6 ? 0 : jqDoc.scrollLeft() )  + 'px';
+          this.view.style.top  = Math.max(off - off/2|0, 0)+  ( this.isFixed && !Util.ie6 ? 0 : jqDoc.scrollTop() ) + 'px';
           return this;
         },
         

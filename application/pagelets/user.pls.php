@@ -46,8 +46,8 @@ class user_pls {
 		$fids = DR('xweibo/xwb.getFriendIds', null, USER::uid(), null, null, -1, 5000);
 		$fids = $fids['rst']['ids'];
 
-		$gender = (isset($userinfo['gender']) && $userinfo['gender'] == 'f') ? '她' : '他';
-		$empty_text = $userinfo['id'] == USER::uid() ? '真悲剧，还没有人关注你，你可以试试多<a href="' . URL('search.recommend') . '">关注别人</a>。' : "还没人关注{$gender}，你可怜一下{$gender}吧，关注一下";
+		$gender = (isset($userinfo['gender']) && $userinfo['gender'] == 'f') ? L('pls__users__fansList__women') : L('pls__users__fansList__men');
+		$empty_text = $userinfo['id'] == USER::uid() ? L('pls__users__fansList__myEmptyNoticeTip', URL('search.recommend')) : L('pls__users__fansList__taEmptyNoticeTip', $gender, $gender);
 
 		$param = array(
 			'list' => $list,
@@ -96,19 +96,19 @@ class user_pls {
 		$list['users'] = F('user_filter', $list['users']);
 		// 我的
 		if ($from == 'follow') {
-			echo 'xxxxxxx wo de';
+			//echo 'xxxxxxx wo de';
 			//获取当前用户的粉丝列表id
 			$fids = DR('xweibo/xwb.getFollowerIds', '', USER::uid(), null, null, -1, 5000);
 			$fids = $fids['rst']['ids'];
 		} else {
 			// 他的
-			echo 'xxxxxxxxxx ta de';
+			//echo 'xxxxxxxxxx ta de';
 			$fids = DR('xweibo/xwb.getFriendIds', null, USER::uid(), null, null, -1, 5000);
 			$fids = $fids['rst']['ids'];
 		}
 		
 		//$gender = (isset($userinfo['gender']) && $userinfo['gender'] == 'f') ? '她' : '他';
-		$empty_text = ($userinfo['id'] == USER::uid() ? '你' : F('escape', $userinfo['screen_name'])) . '还没有关注任何人';
+		$empty_text = ($userinfo['id'] == USER::uid() ? L('pls__users__followersList__myEmptyNoticeTip') : L('pls__users__followersList__taEmptyNoticeTip', F('escape', $userinfo['screen_name'])));
 		
 		$param = array(
 			'list' => $list,
@@ -246,7 +246,7 @@ class user_pls {
 	}
 
 	function recommendUserWeight() {
-		TPL::module('recommendUserWeight', array('guide'=> true, 'title'=>'推荐关注以下用户'));
+		TPL::module('recommendUserWeight', array('guide'=> true, 'title'=> L('pls__users__recommendUserWeight__title')));
 		return array('cls'=>'category_user');
 	}
 	
@@ -295,7 +295,7 @@ class user_pls {
 				$users[] = $item['user'];
 			}
 		}
-		TPL::module('user_hot', array('toplist' => $users, 'fids' => $fids, 'title' => '你可能感兴趣的人'));
+		TPL::module('user_hot', array('toplist' => $users, 'fids' => $fids, 'title' => L('pls__users__interestUsers__title')));
 	}
 	
 	

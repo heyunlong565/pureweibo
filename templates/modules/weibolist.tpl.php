@@ -39,38 +39,38 @@ $param = array('list' => $list,
 									?>
 									<div class="feed-list <?php if (!in_array($header, array(1,2,3))){echo 'mblog-list';}?>">
 										<?php if ($show_unread_tip):?>
-										<a class="new-feed hidden" href="<?php echo URL('index');?>" id="new_wb_tips">有新微博，点击查看</a>
+										<a class="new-feed hidden" href="<?php echo URL('index');?>" id="new_wb_tips"><?php LO('modules__weiboList__newsWeiboTip');?></a>
 										<?php endif;?>
 										<?php if ($show_list_title && (!empty($list) || !empty($filter_type))):?>
-										<div class="feed-tit">
+										<div class="title-box">
 											<?php if ($show_filter_type){?>
 
 											<?php if (USER::isUserLogin()):?>
 											<div class="feed-filter">
 											<?php if (empty($filter_type)):?>
-												<strong>全部</strong>|
+											<strong><?php LO('modules__weiboList__all');?></strong>|
 											<?php else:?>
-												<a href="<?php echo URL(APP::getRequestRoute(), isset($uid)?'id='.$uid:'');?>">全部</a>|
+											<a href="<?php echo URL(APP::getRequestRoute(), isset($uid)?'id='.$uid:'');?>"><?php LO('modules__weiboList__all');?></a>|
 											<?php endif;?>
 											<?php if ($filter_type == 1):?>
-												<strong>原创</strong>|
+												<strong><?php LO('modules__weiboList__ori');?></strong>|
 											<?php else:?>
-												<a href="<?php echo URL(APP::getRequestRoute(), 'filter_type=1'. $filter_uid);?>">原创</a>|
+											<a href="<?php echo URL(APP::getRequestRoute(), 'filter_type=1'. $filter_uid);?>"><?php LO('modules__weiboList__ori');?></a>|
 											<?php endif;?>
 											<?php if ($filter_type == 2):?>
-												<strong>图片</strong>|
+												<strong><?php LO('modules__weiboList__image');?></strong>|
 											<?php else:?>
-												<a href="<?php echo URL(APP::getRequestRoute(), 'filter_type=2'. $filter_uid);?>">图片</a>| 
+											<a href="<?php echo URL(APP::getRequestRoute(), 'filter_type=2'. $filter_uid);?>"><?php LO('modules__weiboList__image');?></a>| 
 											<?php endif;?>
 											<?php if ($filter_type == 3):?>
-												<strong>视频</strong>|
+												<strong><?php LO('modules__weiboList__video');?></strong>|
 											<?php else:?>
-											<a href="<?php echo URL(APP::getRequestRoute(), 'filter_type=3'. $filter_uid);?>">视频</a>|
+											<a href="<?php echo URL(APP::getRequestRoute(), 'filter_type=3'. $filter_uid);?>"><?php LO('modules__weiboList__video');?></a>|
 											<?php endif;?>
 											<?php if ($filter_type == 4):?>
-												<strong>音乐</strong>
+												<strong><?php LO('modules__weiboList__music');?></strong>
 											<?php else:?>
-												<a href="<?php echo URL(APP::getRequestRoute(), '&filter_type=4' . $filter_uid);?>">音乐</a>
+											<a href="<?php echo URL(APP::getRequestRoute(), '&filter_type=4' . $filter_uid);?>"><?php LO('modules__weiboList__music');?></a>
 											<?php endif;?>
 											</div>
 											<?php endif;?>
@@ -78,7 +78,7 @@ $param = array('list' => $list,
 											
 											<?php if ($show_feed_refresh):?>
 											<div class="feed-refresh hidden">
-												<a href="#">有<em></em>条新微博，点击查看</a>
+											<?php LO('modules__weiboList__lookNewsWeibo');?>
 											</div>
 											<?php endif;?>										
 											<h3><?php echo $list_title;?></h3>
@@ -87,10 +87,22 @@ $param = array('list' => $list,
 										<?php endif;?>
 														
 										<?php if (empty($list)) :?>
+											<?php if (isset($show_title_when_empty) && $show_title_when_empty) { ?>
+											<div class="title-box">
+												<?php if ($show_feed_refresh):?>
+												<div class="feed-refresh hidden">
+												<?php LO('modules__weiboList__lookNewsWeibo');?>
+												</div>
+												<?php endif;?>										
+												<h3><?php echo $list_title;?></h3>
+											</div>
+											<div><ul id="xwb_weibo_list_ct"></ul></div>
+											<?php } ?>
+										
 											<div class="default-tips" id="emptyTip">
-												<div class="icon-tips all-bg"></div>
+												<div class="icon-tips"></div>
 												<?php if (V('g:page', 1) > 1):?>
-													<p>已到最后一页</p>
+												<p><?php LO('modules__weiboList__endPage');?></p>
 												<?php elseif (empty($filter_type)):?>
 													<p><?php if (isset($empty_msg)){echo $empty_msg;}?></p>
 												<?php else:?>
@@ -102,7 +114,11 @@ $param = array('list' => $list,
 											<?php TPL::module('feedlist', array('list' => $list, 'header' => $header, 'author' => $author));?>
 											<!-- end 微博列表 -->
 											<?php if (USER::isUserLogin() && $show_page):?>
-											<?php TPL::module('page', array('list' => $list, 'limit' => $limit));?>
+												<?php if (isset($page_type)):?>
+												<?php TPL::module('page', array('list' => $list, 'limit' => $limit, 'type' => $page_type, 'count' => $total_count));?>
+												<?php else:?>
+												<?php TPL::module('page', array('list' => $list, 'limit' => $limit));?>
+												<?php endif;?>
 											<?php endif;?>
 										<?php endif;?>
 										

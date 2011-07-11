@@ -14,7 +14,7 @@
     
 	ui.Layer.setCurrentZ(10010);
 	
-	ui.Dialog.prototype.focusBtnCs = 'btn-s2';
+	ui.Dialog.prototype.focusBtnCs = 'highlight';
 	
 	if( top != self && top.Xwb && top.Xwb.cfg) {
 		Xwb.cfg = top.Xwb.cfg;

@@ -8,7 +8,8 @@
         Util = X.util, 
         Base = ui.Base,
         Req  = X.request,
-        MB   = ui.MsgBox;
+        MB   = ui.MsgBox,
+		getText = X.lang.getText;
 
     X.mod.MyCmt = X.reg('MyCmt', Util.create(Base, {
         
@@ -99,7 +100,7 @@
             });
             
             if(sels.length){
-                MB.confirm('', '确定删除所有选择评论？', Util.bind(function(id){
+                MB.confirm('', getText('确定删除所有选择评论？'), Util.bind(function(id){
                     if(id=='ok'){
                         Req.delComment(sels.join(','), function(){
                             location.reload();
@@ -133,7 +134,7 @@
             var cmtId = e.get('c'), 
                 anchorEl = e.src, 
                 itemElem = e.getEl('c');
-            MB.anchorConfirm(anchorEl, '确定要删除该回复吗？', function(id){
+            MB.anchorConfirm(anchorEl, getText('确定要删除该回复吗？'), function(id){
                 if(id=='ok'){
                         e.lock(1);
                         Req.delComment(cmtId, function(ret){
@@ -155,7 +156,7 @@
         },
         
         createCmtUI : function(cmt){
-            MB.tipOk('回复成功！');
+            MB.tipOk( getText('回复成功！') );
         }
     }));
 })(Xwb, $);

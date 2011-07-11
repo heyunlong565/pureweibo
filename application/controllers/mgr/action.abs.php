@@ -28,13 +28,13 @@ class action {
 
 			$this->menu['home']['sub'] = array(
 					array(
-						'title' => '常用功能',
+						'title' => '快捷方式',
 						'sub' => array(
-							array('title' => '首页', 'url' => URL('mgr/admin.default_page')),
-							array('title' => '聚焦图',			'url' =>URL('mgr/plugins.config','id=2')),
-							array('title' => '个人资料推广位',	'url' =>URL('mgr/plugins.config','id=3')),
-							array('title' => '通知',			'url' =>URL('mgr/notice')),
-							array('title' => '首次登录关注',	'url' =>URL('mgr/plugins.config','id=4'))
+							array('title' => '首页', 'url' => array('mgr/admin.default_page')),
+							array('title' => '聚焦图',			'url' =>array('mgr/plugins.config','id=2')),
+							array('title' => '个人资料推广位',	'url' =>array('mgr/plugins.config','id=3')),
+							array('title' => '通知',			'url' =>array('mgr/notice')),
+							array('title' => '首次登录关注',	'url' =>array('mgr/plugins.config','id=4'))
 							)
 						),
 					array(
@@ -47,51 +47,57 @@ class action {
 					array(
 						'title' => '基础设置',
 						'sub' => array(
-									array('title'=>'站点设置', 		'url' => URL('mgr/setting.editIndex')),
-									array('title'=>'优化设置',		'url' => URL('mgr/setting.editRewrite')),
-									array('title'=>'帐号登录设置',	'url' => URL('mgr/setting.editUser')),
-									array('title'=>'个性化域名',	'url' => URL('mgr/setting.setPersonalDomain'))
-									//array('title'=>'短链接',		'url' => URL('mgr/setting.setShortLink'))
-									//array('title'=>'数据备份',		'url' => URL('mgr/setting.dataBackup'))
+									array('title'=>'站点设置', 		'url' => array('mgr/setting.editIndex')),
+									array('title'=>'优化设置',		'url' => array('mgr/setting.editRewrite')),
+									array('title'=>'帐号登录设置',	'url' => array('mgr/setting.editUser')),
+									array('title'=>'个性化域名',	'url' => array('mgr/setting.setPersonalDomain')),
+									array('title' => '代理帐号设置', 'url' => array('mgr/proxy_account.accountList')),
+									array('title' => '清除缓存', 'url' => array('mgr/setting.cacheClear'))
+									//array('title'=>'短链接',		'url' => array('mgr/setting.setShortLink'))
+									//array('title'=>'数据备份',		'url' => array('mgr/setting.dataBackup'))
 									)
 						),
 					array(
 						'title' => '外部设置',
 						'sub' => array(
-							//array('title' => 'WAP设置',				'url' => URL('mgr/setting.wap')),
-							array('title' => '与论坛插件通信',		'url' => URL('mgr/connection'))
+							//array('title' => 'WAP设置',				'url' => array('mgr/setting.wap')),
+							array('title' => '与论坛插件通信',		'url' => array('mgr/connection'))
 							)
 
 						),
 					array(
 						'title' => '管理员',
 						'sub' => array(
-//							array('title' => '管理员设置',			'url' => URL('mgr/admin.userlist')),
-//							array('title' => '添加管理员',			'url' => URL('mgr/admin.search')),
-							array('title' => '修改密码',				'url' => URL('mgr/admin.repassword'))
+							array('title' => '管理员设置',			'url' => array('mgr/admin.userlist')),
+							array('title' => '添加管理员',			'url' => array('mgr/admin.search')),
+							array('title' => '修改密码',				'url' => array('mgr/admin.repassword'))
 							)
 						)
 					);
 					
 			if (XWB_SERVER_ENV_TYPE!=='sae'){
-				$this->menu['system']['sub'][0]['sub'][] = array('title'=>'短链接',		'url' => URL('mgr/setting.setShortLink'));
+				$this->menu['system']['sub'][0]['sub'][] = array('title'=>'短链接',		'url' => array('mgr/setting.setShortLink'));
+				$this->menu['system']['sub'][0]['sub'][] = array('title'=>'数据库备份还原',		'url' => array('mgr/backup.backupData'));
 			}
+/*
 			// 只有超级管理员才能添加管理员
 			$admRst = DR('mgr/adminCom.getAdminById', FALSE, $this->_getUid());	//获取当前操作者的数据
-			if( $admRst['rst']['is_root'] ) 
+			//if( $admRst['rst']['is_root'] ) 
+			if(USER::get('isAdminAccount') == 1) 
 			{
-				array_unshift($this->menu['system']['sub'][2]['sub'], array('title'=>'管理员设置', 'url'=>URL('mgr/admin.userlist')));
-				array_unshift($this->menu['system']['sub'][2]['sub'], array('title'=>'添加管理员', 'url'=>URL('mgr/admin.search')));
+				array_unshift($this->menu['system']['sub'][2]['sub'], array('title'=>'管理员设置', 'url'=>array('mgr/admin.userlist')));
+				array_unshift($this->menu['system']['sub'][2]['sub'], array('title'=>'添加管理员', 'url'=>array('mgr/admin.search')));
 			}
+*/
 /*
 			$this->menu['system']['sub'] = array(
 					array(
 						'title' => '基础设置',
 						'sub' => array(
-									array('title' => '站点设置',			'url' =>URL('mgr/setting.editIndex')),
-									array('title' => '优化设置',	'url' =>URL('mgr/setting.editRewrite')),
-									array('title' => '账号登陆设置',	'url' =>URL('mgr/setting.editUser')),
-									array('title' => '首次登录关注',	'url' =>URL('mgr/plugins.config','id=4'))
+									array('title' => '站点设置',			'url' =>array('mgr/setting.editIndex')),
+									array('title' => '优化设置',	'url' =>array('mgr/setting.editRewrite')),
+									array('title' => '账号登陆设置',	'url' =>array('mgr/setting.editUser')),
+									array('title' => '首次登录关注',	'url' =>array('mgr/plugins.config','id=4'))
 									)
 					)
 				);
@@ -100,16 +106,17 @@ class action {
 							array(
 								'title' => '界面',
 								'sub' => array(
-									array('title' => '布局',		'url' => URL('mgr/page_nav')),
-									array('title' => '导航',		'url' => URL('mgr/page_nav.nav')),
-									array('title' => '皮肤',		'url' => URL('mgr/skin.getAllSkin')),
-									array('title' => '页头设置',	'url' => URL('mgr/setting.header'))
+									array('title' => '布局',		'url' => array('mgr/page_nav')),
+									array('title' => '导航',		'url' => array('mgr/page_nav.nav')),
+									array('title' => '皮肤',		'url' => array('mgr/skin.getAllSkin')),
+									array('title' => '广告',		'url' => array('mgr/ad.ad_list')),
+									array('title' => '页头设置',	'url' => array('mgr/setting.header'))
 									)
 								),
 							array(
 								'title' => '页面模块',
 								'sub' => array(
-									array('title' => '页面设置',	'url' => URL('mgr/page_manager'))
+									array('title' => '页面设置',	'url' => array('mgr/page_manager'))
 									)
 								)
 							);
@@ -118,36 +125,38 @@ class action {
 							array(
 								'title' => '内容',
 								'sub' => array(
-									array('title' => '微博',		'url' => URL('mgr/weibo/weiboCopy.weiboList')),
-									array('title' => '已屏蔽的评论',		'url' => URL('mgr/weibo/disableComment.commentList')),
-									//array('title' => '话题',		'url' => URL('mgr/weibo/todayTopic.category')),
-									array('title' => '意见反馈',	'url' => URL('mgr/feedback.getList')),
+									array('title' => '内容审核',		'url' => array('mgr/weibo/disableWeibo.verifyWeiboList')),
+									array('title' => '内容屏蔽',		'url' => array('mgr/weibo/disableComment.search')),
+									//array('title' => '已屏蔽的评论',		'url' => array('mgr/weibo/disableComment.commentList')),
+									//array('title' => '已屏蔽的微博',		'url' => array('mgr/weibo/disableWeibo.weiboList')),
+									//array('title' => '话题',		'url' => array('mgr/weibo/todayTopic.category')),
+									array('title' => '意见反馈',	'url' => array('mgr/feedback.getList')),
 									)
 								),
 							array(
 								'title' => '屏蔽过滤',
 								'sub' => array(
-									array('title' => '关键字过滤',	'url' => URL('mgr/weibo/keyword.add'))
+									array('title' => '关键字过滤',	'url' => array('mgr/weibo/keyword.add'))
 									)
 								),
 							array(
 								'title' => '活动',
 								'sub' => array(
-									array('title' => '活动管理', 	'url' => URL('mgr/events.getList'))
+									array('title' => '活动管理', 	'url' => array('mgr/events.getList'))
 									)
 								),
 							array(
 									'title' => '通知',
 									'sub' => array(
-										array('title' => '通知',	'url' => URL('mgr/notice'))
+										array('title' => '通知',	'url' => array('mgr/notice'))
 										)
 								 ),
 							array(
 									'title' => '扩展设置',
 									'sub' => array(
-										array('title' => '页头页脚链接',	'url' => URL('mgr/setting.getlink')),
-										array('title' => '个人资料推广',	'url' => URL('mgr/plugins.config', 'id=3')),
-										array('title' => '我的首页聚焦位',	'url' => URL('mgr/plugins.config', 'id=2'))
+										array('title' => '页头页脚链接',	'url' => array('mgr/setting.getlink')),
+										array('title' => '个人资料推广',	'url' => array('mgr/plugins.config', 'id=3')),
+										array('title' => '我的首页聚焦位',	'url' => array('mgr/plugins.config', 'id=2'))
 										)
 								 )
 					 );
@@ -155,16 +164,16 @@ class action {
 			$this->menu['user']['sub'] = array(
 							array('title' => '用户',
 								'sub' => array(
-									array('title' => '用户管理',		'url' => URL('mgr/users.search')),
-									array('title' => '用户组管理',		'url' => URL('mgr/user_recommend.getReSort')),
-									array('title' => '禁止用户',		'url' => URL('mgr/users.userAction')),
+									array('title' => '用户管理',		'url' => array('mgr/users.search')),
+									array('title' => '用户组管理',		'url' => array('mgr/user_recommend.getReSort')),
+									array('title' => '禁止用户',		'url' => array('mgr/users.userAction')),
 									)
 								),
 							array(
 								'title' => '名人 - 认证',
 								'sub' => array(
-									array('title' => '认证管理',		'url' => URL('mgr/user_verify.search')),
-									array('title' => '名人管理',		'url' => URL('mgr/celeb_mgr.starCatList')),
+									array('title' => '认证管理',		'url' => array('mgr/user_verify.search')),
+									array('title' => '名人管理',		'url' => array('mgr/celeb_mgr.starCatList')),
 									)
 								)
 							);
@@ -172,14 +181,14 @@ class action {
 			$this->menu['tools']['sub'] = array(
 				array('title' => '整合工具',
 					'sub' => array(
-						array('title' => '转发按钮', 'url' => URL('mgr/share')),
-						array('title' => '站外调用', 'url' => URL('mgr/content_unit'))
+						array('title' => '转发按钮', 'url' => array('mgr/share')),
+						array('title' => '站外调用', 'url' => array('mgr/content_unit'))
 					)
 				),
 				array('title' => '扩展应用',
 					'sub' => array(
-						array('title' => '在线直播', 'url' => URL('mgr/wb_live')),
-						array('title' => '在线访谈', 'url' => URL('mgr/micro_interview'))
+						array('title' => '在线直播', 'url' => array('mgr/wb_live')),
+						array('title' => '在线访谈', 'url' => array('mgr/micro_interview'))
 					)
 				)
 			);
@@ -235,7 +244,8 @@ class action {
 					//APP::ajaxRst(false, '-1', '用户未登录');
 					exit('{"state":"403", "msg":"您未登录！"}');
 				}
-				exit('<script>window.top.location.href = "' . URL('account.sinaLogin','cb=login&loginCallBack=' . urlencode(URL('mgr/admin.login', '', 'admin.php')), 'index.php'). '"</script>');
+				$jumpAct = V('-:sysConfig/login_way', 1)*1 == 2 ? 'account.siteLogin' : 'account.sinaLogin'; 
+				exit('<script>window.top.location.href = "' . URL($jumpAct,'cb=login&loginCallBack=' . urlencode(URL('mgr/admin.login', '', 'admin.php')), 'index.php'). '"</script>');
 				//APP :: redirect(URL('account.gloCheckLogin', '', 'index.php'), 3);
 			}
 
@@ -247,11 +257,102 @@ class action {
 				exit('<script>window.top.location.href = "' . URL('mgr/admin.login', '', 'admin.php'). '"</script>');
 				//APP :: redirect(URL('mgr/admin.login', 'admin.php'), 3);
 			}
-
+			// 除登录，拿出和取验证码外，其它页面都要进行功能控制
+			if (!in_array($this->_getAction() , array('login', 'authcode', 'logout')) && !$this->_isAllowAccess(USER::aid())) {
+				if ($ajax) {
+					APP::ajaxRst(false, '-3', '没有访问权限');
+				}
+				exit('没有访问权限');
+			}
 			TPL :: assign('admin_root', $this->_getUserInfo('__CLIENT_ADMIN_ROOT'));
 			TPL :: assign('real_name', $this->_getUserInfo('screen_name'));
 			TPL :: assign('admin_id', $this->_getUid());
 			
+		}
+		
+		/**
+		 * 是否允许访问
+		 * @param $uid int 管理员用户id
+		 * @param $router string 路由
+		 * @return boolean true表示为允许
+		 */
+		function _isAllowAccess($uid, $router=null) {
+			$permissions = $this->_getPermissions($uid);
+			if (!$permissions || !is_array($permissions)) {
+				return false;
+			}
+			if ($router === null) {
+				$r = APP::getRuningRoute(false);
+			} else {
+				$r = $router;
+			}
+			foreach ($permissions as $p) {
+				if (preg_match('#' . $p . '#', $r)) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		/**
+		 * 得到用户权限
+		 * @param $uid int 管理员id
+		 * @return array
+		 */
+		function _getPermissions($uid) {
+			static $permissions = array();
+			if (isset($permissions[$uid])) {
+				return $permissions[$uid];
+			}
+			//@todo 缓存权限信息
+			//@todo 得到用户所属组
+			$rs = DS('mgr/adminCom.getAdminById','' ,$uid);
+			if (empty($rs)) {
+				return false;
+			}
+			$group_id = $rs['group_id'];
+			
+			//@todo 得到用户所属组权限
+			$rs = DS('mgr/adminCom.getGroupInfo','' ,$group_id);
+			if ($rs && isset($rs['permissions']) && !empty($rs['permissions'])) {
+				return $permissions[$uid] = explode(',', $rs['permissions']);
+			}
+			return false;
+		}
+
+		/**
+		 * 得到当前用户可以访问的菜单
+		 * @param $uid int
+		 * @return Array
+		 */
+		function _getUserMenu($uid) {
+			$user_menu = array();
+			foreach($this->menu as $key =>$main) {
+				$m_menu = array();
+				foreach ($main['sub'] as $m) {
+					$s_menu = array();
+					foreach ($m['sub'] as $s) {
+						$router = $s['url'][0];
+
+						if ($this->_isAllowAccess($uid, $router)) {
+							$s_menu[] = $s;
+						}
+					}
+					if (!empty($s_menu)) {
+						$m_menu[] = array(
+								'title' => $m['title'],
+								'sub' => $s_menu
+								);
+					}
+				}
+				if (!empty($m_menu)) {
+					$user_menu[$key] = array(
+							'title' => $main['title'],
+							'sub' => $m_menu
+							);
+				}
+			}
+			return $user_menu;
 		}
 
 		/**
@@ -347,7 +448,10 @@ class action {
 			if (!$url) {
 				APP :: tips(array('msg'=> $msg, 'tpl' => 'error','baseskin'=>false));
 			}
-			APP :: tips(array('msg'=> $msg, 'tpl' => 'mgr/success', 'timeout'=>3, 'location' => $url, 'baseskin'=>false));
+			
+			// 成功后直接调整，不出现成功提示页面, 2011-05-20
+			//APP :: tips(array('msg'=> $msg, 'tpl' => 'mgr/success', 'timeout'=>3, 'location' => $url, 'baseskin'=>false));
+			APP::redirect($url, 3);
 		}
 
 		/**
@@ -466,7 +570,11 @@ class action {
 
 			$json = array();
 			$result['pic'] = $fileInfo['webpath'];
-			$result['filepath'] = $fileInfo['webpath'];
+			if (strtolower(IMAGE_ADAPTER)==='sae') {
+				$result['filepath'] = $fileInfo['webpath'];
+			} else {
+				$result['filepath'] = F('fix_url', $fileInfo['savepath']);
+			}
 
 			die("<script language=\"javascript\">$callback(".APP::ajaxRst($result, 0, '', true).");$redirect</script>");
 		}

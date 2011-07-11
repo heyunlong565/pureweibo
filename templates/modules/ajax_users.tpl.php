@@ -25,14 +25,14 @@ for ($i=0, $count=count($users); $i< $count; $i+=2) {?>
                                     <div class="famous<?php if ($j==1) {echo ' famous-r';}?>" rel="u:<?php echo $row['id'];?>">
                                     
                                     	<div class="user-pic">
-                                            <input type="checkbox" rel="e:ck"/><a href="<?php echo URL('ta', 'id=' . $row['id'] . '&name='. urlencode($row['screen_name']));?>"><img src="<?php echo $row['profile_image_url']?>" alt="<?php echo htmlspecialchars($row['screen_name']);?>的头像" /></a>
+											<input type="checkbox" rel="e:ck"/><a href="<?php echo URL('ta', 'id=' . $row['id'] . '&name='. urlencode($row['screen_name']));?>"><img src="<?php echo $row['profile_image_url']?>" alt="<?php LO('modules__ajaxUsers__profileImage', F('escape', $row['screen_name']));?>" /></a>
                                         </div>
                                         <div class="btn-box">
 											<?php if ($row['id'] != $uid) {?>
 											<?php if ($row['following']) {?>
-												<span class="followed-btn">已关注</span>
+											<span class="followed-btn"><?php LO('common__template__followed');?></span>
 											<?php } else {?>
-												<a class="addfollow-btn"  rel="e:fl,t:1" href="#">加关注</a></li>
+											<a class="addfollow-btn"  rel="e:fl,t:1" href="#"><?php LO('common__template__toFollow');?></a></li>
 											<?php }?>
 											<?php }?>
 										</div>

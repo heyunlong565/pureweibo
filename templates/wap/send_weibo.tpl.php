@@ -10,15 +10,13 @@
 <?php TPL::plugin('wap/include/nav', array('is_top' => true), false); ?>
 	<div class="send">
 		<form method="post" action="<?php echo WAP_URL('wbcom.postWB'); ?>">
-			<span>微博内容:</span><br />
+			<span><?php LO('wbcom__sendWBFrm__label_weiboContent');?></span><br />
 			<textarea id="content" name="content" rows="5" cols="10"></textarea>
-			<div><input type="submit" value="发布" /></div>
+			<div><input type="submit" value="<?php LO('wbcom__sendWBFrm__btnPublish');?>" /></div>
 		</form>
 	</div>
 	<div class="hint">
-		注:<br />
-		1、微博内容中两个#之间的文字将作为本条微博的标签.如:我好#幸福#呀.<br />
-		2、自动分条发布仅限于小于420字的纯文字微博,140个字以上将自动分条发布,图文微博在发布时只保留文字内容.
+		<?php LO('wbcom__sendWBFrm__label_tips');?>
 	</div>
 	</div>
 <?php TPL::plugin('wap/include/nav', array('is_top' => false), false); ?>

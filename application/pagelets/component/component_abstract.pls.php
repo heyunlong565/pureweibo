@@ -2,7 +2,7 @@
 /**
  * 模块pipe基础类
  * @author yaoying
- * @version $Id: component_abstract.pls.php 10966 2011-03-01 11:38:00Z yaoying $
+ * @version $Id: component_abstract.pls.php 16645 2011-05-31 08:17:38Z linyi1 $
  *
  */
 class component_abstract_pls {
@@ -26,13 +26,15 @@ class component_abstract_pls {
 	 * @param string $msg
 	 * @param bool $force 强制输出？否的话受到IS_DEBUG限制
 	 */
-	function _error($msg = '未填写问题原因', $force = false){
+	function _error($msg = false, $force = false){
 		if(true != $force && (!defined('IS_DEBUG') || !IS_DEBUG)){
 			return null;
 		}
-		$title = isset($this->mod['title']) ? F('escape', (string)$this->mod['title']) : '未知模块';
+		$msg = $msg ? $msg : L('pls__component__abstract__errorMsg'); 
+		$title = isset($this->mod['title']) ? F('escape', (string)$this->mod['title']) : L('pls__component__abstract__emptyTitle');
 		$component_id = isset($this->mod['component_id']) ? (int)$this->mod['component_id'] : -999;
-		echo "<div class='int-box load-fail icon-bg'>{$title}（模块ID：{$component_id}）遇到问题：{$msg}</div>";
+		LO('pls__component__abstract__apiError', $title, $component_id, $msg);
+		//echo "<div class='int-box ico-load-fail'>{$title}（模块ID：{$component_id}）遇到问题：{$msg}</div>";
 	}
 	
 }

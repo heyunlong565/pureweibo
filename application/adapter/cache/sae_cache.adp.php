@@ -8,7 +8,6 @@ class sae_cache
 		if($this->memcache){
 			$this -> is_cache = true;
 		}else{
-			LOGSTR('cache', 'SAE memcache init error.');
 			$this -> is_cache = false;
 		}
 	}
@@ -19,7 +18,7 @@ class sae_cache
 
 	function get($key) {
 		if($this -> is_cache){
-			return memcache_get($this->memcache,$key);
+			return memcache_get($this->memcache, MC_PREFIX.$key);
 		}else{
 			return false;
 		}
@@ -27,11 +26,7 @@ class sae_cache
 
 	function set($key, $value, $ttl = 0) {
 		if($this -> is_cache){
-			$rst = memcache_set($this->memcache,$key, $value, MEMCACHE_COMPRESSED, $ttl);
-			if (!$rst) {
-				LOGSTR('cache', 'SAE set data error.data size is:'. sizeof($value));
-			}
-			return $rst;
+			return memcache_set($this->memcache, MC_PREFIX.$key, $value, MEMCACHE_COMPRESSED, $ttl);
 		}else{
 			return false;
 		}
@@ -39,11 +34,18 @@ class sae_cache
 
 	function delete($key) {
 		if($this -> is_cache){
-			return memcache_delete($this->memcache,$key);
+			return memcache_delete($this->memcache, MC_PREFIX.$key);
 		}else{
 			return false;
 		}
 	}
 
+	function flush() {
+		if($this -> is_cache){
+			return memcache_flush($this->memcache);
+		}else{
+			return false;
+		}
+	}
 }
 ?>

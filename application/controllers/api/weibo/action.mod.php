@@ -82,7 +82,13 @@ class action_mod
 		/// 图片
 		$pic = V('p:pic');
 		
-
+		/// 审核策略检查
+		if (F('strategy', $text)) {
+			$xwbPreAction 	= APP::N('xwbPreAction');
+			$e_params 	= V('p:extra_params', array());
+			$extra_params 	= array('weibo' => $text, 'picid' => $pic);
+			call_user_func_array(array($xwbPreAction, 'extra_update'), array($extra_params, $e_params));
+		}
 
 		if (empty($pic)) {
 			/// 调用发布微博api
@@ -187,6 +193,14 @@ class action_mod
 	{
 		/// 要删除微博的id
 		$id = V('p:id');
+		/// 待审核微博标识
+		$v = V('p:v');
+		/// 删除待审核微博
+		if ($v) {
+			DR('weiboVerify.deleteWeiboVerify', false, $id);
+			APP::ajaxRst(true, 0);
+			exit;
+		}
 
 		/// 调用删除微博api
 		DS('xweibo/xwb.destroy', '', $id);
@@ -211,26 +225,60 @@ class action_mod
 		$text = trim(V('p:text'));
 		$rtids = V('p:rtids');
 
-		$add = false;
+		///是否同时评论
+		$is_comment = 0;
+		//$add = false;
+
+		/// 审核策略检查
+		if (F('strategy', $text)) {
+			$xwbPreAction 	= APP::N('xwbPreAction');
+			$e_params 		= V('p:extra_params', array());
+			$extra_params 	= array('weibo' => $text, 'retweeted_wid' => $id, 'cwid' => $rtids);
+			call_user_func_array(array($xwbPreAction, 'extra_update'), array($extra_params, $e_params));
+		}
+
+		/// 如果勾选了作为某人的评论
+		if (!empty($rtids)) {
+			//$add = true;
+			$rtid_array = explode(',', $rtids);
+			if (count($rtid_array) > 1) {
+				/// 同时发表评论给当前微博和原微博
+				$is_comment = 3;
+			} elseif ($rtid_array[0] == $id) {
+				/// 发表评论给原微博
+				$is_comment = 2;
+			} else {
+				/// 发表评论给当前微博
+				$is_comment = 1;
+			}
+			/*
+			foreach ($rtid_array as $var) {
+				DR('xweibo/xwb.comment', '', $var, $text);
+			}
+			 */
+		}
 
 		/// 调用转发微博api
-		$result = DS('xweibo/xwb.repost', '', $id, $text);
+		$result = DS('xweibo/xwb.repost', '', $id, $text, $is_comment);
 		//备份微博
 		$this->_backupWeibo($result);
+		
+		/// 额外的逻辑处理操作
+		$doAction 		= V('p:doAction');
+		$extra_params 	= V('p:extra_params', array());
+		if (!empty($doAction)) {
+			$xwbAdditive = APP::N('xwbAdditive');
+			$fun_name = 'extra_'.$doAction;
+			$extra_params_array = array($extra_params, $result);
+			call_user_func_array(array($xwbAdditive, $fun_name), $extra_params_array);
+		}
+		
 		/// 过滤微博
 		$result = F('weibo_filter', $result, true);
 
 		if (is_array($result)) {
 			$result['uid'] = USER::uid();
 			$result['author'] = true;
-		}
-		/// 如果勾选了作为某人的评论，调用评论接口
-		if (!empty($rtids)) {
-			$add = true;
-			$rtid_array = explode(',', $rtids);
-			foreach ($rtid_array as $var) {
-				DR('xweibo/xwb.comment', '', $var, $text);
-			}
 		}
 
 		/// 获取该微博的转发数和评论数
@@ -317,6 +365,14 @@ class action_mod
 		$forward = V('p:forward', null);
 		$type = max(V('p:type'), 1);
 
+		// 审核策略检查
+		if ( F('strategy', $text) )
+		{
+			$xwbPreAction 	= APP::N('xwbPreAction');
+			$extra_params[]	= array('content'=>$text, 'mid'=>$id, 'reply_cid'=>V('p:cid'), 'forward'=>$forward);
+			call_user_func_array( array($xwbPreAction, 'extra_comment'), $extra_params);
+		}
+		
 		$add = false;
 		/// 调用评论微博api
 		$result = DS('xweibo/xwb.comment', '', $id, $text);
@@ -509,6 +565,16 @@ class action_mod
 		$text = trim(V('p:text'));
 		$forward = V('p:forward');
 		$type = max(V('p:type'), 1);
+		
+		
+		// 审核策略检查
+		if ( F('strategy', $text) )
+		{
+			$xwbPreAction 	= APP::N('xwbPreAction');
+			$extra_params[]	= array('content'=>$text, 'mid'=>$id, 'reply_cid'=>V('p:cid'), 'forward'=>$forward);
+			call_user_func_array( array($xwbPreAction, 'extra_comment'), $extra_params);
+		}
+		
 
 		$add = false;
 		/// 调用回复评论接口
@@ -908,16 +974,20 @@ class action_mod
 		if (isset($result['new_status']) && $result['new_status'] > 0) {
 			//删除'我的首页'缓存
 			DD('xweibo/xwb.getFriendsTimeline');
-		} elseif ($result['comments'] > 0) {
+		} 
+		if ($result['comments'] > 0) {
 			//删除'我收到的评论'缓存
 			DD('xweibo/xwb.getCommentsToMe');
-		} elseif ($result['dm'] > 0) {
+		} 
+		if ($result['dm'] > 0) {
 			//删除'我的私信'缓存
 			DD('xweibo/xwb.getDirectMessages');
-		} elseif ($result['mentions'] > 0) {
+		} 
+		if ($result['mentions'] > 0) {
 			//删除'提到我的'缓存
 			DD('xweibo/xwb.getMentions');
-		} elseif ($result['followers'] > 0) {
+		} 
+		if ($result['followers'] > 0) {
 			//删除'我的粉丝'缓存
 			DD('xweibo/xwb.getFollowers');
 		}
@@ -1041,8 +1111,50 @@ class action_mod
 		//获取要查询的ID，以逗号分隔
 		$url_id = V('r:id');
 
+		$ret = DR('xweibo/xwb.shortUrlBatchInfo', false, $url_id);
+		if (!empty($ret['errno'])) {
+			APP::ajaxRst(false, -1);
+		}
+
+		$ret = $ret['rst'];
+		if ($ret) {
+			$result = array();
+			$json = array();
+			foreach ($ret as $var) {
+				$matches = array();
+				preg_match("/^http:\/\/t.cn\/(.*)/", $var['url_short'], $matches);
+				$url_short_id = $matches[1];
+				$result[$url_short_id]['url'] = $var['url_long'];
+				if ($var['type'] == 1) {
+					$result[$url_short_id]['type'] = 'video';
+					$result[$url_short_id]['screen'] = $var['annotations'][0]['pic'];
+					$result[$url_short_id]['title'] = $var['annotations'][0]['title'];
+					$result[$url_short_id]['flash'] = $var['annotations'][0]['url'];
+					$result[$url_short_id]['mp4'] = isset($var['annotations'][0]['mp4']) ? $var['annotations'][0]['mp4'] : ''; 
+					$result[$url_short_id]['icon'] = '';
+				} elseif ($var['type'] == 2) {
+					$result[$url_short_id]['type'] = 'music';
+					$result[$url_short_id]['screen'] = '';
+					$result[$url_short_id]['appkey'] = '';
+					$result[$url_short_id]['title'] = $var['annotations'][0]['title'];
+					$result[$url_short_id]['author'] = isset($var['annotations'][0]['author']) ? $var['annotations'][0]['author'] : '';
+					//$result[$url_short_id]['url'] = $var['annotations'][0]['url'];
+				} else {
+					$result[$url_short_id]['type'] = 'url';
+				}	
+			}
+			$json['code'] = 'A00006';
+			$json['data'] = $result;
+			$json_str = json_encode($json);
+			echo $json_str;
+		} else {
+			APP::ajaxRst(false, -1);
+		}
+		exit;
+
 		//var_dump($url_id);
 
+		/*
 		$http = APP::ADP('http');
 
 		$http->setUrl(SINAURL_INFO);
@@ -1057,6 +1169,7 @@ class action_mod
 			APP::ajaxRst(false, -1);
 		}
 		exit;
+		 */
 	}
 
 	/**
@@ -1250,33 +1363,46 @@ class action_mod
 	 */
 	function getCounts()
 	{
-		$ids = V('p:ids');
-
+		/// 未登录
+		if (!USER::isUserLogin() && IS_IN_JS_REQUEST) {
+			APP::ajaxRst(true, 0);
+			exit;
+		}
+		
+		$ids 		= V('p:ids');
+		$idList 	= explode(',', $ids);
+		$idList		= is_array($idList) ? $idList : array();
+		$idListAry 	= array_chunk($idList, 100);
+		
 		$uid = USER::uid();
-		if (!$uid) {
+		if (!$uid) 
+		{
 			if (!defined('WB_USER_OAUTH_TOKEN') || !WB_USER_OAUTH_TOKEN) {
 				APP::ajaxRst(true, 0);
 				exit;
 			}
-
 			DS('xweibo/xwb.setToken', '', 2);
-
-			$batch_counts = DR('xweibo/xwb.getCounts', '', $ids);
-		} else {
-			$batch_counts = DR('xweibo/xwb.getCounts', '', $ids);
 		}
 
-		if (!empty($batch_counts['errno'])) {
-			APP::ajaxRst(false, $batch_counts['errno'], $batch_counts['err']);
-			exit;
-		}
-
-		$batch_counts = $batch_counts['rst'];
-
-		if (!empty($batch_counts)) {
-			$counts = array();
-			foreach ($batch_counts as $key => $var) {
-				$counts[(string)$var['id']] = array($var['comments'], $var['rt']);
+		$counts = array();
+		if ( is_array($idListAry) )
+		{
+			foreach ($idListAry as $idsAry)
+			{
+				$ids		  = implode(',', $idsAry);
+				$batch_counts = DR('xweibo/xwb.getCounts', '', $ids);
+				if (!empty($batch_counts['errno'])) {
+					APP::ajaxRst(false, $batch_counts['errno'], $batch_counts['err']);
+					exit;
+				}
+		
+				$batch_counts = $batch_counts['rst'];
+				if (!empty($batch_counts)) 
+				{
+					foreach ($batch_counts as $key => $var) {
+						$counts[(string)$var['id']] = array($var['comments'], $var['rt']);
+					}
+				}
 			}
 			APP::ajaxRst($counts, 0);
 			exit;
@@ -1291,7 +1417,7 @@ class action_mod
 	*/
 	function getTags()
 	{
-		$uid = (int)V('p:uid', 0);
+		$uid = V('p:uid', 0);
 		if (empty($uid)) {
 			APP::ajaxRst(false, 1010000, 'Parameter can not be empty');
 			exit;
@@ -1390,7 +1516,7 @@ class action_mod
 	 */
 	function emotions()
 	{
-		$faces = DR('xweibo/xwb.emotions', 86400);
+		$faces = DR('xweibo/xwb.emotions', 86400, APP::getLang());
 		header('max-age: 3600');
 		APP::ajaxRst($faces['rst']);
 		exit;
@@ -1425,11 +1551,12 @@ class action_mod
 
 		$db->setTable('weibo_copy');
 		$data_weibo = array();
-		$data_weibo['id'] = $result['id'];
-		$data_weibo['weibo'] = $result['text'];
-		$data_weibo['uid'] = $result['user']['id'];
+		$data_weibo['id'] 		= $result['id'];
+		$data_weibo['weibo']	= $result['text'];
+		$data_weibo['uid'] 		= $result['user']['id'];
 		$data_weibo['nickname'] = $result['user']['screen_name'];
-		$data_weibo['addtime'] = APP_LOCAL_TIMESTAMP;
+		$data_weibo['addtime'] 	= APP_LOCAL_TIMESTAMP;
+		$data_weibo['pic'] 		= isset($result['thumbnail_pic']) ? $result['thumbnail_pic'] : '';
 		$data_weibo['disabled'] = 0;
 		$db->save($data_weibo);
 	}
@@ -1445,17 +1572,21 @@ class action_mod
 
         //当前用户是否已开通个性域名
         if ( USER::get('domain_name') ) {
-            APP::ajaxRst('false', '400024', '已设置个性域名，拒绝访问');
+            APP::ajaxRst('false', '400024', L('controller__action__applyDomain__haveSet'));
         }
 
         if ( !preg_match('/^[a-z0-9]{6,20}$/sim', $domain_name) || is_numeric($domain_name) ){
-            APP::ajaxRst('false', '400023', '格式不正确');
+            APP::ajaxRst('false', '400023', L('controller__action__applyDomain__formatError'));
         }
 
+        if ( file_exists(P_MODULES."/".$domain_name.EXT_MODULES) ) {
+        	APP::ajaxRst('false', '400022', L('controller__action__applyDomain__domainUsed'));	
+        }
+        
         $sina_uid = USER::uid();
         $isExist  = DR('mgr/userCom.isDomainExist', FALSE, $domain_name);
         if ( $isExist ){
-            APP::ajaxRst('false', '400022', '域名已被使用');
+            APP::ajaxRst('false', '400022', L('controller__action__applyDomain__domainUsed'));
         }
 
         $setResult = DR('mgr/userCom.setUserDomain', FALSE, $sina_uid, $domain_name);
@@ -1463,7 +1594,7 @@ class action_mod
         	APP::ajaxRst(true);
         }
 
-         APP::ajaxRst('false', '4000221', '数据库操作失败');
+         APP::ajaxRst('false', '4000221', L('controller__action__applyDomain__dbError'));
     }
 
     /**
@@ -1505,7 +1636,7 @@ class action_mod
 			$subject_txt = trim(V('p:text'));
 
 			if ($subject_txt == '') {
-				APP::ajaxRst('false', '500101', '话题关键字不能为空');
+				APP::ajaxRst('false', '500101', L('controller__action__addSubject__topicKeyNotEmpty'));
 			}
 			$sina_uid = USER::uid();
 			$add_result = DR('xweibo/xwb.addSubject', FALSE, $sina_uid, $subject_txt);
@@ -1513,9 +1644,9 @@ class action_mod
 			if ($add_result['errno'] == 0) {
 				APP::ajaxRst(TRUE);
 			} elseif ($add_result['errno'] == 1) {
-				APP::ajaxRst('false', '500100', '话题重复，未被添加');
+				APP::ajaxRst('false', '500100', L('controller__action__addSubject__topicRepeat'));
 			} else {
-				APP::ajaxRst('false', '500102', '数据库操作失败');
+				APP::ajaxRst('false', '500102', L('controller__action__addSubject__dbError'));
 			}
 		}
 		/**
@@ -1527,7 +1658,7 @@ class action_mod
 			$subject_txt = trim(V('p:text'));
 
 			if ($subject_txt == '') {
-				APP::ajaxRst('false', '500101', '话题关键字不能为空');
+				APP::ajaxRst('false', '500101', L('controller__action__deleteSubject__topicKeyNotEmpty'));
 			}
 			$sina_uid = USER::uid();
 			$add_result = DR('xweibo/xwb.deleteSubject', FALSE, $sina_uid, $subject_txt);
@@ -1535,9 +1666,9 @@ class action_mod
 			if ($add_result['errno'] == 0) {
 				APP::ajaxRst(TRUE);
 			} elseif ($add_result['errno'] == 1) {
-				APP::ajaxRst('false', '500103', '不存在该话题订阅的历史记录');
+				APP::ajaxRst('false', '500103', L('controller__action__deleteSubject__notSubTopic'));
 			} else {
-				APP::ajaxRst('false', '500102', '数据库操作失败');
+				APP::ajaxRst('false', '500102', L('controller__action__deleteSubject__dbError'));
 			}
 		}
 		/**
@@ -1549,17 +1680,17 @@ class action_mod
 			$subject_txt = trim(V('p:text'));
 
 			if ($subject_txt == '') {
-				APP::ajaxRst('false', '500101', '话题关键字不能为空');
+				APP::ajaxRst('false', '500101', L('controller__action__isSubjectFollowed__topicKeyNotEmpty'));
 			}
 			$sina_uid = USER::uid();
 			$add_result = DR('xweibo/xwb.isSubjectFollowed', FALSE, $sina_uid, $subject_txt);
 
 			if ($add_result['errno'] == 0) {
-				APP::ajaxRst('true', '500104', '该话题未被收藏');
+				APP::ajaxRst('true', '500104', L('controller__action__isSubjectFollowed__topicNotFavs'));
 			} elseif ($add_result['errno'] == 1) {
-				APP::ajaxRst('false', '500105', '该话题已经被收藏');
+				APP::ajaxRst('false', '500105', L('controller__action__isSubjectFollowed__topicHavedFavs'));
 			} else {
-				APP::ajaxRst('false', '500102', '数据库操作失败');
+				APP::ajaxRst('false', '500102', L('controller__action__isSubjectFollowed__dbError'));
 			}
 		}
 
@@ -1578,14 +1709,26 @@ class action_mod
 					$sina_uid = USER::uid();
 				}
 				$list = DR('xweibo/xwb.getSubjectList', '', $sina_uid);
+				
+				// html标签过滤
+				if ( isset($list['rst']) && is_array($list['rst']) )
+				{
+					foreach ($list['rst'] as $key=>$val)
+					{
+						if ( isset($val['subject']) ) {
+							$list['rst'][$key]['href'] 		= URL('search.weibo', 'k='.urlencode($val['subject']));
+							$list['rst'][$key]['subject'] 	= F('escape', $val['subject']);
+						}
+					}
+				}
 
 				if (isset($list['rst'])) {
 					APP::ajaxRst($list['rst']);
 				} else {
-					APP::ajaxRst('false', '500102', '数据库操作失败');
+					APP::ajaxRst('false', '500102', L('controller__action__getAllSubject__dbError'));
 				}
 			} else {
-				APP::ajaxRst('false', '500107', '用户uid无效');
+				APP::ajaxRst('false', '500107', L('controller__action__getAllSubject__userId'));
 			}
 		}
 		

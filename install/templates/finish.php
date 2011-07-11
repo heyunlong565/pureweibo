@@ -16,17 +16,29 @@
 				<div class="step4 step-bg"></div>
 				<div class="ct-mid">
 					<div class="title-info">
-						<h3 class="lh44"><span class="icon-finish all-bg"></span><?php echo $_LANG['xweibo_finish_install'];?></h3>
+					<h3 class="lh44"><span class="icon-finish all-bg"></span><?php if ($type == 'upgrade'):?><?php echo $_LANG['xweibo_finish_upgrade_install'];?><?php else:?><?php echo $_LANG['xweibo_finish_install'];?><?php endif;?></h3>
 					</div>
 					<ul class="">
+						<?php if (($type=='repeat' || $type=='upgrade') && WB_USER_OAUTH_TOKEN && WB_USER_OAUTH_TOKEN_SECRET):?>
+						<li>1、<?php echo $_LANG['xweibo_security_tip'];?></li>
+						<li>2、<?php echo $_LANG['xweibo_clear_cache'];?></li>
+						<li>3、<?php echo $_LANG['xweibo_api_warn'];?></li>
+						<?php else:?>
 						<li>1、<?php echo $_LANG['xweibo_admin_comment'];?></li>
 						<li>2、<?php echo $_LANG['xweibo_security_tip'];?></li>
 						<li>3、<?php echo $_LANG['xweibo_clear_cache'];?></li>
 						<li>4、<?php echo $_LANG['xweibo_api_warn'];?></li>
+						<?php endif;?>
 					</ul>
-					<div class="btn-area">
-					<a href="<?php echo $admin_url;?>" class="btn-active-admin all-bg"></a>
-					</div>
+					<?php if (($type=='repeat' || $type=='upgrade') && WB_USER_OAUTH_TOKEN && WB_USER_OAUTH_TOKEN_SECRET):?>
+						<p class="btn-area">
+						<a href="<?php echo $index_url;?>">去网站首页&gt;&gt;</a><a href="<?php echo $admin_url;?>">去管理后台&gt;&gt;</a>
+						</p>
+					<?php else:?>
+						<div class="btn-area">
+						<a href="<?php echo $admin_url;?>" class="btn-active-admin all-bg"></a>
+						</div>
+					<?php endif;?>
 				</div>
 				<div class="ct-bot"></div>
 			</div>

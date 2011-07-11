@@ -136,15 +136,18 @@ class setting_mod extends action{
 			}
 
 			$data = array(
-				'logo' => $logo,	//logo图标
-				'logo_wap' => $logo_wap, //wap logo
-				'logo_output' => $logo_output, //output logo
-				'address_icon' => $icon,	//网站地址图标
-				'third_code' => V('p:third_code', ''),//网站第三方统计代码
-				'site_record' => htmlspecialchars(trim(V('p:site_record', ''))),//网站备案信息代码
-				'site_name' => htmlspecialchars(trim(V('p:site_name', ''))),//网站名称
-				'open_user_local_relationship' => trim( V('p:local_relation', 0) )	// 是否开启本地关系
+				'logo' 							=> $logo,											//logo图标
+				'logo_wap' 						=> $logo_wap, 										//wap logo
+				'logo_output' 					=> $logo_output, 									//output logo
+				'address_icon' 					=> $icon,											//网站地址图标
+				'third_code' 					=> V('p:third_code', ''),							//网站第三方统计代码
+				'site_record' 					=> htmlspecialchars(trim(V('p:site_record', ''))),	//网站备案信息代码
+				'site_name' 					=> htmlspecialchars(trim(V('p:site_name', ''))),	//网站名称
+//				'wb_lang_type' 					=> trim( V('p:wb_lang_type', 'zh_cn') ),			//网站当前语言
+				'sysLoginModel' 				=> trim( V('p:sysLoginModel', 0) ),					//登录模式
+				'open_user_local_relationship' 	=> trim( V('p:local_relation', 0) )					// 是否开启本地关系
 				);
+				
 			foreach($data as $key=>$value) {
 				$result = DR('common/sysConfig.set', '', $key, $value);
 				if($result['errno']) {
@@ -567,6 +570,64 @@ class setting_mod extends action{
 	}
 	
 	
+		/**
+		*  背景图片上传 
+		*/
+	  function skinBGUpload(){
+		if ($this->_isPost()) {
+			///如何防止上传相同内容的图片？？？
+			if(!USER::isUserLogin()){
+				APP::ajaxRst(FALSE,610005, L('controller__setting__notLogin'));
+				return;
+			}
+			else{
+				$sina_uid=USER::uid();
+			}
+			$file = V('f:skinbg');
+			$callback=V('g:callback');
+			$state = 200;
+			$maxSize = 2 * 1024 * 1024;
+			$script='window.location="/js/blank.html?rand='.microtime().'";';
+			while ($file && $file['tmp_name']) {
+				if ($file['size'] > $maxSize) {
+					APP::JSONP(FALSE,3040012, L('controller__setting__sizeLimit'),$callback,$script);
+					break;
+				}
+				$info = getimagesize($file['tmp_name']);
+				if ($info[2] != 3&&$info[2] != 2) {
+					//APP::ajaxRst(FALSE,610003,'上传的图片文件不为PNG/JPG格式，请重新选择');
+					APP::JSONP(FALSE,610003,L('controller__setting__uploadImgType'),$callback,$script);
+					break;
+				}
+				//上传文件
+				$file_obj = APP::ADP('upload');
+				///以 md5 为名保存文件
+				if (!$file_obj->upload('skinbg', WB_SKIN_BGIMG_UPLOAD_DIR . md5('admin#skin'), P_VAR_NAME, 'png,jpeg,jpg', $maxSize)) {
+					APP::JSONP(FALSE,610007, L('controller__setting__copyImgError'),$callback,$script);
+					break;
+				}
+				//获取上传文件的信息
+				$skinBG = $file_obj->getUploadFileInfo();
+				//return APP::ajaxRst(F('fix_url', $skinBG['webpath']));
+				APP::JSONP(array('url'=>F('fix_url', $skinBG['webpath']) . '?_rand='.time()),0,'',$callback,$script);
+				return;
+			}
+			if($file&&$file['tmp_name']==''&&$file['size']==0){
+				APP::JSONP(FALSE,3040012, L('controller__setting__sizeLimit'),$callback,$script);
+				return;
+			}
+			else{
+				APP::JSONP(FALSE,610008, L('controller__setting__serverError'),$callback,$script);
+				return;
+			}
+		}
+		else{
+			APP::ajaxRst(FALSE,610002,'');
+		}
+		
+	  }
+	
+	
 	
 	/**
 	 * 检查当前服务器是否Apache并开启了Rewrite模块
@@ -584,5 +645,156 @@ class setting_mod extends action{
 		return TRUE;
 	}
 	
+	
+	/**
+	 * 审核策略的设置
+	 */
+	function setStrategy()
+	{
+		// Update
+		if ( $this->_isPost() ) 
+		{
+			// Build Data
+			$data  				= V('p:data');
+			$config				= array();
+			$config['strategy'] = intval($data['strategy']);
+			if ($config['strategy'])
+			{
+				$config['type'] = $data['type'];
+				switch ( $config['type'] )
+				{
+					// 指定用户审核(黑名单)
+					case 1:
+						if ( isset($data['user']) && $data['user'] )
+						{
+							$nameList 	= explode('|', $data['user']);
+							$blackList 	= F('get_user_show', implode(',', $nameList), FALSE, TRUE);
+							if ( is_array($blackList['rst']) )
+							{
+								foreach ($blackList['rst'] as $aUser)
+								{
+									if ( isset($aUser['id']) && ($id=$aUser['id']) ) {
+										$config['black'][$id] = $aUser['screen_name'];
+									}
+								}
+							}
+						}
+					break;
+						
+						
+					// 指定用户不审核(白名单)
+					case 2:
+						if ( isset($data['user']) && $data['user'] )
+						{
+							$nameList 	= explode('|', $data['user']);
+							$whiteList 	= F('get_user_show', implode(',', $nameList), FALSE, TRUE);
+							if ( is_array($whiteList['rst']) )
+							{
+								foreach ($whiteList['rst'] as $aUser)
+								{
+									if ( isset($aUser['id']) && ($id=$aUser['id']) ) {
+										$config['white'][$id] = $aUser['screen_name'];
+									}
+								}
+							}
+						}
+					break;
+					
+					
+					// 全站
+					default:
+						// 开始时间
+						if ( isset($data['start']) && $data['start'] )
+						{
+							$hour			 = isset($data['start_h']) ? $data['start_h'] : '';
+							$config['start'] = strtotime("{$data['start']} $hour:00:00");
+						}
+						
+						// 结束时间
+						if ( isset($data['end']) && $data['end'] )
+						{
+							$hour			= isset($data['end_h']) ? $data['end_h'] : '';
+							$config['end'] 	= strtotime("{$data['end']} $hour:00:00");
+						}
+						
+						//关键字
+						if ( isset($data['keyword']) )
+						{
+							$data['keyword'] = trim($data['keyword']);
+							if ( $data['keyword'] || '0'===(string)$data['keyword'] ) 
+							{
+								$config['keyword'] 	= explode(',', $data['keyword']);
+							}
+						}
+				}
+			}
+			
+			$conf = DR('common/sysConfig.set', FALSE, 'xwb_strategy', json_encode($config));
+	
+			// show result message
+			$url = $_SERVER['HTTP_REFERER'];
+			if ($conf['rst']) {
+				$this->_succ('操作成功', $url);
+			}
+			$this->_error('操作失败！', $url);
+		}
+		
+		
+		// Show View
+		$config = json_decode( V('-:sysConfig/xwb_strategy'), TRUE );
+		if ( isset($config['black']) ) 
+		{
+			$config['user']	= implode('|', array_values($config['black']) );
+		}
+		
+		if ( isset($config['white']) ) 
+		{
+			$config['user']	= implode('|', array_values($config['white']) );
+		}
+		
+		TPL::assign('config', $config);
+		$this->_display('setting_strategy');
+	}
+
+	/**
+	 * 清空缓存
+	 *
+	 */
+	function cacheClear() {
+		if ($this->_isPost()) {
+			// 清空文件缓存
+			if (XWB_SERVER_ENV_TYPE !== 'sae') {
+				$rs = F('clearDir', P_VAR_CACHE);
+				// 修改user_config.php中memcache前缀，以达到更新缓存目的
+				$fn = P_ROOT. '/../user_config.php';
+				$c = file_get_contents($fn);
+				$c = F('set_define_value',$c, 'APP_FLAG_VER', date('mdHis'));
+				$rs_f = file_put_contents($fn, $c);
+				if ($rs && $rs_f) {
+					APP::ajaxRst(true);
+				}
+			} else {// 如果是sae
+/*
+				// 修改memcache前缀，以达到更新缓存目的
+				$storage = new SaeStorage();
+				$content = $storage->read(CONFIG_DOMAIN, md5(CONFIG_DOMAIN));
+
+				$config = array();
+				parse_str($content, $config);
+				$config['app_flag_ver'] = date('mdHis');
+				$query = http_build_query($config);
+				$storage->write(CONFIG_DOMAIN, md5(CONFIG_DOMAIN), $query);
+				$key 	 = 'sae_set_global_define#'.CONFIG_DOMAIN;
+				CACHE::delete($key);
+*/
+				CACHE::flush();
+				APP::ajaxRst(true);
+			}
+			APP::ajaxRst(false);
+		}
+		$this->_display('cache_clear');
+	}
+
+
 }
 ?>

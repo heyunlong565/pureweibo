@@ -56,6 +56,20 @@ class micro_interview_mod extends action
 			$master_list = $rstList['rst'];
 		}
 
+		/// 默认banner,cover,backgroup图片路径
+		if (WB_LANG_TYPE_CSS) {
+			/// 多语言
+			$default_banner_img 	= W_BASE_URL_PATH.'img/'.WB_LANG_TYPE_CSS.'/talk_banner_960.png';	
+			$default_cover_img 		= W_BASE_URL_PATH.'img/'.WB_LANG_TYPE_CSS.'/talk_logo_124.jpg';
+		} else {
+			$default_banner_img 	= W_BASE_URL_PATH.'img/talk_banner_960.png';	
+			$default_cover_img 		= W_BASE_URL_PATH.'img/talk_logo_124.jpg';
+		}
+		$default_backgroup_img 		= W_BASE_URL_PATH.'img/live_bg_main.jpg';
+
+		TPL::assign('default_banner_img', $default_banner_img);
+		TPL::assign('default_cover_img', $default_cover_img);
+		TPL::assign('default_backgroup_img', $default_backgroup_img);
 		TPL::assign('master_list', $master_list);
 		$this->_display('interview/form');
 	}
@@ -95,9 +109,17 @@ class micro_interview_mod extends action
 		if ( empty($userlist['errno']) ) {
 			$userlist = $userlist['rst'];
 		}
-		
+		/// 默认banner图路径
+		if (WB_LANG_TYPE_CSS) {
+			/// 多语言
+			$default_banner_img = W_BASE_URL.'img/'.WB_LANG_TYPE_CSS.'/talk_bg.jpg';	
+		} else {
+			$default_banner_img = W_BASE_URL.'img/talk_bg.jpg';	
+		}
+
 		TPL::assign('userlist', $userlist);
 		TPL::assign('config', $config);
+		TPL::assign('default_banner_img', $default_banner_img);
 		$this->_display('interview/infomation');
 	}
 
@@ -151,7 +173,7 @@ class micro_interview_mod extends action
 	function saveBase() 
 	{
 		$desc 		= trim(V('p:desc', ''));
-		$banner_img = trim(V('p:pic', W_BASE_URL.'img/talk_bg.jpg'));
+		$banner_img = trim(V('p:pic', W_BASE_URL.'img/'.WB_LANG_TYPE_CSS.'/talk_bg.jpg'));
 		$master 	= V('p:master', array());
 		$contact 	= trim(V('p:contact', ''));
 
@@ -337,12 +359,30 @@ class micro_interview_mod extends action
 			$this->_error('找不到对应的在线访谈', URL('mgr/micro_interview') );
 		}
 		
+		/// 待审核表在线直播的微博信息
+		$verify_list  = array();
+		$wbList = array();
+		$verify_list = DS('weiboVerify.getWeiboVerifyList', false, array('type' => 'interview', 'extend_id' => $interviewId));
+		if ($verify_list) {
+			foreach ($verify_list as $var) {
+				$wbList[$var['id']]['text'] = $var['weibo'];
+				$wbList[$var['id']]['id'] = $var['id'];
+				$wbList[$var['id']]['pic']  = (isset($var['picid'])&&$var['picid']) ? '<img src="'. F('profile_image_url.thumbnail_pic', $var['picid']) . '" />' : '';
+				$wbList[$var['id']]['v'] = 1;
+			}
+		}
+		$verify_totalCnt = DS('weiboVerify.getWeiboVerifyCount', false, array('type' => 'interview', 'extend_id' => $interviewId));
+
 		$params['state'] 	= 'P';
-		$totalCnt 	 		= DR('InterviewWb.getCount', FALSE, $interviewId, $params);
+		$interview_totalCnt	= DR('InterviewWb.getCount', FALSE, $interviewId, $params);
 		$list  		 		= DR('InterviewWb.getList', FALSE, $interviewId, $params, 0, 20, 'ask_id ASC');
+		$wb_list = $this->_buildWbList($list);
+
+		$wb_list = array_merge($wb_list, $wbList);
+		$totalCnt = (int)$interview_totalCnt + (int)$verify_totalCnt;
 		
 		TPL::assign('totalCnt', $totalCnt);
-		TPL::assign('list', $this->_buildWbList($list) );
+		TPL::assign('list',  $wb_list);
 		TPL::assign('interviewId', $interviewId);
 		TPL::assign('interview', $interview);
 		$this->_display('interview/approve');
@@ -411,6 +451,17 @@ class micro_interview_mod extends action
 					$this->_succ('操作已成功', $url);
 				} 
 			}
+
+			/// 待审核在线访谈
+			$v = V('g:v', false);
+			if ($v) {
+				$vid = V('g:vid');
+				$ret = DR('weiboVerify.updateWeiboVerify', false, $vid, 'delete');
+				if ($ret['rst']) {
+					$this->_succ('操作已成功', $url);
+				}
+			}
+
 			$this->_error('操作失败，请检查输入参数是否正确', $url);
 		}
 		
@@ -427,7 +478,9 @@ class micro_interview_mod extends action
 	{
 		$interviewId 		= V('g:id', 0);
 		$params['state']	= 'P';
-		$result		 		= DR('InterviewWb.getCount', FALSE, $interviewId, $params);
+		$interview_total = DR('InterviewWb.getCount', FALSE, $interviewId, $params);
+		$verify_total = DS('weiboVerify.getWeiboVerifyCount', false, array('type' => 'interview', 'extend_id' => $interviewId));
+		$result = (int)$interview_total + (int)$verify_total;
 		
 		if ( $result || $result===0 ) {
 			APP::ajaxRst( $result ); 
@@ -453,7 +506,19 @@ class micro_interview_mod extends action
 				{
 					$this->_succ('操作已成功', $url);
 				} 
+
 			}
+
+			/// 待审核在线访谈
+			$v = V('g:v', false);
+			if ($v) {
+				$vid = V('g:vid');
+				$ret = DR('weiboVerify.updateWeiboVerify', false, $vid);
+				if ($ret['rst']) {
+					$this->_succ('操作已成功', $url);
+				}
+			}
+
 			$this->_error('操作失败，请检查输入参数是否正确', $url);
 		}
 		
@@ -510,6 +575,7 @@ class micro_interview_mod extends action
 			case 'P':	
 				$limit 				= 40;
 				$wbList['askCnt'] 	= 0;
+				$wbList['replyCnt'] = 0;
 				$wbList['askList']	= array();
 				
 				TPL::assign('wbList', $wbList);
@@ -525,6 +591,7 @@ class micro_interview_mod extends action
 					$wbList['askCnt'] 		= 0;
 					$wbList['askList']		= array();
 					$wbList['answerCnt'] 	= 0;
+					$wbList['replyCnt'] 	= 0;
 					$wbList['answerList']	= array();
 					
 					TPL::assign('wbList', $wbList);
@@ -537,6 +604,7 @@ class micro_interview_mod extends action
 			default:	
 				$limit 					= 20;
 				$wbList['answerCnt'] 	= 0;
+				$wbList['replyCnt'] 	= 0;
 				$wbList['answerList']	= array();
 				
 				TPL::assign('wbList', $wbList);

@@ -7,6 +7,7 @@
         add : function(trig, type){
             var tr = $(trig).closest('tr');
             var hd = tr.find('input');
+			if($.trim( hd.val() ) == '') return ;
 			var allInput = $('.add-table input[id=_holder]') , flag =true;
 			  allInput.each(function(){
 				if(this.value === hd.val()){
@@ -22,7 +23,7 @@
             var newHd = $([
             '<table><tr>',
             	'<td><span class="user-pic"><img src="'+gUsrImgUrl+'" /></span></td>',
-                '<td onclick="MicroAdmin.edit(this)"><p title="点击编辑" class="text" class="hidden"></p><input type="text" class="input-txt txt-s1" id="_holder" onblur="MicroAdmin.valdate(this);" vrel="username"><input type="hidden" name="'+type+'[]" id="master" /><span class="tips-error hidden" id="masterTip">该用户不存在</span></td>',
+                '<td onclick="MicroAdmin.edit(this)"><p title="点击编辑" class="text" class="hidden"></p><input type="text" class="input-txt w130" id="_holder" onblur="MicroAdmin.valdate(this);" vrel="username"><input type="hidden" name="'+type+'[]" id="master" /><span class="tips-error hidden" id="masterTip">该用户不存在</span></td>',
                 '<td><a class="icon-edit" href="#" onclick="MicroAdmin.edit(this);return false;">编辑</a> <a class="icon-del" href="#" onclick="MicroAdmin.del(this);return false;">删除</a></td>',
             '</tr></table>'
             ].join(''))

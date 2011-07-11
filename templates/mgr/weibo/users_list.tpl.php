@@ -18,7 +18,7 @@
 				<form method="post" action="<?php echo URL('mgr/weibo/disableUser.userList');?>">
             	<div class="serch-user">
             		<span><strong>搜索包含以下昵称的用户</strong></span>
-                	<input name="keyword" class="input-box box-address-width" type="text" value="<?php echo F('escape', strval(V('r:keyword')));?>" />
+                	<input name="keyword" class="input-txt box-address-width" type="text" value="<?php echo F('escape', strval(V('r:keyword')));?>" />
                 	<span class="serch-btn"><input type="submit" value="搜索" /></span>
            		</div>
 				</form>

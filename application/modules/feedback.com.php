@@ -9,7 +9,7 @@ class feedback {
 
 	function save($params, $id=null) {
 		$keys = array(
-				'content','uid','nickname','mail','qq','addtime','tel'
+				'content','uid','nickname','mail','qq','addtime','tel','ip'
 				);
 		$data = array();
 		foreach ($keys as $v) {
@@ -38,7 +38,7 @@ class feedback {
 			$where = '';
 		}
 		$this->count_sql = 'SELECT COUNT(*) FROM ' . $this->table . $where;
-		$sql = 'SELECT *FROM ' . $this->table. $where . ' LIMIT '.$offset .','. $rows;
+		$sql = 'SELECT *FROM ' . $this->table. $where . ' ORDER BY `id` DESC LIMIT '.$offset .','. $rows;
 		return RST($this->db->query($sql));
 	}
 

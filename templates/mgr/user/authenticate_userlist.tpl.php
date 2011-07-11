@@ -10,22 +10,22 @@
 <script src="<?php echo W_BASE_URL;?>js/admin-all.js"></script>
 <script type="text/javascript">
 var HtmlMode=['<form action="<?php echo URL('mgr/user_verify.authentication');?>" method="post"  name="add-newlink" id="form1">',
-            	'	<div class="pop-form">',
+            	'	<div class="form-box">',
 				'		<div class="form-row">',
-            	'			<label for="nick">成员昵称</label>',
+            	'			<label for="nick" class="form-field">成员昵称</label>',
             	'			<div class="form-cont">',
-            	'				<input name="nick" id="nick" class="input-txt" type="text" value="" vrel="_f|sz=max:20,m:多于10个汉字,ww:true|ne=m:不能为空" warntip="#errTip"/><span id="errTip" class="tips-error hidden"></span>',
+            	'				<input name="nick" id="nick" class="ipt-txt" type="text" value="" vrel="_f|sz=max:20,m:多于10个汉字,ww:true|ne=m:不能为空" warntip="#errTip"/><span id="errTip" class="tips-error hidden"></span>',
             	'			</div>',
             	'		</div>',
 				'		<div class="form-row">',
-            	'			<label for="reason">认证理由</label>',
+            	'			<label for="reason" class="form-field">认证理由</label>',
             	'			<div class="form-cont">',
-            	'				<input name="reason" id="reason" class="input-txt" type="text" value="" vrel="_f|sz=max:40,m:多于20个汉字,ww:true|ne=m:不能为空" warntip="#reasonTip"/><span id="reasonTip" class="tips-error hidden"></span>',
+            	'				<input name="reason" id="reason" class="ipt-txt" type="text" value="" vrel="_f|sz=max:40,m:多于20个汉字,ww:true|ne=m:不能为空" warntip="#reasonTip"/><span id="reasonTip" class="tips-error hidden"></span>',
             	'			</div>',
             	'		</div>',
                 '   	<div class="btn-area">',
-                '			<a href="#" class="general-btn btn-s2" id="pop_submit"><span>确定</span></a>',
-                '			<a href="#" class="general-btn" id="pop_cancel"><span>取消</span></a>',
+                '			<a href="#" class="btn-general highlight" id="pop_submit"><span>确定</span></a>',
+                '			<a href="#" class="btn-general" id="pop_cancel"><span>取消</span></a>',
                 '    	</div>',
 				'	</div>',
                 '</form>'].join('');
@@ -39,7 +39,7 @@ var HtmlMode=['<form action="<?php echo URL('mgr/user_verify.authentication');?>
 				trigger: '#pop_submit'
 			},
 			dlgcfg:{
-				cs:'add-certification win-fixed',
+				cs:'win-certification win-fixed',
 				onViewReady:function(View){
 					var self=this;
 					$(View).find('#pop_cancel').click(function(){
@@ -55,11 +55,11 @@ var HtmlMode=['<form action="<?php echo URL('mgr/user_verify.authentication');?>
 	
 	function edit_user(nickname, reason, sina_uid) {
 		var EditHtml = ['<form action="<?php echo URL('mgr/user_verify.updateVerifyReason');?>" method="post" name="edit_reason" id="edit_frm">',
-            	'	<div class="pop-form">',
+            	'	<div class="form-box">',
             	'		<input type="hidden" name="sina_uid" value="', sina_uid,
             	'" />',
             	'		<div class="form-row">',
-            	'			<label>成员昵称</label>',
+            	'			<label class="form-field">成员昵称</label>',
 				'			<div class="form-cont">',
 				'     			<span class="text">',
 								 nickname,
@@ -67,15 +67,15 @@ var HtmlMode=['<form action="<?php echo URL('mgr/user_verify.authentication');?>
 				'			</div>',
             	'		</div>',
             	'		<div class="form-row">',
-            	'			<label for="reason">认证理由</label>',
+            	'			<label for="reason" class="form-field">认证理由</label>',
             	'			<div class="form-cont">',
-            	'				<input name="reason" id="reason" class="input-txt" type="text" value="', reason,
+            	'				<input name="reason" id="reason" class="ipt-txt" type="text" value="', reason,
             	'" vrel="_f|sz=max:40,m:多于20个汉字,ww:true|ne=m:不能为空" warntip="#reasonTip"/><span id="reasonTip" class="tips-error hidden"></span>',
             	'			</div>',
             	'		</div>',
                 '   	<div class="btn-area">',
-                '			<a href="#" class="general-btn btn-s2" id="pop_submit"><span>确定</span></a>',
-                '			<a href="#" class="general-btn" id="pop_cancel"><span>取消</span></a>',
+                '			<a href="#" class="btn-general highlight" id="pop_submit"><span>确定</span></a>',
+                '			<a href="#" class="btn-general" id="pop_cancel"><span>取消</span></a>',
                 '    	</div>',
                 '    </div>',
                 '</form>'].join('');
@@ -87,7 +87,7 @@ var HtmlMode=['<form action="<?php echo URL('mgr/user_verify.authentication');?>
 				trigger: '#pop_submit'
 			},
 			dlgcfg:{
-				cs:'add-certification win-fixed',
+				cs:'win-certification win-fixed',
 				onViewReady:function(View){
 					var self=this;
 					$(View).find('#pop_cancel').click(function(){
@@ -129,16 +129,16 @@ var HtmlMode=['<form action="<?php echo URL('mgr/user_verify.authentication');?>
 <body  class="main-body">
 	<div class="path"><p>当前位置：用户管理<span>&gt;</span>认证管理</p></div>
     <div class="main-cont">
-        <h3 class="title"><a class="general-btn" href="javascript:add_user();"><span>添加认证用户</span></a><a class="general-btn" href="<?php echo URL('mgr/user_verify.webAuthenWay'); ?>"><span>认证设置</span></a>认证用户列表</h3>
+        <h3 class="title"><a class="btn-general" href="javascript:add_user();"><span>添加认证用户</span></a><a class="btn-general" href="<?php echo URL('mgr/user_verify.webAuthenWay'); ?>"><span>认证设置</span></a>认证用户列表</h3>
 		<div class="set-area">
             <table class="table" cellpadding="0" cellspacing="0" width="100%" border="0">
                 <colgroup>
-                    <col class="h-w50" />
-                    <col class="h-w50" />
-                    <col class="h-w140" />
+                    <col class="w50" />
+                    <col class="w50" />
+                    <col class="w140" />
                     <col />
-                    <col class="h-w150" />
-                    <col class="h-w150" />
+                    <col class="w150" />
+                    <col class="w150" />
                 </colgroup>
                 <thead class="tb-tit-bg">
                     <tr>

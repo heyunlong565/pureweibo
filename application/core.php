@@ -23,15 +23,25 @@ class APP {
 		static $is_init;
 		if ($is_init) {return true;}
 
-		APP::_initCheckMobile();
+		
 		APP::_initConfig();
 		APP::_globalVar();
 		APP::_initRouteVar();
 		
+		APP::_initCheckMobile();
 		APP::_aclCheck();
 		APP::_initOther();
 		APP::_initSkin();
 		
+		/// 加载语言文件
+		if (ENTRY_SCRIPT_NAME == 'wap') {
+			$lang_file = 'wap';
+		} else {
+			$wb_page_type = V('-:sysConfig/wb_page_type');
+			$lang_file = 'lang'.$wb_page_type; 
+		}
+		APP::importLang($lang_file);
+
 		//debug
 		//V('-:sysConfig/login_way', 3, true); 
 		APP::_doPreActions();
@@ -76,6 +86,9 @@ class APP {
 					exit();
 				}
 			}
+			
+		// 写日志
+		register_shutdown_function('SHUTDOWN_LOGRUN');
 		}
 	//------------------------------------------------------------------
 	/// 初始化皮肤 目录常量
@@ -89,6 +102,7 @@ class APP {
 			define('SKIN_CONSTUM_STYLEID',$user_skin_config['style_id']);
 		}
 	}
+	
 	//------------------------------------------------------------------
 	/// 初始化全局量 userConfig sysConfig session
 	function _globalVar(){
@@ -157,6 +171,7 @@ class APP {
 		//　如果运行在SAE环境下　则自动创建相关常量
 		if (XWB_SERVER_ENV_TYPE==='sae'){
 			if (!F('sae_set_global_define')){
+				DD('common/sysConfig.get');
 				header("Location: sae_install/index.php");
 				exit;
 			}
@@ -201,6 +216,8 @@ class APP {
 	 */
 	function _initCheckMobile(){
 		if (!defined('ENTRY_SCRIPT_NAME') || ENTRY_SCRIPT_NAME != 'wap') {
+			if (APP::getRequestRoute()=='output'){return true;}
+			
 			if (isset($_COOKIE['IS_MOBILE_AGENT']) && $_COOKIE['IS_MOBILE_AGENT'] == 0) {
 				return true;
 			} elseif (APP::F('is_mobile') === false) {
@@ -650,6 +667,45 @@ class APP {
 		return call_user_func_array(array('APP','_cls'),$p);
 	}
 	//------------------------------------------------------------------
+	//对当前GET请求，生成一个唯一标识串,可以作为控制器缓存HOOK的　缓存　KEY
+	function requestKey(){
+		return APP::getRequestRoute()."###".md5(serialize(V('g')));
+	}
+	
+	//控制器缓存选项　有参数时－设置，无参数时－获取
+	function xcacheOpt($data=false){
+		static $opt=false;
+		if (func_num_args()==0){
+			return $opt;
+		}else{
+			return $opt = $data;
+		}
+	}
+	
+	/// 收集或者 设置控制器缓存内容，有参数时收集，无参数时更新或者设置
+	function xcache($buf=''){
+		static $html = '';
+		
+		//无参数时，是 shutdown　后调用的,缓冲堆栈中的数据是倒序的
+		if (func_num_args()==0){
+			$noFlushHtml = '';
+			$opt = APP::xcacheOpt();
+			if (!is_array($opt) || !isset($opt['K']) || !isset($opt['T']) ){
+				return true;
+			}
+			
+			while (ob_get_level() > 0) {
+				$noFlushHtml = ob_get_clean().$noFlushHtml;
+			}
+			
+			CACHE::set($opt['K'], $html.$noFlushHtml, $opt['T']);
+			echo $noFlushHtml;exit;			
+		}else{
+			$html.=$buf;
+		}
+		return true;
+	}
+	//------------------------------------------------------------------
 	/**
 	 * APP::M($mRoute);
 	 * 执行一个模块
@@ -674,7 +730,31 @@ class APP {
 			//trigger_error("Module method: [ ".$r[3]." ]  start with '_' is private !  ", E_USER_ERROR);
 			F('err404',"Module method: [ ".$r[3]." ]  start with '_' is private !  ");
 		}
-
+		
+		//检查缓存HOOK　HOOK方法将返回 array('K'=>'keystr'/*缓存KEY*/,'T'=>300/*缓存时间*/);
+		$cacheOptFunc = X_CACHE_HOOK_PREFIX.$r[3];
+		if (CTRL_CACHE_HOOK_ENABLE && method_exists($m,$cacheOptFunc)){
+			$cacheOpt = $m->$cacheOptFunc();
+			if ($cacheOpt===false || V('g:_no_xcache',false)){
+				$cacheContent = false;
+			}else{
+				//检查返回
+				if (!is_array($cacheOpt) || !isset($cacheOpt['K']) || !isset($cacheOpt['T']) ){
+					F('err404',"Cache HOOK return data is Error, ".$r[1].$r[2].$cacheOptFunc);
+				}
+				$cacheContent = CACHE::get($cacheOpt['K']);
+			}
+			
+			
+			if ($cacheContent){
+				echo $cacheContent;exit;
+			}else{
+				APP::xcacheOpt($cacheOpt);
+				register_shutdown_function(array('APP','xcache'));
+			}
+		}
+		//-------
+		
 		if (!method_exists($m,$r[3])){
 			//trigger_error("Can't find method  [ ".$r[3]." ]  in  [ ".$r[2]." ] ", E_USER_ERROR);
 			F('err404',"Can't find method  [ ".$r[3]." ]  in  [ ".$r[2]." ] ");
@@ -778,7 +858,10 @@ class APP {
 		if (!is_array($GLOBALS[V_GLOBAL_NAME]['LANG'])){
 			trigger_error("Can't find any lang data ", E_USER_ERROR);
 		}
-		$s = $GLOBALS[V_GLOBAL_NAME]['LANG'][$k];
+		$s = isset($GLOBALS[V_GLOBAL_NAME]['LANG'][$k]) ? $GLOBALS[V_GLOBAL_NAME]['LANG'][$k] : false;
+		if (!$s) {
+			return false;
+		}
 		$p = func_get_args();
 		array_shift($p);
 		if (!empty($p)){
@@ -787,6 +870,17 @@ class APP {
 		}
 		return $s;
 	}
+    
+    /**
+    * 获取当前系统使用的语言
+    * 
+    * @param mixed $ext
+    */
+    function getLang(){
+        $lang = V('-:sysConfig/wb_lang_type');
+        return $lang ? $lang : SITE_LANG;
+    }
+    
 	//------------------------------------------------------------------
 	/**
 	 * APP::importLang($lRoute);
@@ -794,9 +888,17 @@ class APP {
 	 * @param $lRoute	语言信息路由 规则与模块路由一样
 	 * @return 成功 true 失败 false;
 	 */
-	function importLang($lRoute){
-		$lf = APP::_getIncFile($lRoute,'lang');
-		include $lf;
+	function importLang($lRoute, $ext = false){
+		$ext = $ext ? $ext : APP::getLang();
+		if (!defined('WB_LANG_TYPE_CSS')) {
+			if ($ext == 'zh_cn') {
+				define('WB_LANG_TYPE_CSS', '');
+			} else {
+				define('WB_LANG_TYPE_CSS', $ext);
+			}
+		}
+		$lf = APP::_getIncFile($lRoute,'lang', $ext);
+		include_once $lf;
 		if (!is_array($_LANG)){
 			trigger_error("Can't find lang array var \$_LANG in file [ $lf ] ", E_USER_ERROR);
 		}
@@ -1011,7 +1113,7 @@ class APP {
 	 * @return	是否写成功
 	 */
 	function LOG ($msg,$type=false) {
-		if (strtolower(XWB_SERVER_ENV_TYPE)!='common' || !ENABLE_LOG ) {return false;}
+		if (strtolower(XWB_SERVER_ENV_TYPE)!='common' || !LOG_LEVEL ) {return false;}
 		
 		$log_file = $type ?  substr(P_VAR_LOG_FILE,0,-7).$type.".php" : P_VAR_LOG_FILE ;
 		$msg = sprintf("[%s]:\t%s\r\n",date("Y-m-d H:i:s"),$msg);
@@ -1327,11 +1429,45 @@ class Xpipe {
 		return 'XpipeModule_'.$k;
 	}
 	
+	/**
+	* 当前是否正在运行PIPE
+	* 
+	* @param mixed $run
+	*/
 	function isRunning($run=false){
 		static $isRun = false;
 		if ($run) $isRun = $run;
 		return $isRun ;
 	}
+	
+	//当前请求是否使用 PIPE ，默认使用
+	function usePipe($state=true){
+		static $isUse = true;
+		if (func_num_args()){
+			$isUse = $state;
+		}
+		return $isUse;
+	}
+	
+	/**
+	* 一次管道输出，某个子模块运算完成,通知前端处理相关逻辑
+	* 
+	* @param mixed	$rst
+	* @param string JS端统一调用的管道方法
+	* @return		无返回，输出一段 script　到缓冲并输出
+	*/
+	function output($rst, $jsFunc='load'){
+		$s = sprintf("\n<script>%s.%s(%s);</script>", V_JS_XPIPE_OBJ, $jsFunc, json_encode($rst));
+		//将布局缓冲输出到客户端
+		if (APP::xcacheOpt()){
+			APP::xcache($s);
+		}
+		
+		echo $s;
+		unset($s);
+		@flush();
+	}
+	
 	/**
 	* 执行管道队列中的相关子模块
 	*/
@@ -1339,8 +1475,14 @@ class Xpipe {
 		if (!Xpipe::usePipe()){
 			return false;
 		}
+		
 		//将布局缓冲输出到客户端
-		@ob_end_flush();
+		if (APP::xcacheOpt()){
+			APP::xcache(ob_get_flush());
+		}else{
+			@ob_end_flush();
+		}
+		
 		Xpipe::_start();
 		
 		$pls = Xpipe::_getAndCleanPagelets();
@@ -1368,32 +1510,12 @@ class Xpipe {
 		Xpipe::_end();
 	}
 	
-	//当前请求是否使用 PIPE ，默认使用
-	function usePipe($state=true){
-		static $isUse = true;
-		if (func_num_args()){
-			$isUse = $state;
-		}
-		return $isUse;
-	}
-	
-	/**
-	* 一次管道输出，某个子模块运算完成,通知前端处理相关逻辑
-	* 
-	* @param mixed	$rst
-	* @param string JS端统一调用的管道方法
-	* @return		无返回，输出一段 script　到缓冲并输出
-	*/
-	function output($rst, $jsFunc='load'){
-		echo sprintf("\n<script>%s.%s(%s);</script>", V_JS_XPIPE_OBJ, $jsFunc, json_encode($rst));
-		@flush();
-	}
-	
 	/**
 	* 执行一个管道模块
 	* @param mixed $pl
 	*/
 	function runOnePagelet($pl){
+		//sleep(2);
 		ob_start();
 		list($r, $p, $k,$isPerch) = $pl;
 		$plObj	= APP::_cls($r,'pls',true);
@@ -1408,7 +1530,6 @@ class Xpipe {
 				'perch'=>$isPerch,
 				'id'=>Xpipe::_idKey($k),
 				'data'=>$data
-				//,'cfg'=>Xpipe::addCfg(false,false,true)
 				);
 	}
 	
@@ -1418,19 +1539,19 @@ class Xpipe {
 		Xpipe::isRunning(true);
 		//初始化的全局配置量
 		$iniCfg = array(
-			'basePath'=>W_BASE_URL,'routeMode'=>R_MODE,'routeVname'=>R_GET_VAR_NAME,'akey'=>WB_AKEY,
-			'shortLink'=>V('-:sysConfig/site_short_link', ''),
-			'loginCfg'=>V('-:sysConfig/login_way', 1),
-			'webName'=>V("-:sysConfig/site_name"),
-			'uid'=>USER::uid(),
-			'siteUid'=>USER::get('site_uid'),
-			'siteUname'=>USER::get('site_uname'),
-			'siteName'=>USER::get('site_name'),
-			'siteReg'=>V('-:siteInfo/reg_url'),
-			'sinaReg' => URL('account.goSinaReg'),
-			'page'=>APP::getRequestRoute(),
-			'remind'=>/*V('-:userConfig/user_newfeed')*/intval(PAGE_TYPE_CURRENT) === 1 ? 0 : 1,
-			'maxid' => CACHE::get(USER::uid() . '_maxid')
+			'basePath'	=> W_BASE_URL,'routeMode'=>R_MODE,'routeVname'=>R_GET_VAR_NAME,'akey'=>WB_AKEY,
+			'shortLink'	=> V('-:sysConfig/site_short_link', ''),
+			'loginCfg'	=> V('-:sysConfig/login_way', 1),
+			'webName'	=> V("-:sysConfig/site_name"),
+			'uid'		=> USER::uid(),
+			'siteUid'	=> USER::get('site_uid'),
+			'siteUname'	=> USER::get('site_uname'),
+			'siteName'	=> USER::get('site_name'),
+			'siteReg'	=> V('-:siteInfo/reg_url'),
+			'sinaReg'	=> URL('account.goSinaReg'),
+			'page'		=> APP::getRequestRoute(),
+			'remind'	=> /*V('-:userConfig/user_newfeed')*//*intval(PAGE_TYPE_CURRENT) === 1 ? 0 : 1*/0,
+			'maxid'		=> CACHE::get(USER::uid() . '_maxid')
 		);
 		
 		Xpipe::output($iniCfg, 'start');
@@ -1440,27 +1561,6 @@ class Xpipe {
 	function _end(){
 		Xpipe::output(true, 'end');
 		Xpipe::isRunning(false);
-	}
-	
-	//调试，查看变量
-	function debug($var){
-		echo '<pre style="color:green; border: 1px solid green;padding: 5px;">Xpipe变量跟踪：'."\n";
-		var_dump($var);
-		echo '</pre>';
-	}
-	
-	function addCfg($k, $v=null, $getClean=false){
-		static $cfgArr = array();
-		if ($getClean){
-			$rst = $cfgArr;
-			$cfgArr = array();
-			return $rst;
-		}
-		if (is_array($k) && $v===null ){
-			$cfgArr=array_merge($cfgArr,$k);
-		}else{
-			$cfgArr[$k]=$v;
-		}
 	}
 	
 	/**
@@ -1477,6 +1577,13 @@ class Xpipe {
 			return false;
 		}
 		return empty($ret) ? false : $ret;		
+	}
+	
+	//调试，查看变量
+	function debug($var){
+		echo '<pre style="color:green; border: 1px solid green;padding: 5px;">Xpipe变量跟踪：'."\n";
+		var_dump($var);
+		echo '</pre>';
 	}
 }
 
@@ -1495,6 +1602,11 @@ function V($vRoute, $def=NULL, $setVar=false){
 function L(){
 	$p = func_get_args();
 	return call_user_func_array(array('APP','L'), $p);
+}
+//----------------------------------------------------------------------
+function LO(){
+	$p = func_get_args();
+	echo call_user_func_array(array('APP','L'), $p);
 }
 //----------------------------------------------------------------------
 /// copydoc APP::F
@@ -1645,6 +1757,18 @@ class CACHE {
 		$gKey = GROUP_CACHE_KEY_PRE.' '.trim($gName);
 		return CACHE::delete($gKey);
 	}
+
+	/**
+	 * 目前只有SAE下可以使用
+	 *
+	 */
+	function flush() {
+		if (XWB_SERVER_ENV_TYPE!=='sae'){
+			return false;
+		}
+		$c = & CACHE::instance();
+		return $c->flush();
+	}
 }
 //----------------------------------------------------------------------
 class IO {
@@ -1746,6 +1870,69 @@ class DBG{
 		static $dbg;
 		if (!$dbg){$dbg = APP::N('myXdebuger');}
 
+	}
+}
+//----------------------------------------------------------------------
+
+/// LOG　控制类
+class LogMgr
+{
+	function LogMgr(){
+	}
+	
+	function &instance()
+	{
+		static $c;
+		if(empty($c)) {
+			$c = APP::ADP('log');
+		}
+		return $c;
+	}
+	//------------------------------------------------------------------
+	
+	function log($type, $str, $level='error', $extra_params=array(), $star_time=false)
+	{
+		// Used time
+		if ($star_time)
+		{
+			$usedTime 	= microtime(TRUE)-$star_time;
+			$str		= "[Used=$usedTime]\t".$str;
+		}
+		
+		$c = & LogMgr::instance();
+		return $c->log($type, $str, $level, $extra_params);
+	}
+	
+	
+	function run()
+	{
+		$c = & LogMgr::instance();
+		return $c->run();
+	}
+	
+	
+	/**
+	 * 警告日志
+	 * @param $startTime
+	 * @param $type
+	 * @param $msg
+	 * @param $level
+	 * @param $extra
+	 */
+	function warningLog($startTime, $type, $msg, $level, $extra=array())
+	{
+		$timeList = array(	'db'	=> LOG_DB_WARNING_TIME, 
+							'io'	=> LOG_IO_WARNING_TIME, 
+							'cache'	=> LOG_MC_WARNING_TIME, 
+							'api'	=> LOG_API_WARNING_TIME
+					);
+		
+		$used	 = microtime(TRUE)-$startTime;
+		$defTime = isset($timeList[$type]) ? $timeList[$type] : false;
+		$longExe = $startTime && $defTime && $used>$defTime;
+		if ($longExe) {
+			LOGSTR($type, " [Used=$used]\t".$msg, LOG_LEVEL_WARNING, $extra);
+		}
 	}
 }
 //----------------------------------------------------------------------
@@ -1906,7 +2093,7 @@ class dsMgr {
 					break;
 			}
 			//if (is_array($rst)) echo "CACHE HIT: [$useCache] [$gCacheName], [$gCacheId] \n";//print_r($rst);
-			if (is_array($rst)){return $eHandler ? $rst['rst'] : $rst;}
+			if (is_array($rst) && isset($rst['rst']) && $rst['rst'] !== null){return $eHandler ? $rst['rst'] : $rst;}
 		}
 		//--------------------------------------------------------------
 		$rData = APP::_parseRoute($dsRoute);
@@ -1952,10 +2139,19 @@ class dsMgr {
 						echo  $syncLogoutScript,"\n";
 					}
 				}
-				APP::redirect(URL(APP::getRequestRoute()), 4);
+
+				// 引导重新登录
+				$port = '';
+				if ($_SERVER['SERVER_PORT'] != '80') {
+					$port = ':' .$_SERVER['SERVER_PORT'];
+				}
+				$callback_url = 'http://' . $_SERVER['SERVER_NAME'] . $port . $_SERVER['REQUEST_URI'];
+				$goUrl = URL('account.login','loginCallBack='.urlencode($callback_url));
+				APP::redirect($goUrl, 4);
+				//APP::redirect(URL(APP::getRequestRoute()), 4);
 				return;
 			} elseif ($comRst['errno'] == '1040016' && !IS_IN_JS_REQUEST) {
-				APP::tips(array('tpl' => 'error', 'msg' => '出错啦，该网站调用API次数已超过限制，请联系站长解决！'));
+				APP::tips(array('tpl' => 'error', 'msg' => L('common__apiError__limitTip')));
 			}
 			return  $eHandler ? dsMgr::errorDump($comRst) : $comRst;
 		}
@@ -2014,6 +2210,7 @@ class dsMgr {
 	//------------------------------------------------------------------
 	/// 错误控制，输出错误信息
 	function errorDump($rst){
+		APP::xcacheOpt(false);
 		if(isset($rst['log']) && $rst['log']){
 			APP::LOG($rst['log']);
 		}
@@ -2070,12 +2267,22 @@ function RST($rst, $errno=0, $err='', $level=0, $log=''){
 
 //----------------------------------------------------------------------
 /**
- *
- */
-function LOGSTR($type, $str){
+* 记录一个日志
+* 
+* @param mixed $type	日志的类型：io,db,mc ...
+* @param mixed $str		日志描述
+*/
+function LOGSTR($type, $str, $level='error', $extra_params=array(), $star_time=false)
+{  
 	//时间        项目名称    项目版本号    APP_KEY    错误类型    错误描述 sprintf()
-	$log = WB_SOFT_NAME . "\t" . WB_VERSION . "\t" . WB_AKEY . "\t" . $type . "\t" . $str;
-	APP::LOG($log, 'error');
+	LogMgr::log($type, $str, $level, $extra_params, $star_time);
+}
+/**
+ * 程序退出时，写日志
+ */
+function SHUTDOWN_LOGRUN()
+{
+	LogMgr::run();
 }
 //----------------------------------------------------------------------
 /// 用户类
@@ -2175,7 +2382,6 @@ class USER {
 	/// 获取一个系统配置
 	function sys($k=NULL){
 		static $sCfg = array();
-		
 		if (empty($sCfg)){
 			$sCfg = DS('common/sysConfig.get','0');
 		}

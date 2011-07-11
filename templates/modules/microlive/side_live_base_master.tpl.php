@@ -1,6 +1,6 @@
 <!-- 在线主持人 开始-->
-<div class="user-list-s1">
-	<div class="hd"><h3>微博主持人</h3></div>
+<div class="mod-aside user-list-s1">
+	<div class="hd"><h3><?php LO('modules_microlive_side_live_base_master_title');?></h3></div>
 	<div class="bd">
 		<ul>
 			<?php if ($ulist):?>
@@ -10,11 +10,11 @@
 				<div class="user-info">
 					<p class="name"><a href="<?php echo URL('ta', 'id='.$item['id'].'&name='.$item['screen_name']);?>"><?php echo F('escape', $item['screen_name']);?></a></p>
 					<?php if (!empty($listFans) && in_array($item['id'], $listFans) || USER::uid() == $item['id']):?>
-						<em>已关注</em>
+						<em><?php LO('common__template__followed');?></em>
 					<?php else:?>
-						<a rel="e:fl,t:2" class="addfollow-btn" title="加关注" href="#">加关注</a>
+						<a rel="e:fl,t:2" class="addfollow-btn" title="<?php LO('common__template__toFollow');?>" href="#"><?php LO('common__template__toFollow');?></a>
 					<?php endif;?>
-					<p class="txt">官方主持人</p>
+					<p class="txt"><?php LO('modules_microlive_side_live_base_master_master');?></p>
 				</div>
 			</li>
 			<?php endforeach;?>

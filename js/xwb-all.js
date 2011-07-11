@@ -5,9 +5,16 @@
  * 除/mod/外的都是JavaScript基本API部份，可独立使用。<br/>
  * /mod/下的JavaScript是与Xweibo实现有关的API。
  */
+ 
+if (!window.__gloCfg || !__gloCfg.language)
+    __language = 'zh_cn';
+else
+   __language = __gloCfg.language;
+    
 (function(list){
 	// 是否打开调试模式
 	__debug = true;
+    
 	var jsbase,base;
 	  var scripts = document.getElementsByTagName('SCRIPT');
 	  for(var i=0,len=scripts.length;i<len;i++){
@@ -31,11 +38,13 @@
     s.push('<script charset="utf-8" type="text/javascript" src="'+jsbase+list[i]+'"></script>');
   }
   document.write(s.join(''));
-})([
+})(
+[
 'base/xwbapp.js',
+'languages/' + __language  + '.js',
 'mod/xwbrequestapi.js',
 'base/jqext.js',
-'mod/template.js',
+'mod/template.' + __language + '.js',
 'base/eventable.js',
 'base/selectionholder.js',
 'base/actionmgr.js',
@@ -52,4 +61,5 @@
 'mod/ad.js',
 'mod/pagelets.js',
 'mod/ready.js'
-]);
+]
+);

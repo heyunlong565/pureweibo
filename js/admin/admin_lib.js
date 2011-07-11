@@ -153,7 +153,7 @@ cateBox.prototype = new Box({
 			'	<div class="float-info">',
 			'		<label>',
 			'			</label><p>类别名称：</p>',
-			'			<input type="text" name="link-text" id="content" class="input-box pop-w9" vrel="ne=m:不能为空" warntip="#textErr" value=""><span id="textErr" class="hidden a-error">验证错误提示</span>',
+			'			<input type="text" name="link-text" id="content" class="input-box pop-w9" vrel="ne=m:不能为空" warntip="#textErr" value=""><span id="textErr" class="hidden tips-error">验证错误提示</span>',
 			'	</div>',
 			'	<div class="float-info">',
 			'		<p>类别所用的用户列表：</p>',

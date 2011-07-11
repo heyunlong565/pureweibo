@@ -39,7 +39,7 @@
 			return;
 		}
 
-		$('#small_logo_preview').attr('src', url);
+		$('#small_logo_preview').attr('src', url+'?r='+Math.random());
 		$('#small_file').val(url);
 	}
 
@@ -63,13 +63,13 @@
         	<form action="<?php echo URL('mgr/user_verify.webAuthenWay');?>" method="post" name="authenticate" id="this_form">
 			<div class="form-s1">
 				<p class="tips"><strong>认证方式设置:</strong></p>
-				<p class="opeate">
+				<p class="operate">
                     <label>
                     	<input name="authen_type[]" class="ipt-checkbox" type="checkbox" value="1" <?php if($sysconfig['authen_type'] == 1 || $sysconfig['authen_type'] == 3) echo 'checked="checked"';?> />
                     	使用新浪名人认证
                     </label>
                 </p>
-                <p class="opeate">
+                <p class="operate">
                 	<label>
             			<input name="authen_type[]" class="ipt-checkbox" type="checkbox" value="2" <?php if($sysconfig['authen_type'] == 2 || $sysconfig['authen_type'] == 3) echo 'checked="checked"';?> onclick="icon(this); "/>
                         使用站点自定义认证
@@ -79,8 +79,8 @@
 			<input type="hidden" name="big_file" id="big_file" value="<?php echo $sysconfig['authen_big_icon'];?>" />
 			<input type="hidden" name="small_file" id="small_file" value="<?php echo $sysconfig['authen_small_icon']; ?>" />
 			
-            <div class="certification-desc" id="update_form" style="display:none">
-            	<div class="form-area">
+            <div class="certif-desc" id="update_form" style="display:none">
+            	<div class="form">
                 	<div class="form-row">
                         <label class="form-field">设置认证说明</label>
                         <div class="form-cont">
@@ -90,8 +90,8 @@
                 </div>
             </div>
             </form>
-            <div class="certification" id="update_form_2" style="display:none">
-            	<div class="form-area">
+            <div class="certif" id="update_form_2" style="display:none">
+            	<div class="form">
                 	<div class="form-row file-cont">
                         <label class="form-field">请选择认证图标</label>
                         <div class="form-cont file-cont">
@@ -115,11 +115,11 @@
                         <label class="form-field">效果预览：</label>
                         <div class="form-cont preview-cont">
                             <div class="preview">
-                                <img id="big_logo_preview" src="<?php echo $sysconfig['authen_big_icon'] ? F('fix_url', $sysconfig['authen_big_icon']) : W_BASE_URL. 'var/data/logo/big_auth_icon.png';?>" />
+                                <img id="big_logo_preview" src="<?php echo $sysconfig['authen_big_icon'] ? F('fix_url', $sysconfig['authen_big_icon']) : W_BASE_URL. 'img/logo/big_auth_icon.png';?>" />
                                 <div class="preview_loading" id="big_preview_loading" style="display:none">正在上传图片，请稍候...</div>
                             </div>
                             <div class="preview">
-                                <img id="small_logo_preview" src="<?php echo $sysconfig['authen_small_icon'] ? F('fix_url', $sysconfig['authen_small_icon']) :W_BASE_URL. 'var/data/logo/small_auth_icon.png';?>" title="<?php echo $sysconfig['authen_small_icon_title'];?>" />
+                                <img id="small_logo_preview" src="<?php echo $sysconfig['authen_small_icon'] ? F('fix_url', $sysconfig['authen_small_icon']) :W_BASE_URL. 'img/logo/small_auth_icon.png';?>" title="<?php echo $sysconfig['authen_small_icon_title'];?>" />
                                 <div class="preview_loading" id="small_preview_loading" style="display:none">正在上传图片，请稍候...</div>
                             </div>
                         </div>
@@ -130,7 +130,7 @@
                 </div>
         	</div>  
             <div class="btn-area">
-                <a href="#this" onclick='submit();' class="general-btn btn-s2" name="保存修改"><span>保存修改</span></a>
+                <a href="#this" onclick='submit();' class="btn-general highlight" name="保存修改"><span>保存修改</span></a>
             </div>  
 		</div>
 	</div>

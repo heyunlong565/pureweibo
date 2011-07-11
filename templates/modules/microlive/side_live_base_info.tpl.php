@@ -1,6 +1,6 @@
 <!-- 关于在线直播 开始-->
-<div class="user-sidebar explain">
-    <div class="hd"><h3>关于在线直播</h3></div>
+<div class="mod-aside user-sidebar explain">
+    <div class="hd"><h3><?php LO('modules_microlive_side_live_base_info_title');?></h3></div>
 	<div class="bd">
     	<div class="bg"></div>
         <div class="cont">
@@ -11,8 +11,8 @@
 <!-- 关于在线直播 结束-->
 
 <!-- 联系方式 开始-->
-<div class="user-sidebar explain">
-    <div class="hd"><h3>联系方式</h3></div>
+<div class="mod-aside user-sidebar explain">
+    <div class="hd"><h3><?php LO('modules_microlive_side_live_base_info_contact');?></h3></div>
 	<div class="bd">
     	<div class="bg"></div>
         <div class="cont">

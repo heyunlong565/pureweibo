@@ -82,18 +82,27 @@ $(function(){
 		$('#right > div').each(function(){
 			side.push($(this).attr('data'));
 		});
+		if( Xwb.gModified == true ) {
+			Xwb.ui.MsgBox.alert('提示','未修改请不要提交');
+			return; //未修改
+		}
 		Xwb.request.postReq( mkUrl('mgr/page_manager','savesort','page_id='+pageID),
 							{main:main.join(','),side:side.join(',')},
 							function(r){
 								if(r.isOk()){
-									Xwb.gModified = true ;
-									location.reload();
+									Xwb.ui.MsgBox.success('提示','保存成功',function(id){
+										if(id == 'ok')	{
+											Xwb.gModified = true ;
+											location.reload();	
+										}											
+									});
 								} else {
 									Xwb.ui.MsgBox.alert('提示',r.getMsg());
 								}
 							}
-					)
-	})
+					);
+		return false;
+	});
 	
 	});
 			
@@ -112,6 +121,7 @@ $(function(){
 					var self=this;
 					$(View).find('#pop_cancel').click(function(){
 						self.close();
+						return false;
 					});
 				},
 				destroyOnClose:true,
@@ -123,31 +133,46 @@ $(function(){
 				_lock = 1;
 				// label radio 特殊处理
 				labelfun(this.dlg.view);
-			   if(component_id == 11){
-					popWin.dlg.jq("#submitBtn").unbind('click');
-					popWin.dlg.jq("#submitBtn").click(sp_submit);
-				}
-				if( component_id == 3 || component_id == 2 ){
-					popWin.dlg.jq().attr('class','win-pop win-fixed add-sort');
-					Recom.call(popWin.dlg);
-				}
-				if(component_id == 5 ){
-					popWin.dlg.jq().attr('class','win-pop win-fixed add-sort');
-					WeiboList.call(popWin.dlg);
+				switch (+component_id){
+					case 2:
+					case 3:
+						popWin.dlg.jq().attr('class','win-pop win-fixed win-sort');
+						Recom.call(popWin.dlg);
+						if(popWin.title)
+							popWin.dlg.jq('input[name="data[title]"]').val(popWin.title);
+						break;
+					case 5:
+						popWin.dlg.jq().attr('class','win-pop win-fixed win-sort');
+						WeiboList.call(popWin.dlg);
+						if(popWin.title)
+							popWin.dlg.jq('input[name="data[title]"]').val(popWin.title);
+						break;
+					case 11:
+						popWin.dlg.jq("#submitBtn").unbind('click');
+						popWin.dlg.jq("#submitBtn").click(sp_submit);
+						break;
 				}
 				var modeObj =  Xwb.util.dequery(this.modeUrl);
 				if(modeObj.group_id){
 					this.dlg.jq('#groupID').val(modeObj.group_id);
 				}
 				autoHeight(this);
+				this.dlg.center();
 			}
 		});
 	}
 	//自适应高度
-	function autoHeight(sthis){
-		if(parseInt(sthis.dlg.jq('.form-box').height())> 384 ){
-				sthis.dlg.jq('.form-box').height(384)
+	function autoHeight(sthis,fixedHieght){
+		var height = fixedHieght || 384 , t = 0,formBox = sthis.dlg.jq('.form-box');
+		formBox.children().each(function(){
+			t += this.offsetHeight;
+		});
+		if( formBox.height() >= height && t >= height ){
+			formBox.height(height)
+		} else {
+			formBox.css('height','');
 		} 
+		sthis.dlg.center();
 	}
 	//component_id等于11特殊处理
 	function sp_submit(){
@@ -178,7 +203,7 @@ $(function(){
 				destroyOnClose:true,
 				title:title,
 				view:'Box',
-				cs:'win-fixed add-links',
+				cs:'win-fixed win-links',
 				onViewReady:function(view){
 					$(view).find('#tabMain > ul').addClass('hidden');
 					$(view).find('#tabHead > a').each(function(i){
@@ -187,6 +212,7 @@ $(function(){
 							$(view).find('#tabHead > a').removeClass('current');
 							$(view).find('#tabMain > ul:eq('+i+')').removeClass('hidden');
 							$(this).addClass('current');
+							return false;
 						});
 					});
 					$(view).find('#tabMain > ul > li').hover(function(){
@@ -210,7 +236,7 @@ $(function(){
 			afterDisplay : function(){
 				_lock = 1;
 			}
-		})
+		});
 	}
 	// label radio 特殊处理
 	function labelfun(s){
@@ -436,7 +462,7 @@ $(function(){
 		})
 		.reg('Uedit',function(e){
 			var trObj = $(e.src).parent().parent('tr');
-			trObj.find('p:eq(1)').replaceWith('<input value="'+trObj.find('p:eq(1)').html()+'" id="remark" type="text"  class="input-txt txt-s1"/>');
+			trObj.find('p:eq(1)').replaceWith('<input value="'+trObj.find('p:eq(1)').html()+'" id="remark" type="text"  class="input-txt w130"/>');
 			$(e.src).next('a').replaceWith('<a href="javascript:;" rel="e:cal" class="icon-del">取消</a>');
 			$(e.src).replaceWith('<a href="javascript:;" rel="e:submit" class="icon-confirm">确定</a>');
 		})
@@ -468,6 +494,7 @@ $(function(){
 					delete urlObj[v];
 				}
 				popWin.modeUrl =  Xwb.request.basePath +'admin.php?' +  Util.queryString(urlObj);
+				popWin.title = self.jq('input[name="data[title]"').val();
 				popWin.reload();
 			}
 		});
@@ -581,6 +608,7 @@ $(function(){
 					delete urlObj[v];
 				}
 				popWin.modeUrl = Xwb.request.basePath +'admin.php?' +  Util.queryString(urlObj);
+				popWin.title = self.jq('input[name="data[title]"]').val();
 				popWin.reload();
 			}
 		});
@@ -628,12 +656,14 @@ $(function(){
 	}
 	function addIcs(sthis){
 		if($(sthis).prev('input').val() !='' ){
-			$(sthis).prev('input').before('<p class="input-item"><input type="text"  class="input-txt form-el-w130" name="param[topics][]" value="'+ $(sthis).prev('input').val() +'" /> <a  class="icon-del" href="javascript:;" onclick="delIcs(this);">删除</a></p>');
+			$(sthis).prev('input').before('<p class="input-item"><input type="text"  class="input-txt w130" name="param[topics][]" value="'+ $(sthis).prev('input').val() +'" /> <a  class="icon-del" href="javascript:;" onclick="delIcs(this);">删除</a></p>');
 			 $(sthis).prev('input').val('');
+			 autoHeight(window.popWin,396);
 		}
 	}
 	function delIcs(sthis){
 		$(sthis).prev('input').remove();
 		$(sthis).next('br').remove();
 		$(sthis).remove();
+		autoHeight(window.popWin,396);
 	}

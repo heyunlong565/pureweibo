@@ -214,11 +214,12 @@ class microLive
 	 *
 	 * @params array
 	 */
-	function updateMicroLive($live_id, $wb_id, $type, $state)
+	function updateMicroLive($live_id, $wb_id, $type, $state, $weibo)
 	{
 		$data = array();
 		$data['live_id'] = $live_id;
 		$data['wb_id'] = $wb_id;
+		$data['weibo'] = is_array($weibo) ? json_encode($weibo) : $weibo;
 		$data['type'] = $type;
 		$data['state'] = $state;
 		$data['add_time'] = APP_LOCAL_TIMESTAMP;
@@ -239,7 +240,7 @@ class microLive
 	 *
 	 * @return array
 	 */
-	function getMicroLiveWbs($id, $state = null, $page = 1, $limit = 20, $last_wb_id = false) {
+	function getMicroLiveWbs($id, $state = null, $page = 1, $limit = 20, $last_wb_id = false, $params=array()) {
 		$where = ' WHERE live_id = ' .$id;
 		if ($state) {
 			$where .= ' AND state = ' . $state;
@@ -247,8 +248,13 @@ class microLive
 		if ($last_wb_id) {
 			$where .= ' AND wb_id > "' . $last_wb_id . '"';
 		}
+		
+		if ( isset($params['gMtype']) ) {
+			$where .= " And type In (2, 3) ";
+		}
+		
 		$offset = ($page - 1) * $limit;
-		$sql = 'SELECT wb_id, type, state FROM ' . $this->db->getTable(T_MICRO_LIVE_WB) . $where . ' ORDER BY add_time DESC LIMIT ' . $offset . ', ' . $limit;
+		$sql = 'SELECT wb_id, weibo, type, state FROM ' . $this->db->getTable(T_MICRO_LIVE_WB) . $where . ' ORDER BY add_time DESC LIMIT ' . $offset . ', ' . $limit;
 		$this->count_sql = 'SELECT COUNT(*) FROM ' . $this->db->getTable(T_MICRO_LIVE_WB) . $where . ' ORDER BY add_time DESC';
 		return RST($this->db->query($sql));
 	}
@@ -260,9 +266,14 @@ class microLive
 	 *
 	 * @return array
 	 */
-	function getWbCount($id, $state) {
-		$where = ' WHERE live_id = ' . $this->db->escape($id) .' AND state = ' . $state;	
-		$sql = 'SELECT COUNT(*) FROM ' . $this->db->getTable(T_MICRO_LIVE_WB) . $where; 
+	function getWbCount($id, $state, $params) 
+	{
+		$where 	= ' WHERE live_id = ' . $this->db->escape($id) .' AND state = ' . $state;	
+		if ( isset($params['gMtype']) ) {
+			$where .= " And type In (2, 3) ";
+		}
+		
+		$sql 	= 'SELECT COUNT(*) FROM ' . $this->db->getTable(T_MICRO_LIVE_WB) . $where; 
 		return RST($this->db->getOne($sql));
 	}
 
@@ -322,5 +333,30 @@ class microLive
 		DD('microLive.getCount');
 		DD('microLive.getLiveCount');
 		DD('microLive.getWbCount');
+	}
+
+	function updateMicroLive2($wb_id, $weibo)
+	{
+		$data = array();
+		$data['weibo'] = is_array($weibo) ? json_encode($weibo) : $weibo;
+
+		$save_result = $this->db->save($data, $wb_id, T_MICRO_LIVE_WB, 'wb_id');
+		if ($save_result) {
+			$this->_cleanCache(); //保存成功后清除缓存
+		}
+
+		return RST($save_result);
+	}
+
+	function getMicroLiveWbs2($id, $state = null) {
+		$where = ' WHERE live_id = ' .$id;
+		if ($state) {
+			$where .= ' AND state = ' . $state;
+		}
+
+		$where .= " AND (weibo = '' || ISNULL(weibo))";
+		
+		$sql = 'SELECT wb_id, weibo, type, state FROM ' . $this->db->getTable(T_MICRO_LIVE_WB) . $where . ' ORDER BY add_time DESC';
+		return RST($this->db->query($sql));
 	}
 }

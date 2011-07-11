@@ -5,7 +5,11 @@
 	<base target="_blank" />
 	<title><?php echo F('escape', $unit_name);?></title>
 	<link rel="stylesheet" type="text/css" href="<?php echo W_BASE_URL;?>css/component/content_unit/base.css" />
+	<?php if (WB_LANG_TYPE_CSS):?>
+	<link rel="stylesheet" type="text/css" href="<?php echo W_BASE_URL;?>css/component/content_unit/skin_<?php echo WB_LANG_TYPE_CSS;?>.css" />
+	<?php else:?>
 	<link rel="stylesheet" type="text/css" href="<?php echo W_BASE_URL;?>css/component/content_unit/skin.css" />
+	<?php endif;?>
 	<script src="<?php echo W_BASE_URL;?>js/jquery.js"></script>
 	<script src="<?php echo W_BASE_URL;?>js/base/xwbapp.js"></script>
 	<script src="<?php echo W_BASE_URL;?>js/mod/xwbrequestapi.js"></script>
@@ -17,8 +21,8 @@
 			$(this).click(function(){
 					var uid = $(this).attr('rel');
 					if( ! Xwb.cfg.uid ){ // 未登录...
-						window.open( Xwb.request.mkUrl('ta', '', 'id='+uid),'target=blank' );
-						return;
+						window.open( Xwb.request.mkUrl('ta', '', 'id='+uid),'' );
+						return false;
 					}
 					var self=$(this);
 					if (lock) retuen;
@@ -29,7 +33,7 @@
 			        }else {
 			            if(ed.getCode() == '1020806'){
 			                //如果该用户一天超过500次关注行为，弹窗提示
-			               if(confirm('你今天已经关注了足够多的人，先去看看他们在说些什么吧？') == true ){
+			               if(confirm('<?php LO('modules_unit_t_show_followedTooManyUsers');?>') == true ){
 			                        window.open( Xwb.request.mkUrl('ta', '', 'id='+uid),'target=blank' );
 			                };
 			            }else alert(ed.getMsg());
@@ -56,43 +60,20 @@
 			<img src="<?php echo $userinfo['profile_image_url']; ?>" alt="" />
 			</a>
 			<ul>
-				<li>
-				<a href="<?php echo URL('ta', 'id='.$userinfo['id'].'&name='.F('escape', $userinfo['screen_name']));?>" title="<?php echo F('escape', $userinfo['screen_name']);?>" target="_blank"><?php echo F('escape', $userinfo['screen_name']);?></a><span class="location"><?php echo $userinfo['location'];?></span>
-				</li>
-				<li>
-				粉丝<span class="fans"><?php echo $userinfo['followers_count'];?></span>人
-				</li>
-				
+				<li><a href="<?php echo URL('ta', 'id='.$userinfo['id'].'&name='.F('escape', $userinfo['screen_name']));?>" title="<?php echo F('escape', $userinfo['screen_name']);?>" target="_blank"><?php echo F('escape', $userinfo['screen_name']);?></a><span class="location"><?php echo $userinfo['location'];?></span></li>
+				<li><?php LO('modules_unit_t_show_fans');?><span class="fans"><?php echo $userinfo['followers_count'];?></span><?php LO('modules_unit_t_show_people');?></li>
 			</ul>
-			
 			<?php endif;?>
-
-						<?php
-						
-						if(USER::isUserLogin()):
-						?>
-							<?php
-							if(in_array($userinfo['id'],$fids)):
-							?>
-							<a onclick="return false;" class="btn-followed"></a>
-							<?php
-							elseif(USER::uid()==$userinfo['id']):
-							?>
-							<span class="follow"></span>
-							<?php
-							else:
-							?>
-							<a href="javascript:;" class="btn-addfollow" href="javascript:;" rel='<?php echo $userinfo['id'];?>'></a>
-							<?php
-							endif;
-							?>
-						<?php
-						else:
-						?>
-						<a href="javascript:;" class="btn-addfollow" href="javascript:;" rel='<?php echo $userinfo['id'];?>'></a>
-						<?php
-						endif;
-						?>
+			
+			<?php $isLogin = USER::isUserLogin();
+				if ( $isLogin && isset($fids[$userinfo['id']]) ):
+					echo '<a onclick="return false;" class="btn-followed"></a>';
+				elseif ($isLogin && USER::uid()==$userinfo['id']):
+					echo '<span class="follow"></span>';
+				else:
+			?>
+				<a class="btn-addfollow" href="javascript:;" rel='<?php echo $userinfo['id'];?>'></a>
+			<?php endif; ?>
 							
 		</div>
 		<div class="weibo-main">
@@ -147,7 +128,7 @@
 								</div>
 								<?php endif;?>
 								<div class="weibo-info">
-									<p><a href="<?php echo URL('show', 'id='.$item['id']);?>" target="_blank" id="fw">转发</a>|<a href="<?php echo URL('show', 'id='.$item['id']);?>" target="_blank" id="cm">评论</a></p>
+									<p><a href="<?php echo URL('show', 'id='.$item['id']);?>" target="_blank" id="fw"><?php LO('modules_unit_t_show_forward');?></a>|<a href="<?php echo URL('show', 'id='.$item['id']);?>" target="_blank" id="cm"><?php LO('modules_unit_t_show_comment');?></a></p>
 									<span><a href="<?php echo URL('show', 'id='.$item['id']);?>" target="_blank"><?php echo F('format_time', $item['created_at']);?></a></span>
 								</div>
 							</li>
@@ -163,10 +144,10 @@
 							?>
 							<?php endforeach;?>
 							<?php else:?>
-								<div>暂时没有微博信息</div>
+								<div><?php LO('modules_unit_t_show_empty');?></div>
 							<?php endif;?>
 					<?php else:?>
-						<div class="int-box load-fail icon-bg">获取微博信息失败，请<a href="#" rel="e:rl">刷新</a>再试!</div>
+						<div class="int-box ico-load-fail"><?php LO('modules_unit_t_show_refresh');?></div>
 					<?php endif;?>
 				</ul>
 			</div>

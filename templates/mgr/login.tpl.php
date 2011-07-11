@@ -43,12 +43,12 @@ function ajax_submit() {
 			window.location.href = '<?php echo URL('mgr/admin.index');?>';
 		} else {
 			if (json.state == '402') {
-				$('#verify_code_msg').html(json.msg).addClass("a-error").show();
+				$('#verify_code_msg').html(json.msg).addClass("tips-error").show();
 				$('#username_msg').hide();
 			} else if (json.state == '403') {
 				window.top.location.href = "<?php echo URL('account.sinaLogin','cb=login&loginCallBack=' . urlencode(URL('mgr/admin.login', '', 'admin.php')), 'index.php');?>";
 			} else {
-				$('#username_msg').html(json.msg).addClass("a-error").show();
+				$('#username_msg').html(json.msg).addClass("tips-error").show();
 				$('#verify_code_msg').hide();
 			}
 		}
@@ -61,11 +61,11 @@ function ajax_submit() {
 <body>
 <div id="login-wrap">
 	<div class="login-main">
-    	<div class="login-t">
+    	<div class="login-tit">
         	<div class="admin-logo"></div>
             <div class="tit"></div>
         </div>
-        <div class="login-m">
+        <div class="login-cont">
         	<form id="loginFrm" action="" method="post" onsubmit="ajax_submit();return false;">
             	<div class="account1">
                 	<label>微博帐号：</label>
@@ -74,13 +74,13 @@ function ajax_submit() {
                 </div>
                 <div class="account1">
                 	<label for="">密码：</label>
-                    <input class="input-txt admin-txt" id="password" name="password" type="password" />
+                    <input class="input-txt w180" id="password" name="password" type="password" />
                     <span id="username_msg"></span>
                 </div>
 				<?php if(IS_USE_CAPTCHA):?>
                 <div class="account2">
                 	<label for="">验证码：</label>
-                    <input class="input-txt admin-txt" id="verify_code" name="verify_code" type="text" autocomplete="off" />
+                    <input class="input-txt w180" id="verify_code" name="verify_code" type="text" autocomplete="off" />
                     <span id="verify_code_msg"></span>
                 </div>
                 <div class="account3">

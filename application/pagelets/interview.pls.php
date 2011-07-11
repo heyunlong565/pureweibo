@@ -11,6 +11,7 @@ class interview_pls
 	{
 		TPL::module($param['tpl'], $param);
 		$wbId	 		= isset($param['list'][0]['id']) ? $param['list'][0]['id'] : '';
+		$wbId			= $this->_getCurWbId($wbId);
 		$interviewId	= isset($param['interview']['id']) ? $param['interview']['id'] : '';
 		$minId			= '';
 		
@@ -38,8 +39,10 @@ class interview_pls
 	{
 		TPL::module($param['tpl'], $param);
 		$wbId 			= isset($param['list'][0]['id']) ? $param['list'][0]['id'] : '';
+		$wbId			= $this->_getCurWbId($wbId);
 		$interviewId	= isset($param['interview']['id']) ? $param['interview']['id'] : '';
 		$minId			= '';
+		$type			= isset($param['type']) ? $param['type'] : '';
 		
 		if ( is_array($param['list']) && $minWb=array_pop($param['list']) )
 		{
@@ -51,6 +54,7 @@ class interview_pls
 						'list' 			=> F('format_weibo',$param['list']), 
 						'wb_id'			=> $wbId, 
 						'interview_id'	=> $interviewId,
+						'type'			=> $type,
 						'min_id'		=> $minId
 			);
 	}
@@ -83,7 +87,7 @@ class interview_pls
 		$_data['count'] 		= $totalCnt;
 		$_data['limit'] 		= $limit;
 		$_data['last'] 			= $lastRecord;
-		$_data['dateFormat'] 	= 'm月d日 H:i';
+		$_data['dateFormat'] 	= L('pls__intervies__indexList__timeFormat');
 		
 		TPL::module('interview/index_list', $_data);
 	}
@@ -96,5 +100,23 @@ class interview_pls
 	function guestList($params)
 	{
 		TPL::module('interview/include/user_sidebar', $params);
+	}
+	
+	
+	/**
+	 * 获取用户阅读过的最大 微博ID
+	 * @param $id
+	 */
+	function _getCurWbId($id)
+	{
+		$wbKey		 = 'live#maxwbId';
+		$sessionWbId = USER::V($wbKey);
+		if ( empty($sessionWbId) || ($sessionWbId && $id && $id>$sessionWbId) )
+		{
+			USER::V($wbKey, $id);
+			return $id;
+		}
+		
+		return $sessionWbId;
 	}
 }

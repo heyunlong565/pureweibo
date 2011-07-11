@@ -17,9 +17,11 @@ $(function(){
         jqMain    = $('.weibo-main'),
         jqWbCt    = $('.weibo-list'),
         jqLogo    = jqCt.find('.xweibo'),
-		basePath  = window.Xwb.cfg && Xwb.cfg.basePath;
+		basePath  = window.Xwb.cfg && Xwb.cfg.basePath,
+        
+        getText = Xwb.lang.getText,
 
-		jqWbCt = ( jqWbCt.length == 0 ? $('#recom'): jqWbCt );
+		jqWbCt = ( jqWbCt.length == 0 ? $('#recom'): jqWbCt ),
 		jqHead = ( jqHead.length == 0 ? $('.wb-hd'): jqHead );
 
 	if (basePath)
@@ -34,13 +36,14 @@ $(function(){
             jqWbCt.css('height', total - inner - 4)
                   .show();
         }
-        if( $('#recom').length ){
-        	var liLength = $('#recom > ul > li ').length;
-			if( liLength < 9 ){
-				$('#recom').css('height',Math.ceil(liLength/3) * 130);
-				 $('#upSlider,#downSlider').hide();
-			}
-        }
+		//向上向下滚动条修正
+		var child = jqWbCt.children();
+		var allH = 0;
+		child.each(function(){
+			allH += $(this).height(); 
+		});
+		if(allH <= jqWbCt.height()) $('#upSlider,#downSlider').hide();
+
         var ctH = jqCt[0].offsetHeight;
         var i = 10;
         while(i>0){
@@ -171,11 +174,11 @@ $(function(){
                         var jq = $('#'+id);
                         // comment count
                         if(ct[0]){
-                            jq.find('#cm').text('评论('+ct[0]+')');
+                            jq.find('#cm').text(getText('评论') + '('+ct[0]+')');
                         }
                         // forward count
                         if(ct[1]){
-                            jq.find('#fw').text('转发('+ct[1]+')');
+                            jq.find('#fw').text(getText('转发') + '('+ct[1]+')');
                         }
                     }
                 });

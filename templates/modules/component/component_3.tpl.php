@@ -10,7 +10,7 @@
 	
 ?>
 
-<div class="user-list-s1">
+<div class="mod-aside user-list-s1">
     <div class="hd"><h3><?php echo F('escape', $mod['title']);?></h3></div>
 	<div class="bd">
 		<ul>
@@ -36,9 +36,9 @@
 				<p class="name"><a href="<?php echo $url;?>"><?php echo $nick;?></a></p>
 				<?php if ((string)$u['uid'] !== (string)$uid) {?>
 					<?php if (!isset($followedList[(string)$u['uid']])):?>
-					<a href="#" class="addfollow-btn" rel="e:fl,t:2">加关注</a>
+					<a href="#" class="addfollow-btn" rel="e:fl,t:2"><?php LO('modules_component_component_2_follow');?></a>
 					<?php else:?>
-					<em>已关注</em>
+					<em><?php LO('modules_component_component_2_followed');?></em>
 					<?php endif;?>
 				<?php } else {?>
 					<em>&nbsp;</em>

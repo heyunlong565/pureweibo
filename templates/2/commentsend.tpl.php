@@ -23,10 +23,8 @@
 						<div class="main">
                         	<div class="main-bd">
                                 <div class="comment-list">
-                                    <div class="tab-s2">
-										<span><span><a href="<?php echo URL('index.comments');?>">收到的评论</a></span></span>
-										<span class="current"><span><a href="javascript:void(0)">发出的评论</a></span></span>
-                                    </div>
+                                    <?php  TPL::plugin('include/mymsg_header'); ?>
+                                    
 									<script type="text/javascript" src="<?php echo W_BASE_URL;?>js/mod/mycomments.js"></script>
 									<?php Xpipe::pagelet('weibo.comments', array('type'=>'by'));?>
                                 </div>
@@ -38,6 +36,7 @@
 							<!-- 用户标签 开始-->
 							<?php Xpipe::pagelet('common.userTag');?>
 							<?php Xpipe::pagelet('common.sideComponents', array('type'=>2) );?>
+							<?php echo F('show_ad', 'sidebar', '');?>
 						</div>
 					</div>
 				</div>

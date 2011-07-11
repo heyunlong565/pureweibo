@@ -34,7 +34,7 @@ class xwbAdditive {
 	 * @param array $params
 	 * @param rst $response
 	 */
-	function extra_interView($params, $response)
+	function extra_interView($params, $response, $suid=FALSE, $wbState=FALSE)
 	{
 		// 检查interview id 和api 增加微博失败
 		if ( !isset($params['interview_id']) || !isset($response['id']) ) {
@@ -49,13 +49,14 @@ class xwbAdditive {
 		}
 		
 		
-		$curUid = USER::uid();
+		$curUid = $suid ? $suid : USER::uid();
+		$weibo  = json_encode($response);
 		
 		// 回答微博入库
 		if ( isset($params['ask_id']) ) 
 		{
-			DR('InterviewWb.updateAnswer', FALSE, $params['interview_id'], $params['ask_id'], $curUid, $response['id']);
-			DR('InterviewWbAtme.updateAnswer', FALSE, $params['interview_id'], $params['ask_id'], $curUid, $response['id']);
+			DR('InterviewWb.updateAnswer', FALSE, $params['interview_id'], $params['ask_id'], $curUid, $response['id'], $weibo);
+			DR('InterviewWbAtme.updateAnswer', FALSE, $params['interview_id'], $params['ask_id'], $curUid, $response['id'], $weibo);
 			return TRUE;
 		} 
 		
@@ -63,6 +64,7 @@ class xwbAdditive {
 		// 主持人、嘉宾点评入库
 		$params['ask_id'] 	= $response['id'];
 		$params['ask_uid'] 	= $curUid;
+		$params['weibo']	= $weibo;
 		
 		if ( isset($interview['master'][$curUid]) || isset($interview['guest'][$curUid]) )
 		{
@@ -75,7 +77,7 @@ class xwbAdditive {
 		
 		// 用户提问入库
 		$params['answer_wb'] 	= 0;
-		$params['state'] 		= $interview['wb_state'];
+		$params['state'] 		= $wbState ? $wbState : $interview['wb_state'];
 		DR('InterviewWb.saveWb', FALSE, $params, FALSE);
 		
 		
@@ -84,7 +86,8 @@ class xwbAdditive {
 		{
 			foreach ($interview['guest'] as $uid=>$aGuest)
 			{
-				if ( preg_match("/@{$aGuest['screen_name']}\s+/i", $response['text']) )
+				$screenName = preg_quote($aGuest['screen_name']);
+				if ( preg_match("/@{$screenName}(\s+|$)/i", $response['text']) )
 				{
 					$data 					= array();
 					$data['interview_id'] 	= $params['interview_id'];
@@ -104,7 +107,7 @@ class xwbAdditive {
 	 * @param array $params
 	 * @param rst $result
 	 */
-	function extra_live($params, $result) {
+	function extra_live($params, $result, $sina_uid = false, $state = false) {
 		// 检查在线直播id 和发布的微博是否存在
 		if ( !isset($params['live_id']) || !isset($result['id']) ) {
 			return false;
@@ -117,7 +120,7 @@ class xwbAdditive {
 			return false;
 		}
 
-		$uid = USER::uid();
+		$uid = $sina_uid ? $sina_uid : USER::uid();
 		$master = explode(',', $liveInfo['master']);
 		$guest = explode(',', $liveInfo['guest']);
 		if (in_array($uid, $master)) {
@@ -127,13 +130,13 @@ class xwbAdditive {
 		} else {
 			$type = 1;
 		}
-		if ($liveInfo['wb_state'] == 'P' && $type ==1) {
+		if ($liveInfo['wb_state'] == 'P' && $type ==1 && !$state) {
 			$state = 2;
 		} else {
 			$state = 1;
 		}
 		/// 保存在线直播微博信息
-		DR('microLive.updateMicroLive', '', $liveInfo['id'], $result['id'], $type, $state);
+		DR('microLive.updateMicroLive', '', $liveInfo['id'], $result['id'], $type, $state, $result);
 
 		/// 清除微博列表缓存
 		DD('microLive.getMicroLiveWbs');
@@ -150,7 +153,12 @@ class xwbAdditive {
 		if ( !isset($params['event_id']) || !isset($result['id']) ) {
 			return false;
 		}
-		DR('events.commentEvent', '', $params['event_id'], $result['id']);
+		
+		if ( isset($params['event_wb']) && $params['event_wb'] ) {		// 活动本身的微博
+			DR('events.save', '', array('wb_id'=>$result['id']), $params['event_id']);
+		} else {	// 活动评论的微博
+			DR('events.commentEvent', '', $params['event_id'], $result['id'], $result);
+		}
 	}
 }
 ?>

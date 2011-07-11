@@ -11,10 +11,10 @@
 	TPL::plugin('wap/include/nav', array('is_top' => true), false);
 	TPL::plugin('wap/include/my_preview', $uInfo, false);
 	?>
-    <div class="row"><span>个人资料</span>&nbsp;<a href="<?php echo WAP_URL('index.setinfo'); ?>">修改</a></div>
-    <div class="c"><?php echo F('escape', $uInfo['screen_name'], ENT_QUOTES); ?>/<?php echo ($uInfo['gender'] == 'm' || $uInfo['gender'] == '') ? '男' : '女';?>/<?php echo F('escape', $uInfo['location'], ENT_QUOTES);?></div>
-    <div class="c"><img src="<?php echo F('profile_image_url', $uInfo['profile_image_url'], 'profile'); ?>" alt="头像" /></div>
-    <div class="c">个人简介:<?php echo F('escape', $uInfo['description'], ENT_QUOTES); ?></div>
+    <div class="row"><span><?php LO('index__info__label_profile');?></span>&nbsp;<a href="<?php echo WAP_URL('index.setinfo'); ?>"><?php LO('index__info__label_modify');?></a></div>
+    <div class="c"><?php echo F('escape', $uInfo['screen_name'], ENT_QUOTES); ?>/<?php echo ($uInfo['gender'] == 'm' || $uInfo['gender'] == '') ? L('index__info__label_genderMale') : L('index__info__label_genderFemale');?>/<?php echo F('escape', $uInfo['location'], ENT_QUOTES);?></div>
+    <div class="c"><img src="<?php echo F('profile_image_url', $uInfo['profile_image_url'], 'profile'); ?>" alt="<?php LO('index__info__label_headPic');?>" /></div>
+    <div class="c"><?php LO('index__info__label_description');?><?php echo F('escape', $uInfo['description'], ENT_QUOTES); ?></div>
 	<?php
 	TPL::plugin('wap/include/search', '', false);
 	TPL::plugin('wap/include/nav', array('is_top' => false), false);

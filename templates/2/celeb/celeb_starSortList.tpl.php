@@ -7,7 +7,7 @@ if(!defined('IN_APPLICATION')){
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title><?php echo F('web_page_title', false, "{$sort['name']} - 名人堂");?></title>
+<title><?php echo F('web_page_title', false, L('celeb__starChildSortList__fameTitle', $sort['name']));?></title>
 <?php TPL::plugin('include/css_link');?>
 <?php TPL::plugin('include/js_link');?>
 <link href="<?php echo W_BASE_URL;?>css/default/pub.css" rel="stylesheet" type="text/css" />
@@ -31,11 +31,11 @@ if(!defined('IN_APPLICATION')){
                         <div class="main user-recom">
                         	<div class="main-bd">
                                 <div class="recom-top">
-									<img src="<?php echo W_BASE_URL; ?>img/recommend_bg.png" alt="" />
+									<img src="<?php echo W_BASE_URL.'img/'.WB_LANG_TYPE_CSS.'/recommend_bg.png'; ?>" alt="" />
                                 </div>
                                 <!-- 名人堂一级分类 开始 -->
-                                <div class="column-title">
-                                    <h3><a href="<?php echo URL('celeb');?>">名人堂</a><em class="gt">&gt;</em><a href="#" class="guide-link"><?php echo strip_tags($sort['name']);?></a></h3>
+                                <div class="title-box">
+									<h3><a href="<?php echo URL('celeb');?>"><?php LO('celeb__starChildSortList__fame');?></a><em class="gt">&gt;</em><a href="#" class="guide-link"><?php echo strip_tags($sort['name']);?></a></h3>
                                 </div>
                                 
                         		<!-- 名人列表 开始 -->

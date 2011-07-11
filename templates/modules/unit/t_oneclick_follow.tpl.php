@@ -5,7 +5,11 @@
 	<base target="_blank" />
 	<title><?php echo F('escape', $unit_name);?></title>
 	<link rel="stylesheet" type="text/css" href="<?php echo W_BASE_URL;?>css/component/content_unit/base.css" />
+	<?php if (WB_LANG_TYPE_CSS):?>
+	<link rel="stylesheet" type="text/css" href="<?php echo W_BASE_URL;?>css/component/content_unit/skin_<?php echo WB_LANG_TYPE_CSS;?>.css" />
+	<?php else:?>
 	<link rel="stylesheet" type="text/css" href="<?php echo W_BASE_URL;?>css/component/content_unit/skin.css" />
+	<?php endif;?>
 	<script src="<?php echo W_BASE_URL;?>js/jquery.js"></script>
 	<script src="<?php echo W_BASE_URL;?>js/base/xwbapp.js"></script>
 	<script src="<?php echo W_BASE_URL;?>js/mod/xwbrequestapi.js"></script>
@@ -23,15 +27,17 @@
 			allcheckbox.each(function(){
 				v.push($(this).attr('rel'));
 			});
-			if(v.length == 0 ) return false;
+			if(v.length == 0 ) { alert('请选择要关注的用户'); return false;}
+			lock = 0;
 			Xwb.request.follow(v.join(','),0,function(r){
 				if( r.isOk()  || r.getCode() == '1020805' ){
-					lock = 0;
-					alert('关注成功!');
-					window.open('/index.php?m=index','');
+
+					alert('<?php LO('modules_unit_t_oneclick_follow_followed');?>!');
+					window.open(Xwb.request.mkUrl('index'), '');
 				} else {
 					alert(r.getMsg());
 				}
+				lock = 1;
 			})
 			return false;
 		})
@@ -57,7 +63,7 @@
 					<?php
 					if(!USER::isUserLogin()):
 					?>
-					<p>目前尚未登录<?php echo WB_USER_SITENAME?>，请<a id='loginBtn' target='_blank' href="<?php echo URL('account.login','loginCallBack='.urlencode(V('s:HTTP_REFERER','')))?>">登录</a>后关注！</p>
+					<p><?php LO('modules_unit_t_oneclick_follow_nologin', WB_USER_SITENAME, URL('account.login','loginCallBack='.urlencode(V('s:HTTP_REFERER',''))));?></p>
 					
 					</script>
 					<?php
@@ -69,7 +75,7 @@
 				<ul>
 					<?php
 					if(empty($userlist)){
-						echo '用户列表为空!';
+						echo L('modules_unit_t_oneclick_follow_userlistEmpty');
 					}
 					foreach($userlist as $userinfo):
 					
@@ -91,7 +97,7 @@
 			<a href="#this" class="arrow-down arrow-icon" id="downSlider" onclick='return false;'>
 				<img id="arrowDown" class="arrow-icon" height="4" width="8" src="<?php echo W_BASE_URL;?>css/component/content_unit/bgimg/transparent.gif" alt="arrow-up" />
 			</a>
-				<div class="btn-area" style="width:106px; margin:15px auto 30px;">
+				<div class="btn-area" style="width:106px; margin:0px auto;padding:15px 0 30px 0;">
 					<a href="#this" id="submit" class="btn-follow-all btn-center"></a>
 				</div>
 			

@@ -23,7 +23,7 @@ var
     doc  = document,
     CFG = X.cfg,
 	// 通用的disabled样式
-    disabledCS = 'general-btn-disabled';
+    disabledCS = 'btn-s1-disabled';
     
 var String = window.String,
     trimReg = new RegExp("(?:^\\s*)|(?:\\s*$)", "g");
@@ -32,6 +32,12 @@ var String = window.String,
 window.__debug = !!window.__debug;
 
 var _uid = 0, ds = doc.selection;
+
+if( window.__debug === false) {
+	 window.onerror = function() {
+		return true;
+	}
+}
 
 /**
  * @class Xwb.util
@@ -54,6 +60,12 @@ var Util = X.util = {
         </pre>
         */
        templ : function(str, map, urlencode, cascade){
+           /*
+           if ( map && typeof map !== 'object' && !map.length ) {
+               map = $.makeArray( map );
+           }
+           */
+           
             return str.replace(/\{([\w_$]+)\}/g, function(s, s1){
                 var v = map[s1];
                 if(cascade && typeof v === 'string')
@@ -1690,6 +1702,26 @@ X.ax.Uploader.prototype = {
                 window[fn] = null;
             };
         }
+    }
+};
+
+//多语言支持
+var L = X.lang = {
+    texts : {},
+/**
+* @param txt 要翻译的文本
+* @param [l] 要翻译的目标语言
+*/
+    getText : function(tx, map) {
+        var texts = L.texts;
+        if (tx in texts){
+            tx = texts[tx];
+        }
+        if ( map !== undefined) {
+            return Util.templ( tx, $.isArray( map ) || typeof map == 'object' ? map : [map] );
+        }
+        
+        return tx;
     }
 };
 

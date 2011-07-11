@@ -5,7 +5,8 @@
  * Copyright 2010 SINA Inc.
  * Date: 2010/10/28 21:22:06
  */
-
+(function(X,$){
+var getText = X.lang.getText;
 Xwb.use('pipeMgr')
 // 个人基本资料
 .reg('user.userInfoEdit', function(){
@@ -24,17 +25,17 @@ Xwb.use('pipeMgr')
                         if( e.isOk() ){
                             // apply iframe mask
                             Xwb.ui.MsgBox.getSysBox().frameMask = true;
-                            Xwb.ui.MsgBox.success('', "个人设置保存成功！");
+                            Xwb.ui.MsgBox.success('', getText("个人设置保存成功！") );
                         }else {
                             var msg = e.getMsg();
                             switch(e.getCode()){
                                 case 1020104 :
-                                    msg = '你输入的个人简介不能超过70个字。';
+                                    msg = getText('你输入的个人简介不能超过70个字。');
                                 break;
                                 
                                 //权限超过限制
                                 case 1040016 :
-                                    msg = '抱歉，目前不允许修改个人资料，请联系网站管理员！';
+                                    msg = getText('抱歉，目前不允许修改个人资料，请联系网站管理员！');
                                 break;
                                 
                             }
@@ -114,7 +115,7 @@ Xwb.use('pipeMgr')
             onsuccess : function(data, next){
                 Xwb.request.updateShowProfile(data, function( e ){
                     if(e.isOk()){
-                        Xwb.ui.MsgBox.success('', '显示设置已保存。');
+                        Xwb.ui.MsgBox.success('', getText('显示设置已保存。') );
                     }else Xwb.ui.MsgBox.error('', e.getMsg());
                         
                     next();
@@ -136,7 +137,7 @@ Xwb.use('pipeMgr')
             onsuccess : function(data, next){
                 Xwb.request.updateNoticeProfile(data, function( e ){
                     if(e.isOk()){
-                        Xwb.ui.MsgBox.success('', '提醒设置已保存。');
+                        Xwb.ui.MsgBox.success('', getText('提醒设置已保存。'));
                     }else Xwb.ui.MsgBox.error('', e.getMsg());
                         
                     next();
@@ -166,7 +167,7 @@ Xwb.use('pipeMgr')
                     comForm : true,
                     onsuccess:function(data, next){
                         
-                    	Xwb.ui.MsgBox.confirm('提示','确认要使用这个域名吗？保存后将不能修改', function(rt){
+                    	Xwb.ui.MsgBox.confirm(getText('提示'), getText('确认要使用这个域名吗？保存后将不能修改'), function(rt){
                             if(rt=='ok'){
                             	Xwb.request.postReq(Xwb.request.apiUrl('action', 'applyDomain'), data, function(e){
 		    					    if(e.isOk()){
@@ -179,9 +180,9 @@ Xwb.use('pipeMgr')
 		    					        ui.jq('#domainSet').cssDisplay(false);
 		    					    }else{
 		    					        var errors = {
-		    					            '400024':'您已设置域名，不能更改。',
-		    					            '400023':'格式不正确',
-		    					            '400022':'域名已被占用，请重新设置。'
+		    					            '400024': getText('您已设置域名，不能更改。'),
+		    					            '400023': getText('格式不正确'),
+		    					            '400022': getText('域名已被占用，请重新设置。')
 		    					        };
 		    					        validator.tipWarn(jqDomain, errors[e.getCode()] || e.getMsg());
 		    					    }
@@ -200,7 +201,7 @@ Xwb.use('pipeMgr')
                                 // 6至20位的英文或数字（必须包含英文字符）
                                 var b = /^[a-zA-Z][0-9a-zA-Z]{5,19}$/.test(v) && /[a-z]+/i.test(v);
                                 if(!b && !data.m)
-                                    data.m = '6至20位的英文或数字（必须包含英文字符且不能以数字开头）';
+                                    data.m = getText('6至20位的英文或数字（必须包含英文字符且不能以数字开头）');
                                 this.report(b, data);
                            }else this.report(true,data);
                            
@@ -210,17 +211,20 @@ Xwb.use('pipeMgr')
                 });
             }
             
+            var strTipTitle = getText('提示');
+            
             // 加入收藏夹
             this.jq('#addFavLink').click(function() {
                 var jqUrl = ui.jq('#domainUrl');
             	if ( jqUrl.attr('href')  ) {
-	            	var ctrl = (navigator.userAgent.toLowerCase()).indexOf('mac') != -1 ? 'Command/Cmd' : 'CTRL'; 
+	            	var ctrl = (navigator.userAgent.toLowerCase()).indexOf('mac') != -1 ? 'Command/Cmd' : 'CTRL',
+                        strMainPageTitle = getText('我的主页') + ' - ' + document.title; 
 	            	if(document.all)
-	            	    window.external.addFavorite(jqUrl.attr('href'), '我的主页 - '+document.title); 
+	            	    window.external.addFavorite(jqUrl.attr('href'), strMainPageTitle); 
 	            	else if(window.sidebar)
-	            	    window.sidebar.addPanel('我的主页 - '+document.title, $("#domainUrl").attr('href'), ""); 
+	            	    window.sidebar.addPanel(strMainPageTitle, $("#domainUrl").attr('href'), ""); 
 	            	
-	                else Xwb.ui.MsgBox.alert('提示', '您可以尝试通过快捷键' + ctrl + ' + D 加入到收藏夹~');
+	                else Xwb.ui.MsgBox.alert(strTipTitle, getText('您可以尝试通过快捷键{0} + D 加入到收藏夹~', ctrl) );
             	}
             	return false;
             });
@@ -238,9 +242,9 @@ Xwb.use('pipeMgr')
             this.jq('#copyToClipboard').click(function() {
                 if (document.all){ 
                 	window.clipboardData.setData('text', $('#u_domain').val());
-                	Xwb.ui.MsgBox.success('提示', '链接复制成功！你可以利用快捷方式Ctrl+V键粘贴到UC、QQ或MSN等聊天工具中');
+                	Xwb.ui.MsgBox.success(strTipTitle, getText('链接复制成功！你可以利用快捷方式Ctrl+V键粘贴到UC、QQ或MSN等聊天工具中') );
                 }else { 
-            	   Xwb.ui.MsgBox.alert('提示', '您的浏览器不支持脚本复制或你拒绝了浏览器安全确认，请尝试手动[Ctrl+C]复制。'); 
+            	   Xwb.ui.MsgBox.alert(strTipTitle, getText('您的浏览器不支持脚本复制或你拒绝了浏览器安全确认，请尝试手动[Ctrl+C]复制。') ); 
                 } 
             });
         }
@@ -250,7 +254,7 @@ Xwb.use('pipeMgr')
     onViewReady : function(){
         this.jq('#unbind').click(function(){
             var href = this.href;
-            Xwb.ui.MsgBox.confirm('取消绑定',"你确定要取消当前绑定关系吗？", function(rt){
+            Xwb.ui.MsgBox.confirm( getText('取消绑定') , getText("你确定要取消当前绑定关系吗？"), function(rt){
                 if(rt === 'ok')
                     location.href = href;
             });
@@ -263,7 +267,7 @@ Xwb.use('pipeMgr')
 .reg('user.userTagEdit', {
     onViewReady : function(){
         var maxTag = 10;
-        var focusText = '选择最适合你的词语，多个请用空格分开';
+        var focusText = getText('选择最适合你的词语，多个请用空格分开');
         var jq = this.jq();
         
         function getTagCount(){
@@ -277,7 +281,7 @@ Xwb.use('pipeMgr')
         jq.find('#trig').click(function(){
             var v = $.trim(jq.find('#tagInputor').val());
             if(!v || v === focusText){
-                jq.find('#tip').cssDisplay(true).text('请至少输入一个标签');
+                jq.find('#tip').cssDisplay(true).text( getText('请至少输入一个标签') );
             }
         });
         
@@ -290,7 +294,7 @@ Xwb.use('pipeMgr')
                 var tags = data.tags.replace(/,|;|\uFF0C|\uFF1B|\u3001|\s/,',');
                 Xwb.request.createTags(data.tags, function( e ){
                     if( e.isOk() ){
-                        Xwb.ui.MsgBox.tipOk("标签创建成功！");
+                        Xwb.ui.MsgBox.tipOk( getText("标签创建成功！") );
                         setTimeout(function(){location.reload();}, 1000);
                     }else jq.find('#tip').cssDisplay(true).text(e.getMsg());
                         
@@ -310,15 +314,15 @@ Xwb.use('pipeMgr')
                     // 非法字符检测
                     if(!charReg.test(v)){
                         pass = false;
-                        msg  = '含有非法字符，请修改';
+                        msg  = getText('含有非法字符，请修改');
                     }else if(!sz){
                         pass = false;
-                        msg = '您已添加'+maxTag+'个标签，达到标签上限';
+                        msg = getText('您已添加{0}个标签，达到标签上限', maxTag);
                     }else {
                         for(var k=0,len=tags.length;k<len;k++){
                             var tlen = Xwb.util.byteLen(tags[k]);
                             if(tlen>14){
-                                msg = '单个标签长度不多于7个汉字或14个字母';
+                                msg = getText('单个标签长度不多于7个汉字或14个字母');
                                 pass = false;
                             }
                         }
@@ -341,7 +345,7 @@ Xwb.use('pipeMgr')
 
                 var tag = e.get('t');
                 if(getTagCount() == maxTag){
-                    Xwb.ui.MsgBox.tipWarn('您已添加'+maxTag+'个标签，达到标签上限');
+                    Xwb.ui.MsgBox.tipWarn( getText('您已添加{0}个标签，达到标签上限', maxTag) );
                     return;
                 }
                 jq.find('#tip').cssDisplay(false);
@@ -353,7 +357,7 @@ Xwb.use('pipeMgr')
                             $(el).remove();
                             $('<li><a class="a1" href="'+
                                 Xwb.request.mkUrl('search', 'user&k='+encodeURIComponent(tag))+'&ut=tags">'
-                                  +tag+'</a><a class="close-icon icon-bg" rel="e:dt,id:'+ee.getData().data[0].tagid+'" href="#"></a></li>')
+                                  +tag+'</a><a class="close-ico" rel="e:dt,id:'+ee.getData().data[0].tagid+'" href="#"></a></li>')
                              .appendTo('#tagList');
                         }
                     }else Xwb.ui.MsgBox.alert(ee.getMsg());
@@ -376,3 +380,4 @@ Xwb.use('pipeMgr')
            });
     }
 });
+})(Xwb,$);

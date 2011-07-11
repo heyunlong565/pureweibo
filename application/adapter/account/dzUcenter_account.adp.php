@@ -10,11 +10,11 @@
  */
 // ------------------------------------------------------------------------------ 
 // DZ 的注册地址 
-define('DZUC_REGISTER_URL',		'http://yourDzDomain/register.php');
+define('DZUC_REGISTER_URL',		'http://demo.discuz.cn/utf8/7.2/register.php');
 // DZ 的登录地址     
-define('DZUC_LOGIN_URL', 		'http://yourDzDomain/logging.php?action=login');
+define('DZUC_LOGIN_URL', 		'http://demo.discuz.cn/utf8/7.2/logging.php?action=login');
 // DZ 的UCENTER地址 不包含最后的 /
-define('DZUC_UCENTER_URL', 		'http://yourDzDomain/uc_server');
+define('DZUC_UCENTER_URL', 		'http://demo.discuz.cn/utf8/ucenter');
 // dz 的UCENTER　字符集
 define('DZUC_UCENTER_CHARSET',	'UTF-8');
 // 附属站名称，不以 网字结尾  ,　不要超过　10个汉字，20　个字母
@@ -22,7 +22,7 @@ define('DZUC_SITE_NAME', 		'DZ测试站');
 // 与附属站进行通讯的 UC_KEY
 define('DZUC_API_KEY', 			'123456'); 
 // 此应用在 UC 中的ID
-define('DZUC_APP_ID', 			'2'); 
+define('DZUC_APP_ID', 			'6'); 
 // 用于存储用户信息的 COOKIE 名  
 define('DZUC_USER_CK_NAME', 	'XweiboUserData_xauthCode'); 
 // 用于存储用户信息的 COOKIE 有效时间, 设置为 0 则只在浏览器周期有效 APP_LOCAL_TIMESTAMP+3600*24*15
@@ -137,7 +137,7 @@ class dzUcenter_account {
 		$result = $http->request('post');
 		$code = $http->getState();
 		if ($code != 200) {
-			return RST(false, $code, '登录失败，请检查远程登录验证接口');
+			return RST(false, $code, L('adapter__account__dzUcenter__loginError'));
 		}
 		return RST($result);
 	}

@@ -10,7 +10,7 @@
 	<?php
 	//var_dump($_SERVER['REQUEST_URI']);
 	?>
-			<p><span>当前位置：</span>
+	<p><span><?php LO('modules__pageLink__pos');?></span>
 				<?php
 				if(isset($link)):
 				?>

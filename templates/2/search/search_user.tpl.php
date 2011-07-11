@@ -26,8 +26,8 @@
                                 <!-- 搜索 结束 -->
 								<div class="tab-box">
 									<div class="tab-s2">
-										<span <?php echo V('r:base_app', '0') == 0 ? 'class="current"' : ''; ?>><span><a href="<?php echo URL('search.user', array('k' => V('r:k', ''), 'ut' => V('r:ut', 'nick'), 'base_app' => 0)); ?>">来自新浪</a></span></span>
-										<span <?php echo V('r:base_app', '0') == 1 ? 'class="current"' : ''; ?>><span><a href="<?php echo URL('search.user', array('k' => V('r:k', ''), 'ut' => V('r:ut', 'nick'), 'base_app' => 1)); ?>">本站</a></span></span>
+									<span <?php echo V('r:base_app', '0') == 0 ? 'class="current"' : ''; ?>><span><a href="<?php echo URL('search.user', array('k' => V('r:k', ''), 'ut' => V('r:ut', 'nick'), 'base_app' => 0)); ?>"><?php LO('search__user__fromSina');?></a></span></span>
+									<span <?php echo V('r:base_app', '0') == 1 ? 'class="current"' : ''; ?>><span><a href="<?php echo URL('search.user', array('k' => V('r:k', ''), 'ut' => V('r:ut', 'nick'), 'base_app' => 1)); ?>"><?php LO('search__user__local');?></a></span></span>
 									</div>
                                 </div>
                                 <!--<div class="title-info hidden">
@@ -36,8 +36,8 @@
                                 <!-- 用户列表 开始-->
                                 <?php if (!isset($data) || !is_array($data) || empty($data)) {?>
                     <div class="search-result">
-                        <div class="icon-alert all-bg"></div>
-                        <p><strong>找不到符合条件的用户，请输入其他关键字再试</strong></p>
+                        <div class="icon-alert"></div>
+						<p><strong><?php LO('search__user__emptySearch');?></strong></p>
                     </div>
                     <?php } else {?>
                     <!--<div class="title-info">
@@ -57,6 +57,7 @@
 						</div>
 						<div class="aside">
 							<?php Xpipe::pagelet('common.sideComponents', array('type'=>1) );?>
+						<?php echo F('show_ad', 'sidebar', '');?>
 						</div>
 					</div>
 				</div>

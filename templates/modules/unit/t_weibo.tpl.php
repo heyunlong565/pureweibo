@@ -5,7 +5,11 @@
 	<base target="_blank" />
 	<title><?php echo F('escape', $unit_name);?></title>
 	<link rel="stylesheet" type="text/css" href="<?php echo W_BASE_URL;?>css/component/content_unit/base.css" />
+	<?php if (WB_LANG_TYPE_CSS):?>
+	<link rel="stylesheet" type="text/css" href="<?php echo W_BASE_URL;?>css/component/content_unit/skin_<?php echo WB_LANG_TYPE_CSS;?>.css" />
+	<?php else:?>
 	<link rel="stylesheet" type="text/css" href="<?php echo W_BASE_URL;?>css/component/content_unit/skin.css" />
+	<?php endif;?>
 	<script src="<?php echo W_BASE_URL;?>js/jquery.js"></script>
 	<script src="<?php echo W_BASE_URL;?>js/base/xwbapp.js"></script>
 	<script src="<?php echo W_BASE_URL;?>js/mod/xwbrequestapi.js"></script>
@@ -22,8 +26,8 @@
 			jqWbCt[0].scrollTop = 0;
 			jqWbCt.find('ul:eq(0)').show();
 			jqWbCt.find('div.user-list').hide();
-			tabLi1.html('<a href="javascript:;"><span>全部成员</span></a>');
-			tabLi0.html('<span>他们在说</span>');
+			tabLi1.html('<a href="javascript:;"><span><?php LO("modules_unit_t_weibo_allMembers");?></span></a>');
+			tabLi0.html('<span><?php LO("modules_unit_t_weibo_talkAbout");?></span>');
 			return false;
 		});
 		tabLi1.click(function(){
@@ -33,15 +37,15 @@
 			jqWbCt[0].scrollTop = 0;
 			jqWbCt.find('div.user-list').show();
 			jqWbCt.find('ul:eq(0)').hide();
-			tabLi1.html('<span>全部成员</span>');
-			tabLi0.html('<a href="javascript:;"><span>他们在说</span></a>');
+			tabLi1.html('<span><?php LO("modules_unit_t_weibo_allMembers");?></span>');
+			tabLi0.html('<a href="javascript:;"><span><?php LO("modules_unit_t_weibo_talkAbout");?></span></a>');
 			return false;
 		});
-	  $('a[rel]').each(function(){
+	  $('a.btn-addfollow').each(function(){
 	  	$(this).click(function(){
 	  		var self=$(this);
 	  		Xwb.request.follow(self.attr('rel'),0,function(r){
-	  			if(r.isOk()){
+	  			if(r.isOk() || r.getCode()=='1020805'){
 	  				self.replaceWith('<a href="#" onclick="javascript:return false;" class="btn-followed"></a>');
 	  			}
 	  			else {
@@ -64,8 +68,8 @@
 		<?php endif;?>
 		<div class="wb-hd">
 				<ul class="tab-s1">
-					<li class="current"><span>他们在说</span></li>
-					<li><a href="javascript:;"><span>全部成员</span></a></li>
+					<li class="current"><span><?php LO('modules_unit_t_weibo_talkAbout');?></span></li>
+					<li><a href="javascript:;"><span><?php LO('modules_unit_t_weibo_allMembers');?></span></a></li>
 				</ul>
 			<?php if ($title): ?><h5><?php echo F('escape', $title); ?></h5><?php endif; ?>
 		</div>
@@ -125,8 +129,8 @@
 							</div>
 						</div>
 						<div class="weibo-info">
-							<p><a href="<?php echo URL('show', 'id='.$item['id']);?>" target="_blank" id="fw">转发</a>|<a href="<?php echo URL('show', 'id='.$item['id']);?>" target="_blank" id="cm">评论</a></p>
-							<span><a href="<?php echo URL('show', 'id='.$item['id']);?>" target="_blank"><?php echo F('format_time', $item['created_at']);?></a> 来自 <?php echo $item['source'];?></span>
+							<p><a href="<?php echo URL('show', 'id='.$item['id']);?>" target="_blank" id="fw"><?php LO('modules_unit_t_weibo_forward');?></a>|<a href="<?php echo URL('show', 'id='.$item['id']);?>" target="_blank" id="cm"><?php LO('modules_unit_t_weibo_comment');?></a></p>
+							<span><a href="<?php echo URL('show', 'id='.$item['id']);?>" target="_blank"><?php echo F('format_time', $item['created_at']);?></a> <?php LO('modules_unit_t_weibo_from');?> <?php echo $item['source'];?></span>
 						</div>
 					</li>
 					<?php
@@ -141,10 +145,10 @@
 					?>
 					<?php endforeach;?>
 					<?php else:?>
-						<div>暂时没有关注该话题的微博信息</div>
+						<div><?php LO('modules_unit_t_weibo_empty');?></div>
 					<?php endif;?>
 					<?php else:?>
-						<div class="int-box load-fail icon-bg">获取该话题的微博信息失败，请<a href="javascript:location.reload();">刷新</a>再试!</div>
+						<div class="int-box ico-load-fail"><?php LO('modules_unit_t_weibo_refresh');?></div>
 					<?php endif;?>
 				</ul>
 				<div class="user-list" style="display: none;">
@@ -152,13 +156,13 @@
 					<?php if ($user_list):?>
 					<?php foreach ($user_list as $user): ?>
 						<li>
-							<?php if (!USER::isUserLogin()): ?><a href="<?php echo URL('ta', 'id=' . $user['uid']); ?>" class="btn-addfollow" target="_blank"></a><?php else: ?><?php if ($user['uid'] == USER::uid()): echo ''; elseif (in_array($user['uid'], $fids)): echo '<a href="#" onclick="javascript:return false;" class="btn-followed"></a>'; else: ?><a href="javascript:;" class="btn-addfollow"  rel="<?php echo $user['uid'] ;?>"></a><?php endif; ?><?php endif; ?>
+							<?php if (!USER::isUserLogin()): ?><a href="<?php echo URL('ta', 'id=' . $user['uid']); ?>" class="btn-addfollow" target="_blank"></a><?php endif; ?>
 							<span class="user-pic-s"><img src="<?php echo F("profile_image_url", $user['uid'])?>" width="30px" alt="<?php echo F('escape', $user['nickname']);?>" /></span>
 							<span class="user-name"><a href="<?php echo $user['http_url']; ?>" target="_blank"><?php echo F('escape', $user['nickname']);?></a></span>
 						</li>
 					<?php endforeach; ?>
 					<?php else:?>
-						<div>该用户列表没有数据，请到用户管理中添加用户。</div>
+						<div><?php LO('modules_unit_t_weibo_nousers');?></div>
 					<?php endif;?>
 				</ul>
 				</div>

@@ -10,16 +10,16 @@ if(!defined('IN_APPLICATION')){
 ?>
 
 <div class="pub-feed-list" id="cityWb">
-    <div class="column-title">
+    <div class="title-box">
         <div class="change-city">
-        	<p class="city"><?php if ($province && $city):?><span><?php echo F('escape', $province.','.$city);?></span><?php if (!empty($citys)):?>[<a href="#" name="city" id="cityBtn">切换城市</a>]<?php endif;?><?php endif;?></p>
+        	<p class="city"><?php if ($province && $city):?><span><?php echo F('escape', $province.','.$city);?></span><?php if (!empty($citys)):?>[<a href="#" name="city" id="cityBtn"><?php LO('modules_component_component_8_changeCity');?></a>]<?php endif;?><?php endif;?></p>
 			<?php if (!empty($citys)):?>
 			<div class="win-pop win-city hidden" id="win_city">
                 <div class="win-t"><div></div></div>
                 <div class="win-con">
                     <div class="win-con-in">
 						<div class="select-area">
-							<label for="sel-city">请选择地区：</label>
+							<label for="sel-city"><?php LO('modules_component_component_8_selectArea');?></label>
 							<select name="" id="sel-area">
 							<?php
 								foreach($provinces as $p) {
@@ -37,8 +37,8 @@ if(!defined('IN_APPLICATION')){
                     <div class="win-con-bg"></div>
                 </div>
                 <div class="win-b"><div></div></div>
-                <div class="arrow all-bg"></div>
-                <a href="#" class="icon-close-btn icon-bg" id="xwb_cls"></a>
+                <div class="arrow"></div>
+                <a href="#" class="ico-close-btn" id="xwb_cls"></a>
             </div>
 			<?php endif;?>
         </div>
@@ -52,7 +52,7 @@ if(!defined('IN_APPLICATION')){
 			}elseif(isset($weiboErrMsg) && defined('IS_DEBUG') && IS_DEBUG){
 				echo $weiboErrMsg;
 			}else{
-				echo '暂无微博';
+				echo L('modules_component_component_8_weiboEmpty');
 			}
         ?>
     </div>

@@ -7,16 +7,16 @@ if (isset($userinfo) && !empty($userinfo)) {
 	/// 获取标签
 	$taglist = DR('xweibo/xwb.getTagsList', '', $userinfo['id']);
 } else {
-	$name = '我';
+	$name = L('modules__userTag__me');
 	/// 获取标签
 	$taglist = DR('xweibo/xwb.getTagsList', '', USER::uid());
 }
 $taglist = $taglist['rst'];
 ?>
 <?php if ($myself || (!$myself && !empty($taglist))):?>
-<div class="user-tag">
+<div class="mod-aside user-tag">
 	<div class="hd">
-	<h3><?php echo F('escape', $name);?>的标签</h3>
+	<h3><?php LO('modules__userTag__whoTag', F('escape', $name));?></h3>
 	</div>
 	<div class="bd">
 		<?php if ($taglist):?>
@@ -26,12 +26,12 @@ $taglist = $taglist['rst'];
 			<?php endforeach;?>
 		<?php endforeach;?>
 		<?php else:?>
-			<p>你还没有设置标签。<br /><a href="<?php echo URL('setting.tag');?>">立即添加</a></p>
+			<p><?php LO('modules__userTag__emptyTip', URL('setting.tag'));?></p>
 		<?php endif;?>
 	</div>
-	<?php if ($myself):?>
+	<?php if (!empty($taglist) && $myself):?>
 	<div class="tag-set">
-		<a href="<?php echo URL('setting.tag');?>">设置</a>
+	<a href="<?php echo URL('setting.tag');?>"><?php LO('modules__userTag__set');?></a>
 	</div>
 	<?php endif;?>
 </div>

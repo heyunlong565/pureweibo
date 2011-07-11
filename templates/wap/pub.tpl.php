@@ -19,13 +19,12 @@
 		<div class="bd">
 			
 			<?php
-			
 			foreach($users as $user):
-			
-			$href=WAP_URL('ta',"id={$user['id']}&name=".urlencode($user['name']));
+			$sina_uid = isset($user['uid']) ? $user['uid'] : $user['id'];
+			$href=WAP_URL('ta',"id={$sina_uid}&name=".urlencode(isset($user['name'])?$user['name']:$user['nickname']));
 			?>
-			<a href="<?php echo $href?>"><?php echo $user['screen_name']?></a>
-			
+			<a href="<?php echo $href?>"><?php echo isset($user['screen_name'])?$user['screen_name']:$user['nickname']?></a>
+		
 			<?php
 			endforeach;
 			?>
@@ -38,7 +37,7 @@
 	
 	
 	<div class="list">
-		<div class="hd">热门话题</div>
+		<div class="hd"><?php LO('pub__default__label_hotTrend');?></div>
 		<div class="bd">
 			
 			
@@ -61,7 +60,7 @@
 			<a href="<?php echo WAP_URL('pub.topics');?>">&gt;&gt;</a>
 			
 			<?php else:?>
-			话题提取错误
+			<?php LO('pub__default__label_notFoundTrend');?>
 			<?php endif;?>
 		</div>
 	</div>
@@ -69,22 +68,22 @@
 		<?php
 		if(V('g:m','pub')=='pub'||V('g:m','pub')=='pub.hotForward'):
 		?>
-		<span>热门转发</span>
+		<span><?php LO('pub__default__label_hotRepost');?></span>
 		<?php
 		else:
 		?>
-		<a href="<?php echo WAP_URL('pub.hotForward')?>">热门转发</a>
+		<a href="<?php echo WAP_URL('pub.hotForward')?>"><?php LO('pub__default__label_hotRepost');?></a>
 		<?php
 		endif;
 		?>
 		<?php
 		if(V('g:m','pub')=='pub.hotComments'):
 		?>
-		<span>热门评论</span>
+		<span><?php LO('pub__default__label_hotComment');?></span>
 		<?php
 		else:
 		?>
-		<a href="<?php echo WAP_URL('pub.hotComments')?>">热门评论</a>
+		<a href="<?php echo WAP_URL('pub.hotComments')?>"><?php LO('pub__default__label_hotComment');?></a>
 		<?php
 		endif;
 		?>

@@ -15,12 +15,12 @@ class admin_mod extends action {
 	}
 
 	function index() {
-		TPL::assign('menu', $this->menu);
+		TPL::assign('menu', $this->_getUserMenu(USER::aid()));
 		$this->_display('index');
 	}
 
 	function map() {
-		TPL::assign('menu', $this->menu);
+		TPL::assign('menu', $this->_getUserMenu(USER::aid()));
 		$this->_display('map');
 	}
 
@@ -78,11 +78,14 @@ class admin_mod extends action {
 			}
 
 			session_regenerate_id();   //防御Session Fixation
-			USER::set('__CLIENT_ADMIN_ROOT', $rs['is_root']);	//设置管理员权限
+			USER::set('__CLIENT_ADMIN_ROOT', $rs['group_id']);	//设置管理员权限
 			USER::aid($rs['id']);	
 			
+			if ( V('g:ajax') ) {
+				exit('{"state":"200"}');
+			} 
 			
-			exit('{"state":"200"}');
+			APP::redirect(URL('mgr/admin.index'), 3);
 		}
 
 		//判断数据库中是否存在管理员
@@ -169,7 +172,6 @@ class admin_mod extends action {
 
         //获取管理员基本信息
         $rss = DR('mgr/adminCom.getAdminByUid', '', $sina_uid, $offset, $each);
-
 		//获取当前操作者的数据
 		//$p = DR('mgr/adminCom.getAdminById', '', $this->_getUid());
  
@@ -199,7 +201,7 @@ class admin_mod extends action {
 		}
 		
 		$p = DR('mgr/adminCom.getAdminById', '', $this->_getUid());	//获取当前操作者的数据
-		if(!$p['rst']['is_root']) {
+		if(!$p['rst']['group_id'] == '1') {
 			$this->_error('您无权限删除', array('search'));
 		}
 
@@ -239,6 +241,7 @@ class admin_mod extends action {
 			$id = (int)V('p:id', 0);
 			$new_pwd = trim(V('p:pwd'));
 			$re_pwd = trim(V('p:re_pwd'));
+			$old_pwd = trim(V('p:old_pwd'));
 
 			if (!$new_pwd) {
 				$this->_error('请输入新密码', URL('mgr/admin.repassword', 'id='. $id));
@@ -252,9 +255,12 @@ class admin_mod extends action {
 			if (!$p['rst']) {
 					$this->_error('不存在的用户', URL('mgr/admin.repassword', 'id='. $id));
 			}
-
+			// 如果是本人修改密码，则一定要验证旧密码
+			if ($rs['rst']['id'] == $id && md5($old_pwd) !== $p['rst']['pwd']) {
+				$this->_error('输入的旧密码不正确', URL('mgr/admin.repassword', 'id='. $id));
+			}
 			//判断当前操作者是否为超级管理员或本人
-			if($rs['rst']['is_root'] || $rs['rst']['id'] == $id) {
+			if($rs['rst']['group_id'] == '1' || $rs['rst']['id'] == $id) {
 				$data = array(
 						'pwd' => md5($new_pwd)
 				);
@@ -262,7 +268,7 @@ class admin_mod extends action {
 				if (!$rs['rst']) {
 					$this->_error('修改密码失败, 新密码可能与旧密码相同', URL('mgr/admin.repassword', 'id='. $id));
 				}
-				$this->_succ('操作已成功', array('userlist'));
+				$this->_succ('操作已成功', array('repassword'));
 			}else{
 				$this->_error('您无权限修改', URL('mgr/admin.repassword', 'id='. $id));
 			}
@@ -344,7 +350,7 @@ class admin_mod extends action {
 		}
 
 		$p = DR('mgr/adminCom.getAdminById', '', $this->_getUid());	//获取当前操作者的数据
-		if(!$p['rst']['is_root']) {
+		if(!$p['rst']['group_id'] == '1') {
 			$this->_error('您无权限添加', array('search'));
 		}
 
@@ -356,8 +362,9 @@ class admin_mod extends action {
 		$data = array(
 						'sina_uid' => $sina_uid,
 						'pwd' => md5($pwd),
-						'add_time' =>APP_LOCAL_TIMESTAMP,
-						'is_root' => 0
+						'group_id' => V('p:group_id'),
+						'add_time' =>APP_LOCAL_TIMESTAMP
+						
 					);
 		$rs = DR('mgr/adminCom.saveAdminById', '', $data);
 		if ($rs['rst']) {

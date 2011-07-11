@@ -8,7 +8,7 @@
 <body <?php F('wap_font_set'); ?>>
 <div class="s"></div>
 <p class='c'><?php echo $msg; ?></p>
-<p class='c'><a href="<?php echo $confirmURL; ?>">确定</a> <a href="<?php echo $backURL; ?>">取消</a></p>
+<p class='c'><a href="<?php echo $confirmURL; ?>"><?php LO('wbcom__confirm__ok');?></a> <a href="<?php echo $backURL; ?>"><?php LO('wbcom__confirm__cancel');?></a></p>
 <div class="s"></div>
 </body>
 </html>

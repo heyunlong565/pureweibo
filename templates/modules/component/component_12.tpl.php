@@ -7,7 +7,7 @@
 ?>
 
 <div class="pub-feed-list">
-    <div class="column-title">
+    <div class="title-box">
         <h3><?php echo F('escape', $mod['title']). ' - ' .$rs['topic'];?></h3>
     </div>
 	<div class="feed-list">

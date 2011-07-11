@@ -106,7 +106,7 @@ class upgrade {
 				KEY `index_using` (`using`,`page`,`flag`)
 				) ENGINE=MYISAM DEFAULT CHARSET=utf8 COMMENT='广告'";
 		$ret = mysql_query($sql, $this->link);
-		$sql = "INSERT INTO `$adTable` VALUES ('1','<a href=\"http://x.weibo.com\" target=\"_blank\"><img src=\"var/upload/footer_ad.png\"></a>','1','1293697787','底部通栏广告','全站','global','global_bottom',NULL,'0','0'),('2','','',NULL,'对联广告(左)','全站','global','global_left',null,'0','0'),('3','','',NULL,'对联广告(右)','全站','global','global_right',null,'0','0'),('4','','',NULL,'侧栏广告','微博广场','pub','sidebar',NULL,'0','0'),('5','','',NULL,'今日话题广告','微博广场','pub','today_topic',NULL,'0','0'),('6','','',NULL,'发布框下广告','我的首页','index','publish',NULL,'0','0'),('7','','',NULL,'侧栏广告','我的首页','index','sidebar',NULL,'0','0'),('8','','',NULL,'侧栏广告','他的首页','ta','sidebar',NULL,'0','0');";
+		$sql = "INSERT INTO `$adTable` VALUES ('1','<a href=\"http://x.weibo.com\" target=\"_blank\"><img src=\"img/ad/footer_ad.png\"></a>','1','1293697787','底部通栏广告','全站','global','global_bottom',NULL,'0','0'),('2','','',NULL,'对联广告(左)','全站','global','global_left',null,'0','0'),('3','','',NULL,'对联广告(右)','全站','global','global_right',null,'0','0'),('4','','',NULL,'侧栏广告','微博广场','pub','sidebar',NULL,'0','0'),('5','','',NULL,'今日话题广告','微博广场','pub','today_topic',NULL,'0','0'),('6','','',NULL,'发布框下广告','我的首页','index','publish',NULL,'0','0'),('7','','',NULL,'侧栏广告','我的首页','index','sidebar',NULL,'0','0'),('8','','',NULL,'侧栏广告','他的首页','ta','sidebar',NULL,'0','0');";
 		$ret = mysql_query($sql, $this->link);
 
 		///添加content_unit表
@@ -163,6 +163,69 @@ class upgrade {
 			/// 错误日志
 			install_log('sql: '.$sql_backup." \r\nerrno: ".mysql_errno($this->link)." \r\nerror: ".mysql_error($this->link));
 		}
+		mysql_close($this->link);
+
+		return true;
+	}
+
+	/**
+	 *
+	 * 升级到2.1
+	 *
+	 */
+	function action_db21($db_prefix)
+	{
+		///更新表结构
+		upgrade_tables($db_prefix, $this->link);
+
+		///更新admin的group_id值
+		$adminTable = $db_prefix.'admin';
+		$sina_uid = getAdminId();
+		$sql = "UPDATE `$adminTable` set `group_id` = 1 where `sina_uid` = '".$sina_uid."'";
+		$ret = mysql_query($sql, $this->link);
+		if (!$ret) {
+			install_log('sql: '.$sql." \r\nerrno: ".mysql_errno($this->link)." \r\nerror: ".mysql_error($this->link));
+		}
+
+		///xwb_component_usergroups 添加一条默认记录
+		$componentUsergroupsTable = $db_prefix.'component_usergroups';
+		if (getLangType() == 'zh_cn') {
+			$group_name = '首页用户推荐(他们在微博)';
+		} else {
+			$group_name = '首頁用戶推薦(他們在微博)';
+		}
+		$sql = "INSERT INTO `$componentUsergroupsTable` (`group_name`,`native`,`related_id`,`type`) VALUES ('{$group_name}',1,NULL,0)";
+		$ret = mysql_query($sql, $this->link);
+		if (!$ret) {
+			install_log('sql: '.$sql." \r\nerrno: ".mysql_errno($this->link)." \r\nerror: ".mysql_error($this->link));
+		}
+		///获取用户组id
+		$group_id = mysql_insert_id();
+
+		///xwb_component_user 添加一条默认记录
+		$componentUsersTable = $db_prefix.'component_users';
+		$sql = "INSERT INTO `$componentUsersTable` (`group_id`,`uid`,`sort_num`,`nickname`,`remark`) VALUES ({$group_id},1076590735,1,'Xweibo官方','xweibo官方微博')";
+		$ret = mysql_query($sql, $this->link);
+		if (!$ret) {
+			install_log('sql: '.$sql." \r\nerrno: ".mysql_errno($this->link)." \r\nerror: ".mysql_error($this->link));
+		}
+
+		///sys_config 添加wb_lang_type,xwb_strategy字段值
+		$sysConfigTable = $db_prefix.'sys_config';
+		$lang_type = getLangType();
+		$sql = "INSERT INTO `$sysConfigTable` VALUES ('wb_lang_type','".$lang_type."',1),('xwb_strategy','',1),('sysLoginModel','0',1),('xwb_login_group_id',{$group_id},1)";
+		$ret = mysql_query($sql, $this->link);
+		if (!$ret) {
+			install_log('sql: '.$sql." \r\nerrno: ".mysql_errno($this->link)." \r\nerror: ".mysql_error($this->link));
+		}
+
+		///更新sys_config wb_version版本号的值
+		$sql = "UPDATE `$sysConfigTable` set `value` = '2.1' where `key` = 'wb_version'";
+		$ret = mysql_query($sql, $this->link);
+		if (!$ret) {
+			install_log('sql: '.$sql." \r\nerrno: ".mysql_errno($this->link)." \r\nerror: ".mysql_error($this->link));
+		}
+
 		mysql_close($this->link);
 
 		return true;

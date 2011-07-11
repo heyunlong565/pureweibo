@@ -4,43 +4,36 @@ require_once dirname(__FILE__). '/component_abstract.pls.php';
 /**
  * 今日话题模块
  * @author yaoying
- * @version $Id: component_10.pls.php 12897 2011-04-11 10:10:15Z zhenquan $
+ * @version $Id: component_10.pls.php 16828 2011-06-07 00:57:23Z jianzhou $
  *
  */
-class component_10_pls extends component_abstract_pls{
+class component_10_pls extends component_abstract_pls
+{
 	
-	function run($mod){
+	function run($mod)
+	{
 		parent::run($mod);
-		/*
-		$rs = DR('components/todayTopic.get', 'g/300', $mod['param']);
 		
-		if ($rs['errno']) {
-			$this->_error('components/todayTopic.get 返回错误：'. $rs['err']. '('. $rs['errno']. ')');
-			return;
-	 	}
-	 	
-	 	//如果没有关键字，直接退出
-		$today = &$rs['rst'];
-		if (!$today['keyword']) {
-			$this->_error('无关键字。');
-			return;
+		//取缓存
+		$isLogin   = USER::isUserLogin();
+		$cacheKey  = $isLogin ? FALSE : "component10#".md5( serialize($mod) ) ;
+		$wbListKey = "$cacheKey#wbList";
+		if(ENABLE_CACHE && $cacheKey && ($content=CACHE::get($cacheKey)) ) 
+		{
+		    echo $content;
+		    return array('cls'=>'wblist', 'list'=>CACHE::get($wbListKey) );
 		}
 		
-		if($today['errno'] == 0 && is_array($today['data']['rst']) && !empty($today['data']['rst'])){
-			$followedList = $this->_generateFollowedList($today['data']['rst']);
-		}else{
-			$today['data']['rst'] = array();
-			$followedList = array();
-		}
-		*/
-		$kw = $mod['param']['topic'];
-		$source = $mod['param']['source'];
-		$show_num = $mod['param']['show_num'];
-		if (USER::isUserLogin()/* && $source*/) {
+		
+		$kw 		= $mod['param']['topic'];
+		$source 	= $mod['param']['source'];
+		$show_num 	= $mod['param']['show_num'];
+		if ( USER::isUserLogin() ) {
 			$list = DR('xweibo/xwb.searchStatuse', null, array('base_app' => $source, 'q' => $kw, 'rpp' => $show_num, 'page' => 1));
 		} else {
 			$list = DR('xweibo/xwb.searchStatuse', null, array('base_app' => $source, 'q' => $kw, 'rpp' => $show_num, 'page' => 1), false);
 		}
+		
 		//结果集处理:　只要show_num条内容
 		if ($list['errno'] == 0) {
 			if ( count($list['rst']) > $show_num ) {
@@ -60,11 +53,24 @@ class component_10_pls extends component_abstract_pls{
 			'keyword' => $mod['param']['topic'],
 			'data' => $list
 		);
-		$followedList = $this->_generateFollowedList($today['data']['rst']);
-		TPL::module('component/component_' . $mod['component_id'], array('mod' => $mod, 'today' => $today, 'followedList' => $followedList));
-		return array('cls'=>'wblist', 'list' =>F('format_weibo', $today['data']['rst']) );
 		
+		$followedList = $this->_generateFollowedList($today['data']['rst']);
+		
+		
+		// 设置缓存
+		$wbList  = F('format_weibo', $today['data']['rst']);
+		$content = TPL::module('component/component_'.$mod['component_id'], array('mod'=>$mod, 'today'=>$today, 'followedList'=>$followedList), false);
+		if (ENABLE_CACHE && $cacheKey && $content) 
+		{
+			$cacheTime = V('-:tpl/cache_time/pagelet_component10');
+			CACHE::set($cacheKey, $content,  $cacheTime);
+			CACHE::set($wbListKey, $wbList, $cacheTime);
+		}
+		
+		echo $content;
+		return array('cls'=>'wblist', 'list'=>$wbList);
 	}
+	
 	
 	/**
 	 * 生成本组件内的用户rst数组资源内已经关注的用户数组，类型为：

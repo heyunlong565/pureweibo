@@ -60,7 +60,7 @@ class common_pls {
 			$rs = DR('mgr/skinCom.getSkinById', 86400,null,0);//获取所有的皮肤
 		}
 		
-		$skinSortIndex=array('0'=>array('name'=>'默认','skins'=>array()));
+		$skinSortIndex=array('0'=>array('name'=> L('pls__common__userSkin__defaultTitle'),'skins'=>array()));
 		foreach($skinSort['rst'] as $sort){
 			$skinSortIndex[$sort['style_id']]=array('name'=>$sort['style_name'],'skins'=>array());
 		}

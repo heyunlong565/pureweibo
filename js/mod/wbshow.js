@@ -10,7 +10,8 @@
  *  后台组件设置-微博秀页面
  */
 $(function(){
-    var Box = Xwb.ui.MsgBox;
+    var Box = Xwb.ui.MsgBox,
+        getText = Xwb.lang.getText;
     // 返回form元素的查询字符串表示
     function formQuery(f) {
         var formData = "", elem = "", qid;
@@ -91,9 +92,9 @@ $(function(){
         var txt = $.trim($('#output').val());
         if(window.clipboardData) {
             if(clipboardData.setData("Text", txt) !== false) 
-                Box.alert('提示',"代码已复制至粘贴版。"); 
+                Box.alert(getText('提示'), getText("代码已复制至粘贴板。")); 
         }else { 
-            Box.alert('提示','您的浏览器禁止自动复制，请手动复制。'); 
+            Box.alert(getText('提示'), getText('您的浏览器禁止自动复制，请手动复制。') ); 
             $('#output')[0].select();
         } 
         return false;
@@ -115,7 +116,7 @@ $(function(){
     new Xwb.ax.ValidationMgr({
         form:previewForm,
         onerror : function(elem, data){
-            data.m && Box.alert('提示',data.m);
+            data.m && Box.alert(getText('提示'), data.m);
         },
         validators : {
             dimention : function(elem , v, data, next){
@@ -124,16 +125,16 @@ $(function(){
                         var ret = true;
                         if(!$('#chkAutoWidth').attr('checked')){
                             if(!v){
-                                data.m = '请输入有效宽度';
+                                data.m = getText('请输入有效宽度');
                                 ret = false;
                             }else if(!/^\d+$/.test(v)){
-                                data.m = '请输入数字';
+                                data.m = getText('请输入数字');
                                 ret = false;
                             }else {
                                 v = parseInt(v);
                                 if( v < 190 || v > 1024){
                                     ret = false;
-                                    data.m = '宽度:190-1024px';
+                                    data.m = getText('宽度') + ':190-1024px';
                                 }
                             }
                         }
@@ -142,16 +143,16 @@ $(function(){
                      case 'height' : 
                         var ret = true;
                         if(!v){
-                            data.m = '请输入有效宽度';
+                            data.m = getText('请输入有效宽度');
                             ret = false;
                         }else if(!/^\d+$/.test(v)){
-                            data.m = '请输入数字';
+                            data.m = getText('请输入数字');
                             ret = false;
                         }else {
                             v = parseInt(v);
                             if( v < 75 || v > 800){
                                 ret = false;
-                                data.m = '高度:75-800px';
+                                data.m = getText('高度') + ':75-800px';
                             }
                         }
                         this.report(ret, data);

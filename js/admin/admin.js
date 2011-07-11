@@ -895,7 +895,21 @@ var admin = {
 		$submenu_container: null,
 		$mainmenu: null,
 		$submenu: null,
+		flag:false,
 		
+		mainframeUnload : function(callback){
+			var fxwb = document.getElementById('mainframe').contentWindow.Xwb;
+			if( fxwb && fxwb.gModified === false  ) {
+				Xwb.ui.MsgBox.confirm('提示','有数据未保存确定要离开吗',function(e){
+					if(e==="ok"){
+						fxwb.gModified = true;
+						callback();
+					}
+				});
+			} else {
+				callback();
+			}
+		},
 		/**
 		 * select main menu
 		 * @param n HTMLElement|int|'default'
@@ -1000,13 +1014,14 @@ var admin = {
 
 				// attach event to container
 				$mainmenu_container.click(function(e) {
-						selectMainMenu(this);
+						var self = this;
+						mainframeUnload(function(){ selectMainMenu.call(admin.index,self); });
 						return false;
 				});
 				$submenu_container.click(function(e) {
 					if (e.target.tagName.toLowerCase() == 'a') {
 						console.log(e.target);
-						selectSubMenu(e.target);
+						mainframeUnload(function(){ selectSubMenu.call(admin.index,e.target); });
 						return false;
 					}
 				})
@@ -1123,7 +1138,6 @@ function checkNewVer(url, currVer) {
 		{
 			return;
 		}
-
 		if (compareVersion(r.ver, currVer) > 0)
 		{
 			var html = [
@@ -1153,6 +1167,7 @@ function checkNewVer(url, currVer) {
 			});
 
 			$tips.appendTo('body');
+            console.log($tips);
 		}
 
 	});

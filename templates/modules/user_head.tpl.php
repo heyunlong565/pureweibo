@@ -67,56 +67,56 @@ $userDomain = isset($userDomain['rst']['domain_name']) ? $userDomain['rst']['dom
 	        <?php endif ?>
         </div>
         
-        <p class="icon-bg <?php if ($userinfo['gender'] == 'f'):?>icon-female<?php elseif ($userinfo['gender'] == 'm'):?>icon-male<?php endif;?>"><?php echo F('escape', $userinfo['location']);?></p>
+        <p class="<?php if ($userinfo['gender'] == 'f'):?>ico-female<?php elseif ($userinfo['gender'] == 'm'):?>ico-male<?php endif;?>"><?php echo F('escape', $userinfo['location']);?></p>
         <p><?php echo F('escape', $userinfo['description']);?></p>
 		<?php if ($userinfo['id'] != USER::uid()):?>
         <div class="opera-area">
 			<?php if (USER::isUserLogin()):?>
 				<?php if (!$blocked):?>
 					<span class="opera-area-r">
-						<?php if ($followedBack):?>
-							<a href="javascript:;" rel="e:sdm,n:<?php echo $userinfo['screen_name'];?>" id="xwb_sndmsg">发私信</a>
+						<?php if ( HAS_DIRECT_MESSAGES && $followedBack):?>
+						<a href="javascript:;" rel="e:sdm,n:<?php echo $userinfo['screen_name'];?>" id="xwb_sndmsg"><?php LO('modules__userHead__sendMessage');?></a>
 							|
 						<?php endif;?>
-						<a href="#" id="at_ta" rel="e:sd,m:对 @<?php echo $userinfo['screen_name'];?> 说\:">@<?php if ($userinfo['gender'] == 'f'):?>她<?php elseif ($userinfo['gender'] == 'm'):?>他<?php endif;?></a>
-						<?php if ($followed):?>|<a class="more-opera icon-bg" href="#" rel="e:mop" id="more_oper">更多</a><?php endif;?>
+						<a href="#" id="at_ta" rel="e:sd,m:<?php LO('modules__userHead__talkToWho', $userinfo['screen_name']);?>\:">@<?php if ($userinfo['gender'] == 'f'):?><?php LO('modules__userHead__woman');?><?php elseif ($userinfo['gender'] == 'm'):?><?php LO('modules__userHead__man');?><?php endif;?></a>
+						<?php if ($followed):?>|<a class="more-opera" href="#" rel="e:mop" id="more_oper"><?php LO('modules__userHead__more');?></a><?php endif;?>
 					</span>
 					<?php if (!$followed):?>
-						<a href="#" rel="e:fl,t:3" class="skin-bg addfollow-btn">加关注</a>
+					<a href="#" rel="e:fl,t:3" class="skin-bg addfollow-btn"><?php LO('common__template__toFollow');?></a>
 					<?php elseif ($followedBack):?>
 						<div class="operated-box">
-							<div class="icon-each-follow all-bg ">相互关注</div>
+						<div class="icon-each-follow"><?php LO('modules__userHead__mutualConcern');?></div>
 							<em>|</em>
-							<a class="cancel" rel="e:ufl,t:3" href="#">取消</a>
+							<a class="cancel" rel="e:ufl,t:3" href="#"><?php LO('modules__userHead__cancel');?></a>
 						</div>
 						<div class="more-list hidden" id="more_list">
-							<a class="icon-blacklist icon-bg" href="#" rel="e:abl,u:<?php echo $userinfo['id'];?>,nick:<?php echo F('escape', addslashes($userinfo['screen_name']));?>,gender:<?php echo $userinfo['gender'];?>">加入黑名单</a>
+						<a class="ico-blacklist" href="#" rel="e:abl,u:<?php echo $userinfo['id'];?>,nick:<?php echo F('escape', addslashes($userinfo['screen_name']));?>,gender:<?php echo $userinfo['gender'];?>"><?php LO('modules__userHead__addBlack');?></a>
 						</div>
 					<?php else:?>
 						<div class="operated-box">
-							<span class="followed-btn">已关注</span>
+						<span class="followed-btn"><?php LO('common__template__followed');?></span>
 							<em>|</em>
-							<a class="cancel" rel="e:ufl,t:3" href="#">取消</a>
+							<a class="cancel" rel="e:ufl,t:3" href="#"><?php LO('modules__userHead__cancel');?></a>
 						</div>
 						<div class="more-list hidden" id="more_list">
-							<a class="icon-blacklist icon-bg" href="#" rel="e:abl,u:<?php echo $userinfo['id'];?>,nick:<?php echo F('escape', addslashes($userinfo['screen_name']));?>,gender:<?php echo $userinfo['gender'];?>">加入黑名单</a>
+						<a class="ico-blacklist" href="#" rel="e:abl,u:<?php echo $userinfo['id'];?>,nick:<?php echo F('escape', addslashes($userinfo['screen_name']));?>,gender:<?php echo $userinfo['gender'];?>"><?php LO('modules__userHead__addBlack');?></a>
 						</div>
 					<?php endif;?>
 				<?php else:?>
 					<div class="operated-box">
-						<span class="icon-black">已加入黑名单</span>
+					<span class="ico-yes"><?php LO('modules__userHead__blacked');?></span>
 						<em>|</em>
-						<a class="cancel" href="#" rel="e:dbl,u:<?php echo $userinfo['id'];?>,m:确定将TA从你的黑名单移除？">取消</a>
+						<a class="cancel" href="#" rel="e:dbl,u:<?php echo $userinfo['id'];?>,m:<?php LO('modules__userHead__sureDelete');?>"><?php LO('modules__userHead__cancel');?></a>
 					</div>
 				<?php endif;?>
 			<?php else:?>
-				<a href="#"  rel="e:fl,t:1" class="skin-bg addfollow-btn">加关注</a>
+				<a href="#"  rel="e:fl,t:1" class="skin-bg addfollow-btn"><?php LO('common__template__toFollow');?></a>
 			<?php endif;?>
         </div>
 		<?php else:?>
 		<div class="opera-area">
 			<span class="opera-area-r">
-				<a href="#" rel="e:sd,format:-1" class="icon-bg icon-post-weibo">我要发微博</a>
+			<a href="#" rel="e:sd,format:-1" class="ico-post-weibo"><?php LO('modules__userHead__pubWeibo');?></a>
 			</span>
 		</div>
 		<?php endif;?>

@@ -16,7 +16,7 @@
             	<div class="serch-user">
             		<form action="<?php echo URL('mgr/users.searchAllBanUser');?>" method="post">
             			<span><strong>搜索包含以下昵称的用户</strong></span>
-                		<span><input name="keyword" class="input-box box-address-width" type="text"  value="<?php echo F('escape', strval(V('r:keyword')));?>" /></span>
+                		<span><input name="keyword" class="input-txt box-address-width" type="text"  value="<?php echo F('escape', strval(V('r:keyword')));?>" /></span>
                 		<span class="serch-btn"><input name="" type="submit" value="搜索" /></span>
                     </form>
            		</div>
@@ -64,7 +64,7 @@
 					<tr>
 						<td colspan="5">
                         <div class="pre-next">
-                        	<form name="form" id="form"><div style="float:left;">
+                        	<form name="form" id="form"><div>
                             	<a class="pre" href="">上一页</a><a class="next" href="">下一页</a></div>
 						    	<select name="jumpMenu" id="jumpMenu" onchange="MM_jumpMenu('parent',this,0)">
 						      		<option>1/2</option>
@@ -79,35 +79,35 @@
                     <tr>
    					  	<td>1</td>
    					  	<td>james</td>
-   					  	<td><a href="">http://t.sina.com.cn</a></td>
+   					  	<td><a href="">http://weibo.com</a></td>
    					  	<td>2010-10-10 18：30</td>
 						<td><a href="" class="view-weibo">查看微博</a><a href="" class="unban">解封</a></td>
 					</tr>
                     <tr>
    					  	<td>2</td>
    					  	<td>james</td>
-   					  	<td><a href="">http://t.sina.com.cn</a></td>
+   					  	<td><a href="">http://weibo.com</a></td>
    					  	<td>2010-10-10 18：30</td>
 						<td><a href="" class="view-weibo">查看微博</a><a href="" class="unban">解封</a></td>
 					</tr>
                     <tr>
    					  	<td>3</td>
    					  	<td>james</td>
-   					  	<td><a href="">http://t.sina.com.cn</a></td>
+   					  	<td><a href="">http://weibo.com</a></td>
    					  	<td>2010-10-10 18：30</td>
 						<td><a href="" class="view-weibo">查看微博</a><a href="" class="unban">解封</a></td>
 					</tr>
                     <tr>
    					  	<td>4</td>
    					  	<td>james</td>
-   					  	<td><a href="">http://t.sina.com.cn</a></td>
+   					  	<td><a href="">http://weibo.com</a></td>
    					  	<td>2010-10-10 18：30</td>
 						<td><a href="" class="view-weibo">查看微博</a><a href="" class="unban">解封</a></td>
 					</tr>
                     <tr>
    					  	<td>5</td>
    					  	<td>james</td>
-   					  	<td><a href="">http://t.sina.com.cn</a></td>
+   					  	<td><a href="">http://weibo.com</a></td>
    					  	<td>2010-10-10 18：30</td>
 						<td><a href="" class="view-weibo">查看微博</a><a href="" class="unban">解封</a></td>
 					</tr>

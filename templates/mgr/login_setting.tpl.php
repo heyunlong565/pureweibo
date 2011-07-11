@@ -13,11 +13,9 @@
     	<div class="set-area">
         	<div class="form-s1">
                 <form action="" method="post" id="loginWayForm">
-                    <p class="tips-s2">
-                    	<strong>提示：</strong>
-                        如果您只需要搭建一个Xweibo站点，请选择“仅使用新浪帐号直接登录”<br />
-                        如果您已经搭建了其它网站，希望将新建的Xweibo站点与原有站点实现帐号绑定，请选择“使用新浪帐号与原有站点帐号并存方式登录”
-                    </p>
+                    <p class="tips"><strong>提示：</strong></p>
+                    <p class="tips-s2">如果您只需要搭建一个Xweibo站点，请选择"仅使用新浪帐号直接登录"<br />
+                    如果您已经搭建了其它网站，希望将新建的Xweibo站点与原有站点实现帐号绑定，请选择"使用新浪帐号与原有站点帐号并存方式登录"</p>
                     <p class="operate"><label for="model1"><input id="model1" class="ipt-radio" name="login_way" type="radio" value="1" <?php if($config['login_way'] == 1) echo 'checked="checked"'; ?> />仅使用新浪帐号直接登录</label></p>
                     <p class="operate"><label for="model2"><input id="model2" class="ipt-radio" name="login_way" type="radio" value="2" <?php if($config['login_way'] == 2) echo 'checked="checked"'; ?> />仅使用原有站点帐号登录<span class="form-tips">（需绑定帐号）</span></label></p>
                     <p class="operate"><label for="model3"><input id="model3" class="ipt-radio" name="login_way" type="radio" value="3" <?php if($config['login_way'] == 3) echo 'checked="checked"'; ?> />使用新浪帐号与原有站点帐号并存方式登录</label></p>
@@ -30,7 +28,7 @@
                         <p class="tip">还没完成哦！选择了帐号绑定适配器之后，您需要进行少许的设置才能实现帐号绑定功能。请参考<a href="">Xweibo开发人员文档</a></p>
                     </div>-->
                     <div class="btn-area">
-                        <a href="javascript:$('#loginWayForm').submit();" class="general-btn btn-s2" name="保存修改"><span>保存修改</span></a>
+                        <a href="javascript:$('#loginWayForm').submit();" class="btn-general highlight" name="保存修改"><span>保存修改</span></a>
                         <span class="form-tips">您可以开发与自己站点相匹配的帐号绑定适配器，请参考<a href="http://x.weibo.com/download_official.php" target="_blank">Xweibo开发人员文档</a></span>
                     </div>
                 </form>

@@ -15,9 +15,9 @@
 <?php else: ?>
 	<div class="f-list">
 	<?php if (V('g:page', 1) > 1):?>
-	已到最后一页
+	<?php LO('index__atme__endPage');?>
 	<?php else: ?>
-	还没有人@您
+	<?php LO('index__atme__emptyTip');?>	
 	<?php endif; ?>
 	</div>
 <?php endif; ?>

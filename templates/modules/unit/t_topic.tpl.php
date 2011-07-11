@@ -5,7 +5,11 @@
 	<base target="_blank" />
 	<title><?php echo F('escape', $unit_name);?></title>
 	<link rel="stylesheet" type="text/css" href="<?php echo W_BASE_URL;?>css/component/content_unit/base.css" />
+	<?php if (WB_LANG_TYPE_CSS):?>
+	<link rel="stylesheet" type="text/css" href="<?php echo W_BASE_URL;?>css/component/content_unit/skin_<?php echo WB_LANG_TYPE_CSS;?>.css" />
+	<?php else:?>
 	<link rel="stylesheet" type="text/css" href="<?php echo W_BASE_URL;?>css/component/content_unit/skin.css" />
+	<?php endif;?>
 	<script src="<?php echo W_BASE_URL;?>js/jquery.js"></script>
 	<script src="<?php echo W_BASE_URL;?>js/base/xwbapp.js"></script>
 	<script src="<?php echo W_BASE_URL;?>js/mod/xwbrequestapi.js"></script>
@@ -36,9 +40,9 @@
 				var v = $.trim( jqContent.val() );
 		        var left = calWbText(v);
 		        if (left >= 0)
-		            jqKeyTips.html('您还可以输入<span>'+left+'</span>字');
+		            jqKeyTips.html('<?php LO("modules_unit_t_topic_input");?><span>'+left+'</span><?php LO("modules_unit_t_topic_letter");?>');
 		        else
-		            jqKeyTips.html('已超出<span>'+Math.abs(left)+'</span>字'); 
+		            jqKeyTips.html('<?php LO('modules_unit_t_topic_overflow');?><span>'+Math.abs(left)+'</span><?php LO("modules_unit_t_topic_letter");?>'); 
 		        return left>=0 && v;
 			}
 			 function calWbText(text, max){
@@ -58,7 +62,7 @@
 	<div id="showCtInner" class="<?php if ($show_border):?>weibo<?php else:?>weibo-noborder<?php endif;?>">
 		<?php if ($show_title):?>
 		<div class="weibo-title">
-			<a href="#" class="title" title="">大家都在聊<span><?php echo F('escape', $topic);?></span></a>
+			<a href="#" class="title" title=""><?php LO('modules_unit_t_topic_talkAbout');?><span><?php echo F('escape', $topic);?></span></a>
 		</div>
 		<?php endif;?>
 		<div class="weibo-main">
@@ -71,11 +75,11 @@
 				<?php if (USER::isUserLogin()): ?>
 				<div class="key-tips"></div>
 				<div class="share-btn" id="subBnt"></div>
-				<div class="post-tips" id='postOk' style="display:none;"><span class="post-success"></span>发布成功！</div>
-				<div class="post-tips" id="postError" style="display:none;"><span class="load-fail"></span>错误信息！</div>
+				<div class="post-tips" id='postOk' style="display:none;"><span class="post-success"></span><?php LO('modules_unit_t_topic_succ');?></div>
+				<div class="post-tips" id="postError" style="display:none;"><span class="load-fail"></span><?php LO('modules_unit_t_topic_error');?></div>
 				<?php else: ?>
 				<div class="share-btn share-btn-disable" onclick="javascript:return false;" id="subBnt"></div>
-				<div class="login-tips"><span class="act-notbind"><img src="<?php echo W_BASE_URL;?>css/component/content_unit/bgimg/logo_mini.png" alt="" /></span><a href="<?php echo URL('account.login', 'loginCallBack=' . urlencode(V('s:HTTP_REFERER',''))); ?>" target="_blank" id="loginA">登录<?php echo F('escape', V('-:sysConfig/site_name')); ?></a>,即可参与话题讨论</div>
+				<div class="login-tips"><span class="act-notbind"><img src="<?php echo W_BASE_URL;?>css/component/content_unit/bgimg/logo_mini.png" alt="" /></span><?php LO('modules_unit_t_topic_nologin', URL('account.login', 'loginCallBack=' . urlencode(V('s:HTTP_REFERER',''))), F('escape', V('-:sysConfig/site_name')));?></div>
 				<?php endif; ?>
 			</div>
 			<?php endif; ?>
@@ -135,8 +139,8 @@
 						</div>
 						
 						<div class="weibo-info">
-							<p><a href="<?php echo URL('show', 'id='.$item['id']);?>" target="_blank" id="fw">转发</a>|<a href="<?php echo URL('show', 'id='.$item['id']);?>" target="_blank" id="cm">评论</a></p>
-							<span><a href="<?php echo URL('show', 'id='.$item['id']);?>" target="_blank"><?php echo F('format_time', $item['created_at']);?></a> 来自 <?php echo $item['source'];?></span>
+							<p><a href="<?php echo URL('show', 'id='.$item['id']);?>" target="_blank" id="fw"><?php LO('modules_unit_t_topic_forward');?></a>|<a href="<?php echo URL('show', 'id='.$item['id']);?>" target="_blank" id="cm"><?php LO('modules_unit_t_topic_comment');?></a></p>
+							<span><a href="<?php echo URL('show', 'id='.$item['id']);?>" target="_blank"><?php echo F('format_time', $item['created_at']);?></a> <?php LO('modules_unit_t_topic_from');?> <?php echo $item['source'];?></span>
 						</div>
 					</li>
 					<?php
@@ -151,10 +155,10 @@
 					?>
 					<?php endforeach;?>
 					<?php else:?>
-						<div>暂时没有关注该话题的微博信息<?php if ($show_publish): ?>，立刻发一条吧！<?php endif; ?></div>
+						<div><?php LO('modules_unit_t_topic_empty', $show_publish?L('modules_unit_t_topic_publishAgain'):'');?></div>
 					<?php endif;?>
 					<?php else:?>
-						<div class="int-box load-fail icon-bg">获取该话题的微博信息失败，请<a href="#" rel="e:rl">刷新</a>再试!</div>
+						<div class="int-box ico-load-fail"><?php LO('modules_unit_t_topic_refresh');?></div>
 					<?php endif;?>
 				</ul>
 			</div>

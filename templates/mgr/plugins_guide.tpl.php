@@ -20,7 +20,7 @@
 					$(View).find('#pop_cancel').click(function(){
 						self.close();
 					});
-					this.jq().attr('class','win-pop win-fixed add-sort');
+					this.jq().attr('class','win-pop win-fixed win-sort');
 					Recom.call(this);
 				},
 				destroyOnClose:true,
@@ -41,6 +41,9 @@
 				var modeObj =  Xwb.util.dequery(this.modeUrl);
 				if(modeObj.group_id){
 					this.dlg.jq('#groupID').val(modeObj.group_id);
+				}
+				if(popWin.title){
+					popWin.dlg.jq('input[name="item_name"]').val(popWin.title);
 				}
 				autoHeight(this);
 			}
@@ -107,7 +110,7 @@
 		})
 		.reg('Uedit',function(e){
 			var trObj = $(e.src).parent().parent('tr');
-			trObj.find('p:eq(1)').replaceWith('<input value="'+trObj.find('p:eq(1)').html()+'" id="remark" type="text"  class="input-txt txt-s1"/>');
+			trObj.find('p:eq(1)').replaceWith('<input value="'+trObj.find('p:eq(1)').html()+'" id="remark" type="text"  class="input-txt w130"/>');
 			$(e.src).next('a').replaceWith('<a href="javascript:;" class="icon-del" rel="e:cal">取消</a>');
 			$(e.src).replaceWith('<a href="javascript:;" class="icon-confirm" rel="e:submit">确定</a>');
 		})
@@ -137,6 +140,7 @@
 					delete urlObj[v];
 				}
 				popWin.modeUrl =  Xwb.request.basePath +'admin.php?' +  Util.queryString(urlObj);
+				popWin.title = self.jq('input[name="item_name"]').val();
 				popWin.reload();
 			}
 		});
@@ -271,7 +275,7 @@
                 <div class="automatic">
                 <p class="tips-desc">
                 <label for="matic">
-                    <input id="matic" class="ipt-radio" name="auto_follow" id="auto_follow" type="checkbox" value="1"<?php echo $auto ? ' checked':'';?> />首次登录自动关注以下用户：<span class="hight-light">（请慎用：可能会引起不好的体验）</span>
+                    <input id="matic" class="ipt-radio" name="auto_follow" id="auto_follow" type="checkbox" value="1"<?php echo $auto ? ' checked':'';?> />首次登录自动关注以下用户：<span class="stress">（请慎用：可能会引起不好的体验）</span>
                 </label>
                 </p>
                 <input type="hidden" name="autoFollowId" value="3" />
@@ -295,7 +299,7 @@
                             
                             <tr <?php if (!isset($autoFollowUsers) || count($autoFollowUsers) >=3) {?>class="hidden"<?php }?>>
                                 <td>&nbsp;</td>
-                                <td><input type="text"  class="input-txt txt-s1" name="nickname" id="nickname"/> <span class="tips-error hidden">该用户不存在</span> </td>
+                                <td><input type="text"  class="input-txt w130" name="nickname" id="nickname"/> <span class="tips-error hidden">该用户不存在</span> </td>
                                 <td><a href="javascript:;" class="icon-add" rel="e:addUser">添加</a></td>
                             </tr>
                         </table>
@@ -303,13 +307,13 @@
                 </div>
             </div>
             </div>
-            <h3 class="title"><a href="javascript:openPop('<?php echo URL('mgr/plugins.pluginGuideView',array('json'=>'1'));?>','添加')" class="general-btn" rel="add"><span  rel="add">添加新类别</span></a>登录后引导关注</h3>
+            <h3 class="title"><a href="javascript:openPop('<?php echo URL('mgr/plugins.pluginGuideView',array('json'=>'1'));?>','添加')" class="btn-general" rel="add"><span  rel="add">添加新类别</span></a>登录后引导关注</h3>
 			<div class="set-area">
         		<table class="table" cellpadding="0" cellspacing="0" width="100%" border="0">
 					<colgroup>
-                        <col class="h-w140" />
+                        <col class="w140" />
     					<col />
-    					<col class="h-w120" />
+    					<col class="w120" />
     				</colgroup>
                     <thead class="tb-tit-bg">
 					<tr>

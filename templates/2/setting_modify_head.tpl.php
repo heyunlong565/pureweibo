@@ -10,7 +10,7 @@
 <?php if (!empty($U)) { ?>
 var _userInfo = <?php echo json_encode($U);?>;
 <?php }else{ ?>
-alert('无法获取用户信息');
+alert('<?php LO('setting__setting__errorTips');?>');
 <?php }?>
 </script></head>
 <body id="modify">

@@ -32,7 +32,7 @@ if (!isset($list['x_total']) || ceil($list['x_total'] / $limit) > $page) {
 ?>
 <div class="pages">
 	<form>
-		<?php if (isset($first_link)): ?><a href="<?php echo $first_link; ?>">首页</a>&nbsp;<?php endif; ?><?php if (isset($pre_link)): ?><a href="<?php echo $pre_link; ?>">上页</a>&nbsp;<?php endif; ?><?php if (isset($next_link)): ?><a href="<?php echo $next_link; ?>">下页</a><?php endif; ?>
+		<?php if (isset($first_link)): ?><a href="<?php echo $first_link; ?>"><?php LO('include__pager__first');?></a>&nbsp;<?php endif; ?><?php if (isset($pre_link)): ?><a href="<?php echo $pre_link; ?>"><?php LO('include__pager__prev');?></a>&nbsp;<?php endif; ?><?php if (isset($next_link)): ?><a href="<?php echo $next_link; ?>"><?php LO('include__pager__next');?></a><?php endif; ?>
 	</form>
 </div>
 <?php endif; ?>

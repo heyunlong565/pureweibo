@@ -59,8 +59,8 @@ foreach ($category as $cid => $cty) {
 }
 ?>
 	<div class="fame-list">
-		<div class="column-title">
-			<h3><?php echo isset($title) ? $title: '分类用户推荐';?></h3>
+		<div class="title-box">
+			<h3><?php echo isset($title) ? $title: L('modules__recommendUserWeight__categoryUser');?></h3>
 		</div>
 		<div class="tab-s4">
 		<?php if (is_array($category)) {$i=0; foreach($category as $key =>$item) {?>

@@ -11,7 +11,7 @@
 <?php TPL::plugin('wap/include/my_preview', $uInfo, false); ?>
 <?php TPL::plugin('wap/include/msg_common', '', false); ?>
 <div class="c">
-我的私信 <a href="<?php echo WAP_URL('wbcom.sendMsgFrm'); ?>">发私信</a>
+<?php LO('index__messages__myMessage');?> <a href="<?php echo WAP_URL('wbcom.sendMsgFrm'); ?>"><?php LO('index__messages__sendMessage');?></a>
 <div class="s"></div>
 <?php if (!empty($list)): ?>
 	<?php foreach ($list as $message): ?>
@@ -19,7 +19,7 @@
     	<tbody>
         	<tr>
             	<td>
-            	<?php if ($message['sender_id'] == USER::uid()): ?><a href="<?php echo WAP_URL('index'); ?>">我</a></a>发送给<a href="<?php echo WAP_URL('ta', 'id=' . $message['recipient_id']); ?>"><?php echo F('verified', $message['recipient']); ?></a><?php else: ?><a href="<?php echo WAP_URL('ta', 'id=' . $message['sender_id']); ?>"><?php echo F('verified', $message['sender']); endif; ?></a> <?php echo F('escape', $message['text'], ENT_QUOTES); ?> <?php echo F('format_time', $message['created_at']); ?><?php if ($message['sender_id'] != USER::uid()): ?> <a href="<?php echo WAP_URL('wbcom.sendMsgFrm', array('rid' => $message['sender_id'], 'rname' => $message['sender']['screen_name'])); ?>">回复<?php echo $message['sender']['gender'] == 'f' ? '她' : '他'; ?></a><?php endif; ?> <a href="<?php echo WAP_URL('wbcom.delMsgAlert', 'id=' . $message['id']); ?>">删除</a>
+            	<?php if ($message['sender_id'] == USER::uid()): ?><?php LO('index__messages__sendTo', WAP_URL('index'));?><a href="<?php echo WAP_URL('ta', 'id=' . $message['recipient_id']); ?>"><?php echo F('verified', $message['recipient']); ?></a><?php else: ?><a href="<?php echo WAP_URL('ta', 'id=' . $message['sender_id']); ?>"><?php echo F('verified', $message['sender']); endif; ?></a> <?php echo F('escape', $message['text'], ENT_QUOTES); ?> <?php echo F('format_time', $message['created_at']); ?><?php if ($message['sender_id'] != USER::uid()): ?> <a href="<?php echo WAP_URL('wbcom.sendMsgFrm', array('rid' => $message['sender_id'], 'rname' => $message['sender']['screen_name'])); ?>"><?php LO('index__messages__replyTo');?><?php echo $message['sender']['gender'] == 'f' ? L('index__messages__targetFemale') : L('index__messages__targetMale'); ?></a><?php endif; ?> <a href="<?php echo WAP_URL('wbcom.delMsgAlert', 'id=' . $message['id']); ?>"><?php LO('index__messages__deleteMessage');?></a>
             	</td>
             </tr>
         </tbody>
@@ -28,9 +28,9 @@
 	<?php endforeach; ?>
 <?php else: ?>
 	<?php if (V('g:page', 1) > 1):?>
-	<p>已到最后一页</p>
+	<p><?php LO('index__messages__lastPage');?></p>
 	<?php else: ?>
-	<p>您还没有收到评论</p>
+	<p><?php LO('index__messages__notAnyComment');?></p>
 	<?php endif; ?>
 	<div class="s"></div>
 <?php endif; ?>

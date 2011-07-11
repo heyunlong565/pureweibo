@@ -33,22 +33,22 @@ if ( $uid){
 				<?php echo $uName;?>
 				<?php echo F('verified', $uInfo);?>
 			</strong>
-            <p class="icon-bg icon-<?php echo ($uInfo['gender'] == 'm' || $uInfo['gender'] == '') ? 'male' : 'female';?>"><?php echo $location;?></p>
+            <p class="ico-<?php echo ($uInfo['gender'] == 'm' || $uInfo['gender'] == '') ? 'male' : 'female';?>"><?php echo $location;?></p>
         </div>
     </div>
     <!-- 用户关注、粉丝、微博信息总数 开始-->
     <div class="user-total-box">
     <div class="first">
 	<p><a id="xwb_user_total_follow" class="user-total <?php if (strlen($uInfo['friends_count']) >= 6):?>longnumber<?php endif;?>" href="<?php if (USER::uid() == $uInfo['id']):?><?php echo URL('index.follow');?><?php else:?><?php echo URL('ta.follow', 'id='.$uInfo['id']);?><?php endif;?>"><?php echo $uInfo['friends_count'];?></a></p>
-	<a href="<?php if (USER::uid() == $uInfo['id']):?><?php echo URL('index.follow');?><?php else:?><?php echo URL('ta.follow', 'id='.$uInfo['id']);?><?php endif;?>">关注</a>
+	<a href="<?php if (USER::uid() == $uInfo['id']):?><?php echo URL('index.follow');?><?php else:?><?php echo URL('ta.follow', 'id='.$uInfo['id']);?><?php endif;?>"><?php LO('modules__userPreview__follow');?></a>
     </div>
     <div>
 	<p><a id="xwb_user_total_fans" class="user-total <?php if (strlen($uInfo['followers_count']) >= 6):?>longnumber<?php endif;?>" href="<?php if (USER::uid() == $uInfo['id']):?><?php echo URL('index.fans');?><?php else:?><?php echo URL('ta.fans', 'id='.$uInfo['id']);?><?php endif;?>"><?php echo $uInfo['followers_count'];?></a></p>
-	<a href="<?php if (USER::uid() == $uInfo['id']):?><?php echo URL('index.fans');?><?php else:?><?php echo URL('ta.fans', 'id='.$uInfo['id']);?><?php endif;?>">粉丝</a>
+	<a href="<?php if (USER::uid() == $uInfo['id']):?><?php echo URL('index.fans');?><?php else:?><?php echo URL('ta.fans', 'id='.$uInfo['id']);?><?php endif;?>"><?php LO('modules__userPreview__fans');?></a>
     </div>
     <div>
 	<p><a id="xwb_user_total_wb" class="user-total <?php if (strlen($uInfo['statuses_count']) >= 6):?>longnumber<?php endif;?>" href="<?php if (USER::uid() == $uInfo['id']):?><?php echo URL('index.profile');?><?php else:?><?php echo URL('ta.profile', 'id='.$uInfo['id']);?><?php endif;?>"><?php echo $uInfo['statuses_count'];?></a></p>
-	<a href="<?php if (USER::uid() == $uInfo['id']):?><?php echo URL('index.profile');?><?php else:?><?php echo URL('ta.profile', 'id='.$uInfo['id']);?><?php endif;?>">微博</a>
+	<a href="<?php if (USER::uid() == $uInfo['id']):?><?php echo URL('index.profile');?><?php else:?><?php echo URL('ta.profile', 'id='.$uInfo['id']);?><?php endif;?>"><?php LO('modules__userPreview__weibo');?></a>
     </div>
 </div>
     <p><?php echo $desc;?></p>
@@ -58,7 +58,7 @@ if ( $uid){
     	$l =  $adProfile[array_rand ($adProfile)];
 	?>  
 	<!-- 推广区 开始-->
-	<div class="bulicity skin-bg">
+	<div class="mod-aside bulicity">
 		<a target="_blank" href="<?php echo htmlspecialchars($l['link']);?>"><?php echo F('escape', $l['title']);?></a>
 	</div>
 	<!-- 推广区 结束-->
@@ -83,11 +83,11 @@ if ( $uid){
 	if ($siteLogin){
 	?>
 		<!--已登录 开始-->
-		<div class="account-login">
+		<div class="mod-aside account-login">
 			<h3>HI,<?php echo $site_info['site_uname'];?></h3>
-			<p>您已经成功登陆！要使用<?php echo $site_info['site_name'];?>微博功能，您需要绑定新浪微博帐号。</p>
+			<p><?php LO('modules__userPreview__needBindWeibo', F('escape', $site_info['site_name']));?></p>
 			<div class="login-btn-area"><a rel="e:lg" href="<?php echo URL('account.sinaLogin','cb=bind');?>" class="btn-sina-bind-s"></a></div>
-			<em><a href="<?php echo W_BASE_HTTP.URL('account.goSinaReg');?>">注册微博帐号</a></em>
+			<em><a href="<?php echo W_BASE_HTTP.URL('account.goSinaReg');?>"><?php LO('modules__userPreview__regWeibo');?></a></em>
 		</div>
 		<!--已登录 结束-->
 	<?php } else { 
@@ -95,16 +95,16 @@ if ( $uid){
 		if ($login_way == 2 || $login_way == 3){		
 	?>
 		<!--未登录-站长 开始-->
-		<div class="account-login">
+		<div class="mod-aside account-login">
 			<div class="login-btn-area"><a rel="e:lg" href="<?php echo URL('account.siteLogin','cb=login');?>" class="btn-login"></a></div>
-			<em><a href="<?php echo $site_info['reg_url'];?>">注册帐号</a></em>
+			<em><a href="<?php echo $site_info['reg_url'];?>"><?php LO('modules__userPreview__regAccount');?></a></em>
 		</div>
 		<!--未登录-站长 结束--> 
 	    <?php } else { ?>
 		<!--未登录-普通用户 开始-->
-		<div class="account-login">
+		<div class="mod-aside account-login">
 			<div class="login-btn-area"><a rel="e:lg" href="<?php echo URL('account.sinaLogin','cb=login');?>" class="btn-sina-login"></a></div>
-			<em><a href="<?php echo W_BASE_HTTP.URL('account.goSinaReg');?>">注册微博帐号</a></em>
+			<em><a href="<?php echo W_BASE_HTTP.URL('account.goSinaReg');?>"><?php LO('modules__userPreview__regWeibo');?></a></em>
 		</div>
 		<!--未登录-普通用户 结束-->
 	    <?php

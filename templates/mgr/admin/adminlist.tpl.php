@@ -15,22 +15,24 @@
     <div class="set-area">
         <table class="table" cellpadding="0" cellspacing="0" width="100%" border="0">
             <colgroup>
-                <col class="h-w70"/>
+                <col class="w70"/>
                 <col />
-                <col class="h-w150" />
-                <col class="h-w130" />
+                <col class="w110" />
+                <col class="w150" />
+                <col class="w130" />
             </colgroup>
             <thead class="tb-tit-bg">
                 <tr>
                     <th><div class="th-gap">编号</div></th>
                     <th><div class="th-gap">管理员昵称</div></th>
+                    <th><div class="th-gap">权限</div></th>
                     <th><div class="th-gap">添加时间</div></th>
                     <th><div class="th-gap">操作</div></th>
                 </tr>
             </thead>
             <tfoot class="tb-tit-bg">
                 <tr>
-                    <td colspan="4">
+                    <td colspan="5">
                     	<div class="pre-next">
                             <?php echo $pager;?>
                         </div>
@@ -43,6 +45,7 @@
                     <tr>
                         <td><?php echo ++$num;?></td>
                         <td><a href="<?php echo URL('ta', 'id='.$value['sina_uid'] ,'index.php');?>" target="_blank"><?php if(isset($value['userinfo']['nickname'])) echo F('escape', $value['userinfo']['nickname']); ?></a></td>
+                        <td><?php echo $value['group_name'];?></td>
                         <td><?php echo date('Y-m-d H:i:s', $value['add_time']);?></td>
                         <td>
                             <?php if($admin_root && $value['id'] != $admin_id):?>

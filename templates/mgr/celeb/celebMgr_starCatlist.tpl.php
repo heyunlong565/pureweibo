@@ -17,7 +17,7 @@ function openPop(url,title) {
 			trigger:'#pop_ok'
 		},
 		dlgcfg:{
-			cs:'add-famer win-fixed',
+			cs:'win-famer win-fixed',
 			onViewReady:function(View){
 				var self=this;
 				$(View).find('#pop_cancel').click(function(){
@@ -82,22 +82,22 @@ function ajax_load_add(id)
 <body id="star-catlist" class="main-body">
 	<div class="path"><p>当前位置：用户管理<span>&gt;</span>名人分类<?php echo $parent_id > 0 ? '<span>&gt;</span><a href="' . URL('mgr/celeb_mgr.starCatList') . '">一级分类列表</a><span>&gt;</span>二级分类列表' : '<span>&gt;</span>一级分类列表'; ?></p></div>
     <div class="main-cont">
-        <h3 class="title"><a href="<?php echo URL('mgr/celeb_mgr.starList', array('c_id1'=>$parent_id)); ?>" class="general-btn"><span>名人管理</span></a><a class="general-btn" href="javascript:openPop('<?php echo URL('mgr/celeb_mgr.addStar', array('pid' =>$parent_id)); ?>','添加名人');"><span>添加名人</span></a><a class="general-btn" href="javascript:openPop('<?php echo URL('mgr/celeb_mgr.addStarCat', 'parent_id=' . $parent_id); ?>','添加分类名称');"><span><?php echo $parent_id > 0 ? '添加二级分类' : '添加一级分类'; ?></span></a><?php echo $parent_id > 0 ? '二级分类列表' : '一级分类列表'; ?></h3>
+        <h3 class="title"><a href="<?php echo URL('mgr/celeb_mgr.starList', array('c_id1'=>$parent_id)); ?>" class="btn-general"><span>名人管理</span></a><a class="btn-general" href="javascript:openPop('<?php echo URL('mgr/celeb_mgr.addStar', array('pid' =>$parent_id)); ?>','添加名人');"><span>添加名人</span></a><a class="btn-general" href="javascript:openPop('<?php echo URL('mgr/celeb_mgr.addStarCat', 'parent_id=' . $parent_id); ?>','添加分类名称');"><span><?php echo $parent_id > 0 ? '添加二级分类' : '添加一级分类'; ?></span></a><?php echo $parent_id > 0 ? '二级分类列表' : '一级分类列表'; ?></h3>
 		<div class="set-area">
 				<form id="sortfrm" method="post" action="<?php echo URL('mgr/celeb_mgr.updateCatSort'); ?>">
 				<input type="hidden" name="parent_id" value="<?php echo $parent_id; ?>" />
             	<table  class="table table-s1" cellpadding="0" cellspacing="0" width="100%" border="0">
             		<colgroup>
-                        <col class="h-w50" />
+                        <col class="w50" />
                         <col class="" />
-                        <col class="h-w70" />
-    					<col class="h-w80" />
+                        <col class="w70" />
+    					<col class="w80" />
     					<?php if($parent_id){?>
     					<col class="" />
     					<col class="" />
     					<?php }?>
-    					<col class="h-w50" />
-                        <col class="h-w150" <?php if ( empty($parent_id) ){echo ' style="width:230px;"'; } ?> />
+    					<col class="w50" />
+                        <col class="w150" <?php if ( empty($parent_id) ){echo ' style="width:230px;"'; } ?> />
     				</colgroup>
                     <thead class="tb-tit-bg">
   						<tr>
@@ -120,7 +120,7 @@ function ajax_load_add(id)
                                     <?php echo $pager; ?>
                                 </div>
                                 <!--<a href="" class="btn-add"><span>批量修改</span></a>-->
-                                <a href="#" class="general-btn" onclick="javascript:update();"><span>批量修改</span></a>
+                                <a href="#" class="btn-general" onclick="javascript:update();"><span>批量修改</span></a>
                             </td>
                    		</tr>
                     </tfoot>
@@ -128,7 +128,7 @@ function ajax_load_add(id)
                     	<?php if (empty($list)) {?>
                     	<tr>
                     		<td colspan="<?php echo $parent_id ? '8' : '6'; ?>">
-                            	<p class="no-data">没有数据，请<a href="javascript:openPop('<?php echo URL('mgr/celeb_mgr.addStarCat', 'parent_id=' . $parent_id); ?>');">添加新分类</a></p>
+                            	<p class="no-data">没有数据，请<a href="javascript:openPop('<?php echo URL('mgr/celeb_mgr.addStarCat', 'parent_id=' . $parent_id); ?>','添加分类名称');">添加新分类</a></p>
                             </td>
                    		</tr>
                    		
@@ -139,10 +139,10 @@ function ajax_load_add(id)
                                 <?php echo ++$num; ?>
                             </td>
                             <td>
-                                <input type="text" class="ipt-txt form-el-w180" name="data[<?php echo $value['id']; ?>][name]" value="<?php echo htmlspecialchars($value['name']); ?>" />
+                                <input type="text" class="ipt-txt w180" name="data[<?php echo $value['id']; ?>][name]" value="<?php echo htmlspecialchars($value['name']); ?>" />
                             </td>
                             <td>
-                                <input type="text" class="ipt-txt" style="width:30px;" name="data[<?php echo $value['id']; ?>][sort]" value="<?php echo (int)$value['sort']; ?>" />
+                                <input type="text" class="ipt-txt w30" name="data[<?php echo $value['id']; ?>][sort]" value="<?php echo (int)$value['sort']; ?>" />
                             </td>
                             <td>
                                 <?php echo $parent_cat_name ? '二级分类' : '一级分类'; ?>
@@ -161,11 +161,11 @@ function ajax_load_add(id)
                                     <select name="data[<?php echo $value['id']; ?>][color]" ><?php echo $colorOptionHtm; ?></select>
                                 </td>
                                 <td>
-                                    <input type="checkbox" class="input-box" style="width:30px;" name="data[<?php echo $value['id']; ?>][recommended]" value="1" <?php echo $value['recommended'] ? 'checked' : ''; ?> />
+                                    <input type="checkbox" class="w30" name="data[<?php echo $value['id']; ?>][recommended]" value="1" <?php echo $value['recommended'] ? 'checked' : ''; ?> />
                                 </td>
                             <?php }?>
                             <td>
-                                <input type="checkbox" class="input-box" style="width:30px;" name="data[<?php echo $value['id']; ?>][status]" value="1" <?php echo $value['status'] ? 'checked' : ''; ?> />
+                                <input type="checkbox" class="w30" name="data[<?php echo $value['id']; ?>][status]" value="1" <?php echo $value['status'] ? 'checked' : ''; ?> />
                             </td>
                             
                             <td>
@@ -187,7 +187,7 @@ function ajax_load_add(id)
                 </form>
         </div> 
     </div>
-<div class="win-pop win-fixed add-famer hidden" id="pop_window"></div>
+<div class="win-pop win-fixed win-famer hidden" id="pop_window"></div>
 <div id="pop_mask" class="mask hidden"></div>
 </body>
 </html>

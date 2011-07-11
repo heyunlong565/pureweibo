@@ -42,6 +42,7 @@
 							<!-- 可能感兴趣的人 开始-->
 							<?php Xpipe::pagelet('common.sideComponents', array('type'=>4) );?>
 							<!-- 可能感兴趣的人 结束-->
+						<?php echo F('show_ad', 'sidebar', '');?>
 						</div>
 					</div>
 				</div>

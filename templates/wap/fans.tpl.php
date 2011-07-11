@@ -17,7 +17,7 @@
     	<tbody>
         	<tr>
             	<td><a href="<?php echo WAP_URL('ta', 'id=' . $user['id']); ?>"><img src="<?php echo $user['profile_image_url']; ?>" alt="<?php echo F('escape', $user['screen_name']); ?>" /></a></td>
-                <td><a href="<?php echo WAP_URL('ta', 'id=' . $user['id']); ?>"><?php echo F('verified', $user); ?></a><br />粉丝<?php echo $user['followers_count']; ?>人<br /><a href="<?php echo WAP_URL('wbcom.cancelFanAlert', 'id=' . $user['id']); ?>">移除</a> <?php if (in_array($user['id'], $fids)): ?>已关注<?php else: ?><a href="<?php echo WAP_URL('wbcom.addFollow', 'id=' . $user['id']); ?>">关注<?php echo $user['gender'] == 'f' ? '她' : '他'; ?></a><?php endif; ?> <a href="<?php echo WAP_URL('wbcom.sendMsgFrm', array('rid' => $user['id'], 'rname' => $user['screen_name'], 'st' => 2)); ?>">私信</a></td>
+				<td><a href="<?php echo WAP_URL('ta', 'id=' . $user['id']); ?>"><?php echo F('verified', $user); ?></a><br /><?php LO('index__fans__fansNum', $user['followers_count']);?><br /><a href="<?php echo WAP_URL('wbcom.cancelFanAlert', 'id=' . $user['id']); ?>"><?php LO('index__fans__remove');?></a> <?php if (in_array($user['id'], $fids)): ?><?php LO('common__template__followed');?><?php else: ?><a href="<?php echo WAP_URL('wbcom.addFollow', 'id=' . $user['id']); ?>"><?php LO('index__fans__follow');?><?php echo $user['gender'] == 'f' ? L('index__fans__she') : L('index__fans__he'); ?></a><?php endif; ?> <?php if (HAS_DIRECT_MESSAGES) {?><a href="<?php echo WAP_URL('wbcom.sendMsgFrm', array('rid' => $user['id'], 'rname' => $user['screen_name'], 'st' => 2)); ?>"><?php LO('index__fans__message');?></a><?php }?></td>
             </tr>
         </tbody>
     </table>
@@ -26,9 +26,9 @@
 	<?php endforeach; ?>
 	<?php else: ?>
 		<?php if (V('g:page', 1) > 1):?>
-		<p>已到最后一页</p>
+		<p><?php LO('index__fans__endPage');?></p>
 		<?php else: ?>
-		<p>您暂时还没有关注别人</p>
+		<p><?php LO('index__fans__emptyTip');?></p>
 		<?php endif; ?>
 		<div class="s"></div>
 	<?php endif; ?>

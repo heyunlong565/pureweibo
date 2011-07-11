@@ -47,7 +47,11 @@ class sysConfig {
 							'microLive_setting'			=> '',					// 在线直播设置
 							'open_user_local_relationship' => 0,				// 是否开启用户关系本地化
 							'skin_custom'				=>'',					//自定义的默认皮肤
-							'default_use_custom'		=>'1'					//使用自定义的默认皮肤还是皮肤目录的默认值
+							'xwb_strategy'				=> 0,					// 审核策略
+							'sysLoginModel'				=> 0,					// 首页模式
+							'wb_lang_type'				=> 'zh_cn',				// 当前语言设置
+							'default_use_custom'		=>'1',					//使用自定义的默认皮肤还是皮肤目录的默认值
+							'xwb_login_group_id'		=> ''					//登录页的用户组id
 						);	
 
 

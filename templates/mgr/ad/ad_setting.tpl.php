@@ -17,6 +17,7 @@ function ad_submit(action, type) {
 		form.action = '';
 		form.target = '';
 	}
+	form.submit();
 }
 	function insert() {
 		$.get('<?php echo URL('mgr/ad.getAd','aid='.$data['id'], 'admin.php')?>', function(data) {
@@ -30,52 +31,37 @@ function ad_submit(action, type) {
 	}
 </script>
 </head>
-<body>
+<body class="main-body">
 <div class="main-wrap">
-	<div class="path"><span class="path-icon"></span>当前位置：<span><a href="">组件管理</a></span> &gt; <span>广告管理</span> &gt; <span><?php echo $data['name'];?></span>
-	</div>
-	<div class="set-wrap">
-
-	<h4 class="main-title"><?php echo $data['name'];?>设置</h4>
-		<div class="set-ad">
-
-			<div class="set-area-int">
+	<div class="path"><p>当前位置：界面管理<span>&gt;</span><a href="<?php echo URL('mgr/ad.ad_list')?>">广告</a><span>&gt;</span><?php echo $data['name'];?></p></div>
+    <div class="main-cont">
+        <h3 class="title"><?php echo $data['name'];?>设置</h3>
+		<div class="set-area">
+			<div class="form-s1">
+					<ul>
+						<li>1.广告代码支持html代码（包括JS代码）。<br />比如，加入图片广告，填入的代码一般为:<?php echo htmlspecialchars('<a href="xxx"><img src="http://xxx.com/xxx.gif" alt="xxx" /></a>');?></li>
+						<li>2.广告代码为空时，页面会自动隐藏广告位</li>
+						<li>3.以下广告设置全局生效</li>
+					</ul>
             	<form id="ad_from" action="" method="post">
-        			<div class="code-area">
-                		<p class="chinaz-tips">
-							<?php if (defined('AD_UNION') && AD_UNION == 1) {?>
-							<a href="javascript:insert();">嵌入ChinaZ广告代码</a>
-							<?php }?>
-							请输入广告代码：
-						</p>
-                        <label for="ad-code-t">
-                        	<textarea id="code_input" name="content" class="input-box sub-ad" cols="" rows=""><?php echo htmlspecialchars($data['content']);?></textarea>
-                        </label>
-                	</div>
-					<?php if (in_array($data['flag'], array('global_left', 'global_right'))) {?>
-					<div class="set1">
-        				<p class="title">话题获取方式：</p>
-                		<div class="login-radio">
-                    		<label for="topic_get">
-                				<input name="topic_get" type="radio" value="1" <?php if (!isset($config['topic_get']) || $config['topic_get'] == '1') {?>checked="checked"<?php }?> />刷新展现
-                        	</label><br />
-                        	<label for="topic_get">
-                				<input name="topic_get" type="radio" value="2" <?php if (isset($config['topic_get']) && $config['topic_get'] == '2') {?>checked="checked"<?php }?>/>按天展现<span class="sub-tips">(如果某个用户点击了广告上的关闭按钮，那么在当天将不再向用户展现)</span>
-                        	</label>
-                        </div>
-                    </div>
-                	<?php }?>
-                	<div class="button operate-area"><input type="submit" value="预览" onclick="ad_submit('<?php echo URL($data['page']=='global'?'index':$data['page'] ,($data['page'] =='ta' ?'id=1076590735':'') . '#ad_' .$data['flag'], 'index.php');?>', 'preview')" /><input type="submit" value="提交" onclick="ad_submit('', 'save');" /></div>
-
-
+					<div class="form">
+						<div class="form-row">
+							<div class="form-cont">
+								<label class="label"><?php echo $data['name'];?> ：<span class="form-tips">(<?php echo $data['remarks'];?>)</span></label>
+								<textarea id="code_input" name="content" class="input-area area-s6 code-area" cols="" rows=""><?php echo htmlspecialchars($data['content']);?></textarea>
+							</div>
+						</div>
+						<div id="submit" class="form-cont">
+							<a class="btn-general highlight" href="javascript:ad_submit('', 'save');" ><span>保存</span></a>
+							<a class="btn-general " href="javascript:ad_submit('<?php echo URL($data['page']=='global'?'index':$data['page'] ,($data['page'] =='ta' ?'id=1076590735':'') . '#ad_' .$data['flag'], 'index.php');?>', 'preview')" ><span>预览</span></a>
+						</div>
 					<input type="hidden" name="flag" value="<?php echo $data['flag'];?>" />
 					<input type="hidden" name="page" value="<?php echo $data['page'];?>" />
 					<input type="hidden" name="id" value="<?php echo $data['id'];?>" />
-                </form>
-    		</div>
-        </div>
-			
-     
+					</div>
+				</form>
+			</div>
+		</div>
    </div>
 </div>
 </body>

@@ -8,7 +8,7 @@ function err404($msg = '') {
 	}
 	//APP::tips(array('tpl' => 'e404', 'msg' => '你访问的页面不存在'));
 	if (Xpipe::isRunning()) {
-		echo '<div class="api-error"><p>' . ($msg ? $msg : '你访问的页面不存在') . '</p></div>';
+		echo '<div class="api-error"><p>' . ($msg ? $msg : L('function__common__pageNotExist')) . '</p></div>';
 	} else {
 		TPL::module('e404');
 	}

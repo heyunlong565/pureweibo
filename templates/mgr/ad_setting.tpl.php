@@ -17,7 +17,7 @@
                 	<div class="code-area">
                 		<p>请输入页尾广告代码：</p>
                         <label>
-                        	<textarea rows="" cols="" class="input-box sub-ad" name="ad_footer"><?php echo F('escape', DS('common/sysConfig.get', 'g1/86400', 'ad_footer'));?></textarea>
+                        	<textarea rows="" cols="" class="input-txt sub-ad" name="ad_footer"><?php echo F('escape', DS('common/sysConfig.get', 'g1/86400', 'ad_footer'));?></textarea>
                         </label>
                 	</div>
                 	<div class="button operate-area"><input type="submit" value="提交" name="ad"></div>

@@ -12,7 +12,7 @@
     <div class="main-cont">
         <h3 class="title">修改密码</h3>
 		<div class="set-area">
-        	<div class="form-area">
+        	<div class="form">
             	<form action="" method="post" id="passwordForm">
                 <div class="form-row">
                 	<label class="form-field">帐号</label>
@@ -27,20 +27,26 @@
                     </div>
                 </div>
                 <div class="form-row">
-                	<label class="form-field">请输入新密码</label>
+                	<label for="old_pwd" class="form-field">请输入旧密码</label>
                     <div class="form-cont">
-                        <input name="pwd" class="input-txt form-el-w120" type="password" />
+                        <input id="old_pwd" name="old_pwd" class="input-txt w120" type="password" />
+                    </div>
+                </div>
+                <div class="form-row">
+                	<label for="pwd" class="form-field">请输入新密码</label>
+                    <div class="form-cont">
+                        <input id="pwd" name="pwd" class="input-txt w120" type="password" />
                     </div>
                 </div>
                  <div class="form-row">
-                	<label class="form-field">请再输入一次</label>
+                	<label for="re_pwd" class="form-field">请再输入一次</label>
                     <div class="form-cont">
-                        <input name="re_pwd" class="input-txt form-el-w120" type="password" />
+                        <input id="re_pwd" name="re_pwd" class="input-txt w120" type="password" />
                     </div>
                 </div>
                 <input name="id" type="hidden" value="<?php echo $info['id'];?>" />
                 <div class="btn-area">
-                	<a href="javascript:$('#passwordForm')[0].submit();" class="general-btn btn-s2"><span>提交</span></a>
+                	<a href="javascript:$('#passwordForm')[0].submit();" class="btn-general highlight"><span>提交</span></a>
                 </div>
                 </form>
             </div>

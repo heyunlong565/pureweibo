@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
-	<title><?php echo F('web_page_title',isset($wb['user']['screen_name'])?$wb['user']['screen_name']:'他/她');?></title>
+	<title><?php echo F('web_page_title',isset($wb['user']['screen_name'])?$wb['user']['screen_name']:L('show__repos__lable_ta'));?></title>
 	<link rel="stylesheet" href="<?php echo W_BASE_URL;?>css/wap/base.css" type="text/css" />
 </head>
 <body <?php F('wap_font_set'); ?>>
@@ -14,9 +14,9 @@
 	<div class="send">
 		<form method="post" action="<?php echo WAP_URL('wbcom.reposWB'); ?>">
 			<input type="hidden" name="mid" value="<?php echo $wb['id']; ?>" />
-			<span>转发理由只显示前140字</span><br />
+			<span><?php LO('show__repos__lable_repostCharLimit');?></span><br />
 			<textarea cols="10" name="content"></textarea><br />
-			<input type="submit" value="转发" />&nbsp;<input type="submit" value="转发并评论" name="is_com" />
+			<input type="submit" value="<?php LO('show__repos__lable_repost');?>" />&nbsp;<input type="submit" value="<?php LO('show__repos__lable_commentAndRepost');?>" name="is_com" />
 		</form>
 	</div>
 	<?php TPL::plugin('wap/include/nav', array('is_top' => false), false); ?>

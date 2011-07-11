@@ -17,7 +17,7 @@
 					<div class="main">
 						<?php Xpipe::pagelet('user.userHead', $userinfo ); ?>
 						<div class="title-box">
-							<h3><?php echo F('escape',$userinfo['screen_name']);?>的关注（<?php echo $userinfo['friends_count'];?>）</h3>
+							<h3><?php echo F('escape',$userinfo['screen_name']);?><?php LO('ta__follow__taFollow');?>（<?php echo $userinfo['friends_count'];?>）</h3>
 						</div>
 						<?php Xpipe::pagelet('user.followersList', array('userinfo' =>$userinfo, 'from' => 'friend')); ?>
 					</div>
@@ -30,6 +30,7 @@
 					<?php Xpipe::pagelet('common.userTag', $userinfo);?>
 					<!-- end 标签 -->
 					<?php Xpipe::pagelet('common.magicFriends', $userinfo ); ?>
+						<?php echo F('show_ad', 'sidebar', '');?>
 
 				</div>
 			</div>

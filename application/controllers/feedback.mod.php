@@ -18,7 +18,8 @@ class feedback_mod {
 		$config = array('WB_USER_SITENAME' => WB_USER_SITENAME,
 				'WB_USER_SITEINFO' => WB_USER_SITEINFO,
 				'WB_AKEY' => WB_AKEY,
-				'WB_SKEY' => WB_SKEY
+				'WB_SKEY' => WB_SKEY,
+				'WB_SITE_URL' =>W_BASE_HTTP . W_BASE_URL
 				);
 		$app_key = WB_AKEY;
 		$router = 'install';
@@ -69,6 +70,7 @@ class feedback_mod {
 			$data['uid'] = 0;
 		}
 		$data['addtime'] = APP_LOCAL_TIMESTAMP;
+		$data['ip'] = F('get_client_ip');
 		/*
 		   $data = array(
 		   'content' => 'this is content',

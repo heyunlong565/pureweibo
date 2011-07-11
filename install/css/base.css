@@ -65,6 +65,7 @@ a:link, a:visited {color:#0082cb;}
 /*按钮区域*/
 .btn-area {text-align:center;margin-top:20px;}
 .btn-area p {margin-top:5px;}
+.btn-area a { margin-right:20px;}
 
 /*页面按钮*/
 .btn-common {background-position:0 -136px;display:inline-block;height:27px;line-height:27px;text-align:center;width:92px;}

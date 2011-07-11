@@ -27,88 +27,94 @@ if(!defined('IN_APPLICATION')){
                         <div class="ranking-topic">
 							<div class="tab-s2">
 								<?php if($base_app): ?>
-									<span class="current"><span>本站话题排行榜</span></span>
-									<span><span><a href="<?php echo URL('pub.topics', array('base_app' => 0)); ?>">新浪微博话题排行榜</a></span></span>
+								<span class="current"><span><?php LO('pubTopic__pub__localTopicTop');?></span></span>
+								<span><span><a href="<?php echo URL('pub.topics', array('base_app' => 0)); ?>"><?php LO('pubTopic__pub__weiboTopicTop');?></a></span></span>
 								 <?php else: ?>
-									<span><span><a href="<?php echo URL('pub.topics', array('base_app' => 1)); ?>">本站话题排行榜</a></span></span>
-									<span class="current"><span>新浪微博话题排行榜</span></span>
+								 <span><span><a href="<?php echo URL('pub.topics', array('base_app' => 1)); ?>"><?php LO('pubTopic__pub__localTopicTop');?></a></span></span>
+								 <span class="current"><span><?php LO('pubTopic__pub__weiboTopicTop');?></span></span>
 								<?php endif; ?>
 							</div>
                             <div class="r-t-con">
-                                <div class="r-t-item">
+                                <div class="r-t-item first-item">
                                     <div class="top10">
-                                        <div class="sidebar-head">1小时话题榜</div>
-                                        <ul>
-										<?php
-											if (!empty($hours))
-											{
-												$count = 0;
-												foreach ($hours as $row) {
-													$count++;
-													if($count >= 21){
-														break;
-													}
-										?>
-                                     	    <li>
-                                        	    <div class="ranking <?php if ($count<4):?>r-<?php echo $count;?><?php endif;?> skin-bg"><?php echo $count;?></div>
-                                       	        <a href="<?php echo URL('search.weibo', array('k' => $row['query'], 'base_app' => $base_app));?>"><?php echo F('escape', $row['name']);?></a>
-                                     	   </li>
+										<div class="hd"><?php LO('pubTopic__pub__oneHourTopicTop');?></div>
+										<div class="bd">
+											<ul>
 											<?php
+												if (!empty($hours))
+												{
+													$count = 0;
+													foreach ($hours as $row) {
+														$count++;
+														if($count >= 21){
+															break;
+														}
+											?>
+												<li>
+													<div class="ranking <?php if ($count<4):?>r-<?php echo $count;?> skin-bg<?php endif;?>"><?php echo $count;?></div>
+													<a href="<?php echo URL('search.weibo', array('k' => $row['query'], 'base_app' => $base_app));?>"><?php echo F('escape', $row['name']);?></a>
+											   </li>
+												<?php
+													}
 												}
-											}
-										?>
-                                        </ul>
+											?>
+											</ul>
+										</div>
                                     </div>
                                 </div>
                                 
                                 <div class="r-t-item">
                                     <div class="top10">
-                                        <div class="sidebar-head">今日话题榜</div>
-                                        <ul>
-                                         <?php
-											if (!empty($days))
-											{
-												$count = 0;
-												foreach ($days as $row) {
-													$count++;
-													if($count >= 21){
-														break;
+										<div class="hd"><?php LO('pubTopic__pub__todayTopicTop');?></div>
+										<div class="bd">
+											<ul>
+											 <?php
+												if (!empty($days))
+												{
+													$count = 0;
+													foreach ($days as $row) {
+														$count++;
+														if($count >= 21){
+															break;
+														}
+											?>
+												<li>
+													<div class="ranking <?php if ($count<4):?>r-<?php echo $count;?> skin-bg<?php endif;?>"><?php echo $count;?></div>
+												  <a href="<?php echo URL('search.weibo', array('k' => $row['query'], 'base_app' => $base_app));?>"><?php echo F('escape', $row['name']);?></a>
+												</li>
+											<?php
 													}
-										?>
-                                     	    <li>
-                                        	    <div class="ranking <?php if ($count<4):?>r-<?php echo $count;?><?php endif;?> skin-bg"><?php echo $count;?></div>
-                                          	  <a href="<?php echo URL('search.weibo', array('k' => $row['query'], 'base_app' => $base_app));?>"><?php echo F('escape', $row['name']);?></a>
-                                        	</li>
-										<?php
 												}
-											}
-										?>
-                                        </ul>
+											?>
+											</ul>
+										</div>
                                     </div>
                                 </div>
                                 <div class="r-t-item last-item">
                                     <div class="top10">
-                                        <div class="sidebar-head">本周话题榜</div>
-                                        <ul>
-                                   	  	<?php
-											if (!empty($weeks))
-											{
-												$count = 0;
-												foreach ($weeks as $row) {
-													$count++;
-													if($count >= 21){
-														break;
+										<div class="hd"><?php LO('pubTopic__pub__weekTopicTop');?></div>
+										<div class="bd">
+											<ul>
+											<?php
+												if (!empty($weeks))
+												{
+													$count = 0;
+													foreach ($weeks as $row) {
+														$count++;
+														if($count >= 21){
+															break;
+														}
+											?>
+											   <li>
+													<div class="ranking <?php if ($count<4){?>r-<?php echo $count;?> skin-bg<?php }?>"><?php echo $count;?></div>
+													<a href="<?php echo URL('search.weibo', array('k' => $row['query'], 'base_app' => $base_app));?>"><?php echo F('escape', $row['name']);?></a>
+											   </li>
+											<?php
 													}
-										?>
-                                      	   <li>
-                                          		<div class="ranking <?php if ($count<4):?>r-<?php echo $count;?><?php endif;?> skin-bg"><?php echo $count;?></div>
-                                        	    <a href="<?php echo URL('search.weibo', array('k' => $row['query'], 'base_app' => $base_app));?>"><?php echo F('escape', $row['name']);?></a>
-                                     	   </li>
-										<?php
 												}
-											}
-										?>
-                                        </ul>
+											?>
+											</ul>
+										</div>
                                     </div>
                                 </div>
                             </div>

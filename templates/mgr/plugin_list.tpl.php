@@ -14,11 +14,11 @@
 		<div class="set-area">
         	<table class="table" cellpadding="0" cellspacing="0" width="100%" border="0">
             	<colgroup>
-						<col class="h-w70"/>
-                        <col class="h-w150" />
-    					<col class="h-w80" />
+						<col class="w70"/>
+                        <col class="w150" />
+    					<col class="w80" />
     					<col />
-    					<col class="h-w170" />
+    					<col class="w170" />
     			</colgroup>
                 <thead class="tb-tit-bg">
   					<tr>

@@ -16,7 +16,7 @@
 					<div class="main">
 						
 							<div class="title-box">
-								<h3><a href="<?php echo URL('event.details', 'eid='. $event_info['id']);?>">返回&gt;&gt;</a><?php echo htmlspecialchars($event_info['title']);?></h3>
+								<h3><a class="goback" href="<?php echo URL('event.details', 'eid='. $event_info['id']);?>"><?php LO('events__common__back');?>&gt;&gt;</a><?php echo htmlspecialchars($event_info['title']);?></h3>
 							</div>
 							<?php Xpipe::pagelet('event.eventMembers', $event_info);?>
 
@@ -33,5 +33,6 @@
 			<!-- 尾部 结束 -->
 		</div>
 	</div>
+	<?php TPL::module('gotop');?>
 </body>
 </html>

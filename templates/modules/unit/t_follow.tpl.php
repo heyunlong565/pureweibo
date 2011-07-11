@@ -5,7 +5,11 @@
 	<base target="_blank" />
 	<title><?php echo F('escape', $unit_name);?></title>
 	<link rel="stylesheet" type="text/css" href="<?php echo W_BASE_URL;?>css/component/content_unit/base.css" />
+	<?php if (WB_LANG_TYPE_CSS):?>
+	<link rel="stylesheet" type="text/css" href="<?php echo W_BASE_URL;?>css/component/content_unit/skin_<?php echo WB_LANG_TYPE_CSS;?>.css" />
+	<?php else:?>
 	<link rel="stylesheet" type="text/css" href="<?php echo W_BASE_URL;?>css/component/content_unit/skin.css" />
+	<?php endif;?>
 	<script src="<?php echo W_BASE_URL;?>js/jquery.js"></script>
 	<script src="<?php echo W_BASE_URL;?>js/base/xwbapp.js"></script>
 	<script src="<?php echo W_BASE_URL;?>js/mod/xwbrequestapi.js"></script>
@@ -18,18 +22,18 @@
 					var uid = $(this).attr('rel');
 					if( ! Xwb.cfg.uid ){ // 未登录...
 						window.open( Xwb.request.mkUrl('ta', '', 'id='+uid) );
-						return;
+						return false;
 					}
 					var self=$(this);
 					if (lock) retuen;
 					lock=true;
 					Xwb.request.follow(uid, 0, function( ed ){
 			        if( ed.isOk() || ed.getCode() == '1020805'){
-			    				self.html('已关注');
+			    				self.html('<?php LO('common__template__followed');?>');
 			        }else {
 			            if(ed.getCode() == '1020806'){
 			                //如果该用户一天超过500次关注行为，弹窗提示
-			               if(confirm('你今天已经关注了足够多的人，先去看看他们在说些什么吧？') == true ){
+			               if(confirm('<?php LO('modules_unit_t_follow_followTooManyUser');?>') == true ){
 			                        window.open( Xwb.request.mkUrl('ta', '', 'id='+uid) );
 			                };
 			            }else alert(ed.getMsg());
@@ -62,41 +66,25 @@
 						$profile_image_url = isset($item['profile_image_url']) ? $item['profile_image_url'] : $item['uid']; 
 					?>
 					<li>
-					<a class="user-pic" href="<?php echo $item['http_url'];?>" title="" target="_blank">
-							<img src="<?php echo F('profile_image_url', $profile_image_url);?>" alt="" />
+						<a class="user-pic" href="<?php echo $item['http_url'];?>" title="" target="_blank">
+						<img src="<?php echo F('profile_image_url', $profile_image_url);?>" alt="" />
 						</a>
 						<p class="name"><a href="<?php echo $item['http_url'];?>" target="_blank"><?php echo F('escape', $item['nickname']);?></a></p>
-						<?php
 						
-						if(USER::isUserLogin()):
-						?>
-							<?php
-							if(in_array($item['uid'],$fids)):
-							?>
-							<span>已关注</span>
-							<?php
-							elseif(USER::uid()==$item['uid']):
-							?>
-							<span >我自己</span>
-							<?php
+						<?php $isLogin = USER::isUserLogin();
+							if ( $isLogin && isset($fids[$item['uid']]) ):
+								LO('modules_unit_t_follow_followed');
+							elseif ($isLogin && USER::uid()==$item['uid']):
+								LO('modules_unit_t_follow_my');
 							else:
-							?>
-							<a class="follow" href="javascript:;" rel='<?php echo $item["uid"];?>'>加关注</a>	
-							<?php
-							endif;
-							?>
-						<?php
-						else:
 						?>
-						<a class="follow" href="javascript:;" rel='<?php echo $item["uid"];?>'>加关注</a>	
-						<?php
-						endif;
-						?>
-						
+							<a class="follow" href="javascript:;" rel='<?php echo $item["uid"];?>'><?php LO('common__template__toFollow');?></a>
+						<?php endif; ?>
+							
 					</li>
 					<?php endforeach;?>
 					<?php else:?>
-					<div>该用户列表没有数据，请到用户管理中添加用户。</div>
+					<div><?php LO('modules_unit_t_follow_empty');?></div>
 					<?php endif;?>
 				</ul>
 			</div>

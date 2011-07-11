@@ -18,7 +18,7 @@ function openPop(url,title) {
 			trigger:'#pop_ok'
 		},
 		dlgcfg:{
-			cs:'add-topic win-fixed',
+			cs:'win-topic win-fixed',
 			onViewReady:function(View){
 				var self=this;
 				$(View).find('#pop_cancel').click(function(){
@@ -57,7 +57,7 @@ if ($category['sort'] == '1') {
 	<div class="path"><p>当前位置：内容管理<span>&gt;</span><a href="<?php echo URL('mgr/weibo/todayTopic.category'); ?>">话题</a><span>&gt;</span><?php echo $category['topic_name']?>管理</p></div>
     <div class="main-cont">
         <h3 class="title">
-			<a class="general-btn" href="javascript:openPop('<?php echo URL('mgr/weibo/todayTopic.edit', 'topic_id=' . V('g:category'));?>','添加新话题');"><span>添加新话题</span></a>
+			<a class="btn-general" href="javascript:openPop('<?php echo URL('mgr/weibo/todayTopic.edit', 'topic_id=' . V('g:category'));?>','添加新话题');"><span>添加新话题</span></a>
 <?php if ($category['sort']): ?>
 			<a class="change-order" href="#" id="modifyBtn"></a>
 			<a class="save-order hidden" href="#" id="saveBtn"></a>
@@ -67,11 +67,11 @@ if ($category['sort'] == '1') {
 		<div class="set-area" id="userList">
             <table width="100%" border="0" cellpadding="0" cellspacing="0" class="table" id="tblZoom">
                 <colgroup>
-                    <col class="h-w50" />
-                    <col class="h-w70" />
+                    <col class="w50" />
+                    <col class="w70" />
                     <col />
                     <col class="h-150" />
-                    <col class="h-w140" />
+                    <col class="w140" />
                 </colgroup>
                 <thead class="tb-tit-bg">
                     <tr>
@@ -115,7 +115,7 @@ if ($category['sort'] == '1') {
             </table>
         </div>
     </div>
-<div class="win-pop win-fixed add-topic hidden" id="pop_window"></div>
+<div class="win-pop win-fixed win-topic hidden" id="pop_window"></div>
 <div id="pop_mask" class="mask hidden"></div>
 <script type="text/javascript">
 

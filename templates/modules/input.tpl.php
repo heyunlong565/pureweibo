@@ -13,7 +13,7 @@ $param = array('title' => $title, //发布框上边的标题，默认是 '有什
 <div class="post-box" id="publish_box">
 	<?php
 	//var_dump($_SERVER);
-	$title = isset($title) ? $title : '有什么新鲜事告诉大家？';
+	$title = isset($title) ? $title : L('modules__input__inputTitle');
 	$show_face = isset($show_face) ? $show_face : true;
 	$show_upload_pic = isset($show_upload_pic) ? $show_upload_pic : true;
 	$show_video = isset($show_video) ? $show_video : true;
@@ -22,34 +22,35 @@ $param = array('title' => $title, //发布框上边的标题，默认是 '有什
 	$trends = isset($trends) ? '#'.$trends.'#' : '';
 	?>
 	<div class="post-title"><?php echo $title;?></div>
-    <div class="key-tips" id="xwb_word_cal">您还可以输入<span>140</span>字</div>
+	<div class="key-tips" id="xwb_word_cal"><?php LO('modules__input__inputLength');?></div>
 	<div class="post-textarea" id="focusEl"><div class="inner"><textarea id="xwb_inputor"><?php echo $trends;?></textarea></div></div>
     <div class="add-area">
 		<?php if ($show_face):?>
-        <a class="icon-face icon-bg" href="#" rel="e:ic">表情</a>
+		<a class="ico-face" href="#" rel="e:ic"><?php LO('modules__input__inputFace');?></a>
 		<?php endif;?>
 		<?php if ($show_upload_pic):?>
-        <span class="pic_uploading hidden" id="xwb_upload_tip">正在上传..</span>
-        <span class="pic-name hidden" id="xwb_photo_name"><a class="icon-close-btn icon-bg" href="#" ></a></span>
+			<span class="pic_uploading hidden" id="xwb_upload_tip"><?php LO('modules__input__inputUploading');?></span>
+        <span class="pic-name hidden" id="xwb_photo_name"><a class="ico-close-btn" href="#" ></a></span>
         <div class="share-upload-pic" id="uploadBtn">
             <form class="upload-pic"  method="post"  enctype="multipart/form-data" id="xwb_post_form" action="" target="" id="xwb_imgupload_form">
                 <input type="file" name="pic" id="xwb_img_file" value="" />
             </form>
-            <a class="icon-pic icon-bg" href="#" id="xwb_btn_img">图片</a>
+			<a class="ico-pic" href="#" id="xwb_btn_img"><?php LO('modules__input__inputImage');?></a>
         </div>
         
 		<?php endif;?>
 		<?php if ($show_video):?>
-        <a class="icon-video icon-bg" href="#" id="xwb_btn_vd" rel="e:vd">视频</a>
+			<a class="ico-video" href="#" id="xwb_btn_vd" rel="e:vd"><?php LO('modules__input__inputVideo');?></a>
 		<?php endif;?>
 		<?php if ($show_music):?>
-        <a class="icon-music icon-bg" href="#" id="xwb_btn_ms" rel="e:ms">音乐</a>
+			<a class="ico-music" href="#" id="xwb_btn_ms" rel="e:ms"><?php LO('modules__input__inputMusic');?></a>
 		<?php endif;?>
 		<?php if ($show_trends):?>
-        <a class="icon-topic icon-bg" href="#" id="xwb_btn_tp" rel="e:tp">话题</a>
+			<a class="ico-topic" href="#" id="xwb_btn_tp" rel="e:tp"><?php LO('modules__input__inputTopic');?></a>
 		<?php endif;?>
     </div>
     <div class="share-btn <?php if (!USER::isUserLogin()){?>share-btn-disable<?php }?>" rel="e:sd"></div>
-    <div class="post-success all-bg hidden" id="xwb_succ_mask"></div>
-	<div class="account-notbind load-fail icon-bg <?php if (USER::isUserLogin()){?>hidden<?php }?>">您需要绑定新浪微博帐号后才可以发布，<a href="<?php echo URL('account.login','loginCallBack='.W_BASE_HTTP.URL(APP::getRequestRoute()))?>">现在就去绑定</a></div>
+	<div class="post-success hidden" id="xwb_succ_mask"><span class="icon-success"></span><?php LO('modules__input__inputSuccess');?></div>
+	<div class="post-verify ico-verify hidden" id="xwb_veri_mask"><?php LO('modules__input__inputVerify');?></div>
+	<div class="account-notbind ico-load-fail <?php if (USER::isUserLogin()){?>hidden<?php }?>"><?php LO('modules__input__inputReqLogin');?><a href="<?php echo URL('account.login','loginCallBack='.W_BASE_HTTP.URL(APP::getRequestRoute()))?>"><?php LO('modules__input__inputGoBind');?></a></div>
 </div>

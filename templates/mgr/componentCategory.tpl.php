@@ -2,11 +2,11 @@
 					<h5 class="tab-nav clear" id="tabHead">
 						<?php if (isset($component_cty) && is_array($component_cty)) {foreach ($component_cty as $key => $name) {?>
 						<?php if(V('g:componentType')!=2||$key!='wb'){?>
-						<a href="javascript:;"><span><?php echo $name;?></span></a>
+						<a href="#"><span><?php echo $name;?></span></a>
 						<?php }?>
 						<?php }}?>
 					</h5>
-					<div class="con con-s1" id="tabMain">
+					<div class="tab-con" id="tabMain">
 						<?php if (isset($componentList) && is_array($componentList)) {?>
 						<?php if(V('g:componentType')!=2){?>
 						<ul class="pic-item clear">

@@ -195,6 +195,7 @@ class events
 			case $time > $row['end_time']: return 6;// 已完成
 			case $row['state'] == 4 && $row['end_time'] > $time: return 1; // 推荐
 			case $row['end_time'] > $time && $row['start_time'] < $time : return 2; //进行进
+			case $row['start_time'] > $time : return 7; //未开启状态
 			default: return 3; // 正常
 		}
 	}
@@ -352,12 +353,13 @@ class events
 	 *
 	 * @params array
 	 */
-	function commentEvent($id, $wid)
+	function commentEvent($id, $wid, $weibo)
 	{
 
 		$data = array();
 		$data['event_id'] = $id;
 		$data['wb_id'] = $wid;
+		$data['weibo'] = is_array($weibo) ? json_encode($weibo) : $weibo;
 		$data['comment_time'] = APP_LOCAL_TIMESTAMP;
 
 		$result = $this->db->save($data, '', T_EVENT_COMMENT);
@@ -432,7 +434,7 @@ class events
 	 */
 	function getEventComments($eid, $page = 1, $limit = 20) {
 		$offset = ($page - 1) * $limit;
-		$sql = 'SELECT c.wb_id FROM ' . $this->db->getTable(T_EVENT_COMMENT) . ' AS c LEFT JOIN ' . $this->table . ' as e ON c.event_id = e.id WHERE c.event_id = ' . $eid . ' LIMIT ' . $offset . ', ' . $limit;
+		$sql = 'SELECT c.wb_id, c.weibo FROM ' . $this->db->getTable(T_EVENT_COMMENT) . ' AS c LEFT JOIN ' . $this->table . ' as e ON c.event_id = e.id WHERE c.event_id = ' . $eid . ' LIMIT ' . $offset . ', ' . $limit;
 		$this->count_sql =  'SELECT count(*) FROM ' . $this->db->getTable(T_EVENT_COMMENT) . ' AS c LEFT JOIN ' . $this->table . ' as e ON c.event_id = e.id WHERE c.event_id = "' . $eid . '"';
 		return RST($this->db->query($sql));
 	}
@@ -454,14 +456,32 @@ class events
 	 */
 	function _cleanCache()
 	{
-		DD('events.eventSearch');
-		DD('events.getEventById');
+//		DD('events.eventSearch');
+//		DD('events.getEventById');
 		DD('events.getEventComments');
 		DD('events.getListByIds');
 		DD('events.getMembers');
-		DD('events.getMineAttendEvents');
+//		DD('events.getMineAttendEvents');
 		DD('events.getMembersCount');
 		DD('events.getEventCount');
 		DD('events.getMineAttendEventsCount');
+	}
+
+	function updateEventComment2($wb_id, $weibo)
+	{
+		$data = array();
+		$data['weibo'] = is_array($weibo) ? json_encode($weibo) : $weibo;
+
+		$save_result = $this->db->save($data, $wb_id, T_EVENT_COMMENT, 'wb_id');
+		if ($save_result) {
+			$this->_cleanCache(); //保存成功后清除缓存
+		}
+
+		return RST($save_result);
+	}
+
+	function getEventComments2($eid) {
+		$sql = 'SELECT c.wb_id, c.weibo FROM ' . $this->db->getTable(T_EVENT_COMMENT) . ' AS c LEFT JOIN ' . $this->table . ' as e ON c.event_id = e.id WHERE c.event_id = ' . $eid . ' AND (c.weibo = "" || ISNULL(c.weibo))';
+		return RST($this->db->query($sql));
 	}
 }

@@ -22,7 +22,7 @@
 						<div class="main">
                         	<div class="main-bd">
                                 <div class="title-box">
-								<h3><a href="<?php echo URL('event');?>">返回&gt;&gt;</a><?php echo F('escape', $info['title']);?></h3>
+								<h3><a class="goback" href="<?php echo URL('event');?>"><?php LO('events__common__back');?>&gt;&gt;</a><?php echo F('escape', $info['title']);?></h2>
                                 </div>
                                 <div class="event-box">
 								<?php Xpipe::pagelet('event.eventinfo', array('info' => $info));?>
@@ -35,6 +35,7 @@
 						<!--最新活动 开始-->
 							<?php Xpipe::pagelet('event.sideNewsEvents');?>
 						<!--最新活动 结束-->
+							<?php echo F('show_ad', 'sidebar', '');?>
 					</div>
 				</div>
 			</div>
@@ -44,5 +45,6 @@
 			<!-- 尾部 结束 -->
 		</div>
 	</div>
+	<?php TPL::module('gotop');?>
 </body>
 </html>

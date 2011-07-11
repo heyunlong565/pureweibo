@@ -4,18 +4,32 @@ require_once dirname(__FILE__). '/component_abstract.pls.php';
 /**
  * 当前站点最新微博模块
  * @author yaoying
- * @version $Id: component_14.pls.php 14945 2011-04-29 01:26:27Z guanghui1 $
+ * @version $Id: component_14.pls.php 17002 2011-06-10 00:40:41Z heli $
  *
  */
-class component_14_pls extends component_abstract_pls{
+class component_14_pls extends component_abstract_pls
+{
 	
-	function run($mod){
+	function run($mod)
+	{
 		parent::run($mod);
 		
-		$ret = DR('components/pubTimelineBaseApp.get', 'g/60', $mod['param']);
+		//取缓存
+		$cacheKey  = "component14#".md5( serialize($mod) );
+		$wbListKey = "$cacheKey#wbList";
+		$cacheTime = V('-:tpl/cache_time/pagelet_component14');
+		if(ENABLE_CACHE && ($content=CACHE::get($cacheKey)) ) 
+		{
+		    echo $content;
+		    return array('cls'=>'wblist', 'list'=>CACHE::get($wbListKey) );
+		}
+		
+		
+		$ret = DR('components/pubTimelineBaseApp.get', '', $mod['param']);
 		
 		if ($ret['errno']) {
-			$this->_error('components/pubTimelineBaseApp.get返回API错误：'. $ret['err']. '('. $ret['errno']. ')');
+			$this->_error(L('pls__component14__pubTimeline__apiError', $ret['err'], $ret['errno']));
+			//$this->_error('components/pubTimelineBaseApp.get返回API错误：'. $ret['err']. '('. $ret['errno']. ')');
 			return;
 		//如果数据为空，则不输出
 	 	}/*elseif(empty($ret['rst'])){
@@ -41,9 +55,17 @@ class component_14_pls extends component_abstract_pls{
 	 		$wbList = array_slice($wbList, 0, $show_num);
 	 	}
 	 	
-		TPL::module('component/component_' . $mod['component_id'], array('mod' => $mod, 'list' => $wbList));
-		return array('cls'=>'wblist', 'list' =>F('format_weibo',$wbList) );
-	}
-	
-	
+		
+		// 设置缓存
+		$content = TPL::module('component/component_'.$mod['component_id'], array('mod'=>$mod, 'list'=>$wbList), false);
+		$wbList  = F('format_weibo', $wbList);
+		if (ENABLE_CACHE && $content) 
+		{
+			CACHE::set($cacheKey, $content, $cacheTime);
+			CACHE::set($wbListKey, $wbList, $cacheTime);
+		}
+		
+		echo $content;
+		return array('cls'=>'wblist', 'list'=>$wbList );
+	}	
 }

@@ -14,12 +14,12 @@
 		<?php if ($rid): ?>
 		<input type="hidden" name="rid" value="<?php echo $rid; ?>" />
 		<input type="hidden" name="nick" value="<?php echo F('escape', $rname, ENT_QUOTES); ?>" />
-		<span>给<?php echo F('escape', $rname, ENT_QUOTES); ?>发私信,内容只显示前140字:</span><br />
+		<span><?php LO('wbcom__sendMsgFrm__label_messageLimitTips', F('escape', $rname, ENT_QUOTES));?></span><br />
 		<?php else: ?>
-		<span>输入粉丝姓名:</span><br /><input type="text" name="nick" /><br /><span>私信内容只显示前140字:</span><br />
+		<span><?php LO('wbcom__sendMsgFrm__label_fansTips');?></span><br /><input type="text" name="nick" /><br /><span><?php LO('wbcom__sendMsgFrm__label_messageLimitTips_ND');?></span><br />
 		<?php endif; ?>
 		<textarea name="content" rows="5" cols="10"></textarea>
-		<div><input type="submit" value="发送" /></div>
+		<div><input type="submit" value="<?php LO('wbcom__sendMsgFrm__btnSend');?>" /></div>
 	</form>
 </div>
 <?php TPL::plugin('wap/include/nav', array('is_top' => false), false); ?>

@@ -3,7 +3,7 @@
 	 * 推荐用户公用模板
 	 * 需要传入$title， $categoty， $cid，$base_url，$users
 	 * @author yaoying
-	 * @version $Id: recommendUser.tpl.php 11582 2011-03-15 05:16:19Z zhenquan $
+	 * @version $Id: recommendUser.tpl.php 16719 2011-06-02 02:07:23Z weijiang $
 	 */
 
 	if(!defined('IN_APPLICATION')){
@@ -13,7 +13,7 @@
 ?>
 
 <div class="fame-list">
-    <div class="column-title">
+    <div class="title-box">
     <h3><?php echo F('escape', $title);?></h3>
     </div>
 

@@ -33,7 +33,7 @@ function delSelectedConfirm() {
 				<form method="post" action="<?php echo URL('mgr/weibo/keyword.keywordList');?>">
             	<div class="serch-user">
             		<span><strong>搜索过滤关键字：</strong></span>
-                	<input name="keyword" class="input-box box-address-width" type="text" value="<?php echo htmlspecialchars(V('r:keyword'));?>" />
+                	<input name="keyword" class="input-txt box-address-width" type="text" value="<?php echo htmlspecialchars(V('r:keyword'));?>" />
                 	<span class="serch-btn"><input type="submit" value="搜索" /></span>
            		</div>
 				</form>

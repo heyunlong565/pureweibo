@@ -1,6 +1,6 @@
 <?php
 /**
- * Script para la generación de CAPTCHAS
+ * Script para la generaci de CAPTCHAS
  *
  * @author  Jose Rodriguez <jose.rodriguez@exec.cl>
  * @license GPLv3
@@ -92,7 +92,7 @@ class SimpleCaptcha {
      * directory to another location outise the web server
      *
      */
-    var $resourcesPath = P_VAR_DATA;//'resources';
+    var $resourcesPath;//'resources';
 
     /** Min word length (for non-dictionary random text generation) */
     var $minWordLength = 5;
@@ -181,7 +181,9 @@ class SimpleCaptcha {
 
 
 
-    function __construct($config = array()) {
+    function __construct($config = array()) 
+    {
+    	$this->resourcesPath = P_ROOT.'/../img/';
     }
 
 
@@ -446,7 +448,7 @@ class SimpleCaptcha {
      * Reduce the image to the final size
      */
     function ReduceImage() {
-        // Reduzco el tamaño de la imagen
+        // Reduzco el tamaé§‰ de la imagen
         $imResampled = imagecreatetruecolor($this->width, $this->height);
         imagecopyresampled($imResampled, $this->im,
             0, 0, 0, 0,
@@ -480,7 +482,7 @@ class SimpleCaptcha {
 
 
 	/**
-	 * ²âÊÔÑéÖ¤ÂëÊÇ´øÕýÈ·
+	 * æµ‹è¯•éªŒè¯ç æ˜¯å¸¦æ­£ç¡®
 	 */
 	function checkAuthcode($code) {
 		if (isset($_SESSION[$this->session_var]) && strtolower($_SESSION[$this->session_var]) == strtolower($code)) {

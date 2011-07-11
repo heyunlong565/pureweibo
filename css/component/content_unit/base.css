@@ -29,7 +29,7 @@ img {border:none;}
 	.arrow-down img { *display:block;  }
 	/* 微博标题 */
 	.weibo-title {height:30px;line-height:30px;overflow:hidden;_zoom:1}
-	.mimi-logo {float:left;margin:5px 0 0 10px;height:16px;width:19px;background:url(bgimg/logo_mini.png) no-repeat;_position:relative;_background:none; _filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src="css/bgimg/logo_mini.png", sizingMethod="scale");_display:inline;}
+	.mimi-logo {float:left;margin:5px 0 0 10px;height:16px;width:20px;background:url(bgimg/logo_mini.png) no-repeat;_position:relative;_background:none; _filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src="css/bgimg/logo_mini.png", sizingMethod="scale");_display:inline;}
 	.weibo-title a.title {display:inline-block;margin-left:10px;}
 	
 	/* 微博用户 */
@@ -98,8 +98,8 @@ img {border:none;}
 .post-box .post-textarea .inner textarea, .post-box .post-focus .inner textarea { width:100%;height:55px;border:0 none;font-size:14px;line-height:18px;overflow-x:hidden; }
 .post-box .key-tips{ position:absolute; left:0; top:70px; height:30px; line-height:30px; }
 .post-box .share-btn{ position:absolute; right:0; top:80px; width:66px; height:26px; cursor:pointer; text-indent:-9999px;outline:none;}
-.post-box .login-tips { position:absolute;left:50%;top:21%;margin-left:-100px;width:226px; }
-.post-box .post-tips { position:absolute;left:50%;top:21%;margin-left:-41px;width:82px; }
+.post-box .login-tips { position:absolute;left:50%;top:24%;margin-left:-120px;width:240px; }
+.post-box .post-tips { position:absolute;left:50%;top:24%;margin-left:-41px;width:82px; }
 .post-box .post-success,
 .post-box .load-fail { float:left;padding-left:5px;width:16px; height:16px;}
 .post-box .act-notbind { float:left;padding-left:5px;width:19px;height:16px; }

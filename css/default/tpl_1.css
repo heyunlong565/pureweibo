@@ -38,16 +38,9 @@
 #footer .ft-con a{ margin:0 8px;}
 
 /*导航菜单*/
-.nav{ position:relative; padding-top:4px; height:26px; line-height:22px;color:#c2c2c2;z-index:1000; }
-.nav .nav-bg { position:absolute; top:0; left:0; width:100%; height:30px; background-color:#fff;filter:alpha(opacity=40); opacity:0.4; }
-.nav .inner-nav{ position:relative; margin:auto; width:800px; z-index:10000; }
-.nav .nav-right{ position:absolute; top:0; right:0; }
-.nav a{ margin:0 3px;padding:2px 5px; }
-.nav a:hover { text-decoration:none; }
-.nav .defined-link a,
-.nav-right a { padding:1px 5px 2px;display:inline-block;line-height:15px;height:15px; }
-.nav .defined-link a:hover,
-.nav .user-link a:hover { -webkit-border-radius:2px; -moz-border-radius:2px;}
+.nav .inner-nav{ width:800px; }
+
+.new-tips { margin-left:228px; }
 
 /*logo*/
 .logo{ position:absolute; top:20px; left:0; display:block;}
@@ -77,6 +70,17 @@
 .menu .sub-pubmenu li a{ display:block; width:126px; height:25px; margin:0; font:12px/25px Tahoma; text-indent:20px; overflow:hidden; +width:129px; _width:126px; }
 .menu .sub-arrow{ display:inline-block; width:6px; height:10px; overflow:hidden; *height:18px; }
 
+/*右边用户菜单*/
+.user-menu{ margin:25px 0 24px;}
+.user-menu a { display:block; height:32px; font-size:14px; line-height:31px; text-indent:30px;background-position:0 -405px; _background-position:0 -404px; +line-height:33px; line-height:34px\0; }
+.user-menu span{ float:left; margin:5px 0 0 5px; width:20px; height:20px;}
+#home .home-current,
+#atme .atme-current,
+#comments .comment-current,
+#favs .favs-current,
+#systemnotice .systemnotice-current,
+#messages .messages-current { position:relative; top:-1px; height:35px; font-weight:bold; line-height:35px;color:#fff; }
+
 /*名人堂*/
 .interest-list{ margin-left:29px;}
 .interest-list li{ margin-right:21px;}
@@ -100,6 +104,13 @@
 
 /*第二步：看看推荐的人*/
 #guide-narrow .active-wrap { margin:0 20px;border-top:1px solid #DDE4E6; overflow:hidden; }
-
 .user-list .user-list-wrap .user-item { width:280px;}
 .user-list .user-list-wrap .user-info{ width:130px;}
+
+/*底部广告*/
+.ft-xad-in{ width:800px; margin:0 auto 10px; overflow:hidden; }
+
+/*头部广告*/
+.hd-xad-in{ width:570px; }
+
+

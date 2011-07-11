@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" <?php if ($interview['backgroup_color']){ echo "class='skin{$interview['backgroup_color']}'"; }?>>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>在线访谈-进行中-主持人 - Powered By X微博</title>
+<title><?php echo F('web_page_title', false, F('escape', $interview['title']));?></title>
 <?php TPL::module('interview/include/css_link', array('interview'=>$interview) );?>
 <?php TPL::module('interview/include/js_link');?>
 
@@ -26,7 +26,7 @@
 					<div class="main">
 						<!-- 微博发布框 开始-->
 						<?php 
-							$params['title'] 		= '我有一个想法和大家分享：';
+							$params['title'] 		= L('modules_interview_master_title');
 							$params['show_video']	= FALSE;
 							$params['show_music']	= FALSE;
 							$params['show_trends']	= FALSE;
@@ -48,12 +48,12 @@
 					<!-- 访谈简介 开始-->
 					<div class="talk-intro">
                         <div class="hd">
-                        	<p><?php echo ('P'==$interview['status']) ? '<span class="not-started">未开始</span>' : '<span class="going">进行中</span>' ?></p>
-                            <p class="time">访谈时间：<span><?php echo date($interview['dateFormat'], $interview['start_time']).' - '.date($interview['dateFormat'], $interview['end_time'])?></span></p>
-                        	<p><a class="btn-recommend" href="#" rel="e:sd,m:<?php echo F('share_weibo', 'interview', $interview);?>">推荐给好友</a></p>
+                        	<p><?php echo ('P'==$interview['status']) ? L('modules_interview_master_ready') : L('modules_interview_master_going') ?></p>
+                            <p class="time"><?php LO('modules_interview_master_time');?><span><?php echo date($interview['dateFormat'], $interview['start_time']).' - '.date($interview['dateFormat'], $interview['end_time'])?></span></p>
+                        	<p><a class="btn-recommend" href="#" rel="e:sd,t:share,m:<?php echo F('share_weibo', 'interview', $interview);?>"><?php LO('modules_interview_master_recommend');?></a></p>
                         </div>
                         <div class="bd">
-                            <h4>访谈简介：</h4>
+                            <h4><?php LO('modules_interview_master_description');?></h4>
                            	<p><?php echo $interview['desc']; ?></p>
                         </div>
                     </div>
@@ -64,13 +64,12 @@
                     <!-- 访谈主持人 结束-->
 					
 					<!-- 访谈嘉宾 开始-->
-					<?php Xpipe::pagelet('interview.guestList', array('guestList'=>$interview['guest'])); ?>
+					<?php Xpipe::pagelet('interview.guestList', array('guestList'=>$interview['guest'],'friendList'=>$friendList)); ?>
 					<!-- 访谈嘉宾 结束-->
                     
                     <!-- 访谈列表 开始-->
                    <?php TPL::module('interview/include/program_list', array('interviewList'=>$interviewList)); ?>
                     <!-- 访谈列表 结束-->
-                    
 				</div>
                 <!-- 右边栏 结束 -->
 			</div>

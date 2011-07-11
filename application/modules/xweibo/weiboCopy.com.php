@@ -148,6 +148,71 @@ class weiboCopy {
 		return RST(false, $errno, $msg, $display, $log);
 	}
 
+	function getWeiboCopyList($params=array(), $offset=0, $limit=10)
+	{
+		// Escape Var
+		$offset	 = $this->db->escape($offset);
+		$limit	 = $this->db->escape($limit);
+
+		$where = $this->_buildWhere($params);
+		$sql   = "Select * From {$this->table_weibo} $where Order By id Desc Limit $offset, $limit ";
+		return $this->db->query($sql);
+	}
+
+	/**
+	 * 获取总数
+	 * @param array $params 其它参数
+	 */
+	function getWeiboCopyCount($params=array())
+	{
+		$where = $this->_buildWhere($params);
+		$sql   = "Select count(*) From {$this->table_weibo} $where ";
+		return $this->db->getOne($sql);
+	}
+
+	/**
+	 * 构建where 语句
+	 * @param array $params
+	 */
+	function _buildWhere($params)
+	{
+		$where = ' Where disabled=0 ';
+		
+		// Start Time
+		if ( isset($params['startTime']) && ($startTime=$this->db->escape($params['startTime'])) )
+		{
+			$where .= " And addtime>='$startTime' ";
+		}
+		
+		// End Time
+		if ( isset($params['endTime']) && ($endTime=$this->db->escape($params['endTime'])) )
+		{
+			$where .= " And addtime<='$endTime' ";
+		}
+		
+		// Keyword
+		if ( isset($params['keyword']) && ($keyword=$this->db->escape($params['keyword'])) )
+		{
+			$where .= " And weibo Like '%$keyword%' ";
+		}
+		
+		// ids
+		if ( isset($params['ids']) && ($ids=$this->db->escape($params['ids'])))
+		{
+			$where .= " And id In ($ids)";
+		}
+		
+		return $where;
+	}
+
+	/**
+	 * 刪除
+	 */
+	function deleteByUid($uid) {
+		$rs = $this->db->delete($uid, T_WEIBO_COPY,'uid');
+		return RST($rs);
+	}
+	
 }
 
 

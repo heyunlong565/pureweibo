@@ -56,7 +56,7 @@ function sae_set_global_define() {
 		/// MC　KEY　的前缀
 		//define('MC_PREFIX',					'XWB11_MC_'.APP_FLAG_VER);
 		// 重新设置memcache前缀
-		V('-:adapter_cfg:cache/memcache', MC_PREFIX.$site_base_info['app_flag_ver'], true);
+		V('-:adapter_cfg/cache/memcache/keyPre', MC_PREFIX.$site_base_info['app_flag_ver'], true);
 		return true;
 	}else{
 		return false;

@@ -12,7 +12,7 @@
 /// 产品名称
 define('WB_SOFT_NAME', 'Xweibo');
 /// 当前版本号
-define('WB_VERSION', '2.0');
+define('WB_VERSION', '2.1');
 /// 项目号 用于统计
 define('WB_PROJECT', 'xwb');
 /// 系统默认的模块路由 当入口文件中未定义时使用如下值
@@ -67,15 +67,15 @@ define('WB_LOGO_WAP_FILE_NAME',			'/data/logo/logo_upload_wap.png');
 define('WB_LOGO_OUTPUT_FILE_NAME',			'/data/logo/logo_upload_output.png');
 define('WB_LOGO_PREVIEW_FILE_NAME',	'/data/logo/logo_previews.png');
 /// 站点地址栏文件名
-define('WB_ICON_DEFAULT_NAME',		'var/data/logo/default_icon.png');
+define('WB_ICON_DEFAULT_NAME',		'img/logo/default_icon.png');
 define('WB_ICON_FILE_NAME',			'/data/logo/icon_upload.png');
 define('WB_ICON_PREVIEW_FILE_NAME',	'/data/logo/icon_previews.png');
 /// 网站认证大图标
-define('AUTH_BIG_ICON_DEFAULT_NAME',		'var/data/logo/default_v1.png');
+define('AUTH_BIG_ICON_DEFAULT_NAME',		'img/logo/default_v1.png');
 define('AUTH_BIG_ICON_FILE_NAME',			'/data/logo/big_auth_icon_upload.png');
 define('AUTH_BIG_ICON_PREVIEW_FILE_NAME',	'/data/logo/big_auth_icon_previews.png');
 /// 网站认证小图标
-define('AUTH_SMALL_ICON_DEFAULT_NAME',		'var/data/logo/default_v2.png');
+define('AUTH_SMALL_ICON_DEFAULT_NAME',		'img/logo/default_v2.png');
 define('AUTH_SMALL_ICON_FILE_NAME',			'/data/logo/small_auth_icon_upload.png');
 define('AUTH_SMALL_ICON_PREVIEW_FILE_NAME',	'/data/logo/small_auth_icon_previews.png');
 
@@ -95,6 +95,8 @@ define('WB_UPGRADE_CHK_URL','http://x.weibo.com/service/stdVersion.php?p=std&v='
 define('SINA_WB_REG_URL',	'http://weibo.com/reg.php?ps=u3&lang=zh');
 /// X微博用户反馈上报地址
 define('WB_FEEDBACK_URL',	'http://x.weibo.com/xapi.php');
+/// 测试地址
+//define('WB_FEEDBACK_URL',	'http://x_dev.weibo.com/xapi.php');
 //----------------------------------------------------------------------
 /// 数据库名表名 content_unit
 define('T_CONTENT_UNIT',	'content_unit');
@@ -102,6 +104,8 @@ define('T_CONTENT_UNIT',	'content_unit');
 define('T_AD',				'ad');
 /// 数据库名表名 admin
 define('T_ADMIN',			'admin');
+/// 数据库名表名 admin_group
+define('T_ADMIN_GROUP',		'admin_group');
 /// 数据库名表名 users
 define('T_USERS',			'users');
 /// 数据库名表名 users
@@ -134,7 +138,8 @@ define('T_DISABLED_FOLLOWERS',	'disabled_followers');
 define('T_SYS_CONFIG',		'sys_config');
 /// 数据表,保存用户自定义配置项
 define('T_USER_CONFIG',		'user_config');
-
+/// 代理帐号表
+define('T_ACCOUNT_PROXY', 'account_proxy');
 /// 组件表
 define('T_COMPONENTS',		'components');
 /// 组件配置表
@@ -210,6 +215,21 @@ define('T_USER_ACTION',	'user_action');
 /// 在线直播表 
 define('T_MICRO_LIVE',		'micro_live');
 define('T_MICRO_LIVE_WB',	'micro_live_wb');
+
+/// 待审评论和删除评论表 
+define('T_COMMENT_VERIFY',	'comment_verify');
+define('T_COMMENT_DELETE',	'comment_delete');
+
+/// 待审核微博和删除微博表
+define('T_WEIBO_VERIFY', 'weibo_verify');
+define('T_WEIBO_DELETE', 'weibo_delete');
+
+/// 日志表, api表和http表单独分开
+define('T_LOG_HTTP', 		'log_http');
+define('T_LOG_ERROR', 		'log_error');
+define('T_LOG_INFO', 		'log_info');
+define('T_LOG_API_ERROR', 	'log_error_api');
+define('T_LOG_API_INFO', 	'log_info_api');
 //---------------------------------------------------------------------
 /// cache下标定义 屏蔽回复
 define('CACHE_DISABLED_COMMENT',			'disabled_comment');
@@ -245,7 +265,8 @@ $cfg['adapter'] = array(
 	'upload'	=> UPLOAD_ADAPTER,
 	'auth'		=> AUTH_ADAPTER,
 	'image' 	=> IMAGE_ADAPTER,
-	'mail'		=> MAIL_ADAPTER
+	'mail'		=> MAIL_ADAPTER,
+	'log'		=> LOG_ADAPTER
 );
 //----------------------------------------------------------------------
 /// 适配器初始化数据配置变量
@@ -348,59 +369,63 @@ $tpl['title'] = array(
 			'_suf' => ' - Powered By Xweibo',
 
 			//根据页面路由配置页面标题，可使用格式 如下
-			'comDemo.tit'=>"%s的Baby is %s",
-			'pub'=>'微博广场',
-			'pub.look' => '随便看看',
-			'pub.topics' => '话题排行榜',
-			'pub.hotForward' => '热门转发',
-			'pub.hotComments' => '热门评论',
-			'search.recommend' => '可能感兴趣的人',
-			'search' => '综合搜索',
-			'search.user' => '用户搜索',
-			'search.weibo' => '微博搜索',
-			'index' => '我的首页',
-			'account.login' => '登录方式选择',
-			'account.bind' => '绑定授权- 新浪微博',
-			'index.atme' => '提到我的',
-			'index.comments' => '我的评论',
-			'index.commentsend' => '我的评论',
-			'index.messages' => '我的私信',
-			'index.notices' => '我的通知',
-			'index.favorites' => '我的收藏',
-			'index.profile' => '我的微博',
-			'index.fans' => '我的粉丝',
-			'index.follow' => '我的关注',
-			'index.setinfo' => '设置',
-			'index.info' => '详细信息',
-			'ta' => '%s的微博',
-			'ta.profile' => '%s的微博',
-			'ta.fans' => '关注%s的人',
-			'ta.follow' => '%s关注的人',
-			'ta.mention' =>'提到%s的微博',
-			'setting' => '个人资料设置',
-			'setting.user' => '个人资料设置',
-			'setting.tag' => '个人标签设置',
-			'setting.myface' => '头像设置',
-			'setting.show' => '显示设置',
-			'setting.blacklist' => '黑名单',
-			'setting.notice' => '提醒设置',
-			'setting.account' => '帐号设置',
-			'show' => '%s的微博',
-			'show.repos'=>'%s的微博',
-			'event' => '活动',
-			'event.mine' => '我的活动',
-			'event.details' => '%s',
-			'event.member' => '%s',
-			'event.create' => '发起活动',
-			'event.modify' => '编辑活动',
-			'live' => '在线直播',
-			'live.details' => '%s',
-			'live.livelist' => '在线直播列表',
-			'wbcom.viewPhoto' => '查看图片',
-			'wbcom.replyComment' => '回复微博',
-			'wbcom.sendWBFrm' => '发微博',
-			'wbcom.sendMsgFrm' => '发私信',
-			'account.showLogin' => '登录微博'
+			'comDemo.tit'=> 'pageTitle__comDemo__title',
+			'pub'=>'pageTitle__pub__title',
+			'pub.look' => 'pageTitle__pubLook__title',
+			'pub.topics' => 'pageTitle__pubTopic__title',
+			'pub.hotForward' => 'pageTitle__pubHotForward__title',
+			'pub.hotComments' => 'pageTitle__pubHotComments__title',
+			'search.recommend' => 'pageTitle__searchRecommend__title',
+			'search' => 'pageTitle__search__title',
+			'search.user' => 'pageTitle__searchUser__title',
+			'search.weibo' => 'pageTitle__searchWeibo__title',
+			'index' => 'pageTitle__index__title',
+			'account.login' => 'pageTitle__accountLogin__title',
+			'account.bind' => 'pageTitle__accountBind__title',
+			'account.isBinded' => 'pageTitle__accountIsBinded__title',
+			'index.atme' => 'pageTitle__indexAtme__title',
+			'index.comments' => 'pageTitle__indexComments__title',
+			'index.commentsend' => 'pageTitle__indexCommentsend__title',
+			'index.messages' => 'pageTitle__indexMessages__title',
+			'index.notices' => 'pageTitle__indexNotices__title',
+			'index.favorites' => 'pageTitle__indexFavorites__title',
+			'index.profile' => 'pageTitle__indexProfile__title',
+			'index.fans' => 'pageTitle__indexFans__title',
+			'index.follow' => 'pageTitle__indexFollow__title',
+			'index.setinfo' => 'pageTitle__indexSetinfo__title',
+			'index.info' => 'pageTitle__indexInfo__title',
+			'ta' => 'pageTitle__ta__title',
+			'ta.profile' => 'pageTitle__taProfile__title',
+			'ta.fans' => 'pageTitle__taFans__title',
+			'ta.follow' => 'pageTitle__taFollow__title',
+			'ta.mention' =>'pageTitle__taMention__title',
+			'setting' => 'pageTitle__setting__title',
+			'setting.user' => 'pageTitle__settingUser__title',
+			'setting.tag' => 'pageTitle__settingTag__title',
+			'setting.myface' => 'pageTitle__settingMyface__title',
+			'setting.show' => 'pageTitle__settingShow__title',
+			'setting.blacklist' => 'pageTitle__settingBlacklist__title',
+			'setting.notice' => 'pageTitle__settingNotice__title',
+			'setting.account' => 'pageTitle__settingAccount__title',
+			'setting.domain' => 'pageTitle__settingDomain__title',
+			'show' => 'pageTitle__show__title',
+			'show.repos'=>'pageTitle__showRepos__title',
+			'event' => 'pageTitle__event__title',
+			'event.mine' => 'pageTitle__eventMine__title',
+			'event.details' => 'pageTitle__eventDetails__title',
+			'event.member' => 'pageTitle__eventMember__title',
+			'event.create' => 'pageTitle__eventCreate__title',
+			'event.modify' => 'pageTitle__eventModify__title',
+			'live' => 'pageTitle__live__title',
+			'live.details' => 'pageTitle__liveDetails__title',
+			'live.livelist' => 'pageTitle__liveLivelist__title',
+			'interview' => 'pageTitle__interview__title',
+			'interview.page' => 'pageTitle__interviewPage__title',
+			'wbcom.viewPhoto' => 'pageTitle__wbcomViewPhoto__title',
+			'wbcom.replyComment' => 'pageTitle__wbcomReplyComment__title',
+			'wbcom.sendWBFrm' => 'pageTitle__wbcomSendWBFrm__title',
+			'wbcom.sendMsgFrm' => 'pageTitle__wbcomSendMsgFrm__title',
+			'account.showLogin' => 'pageTitle__accountShowLogin__title'
 			);
 //----------------------------------------------------------------------
 /// sina微博名人推荐类别
@@ -433,7 +458,30 @@ $cfg['writeableCheckRouter']=array('api/weibo/action.comment',
 									 );
 
 //----------------------------------------------------------------------
-
+/// 缓存时间设置, route+desc=time, time 以秒为单位
+$tpl['cache_time'] = array(
+	'output_nologin' 				=> 300,
+	'output_type1_login' 			=> 300,			// 微博秀
+	'output_type2_login' 			=> 300,			// 推荐guanz
+	'output_type3_login' 			=> 30,			// 互动话题
+	'pagelet_component1'			=> 300,			// 热门转发与评论
+	'pagelet_component2'			=> 300,			// 用户组
+	'pagelet_component3'			=> 300,			// 推荐用户
+	'pagelet_component4'			=> 300,			// 人气关注榜模块
+	'pagelet_component5'			=> 30,			// 群组微博
+	'pagelet_component6'			=> 300,			// 话题推荐列表
+	'pagelet_component7'			=> 300,			// 可能感兴趣的人(未登录，不显示)
+	'pagelet_component8'			=> 300,			// 同城微博(未登录缓存, 登录不缓存)
+	'pagelet_component9'			=> 30,			// 随便看看
+	'pagelet_component10'			=> 30,			// 今日话题(未登录缓存, 登录不缓存)
+	'pagelet_component11'			=> 300,			// 用户组
+	'pagelet_component12'			=> 30,			// 话题微博
+	'pagelet_component14'			=> 300,			// 最新微博
+	'pagelet_component15'			=> 300,			// 最新用户
+	'pagelet_component18'			=> 300,			// 活动列表
+	'pagelet_component19'			=> 300			// 本地关注榜
+);
+									 
 /// xweibo模板配置
 define('PAGE_TYPE_SYSCONFIG', 	'wb_page_type');
 define('PAGE_TYPE_DEFAULT', 	'1');
@@ -452,6 +500,9 @@ $cfg['adminNotShowNav'][2] = array(
 define('HEADER_MODEL_SYSCONFIG', 	'wb_header_model');
 define('HEADER_HTMLCODE_SYSCONFIG', 'wb_header_htmlcode');
 //----------------------------------------------------------------------
+/// 是否启用私信功能，FALSE：不启用；TRUE：启用
+define('HAS_DIRECT_MESSAGES', FALSE);
 /// 是否启用个人资料功能，FALSE：不启用；TRUE：启用
-define("HAS_DIRECT_UPDATE_PROFILE", FALSE);
-
+define('HAS_DIRECT_UPDATE_PROFILE', FALSE);
+/// 是否启用修改头像功能，FALSE：不启用；TRUE：启用
+define('HAS_DIRECT_UPDATE_PROFILE_IMAGE', FALSE);

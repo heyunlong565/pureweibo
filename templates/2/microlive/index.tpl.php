@@ -21,14 +21,12 @@
 					<!-- 站点导航 结束 -->
 				</div>
 				<div class="content">
-                	<div class="live-hd">
-                        <img src="<?php echo isset($liveInfo['banner_img']) ? $liveInfo['banner_img'] : W_BASE_URL.'img/live_bg.jpg';?>" alt="" />
-                    </div>
 					<div class="main-wrap">
                         <div class="main">
 							<div class="main-bd">
+							<div class="live-banner"><img src="<?php echo $banner_img;?>" alt="" /></div>
 								<div class="tit-hd">
-									<h3>精彩直播</h3>
+								<h3><?php LO('modules_microlive_news_live_list_title');?></h3>
 								</div>
 								<?php Xpipe::pagelet('live.liveIndexList');?>
 							</div>
@@ -37,13 +35,7 @@
 							<!-- 用户信息 开始-->
 							<?php Xpipe::pagelet('common.userPreview');?>
 							<!-- 用户信息 结束-->
-							
-							<!-- ad180 开始 -->
-							<div class="xad-box xad-box-p3">
-								<a href="#" class="icon-close-btn icon-bg"></a>
-							</div>
-							<!-- ad180 结束 -->
-							
+														
 							<!-- 在线主持人列表 -->
 							<?php Xpipe::pagelet('live.liveBaseMaster', array('info' => $liveInfo));?>
 							<!-- end -->

@@ -21,7 +21,7 @@
 						<div class="main">
                         	<div class="main-bd">
                                 <div class="title-box">
-                                    <h3><?php if ($uid == $userinfo['id']):?>我<?php else:?><?php echo F('escape', $userinfo['screen_name']);?><?php endif;?>的微博</h3>
+									<h3><?php if ($uid == $userinfo['id']):?><?php LO('mblogDetail__show__myTitle');?><?php else:?><?php echo F('escape', $userinfo['screen_name']);?><?php endif;?><?php LO('mblogDetail__show__aWeibo');?></h3>
                                 </div>
                                 <?php 
 								$params = array('mblog_info' => $mblog_info, 'is_show' => $is_show);
@@ -35,6 +35,7 @@
 							<!-- 用户标签 开始-->
 							<?php Xpipe::pagelet('common.userTag');?>
 							<?php Xpipe::pagelet('common.sideComponents', array('type'=>2) );?>
+						<?php echo F('show_ad', 'sidebar', '');?>
 						</div>
 					</div>
 				</div>

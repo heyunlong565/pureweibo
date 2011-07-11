@@ -27,29 +27,28 @@
 		<h3 class="title">与论坛插件通信</h3>
 		<div class="set-area">
         	<div class="form-s1">
-            	<p class="tips">如果你安装了Xweibo for Discuz 插件，可以通过设置共享双方账号绑定关系和内容的互推。</p>
+            	<p class="tips">如果你安装了Xweibo for Discuz 插件，可以通过设置共享双方帐号绑定关系和内容的互推。</p>
                 <p class="tips">在开始设置之前请先确定：</p>
                 <ul>
                 	<li>1.你的xweibo和xweibo for Discuz 插件使用的是同一个appkey；</li>
-                    <li>2.你的论坛所使用的程序是DiscuzX1.5；</li>
+                    <li>2.你的论坛所使用的程序是DiscuzX1.5,Discuz6.0-7.2；</li>
                     <li>3.你所装的xweibo版本是2.0或者以上的</li>
                     <li>4.你所装的xweibo for Discuz 插件版本在2.0或以上</li>
                 </ul>
 
             </div>
 
-            <div class="operate-cont">
-            	<div class="form-s2">
-                    <div class="item">
-                        <?php if ($connected) {?>
-    <?php echo $url?>
-                            <a href="#" id="closecon" class="general-btn"><span>关闭通信</span></a>
-                        <?php } else {?>
-                        	<label><strong>论坛地址</strong></label>
-                            <input type="text" id="connect_url" class="ipt-txt form-el-w200" value="<?php echo $url?>" />
-                            <a href="#" id="opencon" class="general-btn"><span>开启通信</span></a>
-                        <?php }?>
-                    </div>
+            <div class="search-area">
+                <div class="item">
+                    <?php if ($connected) {?>
+<?php echo $url?>
+                        <a href="#" id="closecon" class="btn-general"><span>关闭通信</span></a>
+                    <?php } else {?>
+                        <label><strong>论坛地址</strong></label>
+                        <input type="text" id="connect_url" class="ipt-txt w200" value="<?php echo $url?>" />
+                        <a href="#" id="opencon" class="btn-general"><span>开启通信</span></a>
+						（示例：http://论坛地址/插件目录/xapi.php）
+                    <?php }?>
                 </div>
             </div>
 

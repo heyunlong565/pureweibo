@@ -19,7 +19,7 @@ TPL::plugin('wap/include/status', array('content'=>$content), false);
 ?>
 </div>
     <div class="s"></div>
-    <div class="g row">提到@<?php echo $content?>的微博如下如下：</div>
+    <div class="g row"><?php LO('ta__mention__label_weiboTips', $content);?></div>
     <?php
        TPL::plugin('wap/include/feedlist', array("list"=>$list), false);
     ?>

@@ -5,7 +5,7 @@
 <title>新建话题微博单元 - 新建内容输出单元 - 组件管理</title>
 <link href="<?php echo W_BASE_URL;?>css/admin/admin.css" rel="stylesheet" type="text/css" />
 <script src="<?php echo W_BASE_URL;?>js/jquery.js"></script>
-<script src="<?php echo W_BASE_URL;?>js/xwb-all.js"></script>
+<script src="<?php echo W_BASE_URL;?>js/admin-all.js"></script>
 <script src="<?php echo W_BASE_URL;?>js/admin/admin.js"></script>
 <script src="<?php echo W_BASE_URL;?>js/mod/wbshow.js"></script>
 </head>
@@ -52,28 +52,28 @@ $(function(){
                         	<div id="base_style_area" class="exp-style">
                             	<div class="con-wrap">
                                 	<h4>输出单元名称：</h4>
-    								<input name="unit_name" class="ipt-txt form-el-w150" type="text" value="<?php echo isset($row['unit_name']) ? F('escape', $row['unit_name']) : '';?>" />
+    								<input name="unit_name" class="ipt-txt w150" type="text" value="<?php echo isset($row['unit_name']) ? F('escape', $row['unit_name']) : '';?>" />
     							</div>
     							<?php if ($type == 5): ?>
     							<div class="con-wrap">
                                 	<h4>群组微博标题：</h4>
-    								<input name="title" class="ipt-txt form-el-w150" type="text" value="<?php echo isset($row['title']) ? F('escape', $row['title']) : ''; ?>" /></p>
+    								<input name="title" class="ipt-txt w150" type="text" value="<?php echo isset($row['title']) ? F('escape', $row['title']) : ''; ?>" /></p>
                                 </div>
                                 <?php endif; ?>
                                 <div class="con-wrap">
                                 	<h4>设置尺寸：</h4>
-									<span class="con-edge">宽<input name="width"  class="ipt-txt form-el-w50 input-disabled" type="text" vrel="_f|dimention" value="<?php echo isset($row['width']) && $row['width'] > 0 ? $row['width'] : 350;?>" id="iptAutoWidth" <?php if (isset($row['width']) && $row['width'] > 0):?><?php else:?>disabled="disabled" <?php endif;?> />px</span>
-									<span class="con-edge">高<input name="height" id="viewHeight" class="ipt-txt form-el-w50" vrel="_f|dimention" type="text" value="<?php echo isset($row['height']) ? $row['height'] : 550;?>" />px</span>
+									<span class="con-edge">宽<input name="width"  class="ipt-txt w50 input-disabled" type="text" vrel="_f|dimention" value="<?php echo isset($row['width']) && $row['width'] > 0 ? $row['width'] : 350;?>" id="iptAutoWidth" <?php if (isset($row['width']) && $row['width'] > 0):?><?php else:?>disabled="disabled" <?php endif;?> />px</span>
+									<span class="con-edge">高<input name="height" id="viewHeight" class="ipt-txt w50" vrel="_f|dimention" type="text" value="<?php echo isset($row['height']) ? $row['height'] : 550;?>" />px</span>
                                 	<p>宽度:190-1024px，高度:75-800px</p>
 									<span class="con-edge"><label><input id="chkAutoWidth" name="adaptive" class="ipt-checkbox" type="checkbox" value="1" <?php if (isset($row['width']) && $row['width'] > 0):?><?php else:?>checked="checked"<?php endif;?> />宽度自动适应</label></span><?php if ($type == 3): ?><br /><span class="con-edge"><label><input id="show_publish" name="show_publish" class="ipt-checkbox" type="checkbox" value="1" <?php if (!isset($row['show_publish']) || !empty($row['show_publish'])): ?>checked="checked"<?php endif; ?> />显示发布框</label></span><span class="con-edge"><label><input id="auto_scroll" name="auto_scroll" class="ipt-checkbox" type="checkbox" value="1" <?php if (!isset($row['auto_scroll']) || !empty($row['auto_scroll'])): ?>checked="checked"<?php endif; ?> />话题自动滚动</label></span><?php endif; ?>
                                 </div>
                                 <div class="con-wrap reset-bg">
     								<?php if ($type == 1):?>
                                 	<h4>设置微博秀用户(昵称)：</h4>
-    								<input name="target" class="ipt-txt form-el-w150" type="text" value="<?php echo isset($row['target']) ? F('escape', $row['target']) : '';?>" />
+    								<input name="target" class="ipt-txt w150" type="text" value="<?php echo isset($row['target']) ? F('escape', $row['target']) : '';?>" />
     								<?php elseif ($type == 3):?>
                                 	<h4>设置话题：</h4>
-    								<input name="target" class="ipt-txt form-el-w150" type="text" value="<?php echo isset($row['target']) ? F('escape', $row['target']) : '';?>" />
+    								<input name="target" class="ipt-txt w150" type="text" value="<?php echo isset($row['target']) ? F('escape', $row['target']) : '';?>" />
     								<?php else:?>
                                 	<a href="<?php echo URL('mgr/admin.index#4,1', '', 'admin.php'); ?>" class="fr-info" target="_blank">创建管理用户列表</a><h4>选择用户列表：</h4>
     								<select name="target">
@@ -120,8 +120,8 @@ $(function(){
 						<textarea name="" id="output" class="input-area code-area" cols="" rows=""><?php echo $iframe_code;?></textarea>
                     </div>
                     <div class="btn-area">
-                    	<a href="#" class="general-btn btn-s2" id='submitBtn'><span>保存设置</span></a>
-                    	<a href="#" class="general-btn" id="getCode"><span>获取代码</span></a>
+                    	<a href="#" class="btn-general highlight" id='submitBtn'><span>保存设置</span></a>
+                    	<a href="#" class="btn-general" id="getCode"><span>获取代码</span></a>
                     </div>
                     </form>
                 </div>
@@ -164,12 +164,12 @@ $(function(){
         <div class="set-area">
             <table class="table" cellpadding="0" cellspacing="0" width="100%" border="0">
                 <colgroup>
-                        <col class="h-w70" />
+                        <col class="w70" />
                         
                         <col />
                         <!--<col class="operate-w13" />-->
-                        <col class="h-w150" />
-                        <col class="h-w120" />
+                        <col class="w150" />
+                        <col class="w120" />
                         
                     </colgroup>
                 <thead class="tb-tit-bg">

@@ -28,9 +28,9 @@
                             
                             <?php
 							$param = array('list' => $list,
-								'not_found_msg' => '还没有收藏任何微博',
-								'empty_msg' => '还没有收藏任何微博',
-								'list_title'=>'我的收藏',
+								'not_found_msg' => L('index__favs__notFoundTip'),
+								'empty_msg' => L('index__favs__emptyFavsTip'),
+								'list_title'=> L('index__favs__listTitle'),
 								'limit' => WB_API_LIMIT,
 								'show_filter_type' => false);
 							Xpipe::pagelet('weibo.weiboList', $param );
@@ -43,6 +43,7 @@
 						<!-- 用户标签 开始-->
 						<?php Xpipe::pagelet('common.userTag');?>
 						<?php Xpipe::pagelet('common.sideComponents', array('type'=>2) );?>
+							<?php echo F('show_ad', 'sidebar', '');?>
 					</div>
 				</div>
 			</div>

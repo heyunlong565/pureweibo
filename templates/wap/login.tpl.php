@@ -8,12 +8,12 @@
 <body <?php F('wap_font_set'); ?>>
 <?php TPL::plugin('wap/include/top_logo', '', false); ?>
 <form action="<?php echo WAP_URL('account.doLogin'); ?>" method="post">
-新浪微博账号:<br/><input type="text" name="account" size="30" value=""/>
+<?php LO('account__login__sinaWeibo');?><br/><input type="text" name="account" size="30" value=""/>
 <br/>
-密码:<br/><input type="password" name="password" size="30" value=""/><br/>
+<?php LO('account__login__password');?><br/><input type="password" name="password" size="30" value=""/><br/>
 <input type="hidden" name="backURL" value="<?php echo F('escape', $backURL); ?>" />
-<input type="hidden" name="backTitle" value="新浪微博" />
-<input type="submit" name="submit" value="登录" /><br/>
+<input type="hidden" name="backTitle" value="<?php LO('account__login__weibo');?>" />
+<input type="submit" name="submit" value="<?php LO('account__login__loginTitle');?>" /><br/>
 </form>
 </body>
 </html>

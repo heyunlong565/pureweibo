@@ -66,7 +66,7 @@ $(function(){
 					<h2 <?php if($l_index == 0) {?> class="first"<?php }?>><?php echo $l_menu['title'];?></h2>
 					<ul>
 						<?php if (isset($l_menu['sub']) && is_array($l_menu['sub'])) {foreach ($l_menu['sub'] as $s_index => $s_menu) {?>
-						<li><a href="<?php echo $s_menu['url'];?>"  router="<?php echo $m_index . '/' . $l_index . '/' . $s_index;?>" target="mainframe"><?php echo $s_menu['title'];?></a></li>
+						<li><a href="<?php echo URL($s_menu['url'][0],isset($s_menu['url'][1])?$s_menu['url'][1]:'');?>"  router="<?php echo $m_index . '/' . $l_index . '/' . $s_index;?>" target="mainframe"><?php echo $s_menu['title'];?></a></li>
 						<?php }}?>
 					</ul>
 					<?php }}?>

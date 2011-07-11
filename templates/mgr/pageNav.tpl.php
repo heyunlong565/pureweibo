@@ -24,7 +24,7 @@
                     <label for="focus2"><strong>两栏模板布局</strong></label>
                     <p><img src="<?php echo W_BASE_URL;?>css/admin/bgimg/two_mode.jpg" /></p>
                 </div>
-                <div class="btn-area"><a href="javascript:$('#form1').submit();" class="general-btn btn-s2" name="ad"><span>保存</span></a></div>
+                <div class="btn-area"><a href="javascript:$('#form1').submit();" class="btn-general highlight" name="ad"><span>保存</span></a></div>
             </form>
             </div>
         </div>

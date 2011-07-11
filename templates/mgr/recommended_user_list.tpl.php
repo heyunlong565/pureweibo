@@ -11,16 +11,16 @@
 <body  class="main-body">
 	<div class="path"><p>当前位置：用户管理<span>&gt;</span><a href="<?php echo URL('mgr/user_recommend.getReSort'); ?>">用户组管理</a><span>&gt;</span><?php echo $group_name;?>管理</p></div>
     <div class="main-cont">
-        <h3 class="title" id="title_list"><a class="general-btn" href="javascript:add('user');"><span>添加新成员</span></a><a class="general-btn" href="" id="modifyBtn"><span>修改排序</span></a><a class="general-btn hidden" href="" id="saveBtn"><span>保存排序</span></a><?php echo $group_name;?></h3>
+        <h3 class="title" id="title_list"><a class="btn-general" href="javascript:add('user');"><span>添加新成员</span></a><a class="btn-general" href="" id="modifyBtn"><span>修改排序</span></a><a class="btn-general hidden" href="" id="saveBtn"><span>保存排序</span></a><?php echo $group_name;?></h3>
 		<div class="set-area">
 			<?php if($userlist):?>
             <table class="table" id="tblZoom" cellpadding="0" >
                 <colgroup>
-                    <col class="h-w50"/>
-                    <col class="h-w70" />
-                    <col class="h-w180" />
+                    <col class="w50"/>
+                    <col class="w70" />
+                    <col class="w180" />
                     <col />
-                    <col class="h-w140" />
+                    <col class="w140" />
                 </colgroup>
                 <thead class="tb-tit-bg">
                     <tr>
@@ -58,11 +58,11 @@
             <?php elseif($group_id):?>
             <table  class="table" cellpadding="0" >
                 <colgroup>
-                    <col class="h-w50"/>
-                    <col class="h-w70" />
-                    <col class="h-w180" />
-                    <col class="h-w180" />
-                    <col class="h-w140" />
+                    <col class="w50"/>
+                    <col class="w70" />
+                    <col class="w180" />
+                    <col class="w180" />
+                    <col class="w140" />
                 </colgroup>
                 <thead class="tb-tit-bg">
                     <tr>
@@ -86,47 +86,47 @@
     
 <script type="text/javascript">
 	var editHtmlMode=['<form id="mdyUsrForm" action="<?php echo URL('mgr/user_recommend.setUserRemark');?>" method="post"  name="">',
-            	    '	<div class="pop-form">',
+            	    '	<div class="form-box">',
             	    '		<div class="form-row">',
-            	    ' 			<label>成员昵称</label>',
+            	    ' 			<label class="form-field">成员昵称</label>',
 					'			<div class="form-cont">',
                     '     			<span class="text" id="username"></span>',
 					'			</div>',
             		'		</div>',
             		'		<div class="form-row">',
-            		'			<label for="remark">成员备注</label>',
+            		'			<label for="remark" class="form-field">成员备注</label>',
             		'			<div class="form-cont">',
-            		'				<input name="remark" id="remark" class="input-txt" type="text" value="" vrel="_f|ne|sz=max:20,m:多于10个汉字,ww" warntip="#mdyTip" /><span class="tips-error hidden" id="mdyTip"></span>',
+            		'				<input name="remark" id="remark" class="ipt-txt" type="text" value="" vrel="_f|ne|sz=max:20,m:多于10个汉字,ww" warntip="#mdyTip" /><span class="tips-error hidden" id="mdyTip"></span>',
 					'			<p class="form-tips">限制10个字</p>',
             		'			</div>',
             		'		</div>',
                     '		<div class="btn-area">',
                     '			<input name="group_id" type="hidden" id="user_group_id" value=""/>',
 					'			<input name="uid" type="hidden" id="user_uid" value=""/>',
-                    '			<a href="#" class="general-btn btn-s2" id="pop_submit"><span>确定</span></a>',
-                    '			<a href="#" class="general-btn" id="pop_cancel"><span>取消</span></a>',
+                    '			<a href="#" class="btn-general highlight" id="pop_submit"><span>确定</span></a>',
+                    '			<a href="#" class="btn-general" id="pop_cancel"><span>取消</span></a>',
                     '		</div>',
                     '	</div>',
                 	'</form>'].join('');
     var addHtmlMode=['<form id="addReUsrForm" action="<?php echo URL('mgr/user_recommend.addReUser');?>" method="post"  name="add-newlink">',
-            		'	<div class="pop-form">',
+            		'	<div class="form-box">',
             		'		<div class="form-row">',
-            		'			<label for="nickname">成员昵称</label>',
+            		'			<label for="nickname"  class="form-field">成员昵称</label>',
             		'			<div class="form-cont">',
-            		'				<input name="nickname" id="nickname" class="input-txt" type="text" value="" vrel="_f|ne|sz=max:20,m:多于10个汉字,ww" warntip="#nickTip" /><span class="tips-error hidden" id="nickTip"></span>',
+            		'				<input name="nickname" id="nickname" class="ipt-txt" type="text" value="" vrel="_f|ne|sz=max:20,m:多于10个汉字,ww" warntip="#nickTip" /><span class="tips-error hidden" id="nickTip"></span>',
             		'			</div>',
             		'		</div>',
             		'		<div class="form-row">',
-            		'			<label for="remark">成员备注</label>',
+            		'			<label for="remark" class="form-field">成员备注</label>',
             		'			<div class="form-cont">',
-            		'				<input id="remark" name="remark" class="input-txt" type="text" value="" vrel="_f|ne|sz=max:20,m:多于10个汉字,ww" warntip="#remarkTip" /><span class="tips-error hidden" id="remarkTip"></span>',
+            		'				<input id="remark" name="remark" class="ipt-txt" type="text" value="" vrel="_f|ne|sz=max:20,m:多于10个汉字,ww" warntip="#remarkTip" /><span class="tips-error hidden" id="remarkTip"></span>',
 					'			<p class="form-tips">限制10个字</p>',
             		'			</div>',
             		'		</div>',
                     '		<div class="btn-area">',
                     '			<input name="group_id" type="hidden" value="<?php echo $group_id;?>"/>',
-                    '			<a href="#" class="general-btn btn-s2" id="pop_submit"><span>确定</span></a>',
-                    '			<a href="#" class="general-btn" id="pop_cancel"><span>取消</span></a>',
+                    '			<a href="#" class="btn-general highlight" id="pop_submit"><span>确定</span></a>',
+                    '			<a href="#" class="btn-general" id="pop_cancel"><span>取消</span></a>',
                     '		</div>',
                     '	</div>',
                 	'</form>'].join('');
@@ -139,7 +139,7 @@
 			trigger: '#pop_submit'
 		},
 		dlgcfg:{
-			cs:'add-user win-fixed',
+			cs:'win-user win-fixed',
 			onViewReady:function(View){
 				var self=this;
 				$(View).find('#pop_cancel').click(function(){
@@ -162,7 +162,7 @@
 					trigger: '#pop_submit'
 				},
 				dlgcfg:{
-					cs:'add-user win-fixed',
+					cs:'win-user win-fixed',
 					onViewReady:function(View){
 						var self=this;
 						$(View).find('#pop_cancel').click(function(){

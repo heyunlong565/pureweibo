@@ -16,11 +16,11 @@
 		
         	<table class="table" cellpadding="0" cellspacing="0" width="100%" border="0">
             	<colgroup>
-						<col class="h-w50"/>
-                        <col class="h-w140" />
-    					<col class="h-w60" />
+						<col class="w50"/>
+                        <col class="w140" />
+    					<col class="w60" />
     					<col />
-    					<col class="h-w120" />
+    					<col class="w120" />
     			</colgroup>
                 <thead class="tb-tit-bg">
   					<tr>
@@ -62,7 +62,7 @@
 							<a href="<?php echo URL('mgr/wb_live.set');?>" class="icon-set">设置</a>
 							<?php } elseif ($p['page_id'] == 8) { // 在线访谈?>
 							<a href="<?php echo URL('mgr/micro_interview.set');?>" class="icon-set">设置</a>
-							<?php }?>
+							<?php } else {echo '没有设置'; } ?>
     						<?php if(empty($p['native'])) {?><a href="javascript:delConfirm('<?php echo URL('mgr/page_manager.delPage', array('id'=>$p['page_id']));?>')" class="icon-del">删除</a> <?php }?>
     					</td>
   					</tr>
@@ -72,16 +72,16 @@
 			</table>
     	</div>
 
-		<h3 class="title"><a rel="e:addpage" class="general-btn"><span>创建新页面</span></a>自定义页面列表</h3>
+		<h3 class="title"><a rel="e:addpage" class="btn-general"><span>创建新页面</span></a>自定义页面列表</h3>
 
 		<div class="set-area">
 			<table class="table" cellpadding="0" cellspacing="0" width="100%" border="0">
             	<colgroup>
-						<col class="h-w50"/>
-                        <col class="h-w150" />
-    					<col class="h-w70" />
+						<col class="w50"/>
+                        <col class="w150" />
+    					<col class="w70" />
     					<col />
-    					<col class="h-w120" />
+    					<col class="w120" />
     			</colgroup>
                 <thead class="tb-tit-bg">
   					<tr>
@@ -123,7 +123,7 @@
 Xwb.use("action").reg("addpage",function(e){
 		Xwb.use('MgrDlg',{
 		dlgcfg:{
-			cs:'add-page win-fixed',
+			cs:'win-page win-fixed',
 			title:'添加新的页面',
 			destroyOnClose:true,
 			onViewReady:function(view){

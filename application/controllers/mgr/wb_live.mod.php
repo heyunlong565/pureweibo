@@ -44,6 +44,20 @@ class wb_live_mod extends action {
 			$master_list = $master_list['rst'];
 		}
 
+		/// 默认banner,cover,backgroup图片路径
+		if (WB_LANG_TYPE_CSS) {
+			/// 多语言
+			$default_banner_img = W_BASE_URL.'img/'.WB_LANG_TYPE_CSS.'/live_bg_960.png';	
+			$default_cover_img 	= W_BASE_URL.'img/'.WB_LANG_TYPE_CSS.'/live_logo_120.jpg';
+		} else {
+			$default_banner_img = W_BASE_URL.'img/live_bg_960.png';	
+			$default_cover_img 	= W_BASE_URL.'img/live_logo_120.jpg';
+		}
+		$default_backgroup_img 	= W_BASE_URL.'img/live_bg_main.jpg';
+
+		TPL::assign('default_banner_img', $default_banner_img);
+		TPL::assign('default_cover_img', $default_cover_img);
+		TPL::assign('default_backgroup_img', $default_backgroup_img);
 		TPL::assign('master_list', $master_list);
 		$this->_display('microlive/live_form');
 	}
@@ -123,9 +137,17 @@ class wb_live_mod extends action {
 		if (empty($userlist['errno'])) {
 			$userlist = $userlist['rst'];
 		}
+		/// 默认banner图路径
+		if (WB_LANG_TYPE_CSS) {
+			/// 多语言
+			$default_banner_img = W_BASE_URL.'img/'.WB_LANG_TYPE_CSS.'/live_bg.jpg';	
+		} else {
+			$default_banner_img = W_BASE_URL.'img/live_bg.jpg';	
+		}
 
 		TPL::assign('userlist', $userlist);
 		TPL::assign('live', $rs);
+		TPL::assign('default_banner_img', $default_banner_img);
 		$this->_display('microlive/live_infomation');
 	}
 
@@ -274,9 +296,27 @@ class wb_live_mod extends action {
 			$this->_error('找不到对应的在线访谈', URL('mgr/wb_live') );
 		}
 		
+		/// 待审核表在线直播的微博信息
+		$verify_list  = array();
+		$wbList = array();
+		$verify_list = DS('weiboVerify.getWeiboVerifyList', false, array('type' => 'live', 'extend_id' => $id));
+		if ($verify_list) {
+			foreach ($verify_list as $var) {
+				$wbList[$var['id']]['text'] = $var['weibo'];
+				$wbList[$var['id']]['id'] = $var['id'];
+				$wbList[$var['id']]['pic']  = (isset($var['picid'])&&$var['picid']) ? '<img src="'. F('profile_image_url.thumbnail_pic', $var['picid']) . '" />' : '';
+				$wbList[$var['id']]['v'] = 1;
+			}
+		}
+		$verify_totalCnt = DS('weiboVerify.getWeiboVerifyCount', false, array('type' => 'live', 'extend_id' => $id));
+
 		$list = DS('microLive.getMicroLiveWbs', '', $id, 2);
-		$totalCnt = DS('microLive.getCount');
+		$live_totalCnt = DS('microLive.getCount');
 		$wb_list = $this->_buildWbList($list);
+
+		$wb_list = array_merge($wb_list, $wbList);
+		$totalCnt = (int)$live_totalCnt + (int)$verify_totalCnt;
+
 		
 		TPL::assign('totalCnt', $totalCnt);
 		TPL::assign('list', $wb_list);
@@ -292,7 +332,9 @@ class wb_live_mod extends action {
 	{
 		$id = V('g:id', 0);
 		$state	= 2;
-		$result		 		= DS('microLive.getWbCount', FALSE, $id, $state);
+		$live_total = DS('microLive.getWbCount', FALSE, $id, $state);
+		$verify_total = DS('weiboVerify.getWeiboVerifyCount', false, array('type' => 'live', 'extend_id' => $id));
+		$result = (int)$live_total + (int)$verify_total;
 		
 		if ($result || $result == 0 ) {
 			APP::ajaxRst($result); 
@@ -309,19 +351,27 @@ class wb_live_mod extends action {
 	{
 		$id = V('g:id');
 		$wb_id = V('g:wb_id');
+		$v = V('g:v', false);
 
-		if (empty($id) || empty($wb_id)) {
+		if (empty($id) || (empty($wb_id) && empty($v))) {
 			// 在线访谈ID 为空
 			$this->_error('操作失败，请检查输入参数是否正确', URL('mgr/wb_live') );
 		}
 
 		$url = URL('mgr/wb_live.approveWbList', array('id'=>$id) );
-		$ret = DR('microLive.approveWB', '', $id, $wb_id);
+
+		if ($v) {
+			$vid = V('g:vid');
+			$ret = DR('weiboVerify.updateWeiboVerify', false, $vid);
+		} else {
+			$ret = DR('microLive.approveWB', '', $id, $wb_id);
+		}
+
 		if ($ret['rst']) {
 			$this->_succ('操作已成功', $url);
 		}
 
-		$this->_error('操作失败，请检查输入参数是否正确', $url);
+		$this->_error('审核操作失败，', $url);
 	}
 
 	/**
@@ -331,14 +381,21 @@ class wb_live_mod extends action {
 	{
 		$id = V('g:id');
 		$wb_id = V('g:wb_id');
+		$v = V('g:v', false);
 
-		if (empty($id) || empty($wb_id)) {
+		if (empty($id) || (empty($wb_id) && empty($v))) {
 			// 在线访谈ID 为空
 			$this->_error('操作失败，请检查输入参数是否正确', URL('mgr/wb_live') );
 		}
 
 		$url = URL('mgr/wb_live.approveWbList', array('id'=>$id) );
-		$ret = DR('microLive.deleteLiveWb', '', $id, $wb_id);
+
+		if ($v) {
+			$vid = V('g:vid');
+			$ret = DR('weiboVerify.updateWeiboVerify', false, $vid, 'delete');
+		} else {
+			$ret = DR('microLive.deleteLiveWb', '', $id, $wb_id);
+		}
 		if ($ret['rst']) {
 			$this->_succ('操作已成功', $url);
 		}
@@ -364,31 +421,32 @@ class wb_live_mod extends action {
 	/**
 	 * 获取活动数据并检查
 	 */
-	function _checkData($id){
-		$title = trim(V('p:title',''));
-		$trends = trim(V('p:trends', ''));
-		$desc = trim(V('p:desc',''));
-		$code = trim(V('p:code', ''));
-		$banner_img = trim(V('p:banner_img',''));
-		$cover_img = trim(V('p:cover_img', ''));
-		$master = V('p:master');
-		$guest = V('p:guest');
-        $backgroup_img = trim(V('p:backgroup_img', ''));
-        $backgroup_style = trim(V('p:backgroup_style', ''));
-		$start_time = trim(V('p:start_date',''));
-		$end_time = trim(V('p:end_date',''));
-		$color = V('p:color', false);
-		$notice_time = V('p:notice_time');
-
-		$custom = V('p:custom', false);
-
-		$custom_color = '';
-		$backgroup_color = '';
+	function _checkData($id)
+	{
+		$title 				= trim(V('p:title',''));
+		$trends 			= trim(V('p:trends', ''));
+		$desc 				= trim(V('p:desc',''));
+		$code 				= trim(V('p:code', ''));
+		$banner_img 		= trim(V('p:banner_img',''));
+		$cover_img 			= trim(V('p:cover_img', ''));
+		$master 			= V('p:master');
+		$guest 				= V('p:guest');
+        $backgroup_img 		= trim(V('p:backgroup_img', ''));
+        $backgroup_style 	= trim(V('p:backgroup_style', ''));
+		$start_time 		= trim(V('p:start_date',''));
+		$end_time 			= trim(V('p:end_date',''));
+		$color 				= V('p:color', false);
+		$notice_time 		= V('p:notice_time');
+		$custom 			= V('p:custom', false);
+		$custom_color 		= '';
+		$backgroup_color 	= '';
+		
 		/// 自定义颜色
-		if (1 == $custom) {
-			$bkcolor = trim(V('p:bkcolor'), '');
-			$linkcolor = trim(V('p:linkcolor'), '');
-			$custom_color = $bkcolor.','.$linkcolor;
+		if (1 == $custom) 
+		{
+			$bkcolor 		= trim(V('p:bkcolor'), '');
+			$linkcolor 		= trim(V('p:linkcolor'), '');
+			$custom_color 	= $bkcolor.','.$linkcolor;
 		} else {
 			$backgroup_color = $color;
 		}
@@ -430,7 +488,8 @@ class wb_live_mod extends action {
 			$notice_time = $start_time - $notice_time * 60;
 		}
 
-		if(!$id){
+		if(!$id)
+		{
 			//发起在线直播数据
 			$data = array('title'=>$title,
 						  'trends' => $trends,

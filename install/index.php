@@ -16,16 +16,20 @@ error_reporting(E_ALL);
 define('XWEIBO_ACCESS', true);
 
 define('ROOT_PATH', dirname(__FILE__).'/../');
-define('XWEIBO_VERSION', '2.0');
-define('XWEIBO_DB_PREFIX', 'xwb20_');
+define('XWEIBO_VERSION', '2.1');
+define('XWEIBO_DB_PREFIX', 'xwb21_');
 define('XWEIBO_SCRPIT_DB_PREFIX', 'xwb_');
 define('XWEIBO_PROJECT', 'xwb');
 define('XWEIBO_MAX_UPLOAD_FILE_SIZE',	'2');
 define('XWEIBO_CHARSET','utf-8');
 define('XWEIBO_DB_CHARSET','utf8');
-define('XWEIBO_DB_STRUCTURE_FILE_NAME', 'structure.2.0.sql');
+define('XWEIBO_DB_STRUCTURE_FILE_NAME', 'structure');
+/// 要求的升级版本号
+define('XWEIBO_UPGRADE_VERS', '2.0');
+
 // 反馈上报接口地址
-define('XWEIBO_FEEDBACK_URL', 'http://admin_dev.x.weibo.com/xapi.php');
+define('XWEIBO_FEEDBACK_URL', 'http://x.weibo.com/xapi.php');
+//define('XWEIBO_FEEDBACK_URL', 'http://x_dev.weibo.com/xapi.php');
 include_once ROOT_PATH.'/user_config.php';
 include_once ROOT_PATH.'/install/libs/func.php';
 
@@ -60,7 +64,7 @@ switch ($method) {
 		if (!get_db_cookie()) {
 			show_msg($_LANG['not_allow_step_ship']);
 		}
-		include_once ('templates/step-2.php');
+		include_once ('templates/step-3.php');
 		break;
 	case 'check_app':
 		if (!get_db_cookie()) {
@@ -71,10 +75,52 @@ switch ($method) {
 		$app_key = isset($_POST['app_key']) ? trim($_POST['app_key']) : null;
 		$app_secret = isset($_POST['app_secret']) ? trim($_POST['app_secret']) : null;
 
+		function _s($k, $default='') {
+			return isset($_SERVER[$k])?$_SERVER[$k]:$default;
+		}
+		$protoV = strtolower(_s('HTTPS'));
+		$host	= _s('HTTP_X_FORWARDED_HOST')
+					? _s('HTTP_X_FORWARDED_HOST')
+					: _s("HTTP_HOST", _s("SERVER_NAME", (_s("SERVER_PORT")=='80' ? '' : _s("SERVER_PORT"))));
+
+		$proto = (empty($protoV) || $protoV == 'off') ? 'http' : 'https'; 
+
+		$local_uri = '';
+		if (isset($_SERVER['REQUEST_URI'])){
+			$local_uri = $_SERVER['REQUEST_URI'];
+		}
+		if (empty($local_uri) && isset($_SERVER['PHP_SELF']) ){
+			$local_uri = $_SERVER['PHP_SELF'];
+		}
+		if (empty($local_uri) && isset($_SERVER['SCRIPT_NAME']) ){
+			$local_uri = $_SERVER['SCRIPT_NAME'];
+		}
+		if (empty($local_uri) && isset($_SERVER['ORIG_PATH_INFO']) ){
+			$local_uri = $_SERVER['ORIG_PATH_INFO'];
+		}
+		if (empty($local_uri)){
+			//todo　获取不了　可供计算URI的　路径　错误显示
+		}
+
+		$uri_array = explode('/', $local_uri);
+		$paths = array();
+		foreach ($uri_array as $var) {
+			if ($var == 'install' || $var == 'uninstall' || strpos($var, '.php')) {
+				break;
+			}
+			$paths[] = $var;
+		}
+		$path_string = implode('/', $paths);
+		$path_string = empty($path_string) ? '/' : $path_string.'/';
+
+		// 程序安装位置
+		$url = $proto . '://' . $host . $path_string;
+
 		$config = array('WB_USER_SITENAME' => $site_name,
 						'WB_USER_SITEINFO' => $site_info,
 						'WB_AKEY' => $app_key,
-						'WB_SKEY' => $app_secret
+						'WB_SKEY' => $app_secret,
+						'WB_SITE_URL' => $url
 						);
 
 		if (empty($app_key) || empty($app_secret)) {
@@ -109,7 +155,7 @@ switch ($method) {
 			header('Location: ./index.php?method=create');
 			exit;
 		} else {
-			include_once ('templates/step-2.php');
+			include_once ('templates/step-3.php');
 		}
 		break;
 	case 'setConfig':
@@ -119,7 +165,7 @@ switch ($method) {
 			$mc_host = $mc_host_array[0];
 			$mc_port = $mc_host_array[1];
 		}
-		include_once ('templates/step-3.php');
+		include_once ('templates/step-2.php');
 		break;
 	case 'setDb':
 		if (!function_exists('mysql_connect')) {
@@ -135,6 +181,13 @@ switch ($method) {
 		$cache = isset($_POST['cache']) ? trim($_POST['cache']) : null;
 		$mc_host = isset($_POST['mc_host']) ? trim($_POST['mc_host']) : null;
 		$mc_port = isset($_POST['mc_port']) ? trim($_POST['mc_port']) : null;
+
+		// 安装时选择系统语言
+		$wb_lang_type = isset($_POST['wb_lang_type']) ? trim($_POST['wb_lang_type']) : 'zh_cn';
+		if (!in_array($wb_lang_type, array('zh_cn','zh_tw', 'en') )) {
+			$wb_lang_type = 'zh_cn';
+		}
+		setCookie('xwb_install_config_lang', $wb_lang_type);
 
 		$error_msg = array();
 		if (empty($db_host) || empty($db_name) || empty($db_user)) {
@@ -153,6 +206,17 @@ switch ($method) {
 		}
 
 		if (check_db_connect($db_host, $db_user, $db_passwd)) {
+			if ($cover == 1) {
+				/// 升级安装
+				$old_ver = getXweiboVer($db_host, $db_user, $db_passwd, $db_name, $db_prefix);
+				if ($old_ver && $old_ver != XWEIBO_VERSION) {
+					$upgrade_vers = explode(',', XWEIBO_UPGRADE_VERS);
+					if (!in_array($old_ver, $upgrade_vers)) {
+						$msg = sprintf($_LANG['upgrade_ver_error'], $old_ver, XWEIBO_VERSION, XWEIBO_UPGRADE_VERS);
+						show_msg($msg);
+					}
+				}
+			}
 
 			$config = array('DB_HOST' => $db_host,
 				'DB_USER' => $db_user,
@@ -167,11 +231,6 @@ switch ($method) {
 			set_db_cookie($db_host, $db_user, $db_passwd);
 			header('Location: ./index.php?step=3');
 		}
-		break;
-	case 'backup':
-		set_time_limit(0);
-		backup_data($db_host, $db_user, $db_passwd, $db_name, $db_prefix);
-		echo 'finish';
 		break;
 	case 'db_exists':
 		$db_host = trim($_POST['db_host']);
@@ -199,8 +258,13 @@ switch ($method) {
 		$cover = XWB_INSTALL_COVER; 
 
 		$ret = action_dbs($db_host, $db_user, $db_passwd, $db_name, $db_prefix, $cover);
-		if ($ret === true) {
-			header('Location: ./index.php?method=done');
+		if ($ret == '20000') {
+			/// 重复安装
+			header('Location: ./index.php?method=done&type=repeat');
+			exit;
+		} elseif ($ret == '20001') {
+			/// 升级安装
+			header('Location: ./index.php?method=done&type=upgrade');
 			exit;
 		}
 		header('Location: ./index.php?step=4&method=view');
@@ -217,6 +281,10 @@ switch ($method) {
 		if (!get_db_cookie()) {
 			show_msg($_LANG['not_allow_step_ship']);
 		}
+
+		/// 安装类型
+		$type = isset($_GET['type']) ? $_GET['type'] : '';
+
 		set_config_env();
 
 		$paths = explode('/', $_SERVER['SCRIPT_NAME']);
@@ -231,7 +299,11 @@ switch ($method) {
 		modifly_css_file($string_path);
 
 		$index_url = 'http://'.$_SERVER['HTTP_HOST'].$string_path;
-		$admin_url = 'http://'.$_SERVER['HTTP_HOST'].$string_path.'/admin.php?m=mgr/active_admin.active&app_key='.urlencode(WB_AKEY).'&app_secret='.urlencode(WB_SKEY);
+		if (($type=='repeat' || $type=='upgrade') && WB_USER_OAUTH_TOKEN && WB_USER_OAUTH_TOKEN_SECRET) {
+			$admin_url = 'http://'.$_SERVER['HTTP_HOST'].$string_path.'/admin.php';
+		} else {
+			$admin_url = 'http://'.$_SERVER['HTTP_HOST'].$string_path.'/admin.php?m=mgr/active_admin.active&app_key='.urlencode(WB_AKEY).'&app_secret='.urlencode(WB_SKEY);
+		}
 		include_once ('templates/finish.php');
 		break;
 		default:

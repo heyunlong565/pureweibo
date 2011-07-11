@@ -35,6 +35,7 @@
 								<?php Xpipe::pagelet('common.userTag', $userinfo);?>
 								<!-- end 标签 -->
 								<?php Xpipe::pagelet('common.magicFriends', $userinfo ); ?>
+						<?php echo F('show_ad', 'sidebar', '');?>
 						</div>
 					</div>
 				</div>

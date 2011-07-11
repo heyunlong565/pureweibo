@@ -4,23 +4,43 @@ require_once dirname(__FILE__). '/component_abstract.pls.php';
 /**
  * 本站最新开通微博的用户列表
  * @author yaoying
- * @version $Id: component_15.pls.php 11912 2011-03-23 08:43:59Z yaoying $
+ * @version $Id: component_15.pls.php 16917 2011-06-08 07:39:22Z jianzhou $
  *
  */
-class component_15_pls extends component_abstract_pls{
+class component_15_pls extends component_abstract_pls
+{
 	
-	function run($mod){
+	function run($mod)
+	{
 		parent::run($mod);
 		
-		$result = DR('components/newestWbUser.get', 'g/300', $mod['param']);
+		//取缓存
+		$isLogin   = USER::isUserLogin();
+		$cacheTime = V('-:tpl/cache_time/pagelet_component15');
+		$dataTime  = $isLogin ? "g/$cacheTime" : FALSE;
+		$cacheKey  = $isLogin ? FALSE : "component15#".md5( serialize($mod) );
+		if(ENABLE_CACHE && $cacheKey && ($content=CACHE::get($cacheKey)) ) 
+		{
+		    echo $content; return;
+		}
+		
+		
+		$result = DR('components/newestWbUser.get', $dataTime, $mod['param']);
 		if(!is_array($result['rst']) || empty($result['rst'])){
-			$this->_error('无本站最新开通微博的数据，或者缓存返回错误的非数组数据类型。');
+			$this->_error(L('pls__component15__newestWbUser__emptyTip'));
 			return ;
 		}
 		
 		$followedList = $this->_generateFollowedList($result['rst']);
 		
-		TPL::module('component/component_' . $mod['component_id'], array('mod' => $mod, 'userList' => $result['rst'], 'followedList' => $followedList));
+		
+		// 设置缓存
+		$content = TPL::module('component/component_'.$mod['component_id'], array('mod'=>$mod, 'userList'=>$result['rst'], 'followedList'=>$followedList), false);
+		if (ENABLE_CACHE && $cacheKey && $content) {
+			CACHE::set($cacheKey, $content, $cacheTime);
+		}
+		
+		echo $content; return;
 	}
 	
 	/**

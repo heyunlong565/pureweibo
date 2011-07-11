@@ -187,6 +187,7 @@ class MicroInterview
 		if ( $count>0 ) 
 		{
 			//批量获取, 目前最多支持20个人,超过20个人, 分组调用批量接口
+			if ( !USER::isUserLogin() ){ DS('xweibo/xwb.setToken', '', 2); }
 			if ( $count>20) 
 			{
 				$pageCnt = ceil($count/20);

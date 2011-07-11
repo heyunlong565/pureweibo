@@ -10,16 +10,16 @@
 <body class="main-body">
 	<div class="path"><p>当前位置：运营管理<span> &gt; <a href="/admin.php?m=mgr/page_manager">页面设置</a> &gt; </span>自定义微博列表</p></div>
     <div class="main-cont">
-        <h3 class="title"><a class="general-btn" href="javascript:add('user');"><span>添加新成员</span></a><?php echo $listName; ?></h3>
+        <h3 class="title"><a class="btn-general" href="javascript:add('user');"><span>添加新成员</span></a><?php echo $listName; ?></h3>
 		<div class="set-area">
 			<?php if(!empty($userlist)):?>
             <table class="table" width="100%" cellpadding="0" cellspacing="0" border="0">
                 <colgroup>
-                    <col class="h-w70"/>
-                    <col class="h-w70" />
-                    <col class="h-w120" />
+                    <col class="w70"/>
+                    <col class="w70" />
+                    <col class="w120" />
                     <col />
-                    <col class="h-w90" />
+                    <col class="w90" />
                 </colgroup>
                 <thead class="tb-tit-bg">
                     <tr>
@@ -32,13 +32,12 @@
                 </thead>
                 <tfoot class="tb-tit-bg">
                     <tr><td colspan="5">
+                    	<div class="pre-next">
+                        <?php if($prev_cursor){?><a href="<?php echo URL('mgr/site_list.memberList', array('listId'=>$listId, 'cursor'=>$prev_cursor));?>" class="btn-general"><span>上一页</span></a><?php }?>
+                        <?php if($next_cursor){?>&nbsp;&nbsp;<a href="<?php echo URL('mgr/site_list.memberList', array('listId'=>$listId, 'cursor'=>$next_cursor));?>" class="btn-general"><span>下一页</span></a><?php } echo "  总记录数  $total"?>
+                        </div>
                         <input name="" class="ipt-checkbox" id="selectAll" type="checkbox" value="" />全选
                         <a class="del-all" href="javascript:delSelectId('<?php echo URL('mgr/site_list.delMember', array('listId'=>$listId) );?>');">将所选用户从列表中删除</a>
-                    </td></tr>
-                    
-                    <tr><td colspan="5">
-                        <?php if($prev_cursor){?><a href="<?php echo URL('mgr/site_list.memberList', array('listId'=>$listId, 'cursor'=>$prev_cursor));?>" class="general-btn"><span>上一页</span></a><?php }?>
-                        <?php if($next_cursor){?>&nbsp;&nbsp;<a href="<?php echo URL('mgr/site_list.memberList', array('listId'=>$listId, 'cursor'=>$next_cursor));?>" class="general-btn"><span>下一页</span></a><?php } echo "  总记录数  $total"?>
                     </td></tr>
                 </tfoot>
                 <tbody class="order-main" id="recordList">
@@ -56,11 +55,11 @@
             <?php elseif($listId):?>
             <table class="table" cellpadding="0">
                 <colgroup>
-                    <col class="h-w50"/>
-                    <col class="h-w70" />
-                    <col class="h-w120" />
+                    <col class="w50"/>
+                    <col class="w70" />
+                    <col class="w120" />
                     <col />
-                    <col class="h-w120" />
+                    <col class="w120" />
                 </colgroup>
                 <thead class="tb-tit-bg">
                     <tr>
@@ -83,17 +82,17 @@
 <script type="text/javascript">
 
 var HtmlMode=['<form id="addUserForm" action="<?php echo URL('mgr/site_list.addMember');?>" method="post"  name="add-newlink">',
-            		'<div class="pop-form">',
+            		'<div class="form-box">',
             		'	<div class="form-row">',
-            		'		<label for="link-text">新成员昵称</label>',
+            		'		<label for="link-text"  class="form-field">新成员昵称</label>',
             		'		<div class="form-cont">',
-            		'			<input name="nickname" class="input-txt" type="text" value="" warntip="#nameTip" vrel="_f|sz=max:20,m:超过10个字,ww|ne=m:不能为空|uni=m:该名字已存在"/><span class="tips-error hidden" id="nameTip"></span>',
-            		'		</div',
+            		'			<input name="nickname" class="ipt-txt" type="text" value="" warntip="#nameTip" vrel="_f|sz=max:20,m:超过10个字,ww|ne=m:不能为空|uni=m:该名字已存在"/><span class="tips-error hidden" id="nameTip"></span>',
+            		'		</div>',
             		'	</div>',
                     '	<div class="btn-area">',
 					'		<input name="listId" type="hidden" value="<?php echo $listId;?>"/>',
-                	'    	<a href="#" id="pop_submit" class="general-btn btn-s2"><span>确定</span></a>',
-                	'    	<a href="#" id="pop_cancel" class="general-btn"><span>取消</span></a>',
+                	'    	<a href="#" id="pop_submit" class="btn-general highlight"><span>确定</span></a>',
+                	'    	<a href="#" id="pop_cancel" class="btn-general"><span>取消</span></a>',
                     '	</div>',
                     '</div>',
 					'</form>'].join('');

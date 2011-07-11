@@ -6,17 +6,20 @@
  */
 // 在线直播，在线访谈
 (function(X, $){
-    var Util = X.util;
+    var Util = X.util,
+		Box = X.ui.MsgBox;
     
     // 每次发布时添加的提交参数
     var postParam = {};
+	
+	var getText = X.lang.getText;
     
     var postBoxInited = false;
     
     X.use('action')
     // 回答
     .reg('an', function( e ){
-        var box = X.use('postBox');
+        var box = X.use('forwardBox');
         
         if(!postBoxInited){
             box.jq('.add-area>a').cssDisplay(false).hide();
@@ -37,15 +40,15 @@
         box.getParam = function(){
             var param = GETPARAM.apply(this, arguments);
             return $.extend(param, postParam);
-        };
-        
-        var text = e.get('m');
-        box.display(true)
-           .reset()
-           .selectionHolder.setText(text||'');
-        if(text)
-            box.checkText();
-        var wbId = e.get('w');
+        }
+		
+         var text = e.get('m'),wbId = e.get('w'),wbData = X.getWb(wbId);
+		 text ? wbData.tx = text : 1;
+			box.display(true)
+			  .setContent(wbId,wbData , X.getUid())
+			  .selectionHolder
+			  .focusStart();
+			
         postParam['extra_params[ask_id]']=wbId;
     })
     // 提醒
@@ -53,7 +56,7 @@
         e.lock(true);
         X.request.notice(e.get('u'), e.get('t'), e.get('c'),e.get('n'), function(r){
             if(r.isOk())
-                $(e.src).replaceWith('<span>已设置提醒</span>');
+                $(e.src).replaceWith('<span>' + getText('已设置提醒') + '</span>');
         
             e.lock(false);
         });
@@ -116,10 +119,11 @@
                 autoInsert : false,
                 scrollor : '.feed-list',
                 unreadCounter : '.feed-refresh a em',
+				totalCounter : '#liveWbNum',
                 unreadUIElem:'.feed-refresh',
                 // override to define the requesting url
                 _doRequest : function(callback, param){
-                    X.request.postReq(X.request.mkUrl('live','unread'), Util.extend(param, {id:this.liveid}), callback);
+                    X.request.postReq(X.request.mkUrl('live','unread'), Util.extend(param, {id:this.liveid, gMType:this.gMType}), callback);
                 }
             },
             
@@ -128,12 +132,27 @@
                 var ui = this.getUI();
                 ui.liveid = cfg.data.liveid;
                 ui.latestWid = cfg.data.wb_id;
+                ui.gMType = cfg.data.gMType ? '1' : '0';
                 
                 // 刷新
                 this.jq('.feed-refresh a').click(function(){
                     ui.flushUnread();
                     return false;
                 });
+                
+                if (this.jq('#only').length>0)
+                {
+                	this.jq('#only')[0].checked = cfg.data.gMType;
+	                this.jq('#only').click(function(){
+	                	var url = X.request.mkUrl('live','details',{id:cfg.data.liveid});
+	                	if(this.checked){
+	                		url += '&gMType=1';
+	                	} else {
+	                		url += '&gMType=0';
+	                	}
+	                	location.href = url;
+	                });
+                }
             }
      })
      
@@ -190,7 +209,9 @@
                 autoNextingPage : true,
                 // override to define the requesting url
                 _doRequest : function(callback,param){
-                      X.request.postReq(X.request.mkUrl('interview','unread'), Util.extend(param, {id:this.interview_id}), callback);
+    	 			if (this.type !='myAnswered'){	// 嘉宾回答过的不做unread询问
+                      X.request.postReq(X.request.mkUrl('interview','unread'), Util.extend(param, {id:this.interview_id, type:this.type}), callback);
+    	 			}
                 }
             },
             onViewReady : function(cfg){
@@ -199,6 +220,7 @@
                 ui.latestWid = cfg.data.wb_id;
                 ui.min_id = cfg.data.min_id;
                 ui.interview_id = cfg.data.interview_id;
+                ui.type			= cfg.data.type;
             }
      })
      
@@ -238,7 +260,9 @@
 	                      prevBtn:this.jq('.arrow-l-s2'), 
 	                      nextBtn:this.jq('.arrow-r-s2') ,
 	                      ldisabledCs:'arrow-l-s2-disabled',
-	                      rdisabledCs:'arrow-r-s2-disabled'
+	                      rdisabledCs:'arrow-r-s2-disabled',
+						  items : 'li',
+						  ct : 'ul'
 	              });
                }
            }
@@ -264,7 +288,7 @@
                                     if (r.isOk()) {
                                         e.clear();
                                         Util.disable(e.src, true);
-                                        $(e.src).find('span').text('已关注');
+                                        $(e.src).find('span').text( getText('已关注') );
                                     } else {
                                         Box.tipWarn(r.getMsg());
                                     }
@@ -292,7 +316,10 @@
 	                      prevBtn:this.jq('.arrow-l-s2'), 
 	                      nextBtn:this.jq('.arrow-r-s2') ,
 	                      ldisabledCs:'arrow-l-s2-disabled',
-	                      rdisabledCs:'arrow-r-s2-disabled'
+	                      rdisabledCs:'arrow-r-s2-disabled',
+						  items : 'li',
+						  ct : 'ul'
+						  
 	              });
                }
            }
@@ -318,7 +345,7 @@
                                    if (r.isOk() || '1020805'==r.getCode() ) {
                                        e.clear();
                                        Util.disable(e.src, true);
-                                       $(e.src).find('span').text('已关注');
+                                       $(e.src).find('span').text( getText('已关注') );
                                    } else {
                                        Box.tipWarn(r.getMsg());
                                    }

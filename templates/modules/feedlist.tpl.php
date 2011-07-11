@@ -5,7 +5,7 @@
 	 */
 if(!is_array($list) || empty($list)){
 ?>
-<div class="int-box load-fail icon-bg">该模块下没有微博，<a href="#" rel="e:rl">刷新</a>试试？</div>
+	<div class="int-box ico-load-fail"><?php LO('modules__feedList__emptyTip');?></div>
 <?php
 }else{
 ?>
@@ -24,8 +24,18 @@ if(!is_array($list) || empty($list)){
 		$wb['header'] = isset($header) ? $header: 1;
 		$wb['uid'] 	  = USER::uid();
 		$wb['author'] = isset($author) ? $author : TRUE;
+		/// 待审核的微博
+		if (isset($wb['xwb_weibo_verify']) && $wb['xwb_weibo_verify']) {
+			if (isset($wb['xwb_picid']) && $wb['xwb_picid']) {
+				$rel = 'w:'.$wb['id'].',v:1,p:'.$wb['xwb_picid'];
+			} else {
+				$rel = 'w:'.$wb['id'].',v:1';
+			}
+		} else {
+			$rel = 'w:'.$wb['id'];
+		}
 
-		echo '<li rel="w:'.$wb['id'].'">';
+		echo '<li rel="'.$rel.'">';
 			TPL::module('feed', $wb);
 		echo '</li>';
 	}

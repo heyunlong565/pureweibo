@@ -13,7 +13,8 @@ if(!window.__debug)
 
 var 
     localDomain  = location.hostname,
-    domainReg = /:\/\/(.[^\/]+)/;
+    domainReg = /:\/\/(.[^\/]+)/,
+    Util = X.util;;
 
 var XwbRequest = {
     
@@ -259,11 +260,12 @@ var XwbRequest = {
 /**
  * 删除微博
  * @param {String} postId 微博id
+ * @param {Number|String} v 是否正在审核中的
  * @param {Function} callback 成功后回调方法，参数为 callback(Xwb.ax.ResponseDefinition definition)
  * @param {Xwb.ax.RequestConfig} [config] 可选，请求配置信息
  */
-    del : function(id, fn, cfg){
-        XwbRequest.act('destroy', {id:id}, fn, cfg);
+    del : function(id, v, fn, cfg){
+        XwbRequest.act('destroy', {id:id, v: v}, fn, cfg);
     },
 
 /**
@@ -716,10 +718,22 @@ XwbRequest.DefaultResponseDefinition.prototype = {
  * @param {String} defaultString 如果不存在，返回该字符串。
  * @return {String}
  */
-    getMsg : function(def){
-        if(__debug) if( !ERRORMAP[ this.getCode() ] ) console.warn('未定义错误码消息：' + this.getCode(), '@', this.getRaw());
+    getMsg : function(def, map){
+        var 
+            err_code = this.getCode(),
+            
+            defCode = err_code + '_def',
+            
+            msg = ERRORMAP[ map ? err_code : defCode ] || ERRORMAP[ err_code ];
+            
+        if(__debug) if( !msg ) console.warn('未定义错误码消息：' + err_code, '@', this.getRaw());
+        
         // '系统繁忙，请稍后重试！'
-        return ERRORMAP[ this.getCode() ] || def || ('系统不给力，请稍后再试试吧。');
+        var emsg = msg || def;
+        return ( map ? 
+            Util.templ(
+                emsg , 
+                $.isArray( map ) || typeof map == 'object' ? map : [map]) :emsg )  || (X.lang.getText('系统不给力，请稍后再试试吧。'));
     },
 
 /**
@@ -746,63 +760,7 @@ XwbRequest.DefaultResponseDefinition.prototype = {
 //
 //  这里只限定后台返回的错误码，请不要定义其它多余的错误码。
 //
-var ERRORMAP = XwbRequest.ERRORMAP = {
-        '0': '发布失败。',
-		'5': '超过字数了！',
-		'1': '图片正在上传，请稍候。',
-		'2': '正在发布,请稍候。。',
-		'3': '请先输入内容。',
-		'4': '请写上你要说的话题。',
-		'1010005':'超出字数了哦！',
-		'1020002': '请不要重复发布相同的内容。',
-		'1010006': '不能采用sina域下的邮箱。',
-		'1010007': '已经提交，请耐心等待管理员审核，谢谢！',
-        '20011': '评论字数超过限制',
-		'20016': '他还没有关注你,不能发私信',
-		'30001': '皮肤保存失败，请重试。',
-		//图片相关
-		'20020':'上传图片为空',
-		'20021':'上传图片大小超过限制',
-		'20022':'上传图片类型不符合要求',
-		'20023':'上传图片失败，重新试试看？',
-		'20024':'非法的上传图片',
-	    '1021200':'此昵称不存在',
-	    '1020500':'此微博已被作者移除。',
-	    '1020301':'此微博已被作者移除。',
-	    '1020700':'此微博已被作者移除。',
-	    '1020402':'此微博已被作者移除。',
-	    '1020504':'此微博已被作者移除。',
-	    '1020501':'此评论已被作者移除。',
-	    '1020600':'此评论已被作者移除。',
-		'1040003':'您尚未登录，请先登录再操作',
-		'1040000':'您尚未登录，请先登录再操作',
-		'1050000':'系统繁忙，请稍候再试。',
-		'1040007':'发评论太多啦，休息一会儿吧。',
-		'1040006':'发微博太多啦，休息一会儿吧。',
-		'1040005':'你已经被禁止发言',
-		'1040004': '请不要发表违法和不良信息。',
-		'1021301': '该昵称已存在，请换一个昵称。',
-		'1020104': '不要太贪心哦，发一次就够啦。',
-		'1020808': '你不能关注自己。',
-		'1020801': '关注的用户不存在。',
-		'1020800': '关注失败',
-		'1020805': '已关注该用户',
-		'1050000': '操作失败，重新试试看？',
-		'1020404': '由于用户设置，你暂不能发表评论。',
-		'1020405': '根据对方的设置，你不能进行此操作。',
-		'1020806': '你使用的帐号或IP关注过于频繁，今日将无法再进行同类操作，请谅解！',
-		// 上传文件由于其它原因出错
-		// 这里后台最好和上面的一致
-		'2010009' : '上传图片大小超过限制。',
-		'2010010' : '上传图片大小超过限制。',
-		'2010011' : '上传图片的数据不完整，重新试试看？',
-		'2010012' : '图片上传失败，重新试试看？',
-		'2010013' : '上传图片失败，重新试试看？',
-		'2010014' : '上传图片失败，重新试试看？',
-        '1040016' : '出错啦，该网站调用API次数已超过限制，请联系站长解决！'		
-};
-
-var Util = X.util;
+var ERRORMAP = XwbRequest.ERRORMAP = X.lang.ERRORMAP;
 
 //
 //  为方便处理，所有事件统一有X层发送

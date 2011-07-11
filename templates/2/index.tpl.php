@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title><?php echo F('web_page_title', false, V('g:skinset', false)? '模板设置' : false);?></title>
+<title><?php echo F('web_page_title', false, V('g:skinset', false)? L('index__default__skinSetTitle') : false);?></title>
 <?php TPL::plugin('include/css_link');?>
 <?php
 if(trim(V('g:skinset')) == 1):
@@ -44,14 +44,14 @@ endif;
 					<div class="index-default">
 					<?php if (V('g:page', 1) > 1):?>
 						<div class="default-tips">
-							<div class="icon-tips all-bg"></div>
-							<p>已到最后一页</p>
+							<div class="icon-tips"></div>
+							<p><?php LO('index__default__endPageTip');?></p>
 						</div>
 					<?php else:?>
 						<div class="default-tips">
-							<div class="icon-tips all-bg"></div>
-							<p>您还没有微博信息。</p>
-							<p>想看更多微博？<br />你可以<a href="<?php echo URL('search.recommend');?>">关注更多的人</a>，或者在<a href="javascript:$('#publish_box textarea').focus(),void(0);">上方输入框</a>里，说说身边的新鲜事儿。</p>
+							<div class="icon-tips"></div>
+							<p><?php LO('index__default__emptyWeiboTip');?></p>
+							<p><?php LO('index__default__showMoreWeiboTip', URL('search.recommend'), "javascript:$('#publish_box textarea').focus(),void(0);");?></p>
 						</div>
 						<?php Xpipe::pagelet('user.hotUser'); ?>
 						<?php endif;?>
@@ -66,12 +66,12 @@ endif;
 						if ($fc['in_use'] && !isset($_COOKIE['fc_ad'])) {
 							$ct = DS('dsIndexFocus.get', 0);
 				?> 
-				<div style="background: url(<?php echo F('fix_url', ($ct['bg_pic']? $ct['bg_pic']: 'var/data/index/ad_pic.png'));?>) no-repeat scroll 0% 0% transparent;" class="ad-pic" id="focus_index">
+				<div style="background: url(<?php echo F('fix_url', ($ct['bg_pic']? $ct['bg_pic']: 'img/ad/ad_pic.png'));?>) no-repeat scroll 0% 0% transparent;" class="ad-pic" id="focus_index">
 					<div class="ad-pic-con">
 						<h3><?php echo F('escape', $ct['title']);?></h3>
 						<p><?php echo F('escape', $ct['text']);?></p>
 					</div>
-					<a title="点击关闭" href="#" rel="e:cls,cn:fc_ad" class="icon-close-btn icon-bg"></a>
+					<a title="<?php LO('template__titleTip__click__close');?>" href="#" rel="e:cls,cn:fc_ad" class="ico-close-btn"></a>
 					<a class="ad-pic-btn" rel="e:do,op:<?php echo $ct['oper'];?>,tp:<?php echo $ct['topic'];?>,ln:<?php echo urlencode($ct['link']);?>" href="#"><?php echo F('escape', $ct['btnTitle']);?></a>
 				</div>
 				<?php
@@ -80,8 +80,8 @@ endif;
 				<?php
 				$param = array('list' => $list,
 					'limit'=>$limit, 
-					'not_found_msg' => '找不到符合条件的微博，返回查看<a href="'. URL('index') . '">全部微博</a>',
-					'list_title'=>'我的首页',
+					'not_found_msg' => L('index__default__notFoundTip', URL('index')),
+					'list_title'=> L('index__default__listTitle'),
 					'filter_type'=>$filter_type);
 				Xpipe::pagelet('weibo.weiboList', $param );
 				?>
@@ -100,6 +100,7 @@ endif;
 							<!-- 关注的话题 -->
 							<?php Xpipe::pagelet('common.subjectFollowed',USER::uid()); ?>
 							<!-- 关注的话题 -->	
+							<?php echo F('show_ad', 'sidebar', '');?>
 						</div>
 					</div>
 				</div>

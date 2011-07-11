@@ -31,6 +31,7 @@
 						</div>
 						<div class="aside">
 							<?php Xpipe::pagelet('common.sideComponents', array('type'=>1) );?>
+						<?php echo F('show_ad', 'sidebar', '');?>
 						</div>
 					</div>
 				</div>

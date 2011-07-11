@@ -1,5 +1,5 @@
 <?php
-//$Id: main.tpl.php 14879 2011-04-28 08:42:45Z guoliang $
+//$Id: main.tpl.php 16806 2011-06-03 12:47:20Z heli $
 if(!defined('IN_APPLICATION')){
 	exit('ACCESS DENIED!');
 }
@@ -8,7 +8,7 @@ if(!defined('IN_APPLICATION')){
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>转发 - <?php echo F('web_page_title');?></title>
+<title><?php LO('modules_share_main_title');?><?php echo F('web_page_title');?></title>
 <link href="<?php echo W_BASE_URL ?>css/component/retweet/retweet.css" rel="stylesheet" type="text/css" />
 <?php TPL::plugin('include/js_link');?>
 </head>
@@ -27,19 +27,19 @@ if(!defined('IN_APPLICATION')){
                                 }
                              ?>" alt="" />
                         </a>
-                        <div class="hd-msg">你正在使用 <a href="<?php echo URL('index');?>" target="_blank"><?php echo F('escape', USER::get('screen_name'));?></a> 帐号 | <a href="<?php echo $sharecallbackurl; ?>">换个帐号？</a></div>
+                        <div class="hd-msg"><?php LO('modules_share_main_using');?> <a href="<?php echo URL('index');?>" target="_blank"><?php echo F('escape', USER::get('screen_name'));?></a> <?php LO('modules_share_main_account');?> | <a href="<?php echo $sharecallbackurl; ?>"><?php LO('modules_share_main_changeAccount');?></a></div>
                     </div>
                     <div class="bd">
                     	<div class="post-box" id="postBox">
-                        	<div class="post-tit">转发到我的微博</div>
-                            <div class="key-tips" id="xwb_word_cal">你还可以输入<span>140</span>字</div>
+                        	<div class="post-tit"><?php LO('modules_share_main_redirect');?></div>
+                            <div class="key-tips" id="xwb_word_cal"><?php LO('modules_share_main_inputLest');?></div>
                             <div class="post-textarea" id="focusEl">
                             	<div class="inner">
                             		<textarea id="xwb_inputor"><?php echo APP::F('escape', $text); ?></textarea>
                             		<input type="hidden" name="relateUid" value="{$relateUid}" />
                             	</div>
                             </div>
-                            <div class="share-btn">发布微博</div>
+                            <div class="share-btn"><?php LO('modules_share_main_publish');?></div>
                         </div>
                     </div>
                 </div>
@@ -79,10 +79,10 @@ Xwb.cfg={	basePath :	'<?php echo W_BASE_URL;?>',
         var v = $.trim( jqInputor.val() );
         var left = X.util.calWbText(v);
         if (left >= 0)
-            jqWarn.html('您还可以输入<span>'+left+'</span>字')
+            jqWarn.html('<?php LO('modules_share_main_js_input');?>'+left+'<?php LO('modules_share_main_js_front');?>')
                   .removeClass(exceedCS);
         else
-            jqWarn.html('已超出<span>'+Math.abs(left)+'</span>字')
+            jqWarn.html('<?php LO('modules_share_main_js_lengthLimit');?>'+Math.abs(left)+'<?php LO('modules_share_main_js_front');?>')
                 .addClass(exceedCS);
                 
         return left>=0 && v;

@@ -19,7 +19,7 @@
 # ------------------------------------------------------------------------------------------
 # 是否打开(on|off) Rewrite 功能，
 # 在打开此选项时 请在 Xweibo后台>系统设置>优化设置 中开启优化
-# RewriteEngine off
+# RewriteEngine ON
 
 
 # ------------------------------------------------------------------------------------------
@@ -65,8 +65,9 @@
 # ------------------------------------------------------------------------------------------
 # 普通入口 这条规则使用户可以用 美化的URL访问 Xweibo前端如: http://xxx.com/show/id-9019492199
 
-# RewriteCond $1 !^(js/|img/|css/|flash/|var/|install/|robots\.txt$|.+\.php([^A-Za-z0-9_]|$)|crossdomain\.xml$|share\.html|favicon\.ico$|admin/)
-# RewriteRule ^(.*)$ /index.php/$1?%{QUERY_STRING} [NE,L]
-
+#RewriteCond %{REQUEST_FILENAME} !-f
+#RewriteCond %{REQUEST_FILENAME} !-d
+#RewriteCond $1 !^(admin/)
+#RewriteRule ^(.*)$ /index.php/$1?%{QUERY_STRING} [NE,L]
 # ------------------------------------------------------------------------------------------
  

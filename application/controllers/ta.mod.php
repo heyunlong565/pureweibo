@@ -16,7 +16,7 @@ class ta_mod
 	{
 		$id 	 = (string)V('g:id');
 		if(F('user_action_check',array(3),$id)){
-			TPL::module('error_delete', array('msg'=>'对不起，该用户已经被屏蔽了') );
+			TPL::module('error_delete', array('msg'=> L('controller__ta__haveBlocked')) );
 			exit();
 		}
 	}
@@ -39,7 +39,7 @@ class ta_mod
         }
         
 		if ( empty($id) && empty($name) ) {  /// 提示不存在	
-			APP::tips(array('tpl' => 'e404', 'msg' => '抱歉你所访问的用户不存在'));
+			APP::tips(array('tpl' => 'e404', 'msg' => L('controller__common__userNotExist')));
 		}
 		
         $userinfo = array();
@@ -70,10 +70,10 @@ class ta_mod
 		$userinfo = F('user_filter', $userinfo['rst'], true);
 		if (empty($userinfo)) {
 			/// 提示不存在	
-			APP::tips(array('tpl' => 'e404', 'msg' => '抱歉你所访问的用户不存在'));
+			APP::tips(array('tpl' => 'e404', 'msg' => L('controller__common__userNotExist')));
 		} elseif (!empty($userinfo['filter_state'])) {
 			/// 屏蔽用户
-			TPL::module('error_delete', array('msg'=>'对不起，该用户已经被屏蔽了') );
+			TPL::module('error_delete', array('msg'=> L('controller__ta__haveBlocked')) );
 			exit(-1);
 		}
 		
@@ -83,6 +83,8 @@ class ta_mod
 		if (empty($us_rst['rst'])) {
 			$userinfo['is_localsite_user'] = 0;
 		}
+		
+		$userinfo['needPrivacy'] = (!USER::isUserLogin()) || !$userinfo['is_localsite_user'];
 		
 		//页面代号
 		APP::setData('page', 'ta', 'WBDATA');
@@ -102,7 +104,7 @@ class ta_mod
 		$name = V('g:name');
 		if (empty($id) && empty($name)) {
 			//提示访问的页面不存在，跳转到首页
-			APP::tips(array('tpl' => 'e404', 'msg' => '抱歉你所访问的用户不存在'));
+			APP::tips(array('tpl' => 'e404', 'msg' => L('controller__common__userNotExist')));
 		}
 
 		/// 如果是自己，跳转到首页
@@ -116,7 +118,7 @@ class ta_mod
 		$userinfo = F('user_filter', $userinfo['rst'], true);
 		if (empty($userinfo)) {
 			/// 提示不存在	
-			APP::tips(array('tpl' => 'e404', 'msg' => '抱歉你所访问的用户不存在'));
+			APP::tips(array('tpl' => 'e404', 'msg' => L('controller__common__userNotExist')));
 		}
 		/// 获取前9位优质粉丝信息
 		$followers = DR('xweibo/xwb.getMagicFollowers', '', $userinfo['id'], 9);
@@ -138,7 +140,7 @@ class ta_mod
 		$name = V('g:name');
 		if (empty($id) && empty($name)) {
 			//提示访问的页面不存在，跳转到首页
-			APP::tips(array('tpl' => 'e404', 'msg' => '抱歉你所访问的用户不存在'));
+			APP::tips(array('tpl' => 'e404', 'msg' => L('controller__common__userNotExist')));
 		}
 		
 		/// 调用微博个人资料接口
@@ -146,7 +148,7 @@ class ta_mod
 		//过滤过敏用户
 		$userinfo = F('user_filter', $userinfo['rst'], true);
 		if (empty($userinfo)) {
-			APP::tips(array('tpl' => 'e404', 'msg' => '抱歉你所访问的用户不存在'));
+			APP::tips(array('tpl' => 'e404', 'msg' => L('controller__common__userNotExist')));
 		}
 
 		/// 如果是自己，跳转到首页

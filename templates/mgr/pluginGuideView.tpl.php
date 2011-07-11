@@ -3,7 +3,7 @@
 		<div class="form-row">
         	<label class="form-field">类别名称</label>
             <div class="form-cont">
-                <input type="text" name="item_name" id="content" class="input-txt form-el-w130" vrel="ne=m:不能为空" warntip="#textErr" value="<?php echo isset($info['item_name'])?$info['item_name']:''?>">
+                <input type="text" name="item_name" id="content" class="input-txt w130" vrel="ne=m:不能为空" warntip="#textErr" value="<?php echo isset($info['item_name'])?$info['item_name']:''?>">
                 <?php if( V('g:item_id', false)){?>
                  <input type="hidden" value="<?php echo V('g:item_id');?>" name="id" />
                 <?php } ?>
@@ -38,7 +38,7 @@
                 </select>	
                 <a href="javascript:;" id="showArea">创建一个用户组</a>
                 <span id="addArea" class="hidden">
-                  分组名称: <input type="text" class="input-txt form-el-w100" id="Groupname"> <a class="icon-add" href="javascript:;" id="addGroup"> 添加分组 </a> <a href="javascript:;" class="icon-del" id="calGroup">取消 </a>
+                  分组名称: <input type="text" class="input-txt w100" id="Groupname"> <a class="icon-add" href="javascript:;" id="addGroup"> 添加分组 </a> <a href="javascript:;" class="icon-del" id="calGroup">取消 </a>
                 </span>
                 <span class="tips-error hidden" id="newListNameErr">该用户组已存在</span>
             </div>
@@ -72,8 +72,8 @@
 					<?php }}?>
 					<tr>
 						<td>&nbsp;</td>
-						<td><input type="text"  class="input-txt txt-s1" name="nickname" id="nickname"/> <span class="tips-error hidden">该用户不存在</span> </td>
-						<td><input type="text" class="input-txt txt-s1" name="remark" id="remark"/></td>
+						<td><input type="text"  class="input-txt w130" name="nickname" id="nickname"/> <span class="tips-error hidden">该用户不存在</span> </td>
+						<td><input type="text" class="input-txt w130" name="remark" id="remark"/></td>
 						<td><a href="javascript:;" class="icon-add" rel="e:addUser">添加</a></td>
 					</tr>
 				</table>
@@ -81,7 +81,7 @@
 		</div>
 	</form>
     <div class="btn-area">		
-        <a class="general-btn btn-s2" href="javascript:;" id="submitBtn"><span>确定</span></a>
-        <a class="general-btn" href="javascript:;" id="pop_cancel"><span>取消</span></a>
+        <a class="btn-general highlight" href="javascript:;" id="submitBtn"><span>确定</span></a>
+        <a class="btn-general" href="javascript:;" id="pop_cancel"><span>取消</span></a>
     </div>
 </div>

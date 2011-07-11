@@ -16,8 +16,8 @@
 				<div class="content">
 					<div class="main">
 						<div class="title-box">
-							<a class="btn-send-mes" href="#" rel="e:sdm">发私信</a>	
-							<h3>我的私信</h3>
+						<a class="btn-s2" href="#" rel="e:sdm"><span><?php LO('index__message__sendMessage');?></span></a>	
+						<h3><?php LO('index__message__listTitle');?></h3>
 						</div>
 						
 						<?php Xpipe::pagelet('common.message');?>
@@ -30,6 +30,7 @@
 					<!-- 用户标签 开始-->
 					<?php Xpipe::pagelet('common.userTag');?>
 					<?php Xpipe::pagelet('common.sideComponents', array('type'=>2) );?>
+						<?php echo F('show_ad', 'sidebar', '');?>
 				</div>
 			</div>
 			<!-- 底部 开始-->

@@ -139,9 +139,11 @@ function check_dir(&$result)
 					'./var',
 					'./var/cache',
 					'./var/data',
-					'./var/data/fonts',
+					'./img/fonts',
 					'./var/data/logo',
+					'./var/log',
 					'./var/upload',
+					'./var/upload/avatarTemp',
 					'./install/data');
 
 	$check_dir_files = array();
@@ -518,8 +520,10 @@ function check_app_key($link, $db_name, $db_prefix = null)
 function create_tables($db_host, $db_user, $db_passwd, $db_name, $db_prefix)
 {
 	global $_LANG;
-	$fp = fopen(ROOT_PATH.'/install/data/'.XWEIBO_DB_STRUCTURE_FILE_NAME, 'r');
-	$sql_items = fread($fp, filesize(ROOT_PATH.'/install/data/'.XWEIBO_DB_STRUCTURE_FILE_NAME));
+	$lang_type = isset($_COOKIE['xwb_install_config_lang']) ? $_COOKIE['xwb_install_config_lang'] : 'zh_cn';
+	$data_sql = XWEIBO_DB_STRUCTURE_FILE_NAME.'_'.$lang_type.'.'.XWEIBO_VERSION.'.sql';
+	$fp = fopen(ROOT_PATH.'/install/data/'.$data_sql, 'r');
+	$sql_items = fread($fp, filesize(ROOT_PATH.'/install/data/'.$data_sql));
 	fclose($fp);
 
 	/// 删除SQL行注释
@@ -643,13 +647,17 @@ function action_dbs($db_host, $db_user, $db_passwd, $db_name, $db_prefix, $cover
 		} elseif ('0' != $ret) {
 			/// 检查之前安装的版本号
 			$ver = check_version($db_host, $db_user, $db_passwd, $db_name, $db_prefix);
+			if ('1' == $ver) {
+				/// 相同版本的前提，检查之前安装的语言类型
+				$ver = check_lang($db_host, $db_user, $db_passwd, $db_name, $db_prefix);
+			}
 		} else {
 			$ver = $ret;
 		}
 
 		if ('1' == $ver) {
 			/// 相同版本
-			return true;
+			return '20000';
 		} elseif ('0' == $ver) {
 			/// 查询不到版本信息，就覆盖安装
 			create_db($db_host, $db_user, $db_passwd, $db_name);
@@ -661,6 +669,7 @@ function action_dbs($db_host, $db_user, $db_passwd, $db_name, $db_prefix, $cover
 			init_site_data($db_host, $db_user, $db_passwd, $db_name, $db_prefix);
 		} else {
 			/// 先备份数据
+			/*
 			$link = db_resource($db_host, $db_user, $db_passwd, $db_name);
 			$sql = 'SHOW tables';
 			$result = mysql_query($sql, $link);
@@ -685,6 +694,7 @@ function action_dbs($db_host, $db_user, $db_passwd, $db_name, $db_prefix, $cover
 				die($_LANG['xweibo_uninstall_backup_error']);
 			}
 			fclose($fp);
+			 */
 
 			/// 不同版本
 			$fun_name = 'action_db'.str_replace('.', '', XWEIBO_VERSION);
@@ -694,7 +704,7 @@ function action_dbs($db_host, $db_user, $db_passwd, $db_name, $db_prefix, $cover
 			if (in_array($fun_name, $fun_lists)) {
 				call_user_func(array($upgrade, $fun_name), $db_prefix);
 			}
-			return true;
+			return '20001';
 		}
 	}
 }
@@ -776,7 +786,7 @@ function init_site_data($db_host, $db_user, $db_passwd, $db_name, $db_prefix = '
 
 	$link = db_resource($db_host, $db_user, $db_passwd, $db_name);
 	$table = $db_prefix.'sys_config';
-	$sql = "INSERT INTO $table (`key`,`value`)VALUES('site_name','".mysql_real_escape_string(WB_USER_SITENAME)."'),('wb_version','".mysql_real_escape_string(XWEIBO_VERSION)."'),('app_key', '".mysql_real_escape_string(WB_AKEY)."'),('app_secret', '".mysql_real_escape_string(WB_SKEY)."'),('db_prefix', '".mysql_real_escape_string($db_prefix)."')";
+	$sql = "INSERT INTO $table (`key`,`value`)VALUES('site_name','".mysql_real_escape_string(WB_USER_SITENAME)."'),('wb_version','".mysql_real_escape_string(XWEIBO_VERSION)."'),('app_key', '".mysql_real_escape_string(WB_AKEY)."'),('app_secret', '".mysql_real_escape_string(WB_SKEY)."'),('db_prefix', '".mysql_real_escape_string($db_prefix)."'),('wb_lang_type','" .(isset($_COOKIE['xwb_install_config_lang'])?$_COOKIE['xwb_install_config_lang']: 'zh_cn'). "')";
 	if (mysql_query($sql, $link) == false) {
 		/// 错误日志
 		install_log('sql: '.$sql." \r\nerrno: ".mysql_errno($link)." \r\nerror: ".mysql_error($link));
@@ -1321,5 +1331,169 @@ function clear_tables($db_host, $db_user, $db_passwd, $db_name, $db_prefix) {
 
 	mysql_close($link);
 
+}
+
+/**
+ *
+ * 更新表结构和数据
+ *
+ */
+function upgrade_tables($db_prefix, $link) {
+	global $_LANG;
+	$lang_type = getLangType();
+	$data_sql = 'upgrade_'.$lang_type.'.'.XWEIBO_VERSION.'.sql';
+	$fp = fopen(ROOT_PATH.'/install/data/'.$data_sql, 'r');
+	$sql_items = fread($fp, filesize(ROOT_PATH.'/install/data/'.$data_sql));
+	fclose($fp);
+
+	/// 删除SQL行注释
+	$sql_items = preg_replace('/^\s*(?:--|#).*/m', '', $sql_items);
+	/// 删除SQL块注释
+	$sql_items = preg_replace('/^\s*\/\*.*?\*\//ms', '', $sql_items);
+	/// 代替表前缀
+	$keywords = 'CREATE\s+TABLE(?:\s+IF\s+NOT\s+EXISTS)?|'
+			  . 'DROP\s+TABLE(?:\s+IF\s+EXISTS)?|'
+			  . 'ALTER\s+TABLE|'
+			  . 'UPDATE|'
+			  . 'REPLACE\s+INTO|'
+			  . 'DELETE\s+FROM|'
+			  . 'INSERT\s+INTO|'
+			  .	'LOCK\s+TABLES';
+	$pattern = '/(' . $keywords . ')(\s*)`?' . XWEIBO_SCRPIT_DB_PREFIX . '(\w+)`?(\s*)/i';
+	$replacement = '\1\2`' . $db_prefix . '\3`\4';
+	$sql_items = preg_replace($pattern, $replacement, $sql_items);
+
+	$pattern = '/(UPDATE.*?WHERE)(\s*)`?' . XWEIBO_SCRPIT_DB_PREFIX . '(\w+)`?(\s*\.)/i';
+	$replacement = '\1\2`' . $db_prefix . '\3`\4';
+	$sql_items = preg_replace($pattern, $replacement, $sql_items);
+
+	$sql_items = str_replace("\r", '', $sql_items);
+	$query_items = explode(";\n", $sql_items);
+
+	$sign = true;
+	
+	foreach ($query_items as $var) {
+		$var = trim($var);
+
+		if (empty($var)) {
+			continue;
+		}
+
+		$sign = mysql_query($var, $link);
+		if (!$sign) {
+			/// 错误日志
+			install_log('sql: '.$var." \r\nerrno: ".mysql_errno($link)." \r\nerror: ".mysql_error($link));
+		}
+	}
+
+	if (!$sign) {
+		show_msg($_LANG['tables_create_error']);
+	}
+}
+
+/**
+ *
+ * 返回系统管理员的id
+ */
+function getAdminId() {
+	return SYSTEM_SINA_UID;
+}
+
+/**
+ * 返回系统语言类型
+ */
+function getLangType() {
+	$lang_type = isset($_COOKIE['xwb_install_config_lang']) ? $_COOKIE['xwb_install_config_lang'] : 'zh_cn';
+	return $lang_type;
+}
+
+/**
+ * 获取之前xweibo版本的版本号
+ */
+function getXweiboVer($db_host, $db_user, $db_passwd, $db_name, $db_prefix) {
+	$link = db_resource($db_host, $db_user, $db_passwd, $db_name, true);
+	if ($link == '-1') {
+		return false;
+	}
+
+	$sysConfigTable = $db_prefix.'sys_config';
+
+	$sql = 'SELECT value FROM '.$sysConfigTable.' WHERE `key` = "wb_version"';
+	$ret = mysql_query($sql, $link);
+	if ($ret) {
+		$fields_rows = mysql_fetch_assoc($ret);
+		if ($fields_rows) {
+			$old_ver = $fields_rows['value'];
+			return $old_ver;
+		}
+	}
+
+	return false;
+
+	mysql_close($link);
+}
+
+/**
+ * 添加新定义到 userconfig文件
+ */
+function modifyUserConfig($str) {
+	global $_LANG;
+	if (empty($str)) {
+		return false;
+	}
+	$fp = fopen(ROOT_PATH.'/user_config.php', 'ab+');
+	if ($fp == false) {
+		show_msg($_LANG['create_config_error']);
+	} else {
+		if (fwrite($fp, $str) === false) {
+			show_msg($_LANG['write_config_error']);
+		}
+		fclose($fp);
+	}
+}
+
+/**
+ * 检测之前安装xweibo的语言类型
+ *
+ * @param unknown_type
+ * @return unknown
+ */
+function check_lang($db_host, $db_user, $db_passwd, $db_name, $db_prefix = null)
+{
+	$link = db_resource($db_host, $db_user, $db_passwd, $db_name);
+
+	if ($db_prefix) {
+		$table_name = $db_prefix.'sys_config';
+	} else {
+		$sql = "show tables like '%sys_config'";
+		$result = mysql_query($sql, $link);
+		$list = array();
+		while ($row = mysql_fetch_array($result, MYSQL_NUM)) {
+			if (empty($row[0])) {
+				return '0';
+			}
+			$sql = 'SELECT value FROM '.$row[0].' WHERE `key` = "wb_version"';
+			$ret = mysql_query($sql, $link);
+			$fields_rows = mysql_fetch_assoc($ret);
+			if ($fields_rows) {
+				$table_name = $row[0];
+				break;
+			}
+			return '0';
+		}
+	}
+
+	$sql = 'SELECT value FROM '.$table_name.' WHERE `key` = "wb_lang_type"';
+	$ret = mysql_query($sql, $link);
+	if ($ret) {
+		$row = mysql_fetch_assoc($ret);
+		if ($row['value'] == getLangType()) {
+			return '1';
+		}
+		return '0';
+	}
+	return '0';
+
+	mysql_close();
 }
 ?>

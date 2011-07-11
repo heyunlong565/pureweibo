@@ -29,9 +29,9 @@ Xwb.ax.Tpl.reg({
   
 
      
-     MsgDlgContent : '<div class="tips-c"><div class="icon-alert all-bg" id="xwb_msgdlg_icon"></div><p id="xwb_msgdlg_ct"></p></div>',
+     MsgDlgContent : '<div class="tips-c"><div class="icon-alert" id="xwb_msgdlg_icon"></div><p id="xwb_msgdlg_ct"></p></div>',
      
-     Button : '<a href="#" class="general-btn {.cs}" id="xwb_btn_{.id}"><span>{.title}</span></a>',
+     Button : '<a href="#" class="btn-general {.cs}" id="xwb_btn_{.id}"><span>{.title}</span></a>',
 
 	EmotionHotList: '<div class="hot-e-list" id="hotEm">{.hotList}</div>',
      
@@ -46,7 +46,7 @@ Xwb.ax.Tpl.reg({
             '</div>',
         '</div>'
      ].join(''),
-     ArrowBoxBottom  : '<div class="arrow all-bg"></div>',
+     ArrowBoxBottom  : '<div class="arrow"></div>',
      EmotionIcon       : '<a href="javascript:;" title="{.title}" rel="e:em"><img src="{.src}"></a>',
      Loading : '<div id="xweibo_loading" class="loading"></div>',
     
@@ -55,7 +55,7 @@ Xwb.ax.Tpl.reg({
 	].join(''),
 	
     
-    UploadImgBtn : '<a href="#" rel="e:dlp" class="icon-close-btn icon-bg" title="删除"></a>',
+    UploadImgBtn : '<a href="#" rel="e:dlp" class="icon-close-btn" title="删除"></a>',
    
     AnchorTipContent : '<div class="tips-c"><div class="icon-correct"></div><p id="xwb_title"></p></div>',
     

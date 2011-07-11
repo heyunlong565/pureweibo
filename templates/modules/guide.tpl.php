@@ -12,7 +12,7 @@
 	<div id="wrap">
 	<a class="gotop" href="#">
 		<span class="gotop-bg">in</span>
-		<span class="txt skin-bg">返回顶部</span>
+		<span class="txt skin-bg"><?php LO('common__template__goTop');?></span>
 	</a>
     	<div class="wrap-in">
             <!-- 头部 开始-->

@@ -26,24 +26,24 @@ class show_mod {
 
 		if (empty($id)) {
 			//提示访问的页面不存在，跳转到首页
-			APP::tips(array('tpl' => 'e404', 'msg' => '抱歉你所访问的页面不存在'));
+			APP::tips(array('tpl' => 'e404', 'msg' => L('controller__common__pageNotExist')));
 		}
 
 		//调用单条微博的详细信息接口
 		$mblog_info = DR('xweibo/xwb.getStatuseShow', '', $id);
 		if ($mblog_info['errno']) {
-			APP::tips(array('tpl' => 'e404', 'msg'=> '您要访问的页面不存在'));
+			APP::tips(array('tpl' => 'e404', 'msg'=> L('controller__common__pageNotExist')));
 		}
 		$mblog_info = $mblog_info['rst'];
 
 		/// 过滤过敏微博
 		$mblog_info = APP::F('weibo_filter', $mblog_info, true);
 		if (empty($mblog_info)) {
-			APP::tips(array('tpl' => 'e404', 'msg'=> '您要访问的页面不存在'));
+			APP::tips(array('tpl' => 'e404', 'msg'=> L('controller__common__pageNotExist')));
 		} elseif (in_array(3, $mblog_info['filter_state'])) {
 			// 如果不是管理员则返回出错信息
 			if (!USER::aid()) {
-				APP::tips(array('tpl' => 'e403', 'msg'=> '该微博已被删除或屏蔽'));
+				APP::tips(array('tpl' => 'e403', 'msg'=> L('controller__show__weiboDelOrShielding')));
 			}
 		}
 
@@ -54,7 +54,7 @@ class show_mod {
 		$userinfo = F('user_filter', $userinfo, true);
 
 		if (empty($userinfo)) {
-			APP::tips(array('tpl' => 'e404', 'msg' => '抱歉你所访问的用户不存在'));
+			APP::tips(array('tpl' => 'e404', 'msg' => L('controller__common__userNotExist')));
 		}
 
 		$ids = array();
@@ -78,18 +78,18 @@ class show_mod {
 
 	function disabled() {
 		if (!USER::aid()) {
-			APP::ajaxRst(false, '-1', '不是管理员');
+			APP::ajaxRst(false, '-1', L('controller__show__notAdmin'));
 		}
 		$id = V('r:id', false);
 		if (!$id || !is_numeric($id)){
-			APP::ajaxRst(false, '1', '缺少参数');
+			APP::ajaxRst(false, '1', L('controller__show__missParameter'));
 		}
 		
 		DR('xweibo/xwb.setToken','', 2);
 		$rst = DR('xweibo/xwb.getStatuseShow','', $id);
 		$data = $rst['rst'];
 		if (isset($data['error_code']) && $data['error_code']) {
-			APP::ajaxRst(false, '3', '接口出错');
+			APP::ajaxRst(false, '3', L('controller__show__apiError'));
 		}
 		$values = array(
 				'type' => 1,
@@ -110,7 +110,7 @@ class show_mod {
 			APP::ajaxRst(true);
 		}
 		
-		APP::ajaxRst(false, '2','屏蔽微博失败,可能该微博已经在屏蔽列表');
+		APP::ajaxRst(false, '2', L('controller__show__shieldWeibo'));
 		//APP::ajaxRst(false, 2122202, '屏蔽微博失败,可能该微博已经在屏蔽列表');
 	}
 	
@@ -124,12 +124,12 @@ class show_mod {
 		// check data
 		$cid = V('p:cid', FALSE);
 		if (empty($cid) || !is_numeric($cid)) {
-			APP::ajaxRst(false, '1', '微博ID不能为空');
+			APP::ajaxRst(false, '1', L('controller__show__weiboIdNotAllowEmpty'));
 		}
 		
 		$content = V('p:content', FALSE);
 		if (empty($content)) {
-			APP::ajaxRst(false, '1', '举报内容不能为空');
+			APP::ajaxRst(false, '1', L('controller__show__reportContentEmpty'));
 		}
 		
 		// report to API, 不考虑接口出错问题，认为提交都成功

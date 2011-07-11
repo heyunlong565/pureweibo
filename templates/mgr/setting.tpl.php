@@ -37,7 +37,7 @@
     <div class="main-cont">
         <h3 class="title">站点信息设置</h3>
         <div class="set-area">
-        	<div class="form-area web-info-form">
+        	<div class="form web-info-form">
             	<form action="" name="form1" method="post" id="this_form">
                     <div class="form-row">
                         <label class="form-field">网站名称</label>
@@ -67,6 +67,21 @@
                             <p class="form-tips">继承新浪微博用户关系后，你的网站用户关系如关注数、粉丝数会与新浪微博同步</p>
                     	</div>
                     </div>
+<!--                    <div class="form-row">-->
+<!--                        <label class="form-field">选择前台使用语言</label>-->
+<!--                        <div class="form-cont">-->
+<!--                        	<label><input type="radio" name="wb_lang_type" value="zh_tw" <?php if (isset($config['wb_lang_type'])  && ('zh_tw'==$config['wb_lang_type'])){echo 'checked="checked"'; } ?> />繁体中文</label>-->
+<!--                        	<label><input type="radio" name="wb_lang_type" value="zh_cn" <?php if (!isset($config['wb_lang_type']) || ('zh_cn'==$config['wb_lang_type'])){echo 'checked="checked"'; } ?> />简体中文版</label>-->
+<!--                        </div>-->
+<!--                    </div>-->
+					<div class="form-row">
+                        <label class="form-field" for="declare">网站首页设置</label>
+                        <div class="form-cont">
+                        	<label><input type="radio" value="0" <?php if ( !(isset($config['sysLoginModel'])&&$config['sysLoginModel']) ){echo 'checked="checked"'; } ?> name="sysLoginModel">微博广场作为网站首页</label>
+							<br/>
+                        	<label><input type="radio" value="1" <?php if ( isset($config['sysLoginModel'])&&$config['sysLoginModel'] ){echo 'checked="checked"'; } ?> name="sysLoginModel">类似新浪微博的未登录首页（用户需要登录才能访问广场页）</label>
+                    	</div>
+                    </div>
                     <input type="hidden" name="logo" id="logo" value="<?php echo $config['logo'];?>" />
                 </form>
             </div>
@@ -75,7 +90,7 @@
         <form id="logo_form" target="logo_upload" method="post" action="<?php echo URL('mgr/setting.uploadLogo')?>" enctype="multipart/form-data">
         <h3 class="title">请选择需要在网站中使用的LOGO图案</h3>
         <div class="set-area">
-            <div class="form-area web-info-form">
+            <div class="form web-info-form">
                 <div class="form-row">
                 	<label for="upload_file" class="form-field">选择图片</label>
                     <div class="form-cont">
@@ -92,7 +107,7 @@
                     </div>
                     <iframe name="logo_upload" style="display:none;"></iframe>
                 </div>
-                <div class="btn-area"><a href="#" id="submitBtn" class="general-btn btn-s2" name="保存修改"><span>提交</span></a></div>
+                <div class="btn-area"><a href="#" id="submitBtn" class="btn-general highlight" name="保存修改"><span>提交</span></a></div>
             </div>
         </div>
         </form>

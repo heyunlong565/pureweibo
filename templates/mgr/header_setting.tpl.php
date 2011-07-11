@@ -9,47 +9,47 @@
 <script src="<?php echo W_BASE_URL;?>js/admin-all.js"></script>
 <script type="text/javascript">
 	var addHtmlMode=['<form action="<?php echo URL('mgr/setting.editLink');?>" method="post" id="form1"  name="add-newlink">',
-					'	<div class="pop-form">',
+					'	<div class="form-box">',
 					'		<div class="form-row">',
-					'			<label for="link_name">链接文字</label>',
+					'			<label for="link_name" class="form-field">链接文字</label>',
 					'			<div class="form-cont">',
-					'				<input id="link_name" name="link_name" class="input-txt" type="text" warntip="#nameTip1" vrel="_f|sz=max:12,m:不能超过6个字,ww:true|ne=m:不能为空" value=""/><span id="nameTip1" class="tips-error hidden">验证错误提示</span>',
+					'				<input id="link_name" name="link_name" class="ipt-txt" type="text" warntip="#nameTip1" vrel="_f|sz=max:12,m:不能超过6个字,ww:true|ne=m:不能为空" value=""/><span id="nameTip1" class="tips-error hidden">验证错误提示</span>',
 	                '    			<p class="form-tips">链接文字的长度不得超过6</p>',
 					'			</div>',
 					'		</div>',
 					'		<div class="form-row">',
-					'			<label for="link-address">链接</label>',
+					'			<label for="link-address" class="form-field">链接</label>',
 					'			<div class="form-cont">',
-					'				<input id="link_address" name="link_address" class="input-txt" type="text" value="http://" warntip="#linkTip1" vrel="_f|sz=max:255,m:不能超过255字符|ne=m:不能为空"/><span class="tips-error hidden" id="linkTip1"></span>',
+					'				<input id="link_address" name="link_address" class="ipt-txt" type="text" value="http://" warntip="#linkTip1" vrel="_f|sz=max:255,m:不能超过255字符|ne=m:不能为空"/><span class="tips-error hidden" id="linkTip1"></span>',
 					'			</div>',
 					'		</div>',
 					'		<div class="btn-area">',
 					'			<input type="hidden" name="action" id="add_action" value="foot" />',
-					'			<a class="general-btn  btn-s2" id="pop_ok" href="#this" id="pop_submit"><span>确定</span></a>',
-					'			<a class="general-btn" id="pop_cancel" href="#this" id="pop_cancel"><span>取消</span></a>',
+					'			<a class="btn-general  highlight" id="pop_ok" href="#this" id="pop_submit"><span>确定</span></a>',
+					'			<a class="btn-general" id="pop_cancel" href="#this" id="pop_cancel"><span>取消</span></a>',
 					'		</div>',
 					'	</div>',
 					'</form>'].join('');
 	var editHtmlMode=['<form action="<?php echo URL('mgr/setting.editLink');?>" method="post" id="form2" name="changes-newlink">',
-					'	<div class="pop-form">',
+					'	<div class="form-box">',
 					'		<div class="form-row">',
-					'			<label for="edit_name">链接文字</label>',
+					'			<label for="edit_name" class="form-field">链接文字</label>',
 					'			<div class="form-cont">',
-					'				<input name="link_name" id="edit_name" class="input-txt" type="text" value="" warntip="#nameTip2" vrel="_f|sz=max:12,m:不能超过6个字,ww:true|ne=m:不能为空"/><span class="tips-error hidden" id="nameTip2"> </span>',
+					'				<input name="link_name" id="edit_name" class="ipt-txt" type="text" value="" warntip="#nameTip2" vrel="_f|sz=max:12,m:不能超过6个字,ww:true|ne=m:不能为空"/><span class="tips-error hidden" id="nameTip2"> </span>',
 	                '           	 <p class="form-tips">链接文字的长度不得超过6</p>',
 					'			</div>',
 					'		</div>',
 					'		<div class="form-row">',
-					'			<label for="edit_address">链接</label>',
+					'			<label for="edit_address" class="form-field">链接</label>',
 					'			<div class="form-cont">',
-					'				<input name="link_address" id="edit_address" class="input-txt" type="text" value="http://" warntip="#linkTip2" vrel="_f|sz=max:255,m:不能超过255字符|ne=m:不能为空"/><span class="tips-error hidden" id="linkTip2"> </span>',
+					'				<input name="link_address" id="edit_address" class="ipt-txt" type="text" value="http://" warntip="#linkTip2" vrel="_f|sz=max:255,m:不能超过255字符|ne=m:不能为空"/><span class="tips-error hidden" id="linkTip2"> </span>',
 	                '			</div>',
 					'		</div>',
 					'		<div class="btn-area"s>',
 					'			<input type="hidden" name="id" id="edit_id" value="" />',
 					'			<input type="hidden" name="action" id="edit_action" value="" />',
-					'			<a class="general-btn  btn-s2" id="pop_ok" href="#" id="pop_submit"><span>确定</span></a>',
-					'			<a class="general-btn" id="pop_cancel" href="#" id="pop_cancel"><span>取消</span></a>',
+					'			<a class="btn-general  highlight" id="pop_ok" href="#" id="pop_submit"><span>确定</span></a>',
+					'			<a class="btn-general" id="pop_cancel" href="#" id="pop_cancel"><span>取消</span></a>',
 					'		</div>',
 					'	</div>',
 					'</form>'].join('');
@@ -62,7 +62,7 @@
 				trigger: '#pop_ok'
 			},
 			dlgcfg:{
-				cs:'add-link win-fixed',
+				cs:'win-link win-fixed',
 				onViewReady:function(View){
 					var self=this;
 					$(View).find('#pop_cancel').click(function(){
@@ -86,7 +86,7 @@
 						trigger: '#pop_ok'
 					},
 					dlgcfg:{
-						cs:'add-link win-fixed',
+						cs:'win-link win-fixed',
 						onViewReady:function(View){
 							var self=this;
 							$(View).find('#pop_cancel').click(function(){
@@ -117,14 +117,13 @@
 <div class="main-body">
 	<div class="path"><p>当前位置：内容管理<span>&gt;</span>页头页脚链接</p></div>
     <div class="main-cont">
-    	<?php if (!isset($adminNotShowNav['mgr/setting.getlink.header'])) {?>
-        <h3 class="title"><a class="general-btn" href="javascript:add('head');"><span>添加新的链接</span></a>页头链接列表</h3>
+        <h3 class="title"><a class="btn-general" href="javascript:add('head');"><span>添加新的链接</span></a>页头链接列表</h3>
         <div class="set-area">
             <table class="table" cellpadding="0" cellspacing="0" width="100%" border="0">
                 <colgroup>
-                    <col class="h-w120" />
+                    <col class="w120" />
                     <col />
-                    <col class="h-w140" />
+                    <col class="w140" />
                 </colgroup>
                 <thead class="tb-tit-bg">
                     <tr>
@@ -147,14 +146,13 @@
                 </tbody>
             </table>
         </div>
-        <?php } ?>
-        <h3 class="title"><a class="general-btn" href="javascript:add('foot');"><span>添加新的链接</span></a>页脚链接列表</h3>
+        <h3 class="title"><a class="btn-general" href="javascript:add('foot');"><span>添加新的链接</span></a>页脚链接列表</h3>
         <div class="set-area">
             <table class="table" cellpadding="0" cellspacing="0" width="100%" border="0">
                 <colgroup>
-                    <col class="h-w120" />
+                    <col class="w120" />
                     <col />
-                    <col class="h-w140" />
+                    <col class="w140" />
                 </colgroup>
                 <thead class="tb-tit-bg">
                     <tr>

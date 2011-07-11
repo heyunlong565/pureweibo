@@ -32,6 +32,7 @@
 					<?php Xpipe::pagelet('common.userTag');?>
 					<!-- 用户标签 结束-->
 					<?php Xpipe::pagelet('common.sideComponents', array('type'=>4) );?>
+						<?php echo F('show_ad', 'sidebar', '');?>
 				</div>
 			</div>
 			<!-- 底部 开始-->

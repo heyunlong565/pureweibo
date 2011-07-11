@@ -11,11 +11,11 @@ html{ background:#F2F5F8;}
 <body>
 <div id="login-wrap">
 	<div class="login-main">
-    	<div class="login-t">
+    	<div class="login-tit">
         	<div class="admin-logo"></div>
             <div class="tit"></div>
         </div>
-        <div class="login-active">
+        <div class="lg-active">
         	<p>请激活管理员帐号，以便使用后台管理功能</p>
             <a href="<?php echo URL('mgr/active_admin.active');?>" class="active-one">激活管理员帐号</a>
         </div>

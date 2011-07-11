@@ -35,7 +35,7 @@ class event_mod {
 		$eid = V('g:eid');
 		/// 编辑的id为空
 		if (empty($eid)) {
-			APP::tips(array('tpl' => 'e404', 'msg' => '抱歉你所访问的活动不存在'));
+			APP::tips(array('tpl' => 'e404', 'msg' => L('controller__common__eventNotExist')));
 		}
 
 		TPL::display('events_form');
@@ -53,20 +53,28 @@ class event_mod {
 	}
 
 	/**
+	 * 活动列表
+	 */
+	function eventlist() {
+
+		TPL::display('eventlist');
+	}
+
+	/**
 	 * 活动详情
 	 */
 	function details() {
 		/// 活动id
 		$eid = V('g:eid', '');
 		if (empty($eid)) {
-			APP::tips(array('tpl' => 'e404', 'msg' => '抱歉你所访问的活动不存在'));
+			APP::tips(array('tpl' => 'e404', 'msg' => L('controller__common__eventNotExist')));
 		}
 
 		///获取活动的详细信息
-		$info = DS('events.getEventById', 'g0/1800', $eid);
+		$info = DS('events.getEventById', '', $eid);
 		if (empty($info) || 
 			(isset($info['state']) && ($info['state'] == 2 || $info['state'] == 3) && (isset($info['sina_uid']) && $info['sina_uid'] != USER::uid()))) {
-			APP::tips(array('tpl' => 'e404', 'msg' => '抱歉你所访问的活动不存在'));
+			APP::tips(array('tpl' => 'e404', 'msg' => L('controller__common__eventNotExist')));
 		}
 
 		TPL::assign('info', $info);
@@ -79,9 +87,9 @@ class event_mod {
 	function member() {
 		$eid = V('r:eid');
 		if (!$eid) {
-			APP::tips(array('tpl' => 'e404', 'msg' => '抱歉你所访问的活动不存在'));
+			APP::tips(array('tpl' => 'e404', 'msg' => L('controller__common__eventNotExist')));
 		}
-		$event_info = DS('events.getEventById', 'g0/1800', $eid);
+		$event_info = DS('events.getEventById', '', $eid);
 		TPL::assign('event_info', $event_info);
 		TPL::display('events_person');
 
@@ -99,7 +107,7 @@ class event_mod {
 					APP::ajaxRst(false,'3001005');
 					exit;
 				}
-				$data = DR('events.getEventById','g0/1800',$id);
+				$data = DR('events.getEventById','',$id);
 				$event = $data['rst'];
 				//是否有权限编辑此活动
 				if($event===false || sizeof($event)==0 || $event['sina_uid']!= USER::uid() || $event['state']=='3'){
@@ -113,34 +121,66 @@ class event_mod {
 			$result = DR('events.save','',$data,$id);
 			
 			$eid = $id;
-			if(!$id && $result['rst']){				
+			if(!$id && $result['rst'])
+			{				
 				$eid = $result['rst'];
 				//发起者默认参加此活动
-				DR('events.joinEvent','',$eid, USER::uid());
-
-				//发活动的微博失败不处理
-				//$wb = DR('xweibo/xwb.update','',$this->_get_wb_content($data,$eid));
-				$wb = DR('xweibo/xwb.upload','',$this->_get_wb_content($data,$eid), $data['pic']);
-
-				if($wb['errno']==0 && $wb['rst']['id']!=''){				
-					///查询是否开启数据备份
-					$plugins = DR('Plugins.get', '', 6);
-					$plugins = $plugins['rst'];
-					if (isset($plugins['in_use']) && $plugins['in_use'] == 1) {
-						$db = APP::ADP('db');
-
-						$db->setTable('weibo_copy');
-						$data_weibo = array();
-						$data_weibo['id'] = $wb['rst']['id'];
-						$data_weibo['weibo'] = $wb['rst']['text'];
-						$data_weibo['uid'] = $wb['rst']['user']['id'];
-						$data_weibo['nickname'] = $wb['rst']['user']['screen_name'];
-						$data_weibo['addtime'] = APP_LOCAL_TIMESTAMP;
-						$data_weibo['disabled'] = 0;
-						$db->save($data_weibo);
+				DR('events.joinEvent','',$eid, USER::uid(), $data['phone'], mb_substr($data['desc'], 0, 50, 'UTF-8'));
+				
+		
+				// 先审后发
+				$wbContent = $this->_get_wb_content($data, $eid);
+				if ( F('strategy', $wbContent) )
+				{
+					// 图片发送给api
+					$wbVerify['picid'] = $data['pic'];
+					if ( count(explode('://', $data['pic']))>1 )
+					{
+						$picRst = DR('xweibo/xwb.uploadPic', FALSE, $data['pic']);
+						if ( isset($picRst['rst']['pic_id']) ) {
+							$wbVerify['picid']	= $picRst['rst']['pic_id'];
+						}
 					}
-
-					$result2 = DR('events.save','',array('wb_id'=>$wb['rst']['id']),$eid);				
+					
+					$wbVerify['weibo']			= $wbContent;
+					$wbVerify['type'] 			= 'event';
+					$wbVerify['extend_id'] 		= $eid;
+					$wbVerify['extend_data'] 	= json_encode(array('event_id'=>$eid, 'event_wb'=>1));
+					$wbVerify['sina_uid']		= USER::uid();
+					$wbVerify['nickname']		= USER::get('screen_name');
+					$userToken					= USER::getOAuthKey(TRUE);
+					$wbVerify['access_token']	= $userToken['oauth_token'];
+					$wbVerify['token_secret']	= $userToken['oauth_token_secret'];
+					$wbVerify['dateline']		= APP_LOCAL_TIMESTAMP;
+			
+					$result = DR('weiboVerify.addWeiboVerify', FALSE, $wbVerify);
+				}
+				else 	// 先发后审
+				{
+					//发活动的微博失败不处理
+					$wb = DR('xweibo/xwb.upload', '', $wbContent, $data['pic']);
+	
+					if($wb['errno']==0 && $wb['rst']['id']!='')
+					{				
+						///查询是否开启数据备份
+						$plugins = DR('Plugins.get', '', 6);
+						$plugins = $plugins['rst'];
+						if (isset($plugins['in_use']) && $plugins['in_use'] == 1) {
+							$db = APP::ADP('db');
+	
+							$db->setTable('weibo_copy');
+							$data_weibo = array();
+							$data_weibo['id'] = $wb['rst']['id'];
+							$data_weibo['weibo'] = $wb['rst']['text'];
+							$data_weibo['uid'] = $wb['rst']['user']['id'];
+							$data_weibo['nickname'] = $wb['rst']['user']['screen_name'];
+							$data_weibo['addtime'] = APP_LOCAL_TIMESTAMP;
+							$data_weibo['disabled'] = 0;
+							$db->save($data_weibo);
+						}
+	
+						$result2 = DR('events.save','',array('wb_id'=>$wb['rst']['id']),$eid);				
+					}
 				}
 			}
 			
@@ -163,7 +203,7 @@ class event_mod {
 			exit;			
 		}
 
-		$data = DR('events.getEventById','g0/1800',$eid);
+		$data = DR('events.getEventById','',$eid);
 		$event = $data['rst'];
 		//是否有权限编辑此活动
 		if($event===false || sizeof($event)==0 || $event['sina_uid']!= USER::uid()){
@@ -186,7 +226,7 @@ class event_mod {
 			exit;			
 		}
 
-		$data = DR('events.getEventById','g0/1800',$eid);
+		$data = DR('events.getEventById','',$eid);
 		$event = $data['rst'];
 		//是否有权限编辑此活动
 		if($event===false || sizeof($event)==0 || $event['sina_uid']!= USER::uid()){
@@ -269,7 +309,8 @@ class event_mod {
 					$imageInfo = $image->getImgInfo();
 					if($imageInfo['width']>120 || $imageInfo['height']>120){
 						$image->resize(120,120);
-						$image->save($fileName);
+						$rs = $image->save($fileName);
+						$fileInfo['webpath'] = $rs;
 					}
 				}else{
 					$image->loadFile($fileInfo['savepath']);
@@ -294,7 +335,11 @@ class event_mod {
 		
 		$json = array();
 		$result['pic'] = $fileInfo['webpath'];
-		$result['filepath'] = $fileInfo['webpath'];
+		//if (strtolower(IMAGE_ADAPTER)==='sae') {
+			$result['filepath'] = $fileInfo['webpath'];
+		//} else {
+			//$result['filepath'] = $fileInfo['savepath'];
+		//}
 
 		die("<script language=\"javascript\">$callback(".APP::ajaxRst($result, 0, '', true).");$redirect</script>");
 	}
@@ -404,7 +449,7 @@ class event_mod {
 	function _get_wb_content($data=array(),$eid){
 		//生成短链接
 		$e_url = W_BASE_HTTP.URL('event.details',array('eid'=>$eid));
-		$wb = '我发起了一个活动，大家都来关注一下：' . $data['title'] . ' ' . $e_url;
+		$wb = L('controller__event__shareEvent') . $data['title'] . ' ' . $e_url;
 		return $wb;
 	}
 }

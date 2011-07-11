@@ -11,7 +11,7 @@
 <?php TPL::plugin('wap/include/my_preview', '', false); ?>
 <?php TPL::plugin('wap/include/msg_common', '', false); ?>
 <div class="c">
-收到的评论 <a href="<?php echo WAP_URL('index.messages', 'type=2&ctype=2'); ?>">发出的评论</a>
+	<?php LO('index__comment__comments');?> <a href="<?php echo WAP_URL('index.messages', 'type=2&ctype=2'); ?>"><?php LO('index__comment__commentsend');?></a>
 <div class="s"></div>
 <?php if (!empty($list)): ?>
 	<?php foreach ($list as $comment): ?>
@@ -19,11 +19,11 @@
     	<tbody>
         	<tr>
             	<td>
-            	<?php if ($comment['status']['user']['id'] != USER::uid()): ?><a href="<?php echo WAP_URL('ta', 'id=' . $comment['status']['user']['id']); ?>"><?php echo F('verified', $comment['status']['user']); ?></a><?php else: ?>我<?php endif; ?>的微博:<?php echo F('escape', mb_strlen($comment['status']['text'], 'utf-8') > 15 ? mb_substr($comment['status']['text'], 0, 15, 'utf-8') . '...' : $comment['status']['text']); ?><br />
+				<?php if ($comment['status']['user']['id'] != USER::uid()): ?><a href="<?php echo WAP_URL('ta', 'id=' . $comment['status']['user']['id']); ?>"><?php echo F('verified', $comment['status']['user']); ?></a><?php else: ?><?php LO('index__comment__I');?><?php endif; ?><?php LO('index__comment__whoWeibo');?><?php echo F('escape', mb_strlen($comment['status']['text'], 'utf-8') > 15 ? mb_substr($comment['status']['text'], 0, 15, 'utf-8') . '...' : $comment['status']['text']); ?><br />
             	<?php if (isset($comment['reply_comment']) && !empty($comment['reply_comment'])): ?>
-            	--<?php if ($comment['reply_comment']['user']['id'] == USER::uid()): ?>我<?php else: ?><a href="<?php echo WAP_URL('ta', 'id=' . $comment['reply_comment']['user']['id']); ?>"><?php echo F('verified', $comment['reply_comment']['user']); ?></a><?php endif; ?>: <?php echo F('escape', $comment['reply_comment']['text']); ?><br />
+				--<?php if ($comment['reply_comment']['user']['id'] == USER::uid()): ?><?php LO('index__comment__I');?><?php else: ?><a href="<?php echo WAP_URL('ta', 'id=' . $comment['reply_comment']['user']['id']); ?>"><?php echo F('verified', $comment['reply_comment']['user']); ?></a><?php endif; ?>: <?php echo F('escape', $comment['reply_comment']['text']); ?><br />
             	<?php endif; ?>
-            	--<a href="<?php echo WAP_URL('ta', 'id=' . $comment['user']['id']); ?>"><?php echo F('verified', $comment['user']); ?></a>: <?php echo F('format_text', $comment['text']); ?> <?php echo F('format_time', $comment['created_at']); ?> <a href="<?php echo WAP_URL('wbcom.replyComment', array('mid' => $comment['status']['id'], 'cid' => $comment['id'], 'reply_user' => $comment['user']['screen_name'])); ?>">回复<?php echo $comment['user']['gender'] == 'f' ? '她' : '他'; ?></a>
+				--<a href="<?php echo WAP_URL('ta', 'id=' . $comment['user']['id']); ?>"><?php echo F('verified', $comment['user']); ?></a>: <?php echo F('format_text', $comment['text']); ?> <?php echo F('format_time', $comment['created_at']); ?> <a href="<?php echo WAP_URL('wbcom.replyComment', array('mid' => $comment['status']['id'], 'cid' => $comment['id'], 'reply_user' => $comment['user']['screen_name'])); ?>"><?php LO('index__comment__reply');?><?php echo $comment['user']['gender'] == 'f' ? L('index__comment__she') : L('index__comment__he'); ?></a>
             	</td>
             </tr>
         </tbody>
@@ -32,9 +32,9 @@
 	<?php endforeach; ?>
 <?php else: ?>
 	<?php if (V('g:page', 1) > 1):?>
-	<p>已到最后一页</p>
+	<p><?php LO('index__comment__endPage');?></p>
 	<?php else: ?>
-	<p>您还没有收到评论</p>
+	<p><?php Lo('index__comment__emptyTip');?></p>
 	<?php endif; ?>
 	<div class="s"></div>
 <?php endif; ?>

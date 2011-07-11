@@ -25,13 +25,14 @@ $(function(){
 	<div class="path"><p>当前位置：用户管理<span>&gt;</span>禁止用户</p></div>
     <div class="main-cont">
 		<form method='post' id='form' action=<?php echo URL('mgr/users.userAction');?>>
+		<input type="hidden" name="call_back" value="<?php echo isset($callBack) ? $callBack : ''; ?>" />
         <h3 class="title">用户封禁、屏蔽</h3>
 		<div class="set-area">
-        	<div class="form-area">
+        	<div class="form">
                 <div class="form-row">
                 	<label for="compere" class="form-field">要操作的用户</label>
                     <div class="form-cont">
-                        <input type="text" name='name' value='<?php if(isset($screen_name)){echo $screen_name;}?>'  class="input-txt txt-s1"/>
+                        <input type="text" name='name' value='<?php if(isset($screen_name)){echo $screen_name;}?>'  class="input-txt w130"/>
                     </div>
                 </div>
                 <div class="form-row">
@@ -43,7 +44,7 @@ $(function(){
                         <p><label for="s4"><input id="s4" name='type' value='3' <?php if(isset($type)) action(3,$type)?> class="ipt-radio" type="radio" />清除用户<span class="form-tips">（清除该用户在本站的所有信息）</span></label></p>
                     </div>
                 </div>
-				<div class="btn-area"><a href="#" class="general-btn btn-s2" id='submit'><span>确认</span></a></div>
+				<div class="btn-area"><a href="#" class="btn-general highlight" id='submit'><span>确认</span></a></div>
                
             </div>
         </div>

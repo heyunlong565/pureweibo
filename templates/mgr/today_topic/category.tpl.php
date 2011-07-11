@@ -18,7 +18,7 @@ function openPop(url,title) {
 			trigger:'#pop_ok'
 		},
 		dlgcfg:{
-			cs:'add-topic win-fixed',
+			cs:'win-topic win-fixed',
 			onViewReady:function(View){
 				var self=this;
 				$(View).find('#pop_cancel').click(function(){
@@ -34,14 +34,14 @@ function openPop(url,title) {
 <body class="main-body">
 	<div class="path"><p>当前位置：内容管理<span>&gt;</span>话题</p></div>
     <div class="main-cont">
-    	<h3 class="title"><a class="general-btn" href="javascript:openPop('<?php echo URL('mgr/weibo/todayTopic.addCategory');?>','添加话题列表');"><span>添加话题列表</span></a>话题列表</h3>
+    	<h3 class="title"><a class="btn-general" href="javascript:openPop('<?php echo URL('mgr/weibo/todayTopic.addCategory');?>','添加话题列表');"><span>添加话题列表</span></a>话题列表</h3>
 		<div class="set-area">
             <table class="table" cellpadding="0" cellspacing="0" width="100%" border="0">
                 <colgroup>
-                    <col class="h-w70"/>
+                    <col class="w70"/>
                     <col />
-                    <col class="h-w150" />
-                    <col class="h-w160" />
+                    <col class="w150" />
+                    <col class="w160" />
                 </colgroup>
                 <thead class="tb-tit-bg">
                 <tr>
@@ -79,7 +79,7 @@ function openPop(url,title) {
             </table>
         </div>   
     </div>
-<div id="pop_window" class="win-pop win-fixed add-topic hidden"></div>
+<div id="pop_window" class="win-pop win-fixed win-topic hidden"></div>
 <div id="pop_mask" class="mask hidden"></div>
 </body>
 </html>

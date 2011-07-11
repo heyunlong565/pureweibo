@@ -190,7 +190,7 @@ class user_recommend_mod extends action
 	*/
 	function delUserById() 
 	{
-		$uid 		= (int)V('r:uid',0);		//用户uid
+		$uid 		= V('r:uid',0);		//用户uid
 		$group_id 	= (int)V('r:group_id','');	//类别id
 		$json = V('g:json', false);		// 是否返回json
 
@@ -290,7 +290,7 @@ class user_recommend_mod extends action
 	 */
 	function setUserRemark() {
 		$group_id = (int)V('r:group_id',0);	//类别id
-		$uid = (int)V('r:uid',0);	//用户id
+		$uid = V('r:uid',0);	//用户id
 		$remark = trim(V('p:remark',''));	//备注
 		$json = V('g:json', false);		// 是否返回json
 

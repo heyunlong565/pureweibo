@@ -11,8 +11,8 @@
 
 <div class="hot-mblog">
     <div class="tab-s2">
-        <span class="current"><span><a href="javascript:;">热门转发</a></span></span>
-        <span><span><a href="javascript:;">热门评论</a></span></span>
+        <span class="current"><span><a href="javascript:;"><?php LO('modules_component_component_1_hotForward');?></a></span></span>
+        <span><span><a href="javascript:;"><?php LO('modules_component_component_1_hotComment');?></a></span></span>
     </div>
 <?php
 ?>

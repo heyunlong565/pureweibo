@@ -5,6 +5,7 @@ var undefined;
 var doc = document;
 var T = X.ax.Tpl;
 var ui = X.ui;
+var getText = X.lang.getText;
 
 /**
  * @class Xwb.ui.Dialog
@@ -33,7 +34,7 @@ ui.Dialog = X.reg('Dlg', Util.create(ui.Box, function(father){
         
         contentHtml : 'DialogContent',
         
-        focusBtnCs : 'highlight',
+        focusBtnCs : 'btn-s1-light',
         
         mask : true,
         
@@ -142,16 +143,16 @@ ui.MsgBox = X.reg('msgbox', {
         if(!w){
             w = this.sysBox =  X.use('Dlg', {
                 appendTo:doc.body,
-                title:'提示',
+                title:getText('提示'),
                 dlgContentHtml : 'MsgDlgContent',
                 mask : true,
                 //对话框默认按钮
                 buttons : [
-                  {title: '确&nbsp;定',     id :'ok'},
-                  {title: '取&nbsp;消',     id :'cancel'},
-                  {title: '&nbsp;是&nbsp;', id :'yes'},
-                  {title: '&nbsp;否&nbsp;', id :'no'},
-                  {title: '关&nbsp;闭',     id :'close'}
+                  {title: getText('确&nbsp;定'),     id :'ok'},
+                  {title: getText('取&nbsp;消'),     id :'cancel'},
+                  {title: getText('&nbsp;是&nbsp;'), id :'yes'},
+                  {title: getText('&nbsp;否&nbsp;'), id :'no'},
+                  {title: getText('关&nbsp;闭'),     id :'close'}
                 ],
                 
                 /***/
@@ -224,8 +225,8 @@ ui.MsgBox = X.reg('msgbox', {
                 //对话框默认按钮
                 defBtn:'ok',
                 buttons : [
-                  {title: '确&nbsp;定',     id :'ok'},
-                  {title: '取&nbsp;消',     id :'cancel'}
+                  {title: getText('确&nbsp;定'),     id :'ok'},
+                  {title: getText('取&nbsp;消'),     id :'cancel'}
                 ],
                 setAnchor : function(anchorElem){
                     this.anchorEl = anchorElem;
@@ -404,7 +405,7 @@ ui.MsgBox = X.reg('msgbox', {
      * @param {String} defaultButton
      */
     confirm : function(title, msg, callback, def){
-        this.alert(title || '提示', msg, callback, 'ok|cancel', 'ask', def||'ok');
+        this.alert(title || getText('提示'), msg, callback, 'ok|cancel', 'ask', def||'ok');
     },
     /**
      * @param {String} title

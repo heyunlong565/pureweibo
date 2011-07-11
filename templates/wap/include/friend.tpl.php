@@ -16,9 +16,9 @@
 		    
                     ?>
             	<td><a href="<?php echo $ta_href;?>"><img src="<?php echo $userinfo['face'];?>" alt="userName" /></a></td>
-                <td><a href="<?php echo $ta_href;?>"><?php echo F('verified', $userinfo)?></a><br />粉丝<?php echo $userinfo['followers_count']?>人<br />
+                <td><a href="<?php echo $ta_href;?>"><?php echo F('verified', $userinfo)?></a><br /><?php LO('include__friend__fans',$userinfo['followers_count']);?><br />
                 <?php
-                $genderChar=($userinfo['gender']=='m'?'他':'她');
+                $genderChar=($userinfo['gender']=='m'?L('include__friend__genderMale'):L('include__friend__genderFemale'));
                 ?>
                 
                 <?php
@@ -26,16 +26,16 @@
                 if(in_array($userinfo['id'],$fids)):
                 ?>
 		
-                已关注
+                <?php LO('include__friend__followed');?>
 		
 		<?php
 		elseif($userinfo['id']==USER::uid()):
 		?>
-		我自己
+		<?php LO('include__friend__mine');?>
                 <?php
                 else:
                 ?>
-                <a href="<?php echo WAP_URL('wbcom.addFollow','id='.$userinfo['id'])?>">关注<?php echo $genderChar?></a>                
+                <a href="<?php echo WAP_URL('wbcom.addFollow','id='.$userinfo['id'])?>"><?php LO('include__friend__follow');?><?php echo $genderChar?></a>                
                 <?php
                 endif;
                 ?>

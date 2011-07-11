@@ -14,7 +14,8 @@
         Req = X.request,
         Util = X.util,
         Box = X.ui.MsgBox,
-        Pagelet = X.ax.Pagelet;
+        Pagelet = X.ax.Pagelet,
+        getText = X.lang.getText;
 		        
     /**
      * @namespace
@@ -74,10 +75,12 @@
                     
                     // 内容转发区内的微博
                     wbd  = wbsData[wid];
-                    var rt = wbd.rt;
-                    if(rt && (cntd = cntData[rt.id])){
-                        jq = jq.find('.forward');
-                        self.renderInnerWeiboCounter(jq, cntd);
+                    if (wbd){
+                        var rt = wbd.rt;
+                        if(rt && (cntd = cntData[rt.id])){
+                            jq = jq.find('.forward');
+                            self.renderInnerWeiboCounter(jq, cntd);
+                        }
                     }
                 });
             }
@@ -87,20 +90,20 @@
         renderWeiboCounter : function(jq, cntd){
             // 存在评论
             if(cntd[0])
-                jq.find('#cm').text('评论(' + cntd[0] + ')');
+                jq.find('#cm').text( getText('评论') + '(' + cntd[0] + ')');
             // 存在转发
             if(cntd[1])
-                jq.find('#fw').text('转发(' + cntd[1] + ')');
+                jq.find('#fw').text( getText('转发') + '(' + cntd[1] + ')');
         },
         
         // 内容转发区内的微博数据更新
         renderInnerWeiboCounter : function(jq, cntd){
             // 存在评论
             if(cntd[0])
-                jq.find('#lk_cm').text('原文评论(' + cntd[0] + ')');
+                jq.find('#lk_cm').text( getText('原文评论') + '(' + cntd[0] + ')');
             // 存在转发
             if(cntd[1])
-                jq.find('#lk_fw').text('原文转发(' + cntd[1] + ')');
+                jq.find('#lk_fw').text( getText('原文转发') + '(' + cntd[1] + ')');
         }
     });
 
@@ -180,7 +183,8 @@
 		    	,closeUploadImg : function(){
 		    		var rel = this.pwImg.attr('rel');
 		    		if(rel){
-		    			this.pwImg.attr({'rel':'','src':Req.basePath+'img/upload_pic.png'});
+						var language = getCfg('language');
+		    			this.pwImg.attr({'rel':'','src':Req.basePath+'img/' + (language == 'zh_cn' ? '/' : language + '/') + 'upload_pic.png'});
 		    			this.delImg.cssDisplay(false);
 		    			this.getBackPhoto(false,'');
 		    		}
@@ -221,7 +225,7 @@
 		    	//上传图片	
 		    	,change:function(fileVal){
 					if(fileVal && !this.checkImg(fileVal)){
-						Box.alert('','只支持 jpg、png的图片。');
+						Box.alert('', getText('只支持{0}格式的图片。', 'jpg、png') );
 						this.back_form[0].reset();
 						return;
 					}
@@ -249,7 +253,7 @@
 					var e = Req.parseProtocol(ret);
 					this.back_form[0].reset();
 					if(typeof e != 'object'){
-					    Box.alert('提示', "上传失败!");	
+					    Box.alert( getText('提示'), getText("上传失败!"));	
 					    return;
 					}					
 					if (e.isOk()&&e.getRaw().raw.rst !== false) {
@@ -273,24 +277,25 @@
 					}else {
 						var errStr="";
 						switch( e.raw.raw.errno ){
-							case 3040010: errStr="上传图片失败";break;
-							case 3040012: errStr="上传背景图片的大小不能超过2M，请重新选择";break;
+							case 3040010: errStr= getText("上传图片失败");break;
+							case 3040012: errStr= getText("上传背景图片的大小不能超过2M，请重新选择");break;
 							case 610003:
-							case 3040013: errStr="上传图片类型不符合要求";break;
-							default : errStr="上传图片失败";break;
+							case 3040013: errStr= getText("上传图片类型不符合要求");break;
+							default : errStr= getText("上传图片失败");break;
 						}
-						Box.alert('提示', errStr);	
+						Box.alert(getText('提示'), errStr);	
 					}
 				}
 				//上传图片结束	
 				
 				//选择皮肤后加载新css
 				,changeCss : function(skin, id){
+					var cssFileName = getCfg('language') === "zh_tw"?'/skin_zh_tw.css':'/skin.css';
 			        var self = this;
 			        var has = false;
 					function updStyle(url,obj){
 					    if(!url){				        	
-							url = self.address+'css/default/'+skin+'/skin.css';
+							url = self.address+'css/default/'+skin+cssFileName;
 						}else{
 							url = self.address+url;
 						}
@@ -304,6 +309,7 @@
 										clearInterval(ti);
 										$(obj).remove();
 										Util.getClassByName('html')['backgroundImage'] = "url()";
+										self.loadLanguageCss();
 									}
 								} catch (e){}
 							}, 10);
@@ -314,25 +320,24 @@
 								  clearInterval(fi);
 								  $(obj).remove();
 								  Util.getClassByName('html')['backgroundImage'] = "url()"
+								  self.loadLanguageCss();
 								} catch (e){}
 							  }, 10);
 						}
 						$('head').append(fileref);		
-							//setTimeout(function(){Util.getClassByName('html')['backgroundImage'] = "url()";},200);
 			        }
 					
-			        //$('#'+this.customLinkId).remove();	
+					$('link[href$="zh_tw.css"]').remove();//delete language Css
 			        $('link[rel=stylesheet]').each(function(){
-			            if(this.href.indexOf('/skin.css') !== -1 &&  this.id != self.customLinkId){
+			            if(this.href.indexOf(cssFileName) !== -1 &&  this.id != self.customLinkId){
 			            	has = true;
 			                // 保存最初skin，方便恢复
-			                if(!self.usedSkin)
-			                    self.usedSkin = this.href.match(/\/css\/(.*)\/skin.css/i)[1];			                    
-			                if(this.href.indexOf('/css/default/'+skin+'/skin.css')>0){//判断是否修改的css文件跟原来的一样，如果一样就先删除原来的再加入新的。
+			                //if(!self.usedSkin)
+			                //    self.usedSkin = this.href.match(/\/css\/(.*)\/skin.css/i)[1];			                    
+			                if(this.href.indexOf('/css/default/'+skin+cssFileName)>0){//判断是否修改的css文件跟原来的一样，如果一样就先删除原来的再加入新的。
 			                	var url = this.href;
 			                }else{								
-								updStyle('/css/default/'+skin+'/skin.css',this);
-
+								updStyle('/css/default/'+skin+cssFileName,this);
 			                }
 			            }
 			        });
@@ -348,6 +353,7 @@
 			        this.switcher = id;
 			    }
 			    
+				//创建样式
 			    ,createCss : function(url,id){
 			    	//if(id == this.customLinkId && $('#'+this.customLinkId).length) return;
     			    var fileref=document.createElement("link"); 
@@ -357,6 +363,13 @@
 		            fileref.setAttribute("id", id);
 		            return fileref;
 			    }
+				
+				//重新加载繁体语言样式
+				,loadLanguageCss : function(){		
+					if(getCfg('language') === "zh_tw"){				
+					    $('head').append(this.createCss(this.address+'css/default/language/zh_tw.css',''));
+					}
+				}
 			    
 			    //修改选择的皮肤样式(设置点击点)
 			    ,decorateSelected : function(currentEl){
@@ -385,7 +398,6 @@
 		    			if(!this.jqPreSel)
 		            		this.jqPreSel = this.jq('#switcherCom .'+this.skinSelectedCS);
 		            	if(this.jqPreSel.length){//已经选择过了
-
 							this.cacheCss = this.getTempStyle();
 		            		var rel = this.parseRel(this.jqPreSel.attr('rel'));
 							this.changeCss(rel['sk'],rel['id']);
@@ -397,11 +409,13 @@
 			    }
 						    
 			    ,loadLink : function(url,id){
+					var cssFileName = getCfg('language') === "zh_tw"?'/skin_zh_tw.css':'/skin.css';
 					var self = this;
 					var callBack = function(){
+						$('link[href$="zh_tw.css"]').remove();//delete language Css
 						// 判断是否存在选择的皮肤文件，有则删除
 					　　$('link[rel=stylesheet]').each(function(){
-				　　	    if(this.href.indexOf('/skin.css') !== -1 && this.id != self.customLinkId){
+				　　	    if(this.href.indexOf(cssFileName) !== -1 && this.id != self.customLinkId){
 				　　	    	$(this).remove();
 				　　	    }
 					　　});
@@ -409,7 +423,7 @@
 							self.addStyle('',self.cacheCss,'cathe');
 							self.cacheCss = '';
 						}
-						return;
+						
 /* 						var v = self.setCustomClass();
 						self.setPageStyle(v[0],v[1]);	 */					
 					}
@@ -427,10 +441,11 @@
 							}else{
 								rulee.innerHTML = d;
 							}
-							
+							self.loadLanguageCss();
 						});
 					}else{
 						callBack();
+						self.loadLanguageCss();
 					}
 			    }
 			    
@@ -944,7 +959,7 @@
 		            			data = this.getCustomData();
 		            		}else{
 		            			if(this.switcher == ''){
-		            				Box.alert('','请选择皮肤');
+		            				Box.alert('', getText('请选择皮肤') );
 		            				return;
 		            			}
 		            			data = {'skin_id':this.switcher};
@@ -1270,9 +1285,9 @@
                     		if(rel=='e:delSubject' || rel== 'e:addSubject')
                     		{
                     			if(d.type == 'add'){
-                    				ui.jq('.search-field span:last').replaceWith('<span>已关注(<a href="javascript:;" rel="e:delSubject">取消关注</a>)</span>');
+                    				ui.jq('.search-field span:last').replaceWith('<span>' + getText('已关注') + '(<a href="javascript:;" rel="e:delSubject">' + getText('取消关注') + '</a>)</span>');
                     			} else {
-                    				ui.jq('.search-field span:last').replaceWith('<span class="icon-follow"><a href="javascript:;" rel="e:addSubject">关注该话题</a></span>');
+                    				ui.jq('.search-field span:last').replaceWith('<span class="icon-follow"><a href="javascript:;" rel="e:addSubject">' + getText('关注该话题') + '</a></span>');
                     			}
                     		}
                     	}
@@ -1364,10 +1379,11 @@
         			   },
                        actionMgr:true,
                        onactiontrig : function(e){
+					  
                            switch(e.data.e){
                                case 'ufl' :
                                    var uid = e.get('u'), name = e.get('n');
-                                   Box.confirm('提示', '确定要取消关注' + name + '?', function (btnId) {
+                                   Box.confirm(getText('提示'), getText('确定要取消关注') + name + '?', function (btnId) {
                                        if (btnId === 'ok') {
                                            e.lock(1);
                                            X.request.unfollow(uid, '', function (ret) {
@@ -1492,11 +1508,11 @@
                                     }
                                 });
                                 if(!ids.length){
-                                    Box.tipWarn('请选择您要关注的人。');
+                                    Box.tipWarn( getText('请选择您要关注的人。') );
                                 }else {
                                     Req.follow(ids.join(','), 0, function(r){
                                         if (r.isOk()) {
-                                            $(e.src).replaceWith('<span class="followed-btn">已关注</span>');
+                                            $(e.src).replaceWith('<span class="followed-btn">' + getText('已关注') + '</span>');
                                         } else {
                                             Box.tipWarn(r.getMsg());
                                         }
@@ -1536,7 +1552,7 @@
                                 lock = r.isOk();
                                 if(lock){
                                     self.jq('a[name=follow]')
-                                        .replaceWith('<span class="followed-btn">已关注</span>');
+                                        .replaceWith('<span class="followed-btn">' + getText('已关注') + '</span>');
                                 }
                             });
                         }
@@ -1623,7 +1639,7 @@
                            if (n > 0) {
                               var m = (count % 100000) / 10000 >> 0;
                               m = m > 0 ? "." + m : "";
-                              count = "" + n + m + "万"
+                              count = "" + n + m + getText("万")
                            }
                         }
                         jq.find('#hotNum').text(count);
@@ -1719,8 +1735,8 @@
                                 
 	    						for(var i=0, l=data.length; i < l; i++) {
                                     var subject = data[i].subject;
-                                    var href = Req.mkUrl('search', 'weibo', {k: subject});
-	    							$(' <li rel="subject:' + subject + '"><a href="' + href +'" target="_blank">' +  subject + '</a> <span class="close hidden" rel="e:deleteSubject" title="删除">x</span> </li>').appendTo($('#subjectCount ul'));
+                                    var href = data[i].href;
+	    							$(' <li rel="subject:' + subject + '"><a href="' + href +'">' + subject + '</a> <span class="close hidden" rel="e:deleteSubject" title="' + getText('删除') + '">x</span> </li>').appendTo($('#subjectCount ul'));
                                 }
                                 
 				    			$('#subjectCount ul li').each(function(){
@@ -1728,7 +1744,7 @@
 				    			});
 				    			$('#subjectCount').prev('div.hd').find('h3 span').html('('+ r.getData().length +')');
 	    					} else {
-	    						Box.alert('提示',r.getError());
+	    						Box.alert(getText('提示'), r.getError());
 	    					}
 	    				});
                     });
@@ -1743,7 +1759,7 @@
 			    					if(r.isOk()){
 			    						X.fire('subrefresh',{'subject':e.get('subject'),type:'del'});
 			    					} else {
-			    						Box.alert('提示',r.getError());
+			    						Box.alert(getText('提示'), r.getError());
 			    					}
 			    					e.lock(0);
 			    				});
@@ -1769,9 +1785,10 @@
                     actionMgr : true,
                     onactiontrig : function(e){
                     	//分享微博框
-                    	var sendWeiBo = function(e,m1) {
+                    	var sendWeiBo = function(e,m1,t) {
                     			var box = X.use('postBox');
 							    var text = m1 || e.get('m');
+								if(t&&t=='share') box.setPostTitle(getText('分享给大家'));
 							    box.display(true)
 							       .reset()
 							       .selectionHolder.setText(text||'');
@@ -1784,10 +1801,10 @@
                     			if(e.get('other') == '1' ){
 	                    			Req.eventJoin({eid:e.get('eid')},function(r){
 	                    				if(r.isOk()){
-	                    					Box.tipOk('参加成功！',function(){
+	                    					Box.tipOk(getText('参加成功！'), function(){
 	                    						sendWeiBo(ActObj);
 	                    					});
-	                    					$(e.src).replaceWith('<a class="has-join-btn" href="#">已参加</a>');
+	                    					$(e.src).replaceWith('<a class="has-join-btn" href="#">' + getText('已参加') + '</a>');
 	                    				} else {
 	                    					Box.tipWarn(r.getError());
 	                    				}
@@ -1806,26 +1823,27 @@
                     					onViewReady:function(){
                     						var self=this;
                     						this.jq('#contact,#note').keydown(function(){
-                    							self.jq('.tips').removeClass('hidden');
-                    							self.jq('.warn').addClass('hidden');
+                    							self.jq('#tips').removeClass('hidden');
+                    							self.jq('#wrong').addClass('hidden');
                     						})
                     					},
                     					onactiontrig : function(e){
                     						switch(e.data.e){
                     							case 'sd':
+													var tips = this.jq('#tips') , warn = this.jq('#wrong');
                     								if(this.jq('#contact').val() == ''){
-                    									this.jq('.tips').addClass('hidden');
-                    									this.jq('.warn').removeClass('hidden').html('请输入联系方式！');
+                    									tips.addClass('hidden');
+                    									warn.removeClass('hidden').html( getText('请输入联系方式！') );
                     									return;
                     								}
 													if($.trim(this.jq('#note').val()) == ''){
-													    this.jq('.tips').addClass('hidden');
-                    									this.jq('.warn').removeClass('hidden').html('请填写备注');
+													    tips.addClass('hidden');
+                    									warn.removeClass('hidden').html( getText('请填写备注') );
                     									return;
 													}
                     								if( Util.calWbText(this.jq('#note').val(),100) < 0 ){
-                    									this.jq('.tips').addClass('hidden');
-                    									this.jq('.warn').removeClass('hidden').html('备注长度超过100！');
+                    									tips.addClass('hidden');
+                    									warn.removeClass('hidden').html( getText('备注长度超过100！') );
                     									return;
                     								}
                     								var self=this;
@@ -1834,11 +1852,11 @@
                     												note:this.jq('#note').val()
                     											  },function(r){
 									                    				if(r.isOk()){
-									                    					Box.tipOk('参加成功！',function(){
+									                    					Box.tipOk( getText('参加成功！') ,function(){
 									                    						sendWeiBo(ActObj);
 									                    						self.close();
 									                    					});
-									                    					$(ActObj.src).replaceWith('<a class="join-btn-disabled" href="#">我要参加</a>');
+									                    					$(ActObj.src).replaceWith('<a class="join-btn-disabled" href="#">'+getText('已参加')+'</a>');
 									                    				} else {
 									                    					Box.tipWarn(r.getError());
 									                    				}
@@ -1851,7 +1869,7 @@
                     			}
                     			break;
                     		case 'sd' :
-                    			sendWeiBo(ActObj,ActObj.get('m1'));
+                    			sendWeiBo(ActObj,ActObj.get('m1'),ActObj.get('t'));
                     			break;
                     		default :
                     				e.stopPropagation(false);
@@ -1865,7 +1883,7 @@
 			return new Pagelet({
 				ui:{
                 	actionMgr : true,
-                	exceedCS:'out140',
+                	exceedCS:'over-limit',
                     onactiontrig : function(e){
                     	switch(e.data.e){
 				            // 点击发送
@@ -1889,15 +1907,19 @@
                         this.checkText();
                     },
                     send: function(eid,doAction,e){
+						var self = this;
                     	e.lock(1);
                     	if(this.checkText()){
 	                    	Req.postReq(Req.apiUrl('action','update'),{'extra_params[event_id]':eid,doAction:doAction,text:this.jqInputor.val()},function(r){
 	                    		if(r.isOk()){
-	                    			Box.tipOk('发布成功',function(){
+	                    			Box.tipOk( getText('发布成功'), function(){
 	                    				window.location.reload();
 	                    			})
 	                    		} else {
-	                    			Box.tipWarn(r.getMsg());
+	                    			Box.tipWarn(r.getMsg(),function(){
+										if(r.getCode() == '30000')
+											self.jqInputor.val('#'+ self.jq('p.title a').html() +'#');
+									});
 	                    		}
 	                    		e.lock(0);
 	                    	})
@@ -1910,9 +1932,9 @@
                     	var ipt = this.jqInputor, val = $.trim( ipt.val() );
 				        var left = Util.calWbText(val);
 				        if (left >= 0)
-				            this.jqWarn.html('还可以输入'+left+'个字').removeClass(this.exceedCS);
+				            this.jqWarn.html( getText('您还可以输入{0}字', left) ).removeClass(this.exceedCS);
 				        else
-				            this.jqWarn.html('已超出'+Math.abs(left)+'个字').addClass(this.exceedCS);
+				            this.jqWarn.html( getText('已超出{0}字', Math.abs(left)) ).addClass(this.exceedCS);
 				 
 				        return left>=0 && val;
                     }

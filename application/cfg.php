@@ -19,8 +19,6 @@ define('IS_SESSION_START',		TRUE);
 ///定义用于wap session存储在url中的session名称
 define('WAP_SESSION_NAME','PHPSESSID');
 
-/// 是否启用日志 未启用时 写日志操作将被忽略
-define('ENABLE_LOG',			TRUE);
 /// 是否使用 CACHE 未启用时，缓存操作将被忽略
 define('ENABLE_CACHE',			TRUE);
 //----------------------------------------------------------------------
@@ -76,7 +74,7 @@ define('P_ADAPTER',		P_ROOT."/adapter");
 define('P_TEMPLATE',	P_ROOT."/../templates");
 /// 存放可变数据的目录名
 define('P_VAR_NAME',	'var');
-/// 系统文件数据（上传数据，缓存数据，字体，LOG 等）的存放目录
+/// 系统文件数据（上传数据，缓存数据）的存放目录
 define('P_VAR',			P_ROOT."/../". P_VAR_NAME);
 /// 系统永久存储的数据目录
 define('P_VAR_DATA',	P_VAR."/data");
@@ -87,6 +85,12 @@ define('P_VAR_UPLOAD',	P_VAR."/upload");
 
 /// 锁文件存放目录
 define('P_VAR_LOCK',	P_VAR . '/lock');
+
+/// 备份目录
+define('P_VAR_BACKUP',	P_VAR . '/backup');
+/// 数据库备份目录
+define('P_VAR_BACKUP_SQL',	P_VAR_BACKUP . '/sql');
+
 /// 用于组合URL 的 VAR 路径
 define('P_URL_UPLOAD',	P_VAR_NAME . "/upload" );
 
@@ -139,6 +143,12 @@ define('ENABLE_PAGE_HOOK',		TRUE);
 /// 是否启用模块 Action hook
 define('ENABLE_ACTION_HOOK',	TRUE);
 
+/// 是否开启全页面的控制器级缓存
+define('CTRL_CACHE_HOOK_ENABLE', TRUE);
+/// 是否开启PAGELETS(页面碎片)的级缓存
+define('PLS_CACHE_HOOK_ENABLE', TRUE);
+/// 控制器、PAGELET 缓存HOOK  X_CACHE_HOOK_PREFIX+模块方法名 HOOK方法将返回 array('K'=>'keystr'/*缓存KEY*/,'T'=>300/*缓存时间*/);
+define('X_CACHE_HOOK_PREFIX', '_xcache_');
 //----------------------------------------------------------------------
 /// 用于存储全局数据的变量名
 define('V_GLOBAL_NAME',			"__GG");

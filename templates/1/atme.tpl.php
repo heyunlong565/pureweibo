@@ -21,9 +21,9 @@
 						<!-- 微博列表 开始-->
 						<?php
 								$param = array(
-									'not_found_msg' => '找不到符合条件的微博，返回查看<a href="'. URL('index') . '">全部微博</a>',
-									'list_title'=>'提到我的',
-									'empty_msg' => '目前，还没有人提到你呢，敬请期待。',
+									'not_found_msg' => L('index__atme__notFoundTip'),
+									'list_title'=> L('index__atme__listTitle'),
+									'empty_msg' => L('index__atme__emptyWeiboTip'),
 									);
 								Xpipe::pagelet('weibo.atme', $param );
 								?>
@@ -37,6 +37,7 @@
 					<!-- 用户标签 开始-->
 					<?php Xpipe::pagelet('common.userTag');?>
 					<?php Xpipe::pagelet('common.sideComponents', array('type'=>2) );?>
+						<?php echo F('show_ad', 'sidebar', '');?>
 				</div>
 			</div>
 			<!-- 底部 开始-->

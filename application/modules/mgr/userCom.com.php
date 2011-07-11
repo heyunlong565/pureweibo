@@ -447,6 +447,26 @@ class userCom {
 	}
 	
 	
-	
+	/**
+	 * 获取新浪关系的 本地关注排行版
+	 * @param $showNum
+	 */
+	function getSinaFollowerTop($showNum)
+	{
+		$db  	= APP::ADP('db');
+		$table	= $db->getTable(T_USERS);
+		$sql	= "Select sina_uid From $table Order By followers_count Desc Limit $showNum";
+		$temp	= $db->query($sql);
+		$list	= array();
+		
+		if (is_array($temp))
+		{
+			foreach($temp as $val)
+			{
+				array_push($list, $val['sina_uid']);
+			}	
+		}
+		return $list;
+	}
 	
 }

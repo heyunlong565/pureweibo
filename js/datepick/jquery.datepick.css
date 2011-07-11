@@ -1,6 +1,6 @@
 /* Default styling for jQuery Datepicker v4.0.4. */
 .datepick {background-color:#fff;border:1px solid #DADADA;-moz-border-radius:3px;-webkit-border-radius:3px;border-radius:3px;font-family: Arial,Helvetica,Sans-serif;}
-.datepick-popup {z-index: 1000;}
+.datepick-popup {z-index: 60000;}
 .datepick-disable {position: absolute;z-index: 100;background-color: white;opacity: 0.5;filter: alpha(opacity=50);}
 .datepick a {color: #3290D4;text-decoration: none;}
 .datepick a:visited {text-decoration:none;}

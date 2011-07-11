@@ -190,6 +190,11 @@ class index_mod
 	 */
 	function messages()
 	{
+		// 是否开启私信
+		if ( !HAS_DIRECT_MESSAGES ) {
+			APP::tips( array('tpl'=>'e404', 'msg'=>L('controller__common__pageNotExist')) );
+		}
+		
 		/// 页码数
 		$page = max(V('g:page'), 1);
 
@@ -294,7 +299,7 @@ class index_mod
 		$userinfo = APP::F('user_filter', $userinfo, true);
 		if (empty($userinfo)) {
 			/// 提示不存在
-			APP::tips(array('tpl' => 'e404', 'msg' => '抱歉你所访问的用户不存在'));
+			APP::tips(array('tpl' => 'e404', 'msg' => L('controller__common__userNotExist')));
 		}
 /*
 		//调用获取当前用户关注对象列表及最新一条微博信息api
@@ -358,7 +363,7 @@ class index_mod
 		$userinfo = F('user_filter', $userinfo['rst'], true);
 		if (empty($userinfo)) {
 			/// 提示不存在
-			APP::tips(array('tpl' => 'e404', 'msg' => '抱歉你所访问的用户不存在'));
+			APP::tips(array('tpl' => 'e404', 'msg' => L('controller__common__userNotExist')));
 		}
 
 		//调用获取当前用户粉丝列表及最新一条微博信息api
@@ -424,7 +429,7 @@ class index_mod
 		$userinfo = F('user_filter', $userinfo, true);
 		if (empty($userinfo)) {
 			/// 提示不存在
-			APP::tips(array('tpl' => 'e404', 'msg' => '抱歉你所访问的用户不存在'));
+			APP::tips(array('tpl' => 'e404', 'msg' => L('controller__common__userNotExist')));
 		} 
 
 		$modules = DS('PageModule.getPageModules', '', 2, 1);

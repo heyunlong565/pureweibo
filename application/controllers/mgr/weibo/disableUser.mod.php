@@ -91,7 +91,6 @@ class disableUser_mod extends action {
 						'sort' => 2,
 						'page' => 1
 					);
-			DR('xweibo/xwb.setToken','', 2);
 			$rst = DR('xweibo/xwb.searchUser','', $q);
 			if (!$rst['err']) {
 				$rst = $rst['rst'];

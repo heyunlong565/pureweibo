@@ -1,5 +1,5 @@
 <?php
-//$Id: button.tpl.php 15744 2011-05-12 01:38:52Z qijun1 $
+//$Id: button.tpl.php 17061 2011-06-13 01:31:06Z heli $
 if(!defined('IN_APPLICATION')){
 	exit('ACCESS DENIED!');
 }
@@ -55,12 +55,13 @@ $shareurl = W_BASE_HTTP. W_BASE_URL. 'share.html';
  ' var _w = {_w} , _h = {_h}; \n', 
   'var param = { \n', 
   '  url:location.href,\n',  
-  '  type:"{type}", /**type类型有a,b,c,d, ... ,g,h*/ \n', 
+  '  type:"{type}", /**type类型有b/d/f/h/j/l*/ \n', 
   '  count:"{count}", /**是否显示分享数，1显示(可选)*/ \n', 
   '  appkey:"<?php echo WB_AKEY; ?>", /**您申请的应用appkey,显示分享来源(可选)*/ \n', 
   '  title:encodeURI(document.title), /**分享的文字内容(可选，默认为所在页面的title)*/ \n', 
   '  relateUid:"{relateUid}", /**关联用户的UID，分享微博会@该用户(可选)*/ \n', 
-  '  rnd:new Date().valueOf() \n', 
+  '  rnd:new Date().valueOf(), \n', 
+  '	 lang:"<?php echo APP::getLang();?>" \n',
   '}\n', 
   'var temp = []; \n', 
   'for( var p in param ){ \n', 
@@ -69,27 +70,27 @@ $shareurl = W_BASE_HTTP. W_BASE_URL. 'share.html';
 'document.write(\'','<','iframe allowTransparency="true" frameborder="0" scrolling="no" src="<?php echo $shareurl;?>?\' + temp.join(\'&\') + \'" width="\'+ _w+\'" height="\'+_h+\'">','<','/iframe>\') \n', 
  
 ,'})()<','/script>'].join('');;
-		var count = '1', type = 'a',relateUid = '', _w= '190' , _h='32', v=0 ;
+		var count = '0', type = 'b',relateUid = '', _w= '190' , _h='32', v=0 ;
 		var val={
-			'a':{count:'1',_w:'190',_h:'32'},
+			//'a':{count:'1',_w:'190',_h:'32'},
 			'b':{count:'',_w:'158',_h:'32'},
-			'c':{count:'1',_w:'145',_h:'24'},
+			//'c':{count:'1',_w:'145',_h:'24'},
 			'd':{count:'',_w:'120',_h:'24'},
-			'e':{count:'1',_w:'118',_h:'16'},
+			//'e':{count:'1',_w:'118',_h:'16'},
 			'f':{count:'',_w:'105',_h:'16'},
-			'g':{count:'1',_w:'96',_h:'32'},
+			//'g':{count:'1',_w:'96',_h:'32'},
 			'h':{count:'',_w:'32',_h:'32'},
-			'i':{count:'1',_w:'88',_h:'25'},
+			//'i':{count:'1',_w:'88',_h:'25'},
 			'j':{count:'',_w:'24',_h:'24'},
-			'k':{count:'1',_w:'75',_h:'16'},
+			//'k':{count:'1',_w:'75',_h:'16'},
 			'l':{count:'',_w:'16',_h:'16'}
-		}
+		};
 		replachScript();
 		$('[rel="change"]').each(function(){
 			$(this).change(function(){
 				var self=$(this);
 				if(this.name == 'site_name'){
-					$('.a-error').addClass('hidden');
+					$('.tips-error').addClass('hidden');
 					if($(this).val() == ''){
 						relateUid = '0';
 						$('#txtout').html('').hide();	
@@ -106,13 +107,13 @@ $shareurl = W_BASE_HTTP. W_BASE_URL. 'share.html';
 						success:function(r){
 							if(r.errno == 0){
 								$('#txtout').html('预览：（分享自 <a href="index.php?m=ta&id=' + r.rst.id + '" target="_blank">@'+ r.rst.screen_name + '</a>）').show();
-								$('.a-error').addClass('hidden');
+								$('.tips-error').addClass('hidden');
 								relateUid=r.rst.id;
 								replachScript();
 							} else {
 								relateUid= '0' ;
 								$('#txtout').hide();
-								$('.a-error').html(r.err).removeClass('hidden');
+								$('.tips-error').html(r.err).removeClass('hidden');
 							}
 						}
 					})
@@ -124,7 +125,8 @@ $shareurl = W_BASE_HTTP. W_BASE_URL. 'share.html';
 					v+= parseInt( allradio.get(i).value );
 				}
 				type = String.fromCharCode( 96 + v );
-				count = val[type].count;
+				//count = val[type].count;
+				count = 0;
 				_w = val[type]._w;
 				_h = val[type]._h;
 				replachScript();
@@ -152,7 +154,7 @@ $shareurl = W_BASE_HTTP. W_BASE_URL. 'share.html';
     <div class="main-cont">
     	<h3 class="title">转发按钮</h3>
     	<div class="set-area">
-        	<div class="form-area transmit-form">
+        	<div class="form">
             	<div class="form-row">
                 	<p class="form-tips">将转发按钮嵌入到你的网站里，你的访客点击它就能将你的网页转发到你的微博，同时也会转发到新浪微博，分享给他们的粉丝，增加你的网站的访问流量。</p>
                 </div>
@@ -176,16 +178,18 @@ $shareurl = W_BASE_HTTP. W_BASE_URL. 'share.html';
                         <label for="model5">小</label>
                     </div>
                 </div>
+                <!--
                 <div class="form-row">
                 	<label class="form-field">&nbsp;</label>
                     <div class="form-cont">
                         <label for="show-number">
-                            <input id="show-number" class="ipt-checkbox" type="checkbox" checked="checked" value="-1" rel="change"/>
+                            <input id="show-number" class="ipt-checkbox" type="checkbox" value="-1" rel="change"/>
                             <strong>显示转发数</strong> 
                             <span class="form-tips">显示当前页面的url在微博被转次数</span>
                         </label>
                     </div>
                 </div>
+                -->
                 <div class="form-row">
                     <label class="form-field">预览</label>
                     <div class="form-cont">
@@ -193,10 +197,10 @@ $shareurl = W_BASE_HTTP. W_BASE_URL. 'share.html';
                     </div>
                 </div>
                 <div class="form-row">
-                    <label class="form-field">关联帐号</label>
+                    <label for="site-name" class="form-field">关联帐号</label>
                     <div class="form-cont">
-                        <input name="site_name" class="input-txt form-el-w200"  type="text" value="" rel="change">
-						<span class="a-error tips-error hidden">错误信息</span>
+                        <input id="site-name" name="site_name" class="input-txt w200"  type="text" value="" rel="change">
+						<span class="tips-error hidden">错误信息</span>
                         <p class="form-tips">该帐号转发时会被@,并在转发后提示关注他。</p>
 						<span id="txtout" class="form-tips"></span>
                     </div>

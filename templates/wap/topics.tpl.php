@@ -17,11 +17,11 @@
 		
 		if(!isset($type)||$type==1||!$type):
 		?>
-		<span>最近1小时</span>&nbsp;
+		<span><?php LO('pub__topics__label_lately');?></span>&nbsp;
 		<?php
 		else:
 		?>
-		<a href="<?php echo WAP_URL('pub.topics', "type=1");?>">最近1小时</a>&nbsp;
+		<a href="<?php echo WAP_URL('pub.topics', "type=1");?>"><?php LO('pub__topics__label_lately');?></a>&nbsp;
 		<?php
 		endif;
 		?>
@@ -29,11 +29,11 @@
 		<?php
 		if($type==2):
 		?>
-		<span>今日</span>&nbsp;
+		<span><?php LO('pub__topics__label_today');?></span>&nbsp;
 		<?php
 		else:
 		?>
-		<a href="<?php echo WAP_URL('pub.topics', "type=2");?>">今日</a>&nbsp;
+		<a href="<?php echo WAP_URL('pub.topics', "type=2");?>"><?php LO('pub__topics__label_today');?></a>&nbsp;
 		<?php
 		endif;
 		?>
@@ -41,11 +41,11 @@
 		<?php
 		if($type==3):
 		?>
-		<span>本周</span>&nbsp;
+		<span><?php LO('pub__topics__label_thisWeek');?></span>&nbsp;
 		<?php
 		else:
 		?>
-		<a href="<?php echo WAP_URL('pub.topics', "type=3");?>">本周</a>
+		<a href="<?php echo WAP_URL('pub.topics', "type=3");?>"><?php LO('pub__topics__label_thisWeek');?></a>
 		<?php
 		endif;
 		?>
@@ -57,7 +57,7 @@
     <ul class="t-l">
 	<?php
 	if(empty($data)) {
-		echo "<li><a href=".WAP_URL('pub.topics', "type=".V('g:type',1)).">没有数据了，返回首页</a></li>";
+		echo "<li><a href=".WAP_URL('pub.topics', "type=".V('g:type',1)).">".L('pub__topics__label_noFoundData')."</a></li>";
 	}
 	$index=1+($page-1)*$limit;
 	foreach($data as $d):

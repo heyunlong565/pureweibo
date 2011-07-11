@@ -78,7 +78,9 @@
                                         })
                                         $(input).attr('checked',true);
                                         jq.find('.select-user .all span').text(input.length);
-                                    }
+                                    } else {
+										jqTrig.data('panel', $(''));
+									}
                                     e.lock(0);
                                 });
                             }else {
