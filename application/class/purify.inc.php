@@ -975,12 +975,22 @@
 			2231799534 => '连云港同城会V',
 			0 => '',
 			1 => '');
+		static $bannedapps = array(
+			'<a href="http://badge.weibo.com/" rel="nofollow">勋章馆</a>',
+			'<a href="http://client.sina.com.cn/2011snowbeer/" rel="nofollow">雪花啤酒勇闯天涯活动</a>',
+			'<a href="http://hd.360.cn" rel="nofollow">360电脑达人晒开机</a>',
+			'<a href="" rel="nofollow">placeholder</a>');
 		if (array_key_exists($item['user']['id'], $bannedlist)) {
 			return 0;
 		}
 		//var_dump($item);
 		if (array_key_exists('retweeted_status', $item)) {
 			if (array_key_exists($item['retweeted_status']['user']['id'], $bannedlist)) {
+				return 0;
+			}
+		}
+		if (array_key_exists('source', $item)) {
+			if (in_array($item['source'], $bannedapps)) {
 				return 0;
 			}
 		}
